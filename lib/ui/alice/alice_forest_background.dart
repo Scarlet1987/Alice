@@ -48,7 +48,9 @@ class AliceForestBackground extends StatelessWidget {
             ),
           ),
         ),
-        child,
+        // Positioned, not bare, so a scrolling child gets a bounded
+        // height to scroll in instead of an unbounded Stack height.
+        Positioned.fill(child: child),
       ],
     );
   }

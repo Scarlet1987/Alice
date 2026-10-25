@@ -13,9 +13,8 @@ import 'package:front_porch_ai/ui/alice/alice_creator_fields.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_mc_appearance.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_mc_voice.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_mc_world.dart';
+import 'package:front_porch_ai/ui/alice/alice_creator_notes.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
-import 'package:front_porch_ai/ui/creator/sections/gear_section.dart';
-import 'package:front_porch_ai/ui/creator/sections/kardashev_section.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
 /// The Main Character pane.
@@ -85,38 +84,13 @@ class McPane extends StatelessWidget {
             hint: 'e.g. ze/zir, xe/xem, fae/faer…',
           ),
         ],
-        if (draft.showAllFields)
-          AliceCollapsibleSection(
-            title: 'Kardashev scale',
-            subtitle:
-                'How much energy this world\u2019s civilization commands; '
-                'it drives the whole loadout below.',
-            barColor: AppColors.porchAmberOf(context),
-            initiallyOpen: true,
-            child: KardashevSection(
-              selected: draft.kardashev,
-              locked: draft.kardashevLocked,
-              onSelect: draft.setKardashev,
-              onUnlock: draft.unlockKardashev,
-              beyondNameController: draft.beyondName,
-              beyondScopeController: draft.beyondScope,
-              beyondGearController: draft.beyondGear,
-            ),
-          ),
-        if (draft.showAllFields)
-          AliceCollapsibleSection(
-            title: 'Gear loadout',
-            subtitle:
-                'What you fight with, what protects you, what you wear — '
-                'checked against the Kardashev scale as you type.',
-            barColor: AppColors.frostAccentOf(context),
-            child: GearSection(
-              kardashevType: draft.kardashev,
-              offensiveController: draft.gearOffense,
-              defensiveController: draft.gearDefense,
-              clothingController: draft.gearClothing,
-            ),
-          ),
+        // Notes board, always visible: it replaces the gated
+        // Kardashev and Gear sections above, which hid those fields
+        // behind the show-all toggle. The old offense/defense/
+        // clothing controllers still save through the draft; the
+        // notes gear saves alongside them in the same card build.
+        const SizedBox(height: 10),
+        CreatorNotesBoard(draft: draft),
         AliceCollapsibleSection(
           title: 'Personality',
           subtitle: 'Tone, sarcasm, alignment, and the mission underneath.',

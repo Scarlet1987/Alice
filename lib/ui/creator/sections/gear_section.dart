@@ -53,7 +53,7 @@ GearVerdict checkGear(String text, KardashevType type) {
   ];
   if (godWords.any(t.contains)) return GearVerdict.godMode;
   // Over-scale markers by type.
-  final typeIndex = type.index; // type0=0 .. beyond=4
+  final typeIndex = type.index; // type0=0 .. beyond=6
   const dysonWords = ['dyson', 'star lift', 'stellar engine'];
   const galacticWords = ['galaxy', 'galactic', 'black hole'];
   if (typeIndex < 2 && dysonWords.any(t.contains)) {

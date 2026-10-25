@@ -134,6 +134,53 @@ class AliceCreatorDraft extends ChangeNotifier {
   final gearDefense = TextEditingController();
   final gearClothing = TextEditingController();
 
+  /// Notes-board gear, in the notes page's order. Keys are
+  /// "Section — Field"; each key holds one controller per + press,
+  /// starting with one. This is draft state only — it is saved
+  /// through the existing card build below, not a new backend.
+  static const kNotesGearKeys = [
+    'Accessories — Earrings and piercings',
+    'Accessories — Necklace',
+    'Accessories — Amulet',
+    'Accessories — Collar',
+    'Accessories — Thigh accessories',
+    'Armor — Chest',
+    'Armor — Torso',
+    'Armor — Legs',
+    'Armor — Thigh',
+    'Weapons — Long range',
+    'Weapons — Close range',
+    'Weapons — Intimate range',
+    'Clothing — Intimates',
+    'Clothing — Style of intimates',
+    'Clothing — Outer wear — Head',
+    'Clothing — Outer wear — Torso',
+    'Clothing — Outer wear — Chest',
+    'Clothing — Outer wear — Legs',
+    'Clothing — Outer wear — Feet',
+    'Items — Consumables — Health potion',
+    'Items — Consumables — Mana potion',
+    'Items — Consumables — Consumable other — food, water, etc.',
+  ];
+
+  final Map<String, List<TextEditingController>> notesGear = {};
+
+  List<TextEditingController> notesControllersFor(String key) {
+    return notesGear.putIfAbsent(key, () => [TextEditingController()]);
+  }
+
+  void addNotesField(String key) {
+    notesControllersFor(key).add(TextEditingController());
+    notifyListeners();
+  }
+
+  void removeNotesField(String key) {
+    final list = notesGear[key];
+    if (list == null || list.length <= 1) return;
+    list.removeLast().dispose();
+    notifyListeners();
+  }
+
   // ── Main Character: personality ───────────────────────────────────
   final personality = TextEditingController();
   final tone = TextEditingController();
@@ -318,6 +365,9 @@ class AliceCreatorDraft extends ChangeNotifier {
         'Defensive: ${gearDefense.text.trim()}',
       if (gearClothing.text.trim().isNotEmpty)
         'Clothing: ${gearClothing.text.trim()}',
+      for (final key in kNotesGearKeys)
+        if (notesGear[key]?.any((c) => c.text.trim().isNotEmpty) ?? false)
+          '$key: ${notesGear[key]!.where((c) => c.text.trim().isNotEmpty).map((c) => c.text.trim()).join('; ')}',
     ].join('\n');
 
     final scaleLine =
@@ -401,6 +451,11 @@ class AliceCreatorDraft extends ChangeNotifier {
 
   @override
   void dispose() {
+    for (final list in notesGear.values) {
+      for (final c in list) {
+        c.dispose();
+      }
+    }
     for (final c in [
       mcName,
       mcRole,

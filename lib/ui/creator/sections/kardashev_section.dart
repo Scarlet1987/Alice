@@ -27,7 +27,7 @@ import 'package:front_porch_ai/ui/theme/app_colors.dart';
 import 'package:front_porch_ai/ui/theme/porch_design.dart';
 
 /// The Kardashev types.
-enum KardashevType { type0, type1, type2, type3, beyond }
+enum KardashevType { type0, type1, type2, type3, type4, type5, beyond }
 
 extension KardashevTypeLabel on KardashevType {
   String get label {
@@ -35,11 +35,15 @@ extension KardashevTypeLabel on KardashevType {
       case KardashevType.type0:
         return 'Type 0';
       case KardashevType.type1:
-        return 'Type I';
+        return 'Type 1';
       case KardashevType.type2:
-        return 'Type II';
+        return 'Type 2';
       case KardashevType.type3:
-        return 'Type III';
+        return 'Type 3';
+      case KardashevType.type4:
+        return 'Type 4';
+      case KardashevType.type5:
+        return 'Type 5';
       case KardashevType.beyond:
         return 'Beyond';
     }
@@ -58,8 +62,16 @@ extension KardashevTypeLabel on KardashevType {
             '(≈10²⁶–10²⁸ W, e.g. a Dyson sphere).';
       case KardashevType.type3:
         return 'Galactic — commands a galaxy\u2019s total energy (≈10³⁶ W).';
+      case KardashevType.type4:
+        return 'Universal — controls all the energy of one universe. '
+            'Can cross the universe, bend space and time, and use whole '
+            'galaxies like tools. Can\u2019t yet leave its universe.';
+      case KardashevType.type5:
+        return 'Multiversal — controls energy across many universes. '
+            'Can step between realities and use more than one universe '
+            'at once. Its only real limit is what you decide it is.';
       case KardashevType.beyond:
-        return 'Your definition. Past Type III the app presets no wattage '
+        return 'Your definition. Past Type 5 the app presets no wattage '
             '— your definition is the scale check here, under the same '
             'ceiling as every world.';
     }
@@ -133,8 +145,8 @@ class _KardashevSectionState extends State<KardashevSection> {
       children: [
         Text(
           'The base categories. Types 1 to 3 stay exactly as Kardashev '
-          'defined them. Type 0 sits below; anything past Type 3 is yours '
-          'to define.',
+          'defined them. Types 4 and 5 extend the scale; Type 0 sits '
+          'below; anything past Type 5 is yours to define.',
           style: PorchType.hint(context),
         ),
         const SizedBox(height: PorchSpacing.sm),

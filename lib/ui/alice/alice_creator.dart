@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:front_porch_ai/ui/alice/alice_creator_draft.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_mc.dart';
+import 'package:front_porch_ai/ui/alice/alice_forest_background.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_npc.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_user.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
@@ -113,62 +114,66 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
     return ListenableBuilder(
       listenable: _draft,
       builder: (context, _) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 860),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const AliceScreenTitle(title: 'Character creator'),
-                            const SizedBox(height: 2),
-                            Text(
-                              'You author the main character and yourself; '
-                              'the AI writes the supporting cast.',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.hintColor,
+        return AliceForestBackground(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 860),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const AliceScreenTitle(
+                                title: 'Character creator',
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              Text(
+                                'You author the main character and yourself; '
+                                'the AI writes the supporting cast.',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.hintColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      AliceButton(
-                        label: 'What do these words mean?',
-                        ghost: true,
-                        small: true,
-                        onPressed: _showGlossary,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  AliceSegmentedControl<CreatorTab>(
-                    values: CreatorTab.values,
-                    labels: const ['Main Character', 'NPC', 'You (User)'],
-                    selected: _draft.tab,
-                    onChanged: _draft.setTab,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _tabDescription,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.hintColor,
+                        AliceButton(
+                          label: 'What do these words mean?',
+                          ghost: true,
+                          small: true,
+                          onPressed: _showGlossary,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  switch (_draft.tab) {
-                    CreatorTab.mc => McPane(draft: _draft),
-                    CreatorTab.npc => NpcPane(draft: _draft),
-                    CreatorTab.user => UserPane(draft: _draft),
-                  },
-                ],
+                    const SizedBox(height: 14),
+                    AliceSegmentedControl<CreatorTab>(
+                      values: CreatorTab.values,
+                      labels: const ['Main Character', 'NPC', 'You (User)'],
+                      selected: _draft.tab,
+                      onChanged: _draft.setTab,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _tabDescription,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    switch (_draft.tab) {
+                      CreatorTab.mc => McPane(draft: _draft),
+                      CreatorTab.npc => NpcPane(draft: _draft),
+                      CreatorTab.user => UserPane(draft: _draft),
+                    },
+                  ],
+                ),
               ),
             ),
           ),
