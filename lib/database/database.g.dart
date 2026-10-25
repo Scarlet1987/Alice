@@ -1,0 +1,16899 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'database.dart';
+
+// ignore_for_file: type=lint
+class $CharactersTable extends Characters
+    with TableInfo<$CharactersTable, Character> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CharactersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _personalityMeta = const VerificationMeta(
+    'personality',
+  );
+  @override
+  late final GeneratedColumn<String> personality = GeneratedColumn<String>(
+    'personality',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _scenarioMeta = const VerificationMeta(
+    'scenario',
+  );
+  @override
+  late final GeneratedColumn<String> scenario = GeneratedColumn<String>(
+    'scenario',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _firstMessageMeta = const VerificationMeta(
+    'firstMessage',
+  );
+  @override
+  late final GeneratedColumn<String> firstMessage = GeneratedColumn<String>(
+    'first_message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _mesExampleMeta = const VerificationMeta(
+    'mesExample',
+  );
+  @override
+  late final GeneratedColumn<String> mesExample = GeneratedColumn<String>(
+    'mes_example',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _systemPromptMeta = const VerificationMeta(
+    'systemPrompt',
+  );
+  @override
+  late final GeneratedColumn<String> systemPrompt = GeneratedColumn<String>(
+    'system_prompt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _postHistoryInstructionsMeta =
+      const VerificationMeta('postHistoryInstructions');
+  @override
+  late final GeneratedColumn<String> postHistoryInstructions =
+      GeneratedColumn<String>(
+        'post_history_instructions',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _alternateGreetingsMeta =
+      const VerificationMeta('alternateGreetings');
+  @override
+  late final GeneratedColumn<String> alternateGreetings =
+      GeneratedColumn<String>(
+        'alternate_greetings',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+    'tags',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _imagePathMeta = const VerificationMeta(
+    'imagePath',
+  );
+  @override
+  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
+    'image_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ttsVoiceMeta = const VerificationMeta(
+    'ttsVoice',
+  );
+  @override
+  late final GeneratedColumn<String> ttsVoice = GeneratedColumn<String>(
+    'tts_voice',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _folderIdMeta = const VerificationMeta(
+    'folderId',
+  );
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+    'folder_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lorebookMeta = const VerificationMeta(
+    'lorebook',
+  );
+  @override
+  late final GeneratedColumn<String> lorebook = GeneratedColumn<String>(
+    'lorebook',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _worldNamesMeta = const VerificationMeta(
+    'worldNames',
+  );
+  @override
+  late final GeneratedColumn<String> worldNames = GeneratedColumn<String>(
+    'world_names',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _memorySourcesMeta = const VerificationMeta(
+    'memorySources',
+  );
+  @override
+  late final GeneratedColumn<String> memorySources = GeneratedColumn<String>(
+    'memory_sources',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _evolvedPersonalityMeta =
+      const VerificationMeta('evolvedPersonality');
+  @override
+  late final GeneratedColumn<String> evolvedPersonality =
+      GeneratedColumn<String>(
+        'evolved_personality',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _evolvedScenarioMeta = const VerificationMeta(
+    'evolvedScenario',
+  );
+  @override
+  late final GeneratedColumn<String> evolvedScenario = GeneratedColumn<String>(
+    'evolved_scenario',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _evolutionCountMeta = const VerificationMeta(
+    'evolutionCount',
+  );
+  @override
+  late final GeneratedColumn<int> evolutionCount = GeneratedColumn<int>(
+    'evolution_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _primeAvatarIndexMeta = const VerificationMeta(
+    'primeAvatarIndex',
+  );
+  @override
+  late final GeneratedColumn<int> primeAvatarIndex = GeneratedColumn<int>(
+    'prime_avatar_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    description,
+    personality,
+    scenario,
+    firstMessage,
+    mesExample,
+    systemPrompt,
+    postHistoryInstructions,
+    alternateGreetings,
+    tags,
+    imagePath,
+    ttsVoice,
+    folderId,
+    lorebook,
+    worldNames,
+    memorySources,
+    evolvedPersonality,
+    evolvedScenario,
+    evolutionCount,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    primeAvatarIndex,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'characters';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Character> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('personality')) {
+      context.handle(
+        _personalityMeta,
+        personality.isAcceptableOrUnknown(
+          data['personality']!,
+          _personalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scenario')) {
+      context.handle(
+        _scenarioMeta,
+        scenario.isAcceptableOrUnknown(data['scenario']!, _scenarioMeta),
+      );
+    }
+    if (data.containsKey('first_message')) {
+      context.handle(
+        _firstMessageMeta,
+        firstMessage.isAcceptableOrUnknown(
+          data['first_message']!,
+          _firstMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mes_example')) {
+      context.handle(
+        _mesExampleMeta,
+        mesExample.isAcceptableOrUnknown(data['mes_example']!, _mesExampleMeta),
+      );
+    }
+    if (data.containsKey('system_prompt')) {
+      context.handle(
+        _systemPromptMeta,
+        systemPrompt.isAcceptableOrUnknown(
+          data['system_prompt']!,
+          _systemPromptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_history_instructions')) {
+      context.handle(
+        _postHistoryInstructionsMeta,
+        postHistoryInstructions.isAcceptableOrUnknown(
+          data['post_history_instructions']!,
+          _postHistoryInstructionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('alternate_greetings')) {
+      context.handle(
+        _alternateGreetingsMeta,
+        alternateGreetings.isAcceptableOrUnknown(
+          data['alternate_greetings']!,
+          _alternateGreetingsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+        _tagsMeta,
+        tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta),
+      );
+    }
+    if (data.containsKey('image_path')) {
+      context.handle(
+        _imagePathMeta,
+        imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
+      );
+    }
+    if (data.containsKey('tts_voice')) {
+      context.handle(
+        _ttsVoiceMeta,
+        ttsVoice.isAcceptableOrUnknown(data['tts_voice']!, _ttsVoiceMeta),
+      );
+    }
+    if (data.containsKey('folder_id')) {
+      context.handle(
+        _folderIdMeta,
+        folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta),
+      );
+    }
+    if (data.containsKey('lorebook')) {
+      context.handle(
+        _lorebookMeta,
+        lorebook.isAcceptableOrUnknown(data['lorebook']!, _lorebookMeta),
+      );
+    }
+    if (data.containsKey('world_names')) {
+      context.handle(
+        _worldNamesMeta,
+        worldNames.isAcceptableOrUnknown(data['world_names']!, _worldNamesMeta),
+      );
+    }
+    if (data.containsKey('memory_sources')) {
+      context.handle(
+        _memorySourcesMeta,
+        memorySources.isAcceptableOrUnknown(
+          data['memory_sources']!,
+          _memorySourcesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolved_personality')) {
+      context.handle(
+        _evolvedPersonalityMeta,
+        evolvedPersonality.isAcceptableOrUnknown(
+          data['evolved_personality']!,
+          _evolvedPersonalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolved_scenario')) {
+      context.handle(
+        _evolvedScenarioMeta,
+        evolvedScenario.isAcceptableOrUnknown(
+          data['evolved_scenario']!,
+          _evolvedScenarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolution_count')) {
+      context.handle(
+        _evolutionCountMeta,
+        evolutionCount.isAcceptableOrUnknown(
+          data['evolution_count']!,
+          _evolutionCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('prime_avatar_index')) {
+      context.handle(
+        _primeAvatarIndexMeta,
+        primeAvatarIndex.isAcceptableOrUnknown(
+          data['prime_avatar_index']!,
+          _primeAvatarIndexMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Character map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Character(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      personality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}personality'],
+      )!,
+      scenario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scenario'],
+      )!,
+      firstMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}first_message'],
+      )!,
+      mesExample: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mes_example'],
+      )!,
+      systemPrompt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}system_prompt'],
+      )!,
+      postHistoryInstructions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_history_instructions'],
+      )!,
+      alternateGreetings: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alternate_greetings'],
+      )!,
+      tags: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tags'],
+      )!,
+      imagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_path'],
+      ),
+      ttsVoice: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tts_voice'],
+      ),
+      folderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_id'],
+      ),
+      lorebook: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lorebook'],
+      ),
+      worldNames: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}world_names'],
+      )!,
+      memorySources: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}memory_sources'],
+      )!,
+      evolvedPersonality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evolved_personality'],
+      )!,
+      evolvedScenario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evolved_scenario'],
+      )!,
+      evolutionCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}evolution_count'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      primeAvatarIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prime_avatar_index'],
+      )!,
+    );
+  }
+
+  @override
+  $CharactersTable createAlias(String alias) {
+    return $CharactersTable(attachedDatabase, alias);
+  }
+}
+
+class Character extends DataClass implements Insertable<Character> {
+  final String id;
+  final String name;
+  final String description;
+  final String personality;
+  final String scenario;
+  final String firstMessage;
+  final String mesExample;
+  final String systemPrompt;
+  final String postHistoryInstructions;
+  final String alternateGreetings;
+  final String tags;
+  final String? imagePath;
+  final String? ttsVoice;
+  final String? folderId;
+  final String? lorebook;
+  final String worldNames;
+  final String memorySources;
+  final String evolvedPersonality;
+  final String evolvedScenario;
+  final int evolutionCount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final int primeAvatarIndex;
+  const Character({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.personality,
+    required this.scenario,
+    required this.firstMessage,
+    required this.mesExample,
+    required this.systemPrompt,
+    required this.postHistoryInstructions,
+    required this.alternateGreetings,
+    required this.tags,
+    this.imagePath,
+    this.ttsVoice,
+    this.folderId,
+    this.lorebook,
+    required this.worldNames,
+    required this.memorySources,
+    required this.evolvedPersonality,
+    required this.evolvedScenario,
+    required this.evolutionCount,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.primeAvatarIndex,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['description'] = Variable<String>(description);
+    map['personality'] = Variable<String>(personality);
+    map['scenario'] = Variable<String>(scenario);
+    map['first_message'] = Variable<String>(firstMessage);
+    map['mes_example'] = Variable<String>(mesExample);
+    map['system_prompt'] = Variable<String>(systemPrompt);
+    map['post_history_instructions'] = Variable<String>(
+      postHistoryInstructions,
+    );
+    map['alternate_greetings'] = Variable<String>(alternateGreetings);
+    map['tags'] = Variable<String>(tags);
+    if (!nullToAbsent || imagePath != null) {
+      map['image_path'] = Variable<String>(imagePath);
+    }
+    if (!nullToAbsent || ttsVoice != null) {
+      map['tts_voice'] = Variable<String>(ttsVoice);
+    }
+    if (!nullToAbsent || folderId != null) {
+      map['folder_id'] = Variable<String>(folderId);
+    }
+    if (!nullToAbsent || lorebook != null) {
+      map['lorebook'] = Variable<String>(lorebook);
+    }
+    map['world_names'] = Variable<String>(worldNames);
+    map['memory_sources'] = Variable<String>(memorySources);
+    map['evolved_personality'] = Variable<String>(evolvedPersonality);
+    map['evolved_scenario'] = Variable<String>(evolvedScenario);
+    map['evolution_count'] = Variable<int>(evolutionCount);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['prime_avatar_index'] = Variable<int>(primeAvatarIndex);
+    return map;
+  }
+
+  CharactersCompanion toCompanion(bool nullToAbsent) {
+    return CharactersCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: Value(description),
+      personality: Value(personality),
+      scenario: Value(scenario),
+      firstMessage: Value(firstMessage),
+      mesExample: Value(mesExample),
+      systemPrompt: Value(systemPrompt),
+      postHistoryInstructions: Value(postHistoryInstructions),
+      alternateGreetings: Value(alternateGreetings),
+      tags: Value(tags),
+      imagePath: imagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imagePath),
+      ttsVoice: ttsVoice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ttsVoice),
+      folderId: folderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(folderId),
+      lorebook: lorebook == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lorebook),
+      worldNames: Value(worldNames),
+      memorySources: Value(memorySources),
+      evolvedPersonality: Value(evolvedPersonality),
+      evolvedScenario: Value(evolvedScenario),
+      evolutionCount: Value(evolutionCount),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      primeAvatarIndex: Value(primeAvatarIndex),
+    );
+  }
+
+  factory Character.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Character(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String>(json['description']),
+      personality: serializer.fromJson<String>(json['personality']),
+      scenario: serializer.fromJson<String>(json['scenario']),
+      firstMessage: serializer.fromJson<String>(json['firstMessage']),
+      mesExample: serializer.fromJson<String>(json['mesExample']),
+      systemPrompt: serializer.fromJson<String>(json['systemPrompt']),
+      postHistoryInstructions: serializer.fromJson<String>(
+        json['postHistoryInstructions'],
+      ),
+      alternateGreetings: serializer.fromJson<String>(
+        json['alternateGreetings'],
+      ),
+      tags: serializer.fromJson<String>(json['tags']),
+      imagePath: serializer.fromJson<String?>(json['imagePath']),
+      ttsVoice: serializer.fromJson<String?>(json['ttsVoice']),
+      folderId: serializer.fromJson<String?>(json['folderId']),
+      lorebook: serializer.fromJson<String?>(json['lorebook']),
+      worldNames: serializer.fromJson<String>(json['worldNames']),
+      memorySources: serializer.fromJson<String>(json['memorySources']),
+      evolvedPersonality: serializer.fromJson<String>(
+        json['evolvedPersonality'],
+      ),
+      evolvedScenario: serializer.fromJson<String>(json['evolvedScenario']),
+      evolutionCount: serializer.fromJson<int>(json['evolutionCount']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      primeAvatarIndex: serializer.fromJson<int>(json['primeAvatarIndex']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String>(description),
+      'personality': serializer.toJson<String>(personality),
+      'scenario': serializer.toJson<String>(scenario),
+      'firstMessage': serializer.toJson<String>(firstMessage),
+      'mesExample': serializer.toJson<String>(mesExample),
+      'systemPrompt': serializer.toJson<String>(systemPrompt),
+      'postHistoryInstructions': serializer.toJson<String>(
+        postHistoryInstructions,
+      ),
+      'alternateGreetings': serializer.toJson<String>(alternateGreetings),
+      'tags': serializer.toJson<String>(tags),
+      'imagePath': serializer.toJson<String?>(imagePath),
+      'ttsVoice': serializer.toJson<String?>(ttsVoice),
+      'folderId': serializer.toJson<String?>(folderId),
+      'lorebook': serializer.toJson<String?>(lorebook),
+      'worldNames': serializer.toJson<String>(worldNames),
+      'memorySources': serializer.toJson<String>(memorySources),
+      'evolvedPersonality': serializer.toJson<String>(evolvedPersonality),
+      'evolvedScenario': serializer.toJson<String>(evolvedScenario),
+      'evolutionCount': serializer.toJson<int>(evolutionCount),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'primeAvatarIndex': serializer.toJson<int>(primeAvatarIndex),
+    };
+  }
+
+  Character copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? personality,
+    String? scenario,
+    String? firstMessage,
+    String? mesExample,
+    String? systemPrompt,
+    String? postHistoryInstructions,
+    String? alternateGreetings,
+    String? tags,
+    Value<String?> imagePath = const Value.absent(),
+    Value<String?> ttsVoice = const Value.absent(),
+    Value<String?> folderId = const Value.absent(),
+    Value<String?> lorebook = const Value.absent(),
+    String? worldNames,
+    String? memorySources,
+    String? evolvedPersonality,
+    String? evolvedScenario,
+    int? evolutionCount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    int? primeAvatarIndex,
+  }) => Character(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description ?? this.description,
+    personality: personality ?? this.personality,
+    scenario: scenario ?? this.scenario,
+    firstMessage: firstMessage ?? this.firstMessage,
+    mesExample: mesExample ?? this.mesExample,
+    systemPrompt: systemPrompt ?? this.systemPrompt,
+    postHistoryInstructions:
+        postHistoryInstructions ?? this.postHistoryInstructions,
+    alternateGreetings: alternateGreetings ?? this.alternateGreetings,
+    tags: tags ?? this.tags,
+    imagePath: imagePath.present ? imagePath.value : this.imagePath,
+    ttsVoice: ttsVoice.present ? ttsVoice.value : this.ttsVoice,
+    folderId: folderId.present ? folderId.value : this.folderId,
+    lorebook: lorebook.present ? lorebook.value : this.lorebook,
+    worldNames: worldNames ?? this.worldNames,
+    memorySources: memorySources ?? this.memorySources,
+    evolvedPersonality: evolvedPersonality ?? this.evolvedPersonality,
+    evolvedScenario: evolvedScenario ?? this.evolvedScenario,
+    evolutionCount: evolutionCount ?? this.evolutionCount,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    primeAvatarIndex: primeAvatarIndex ?? this.primeAvatarIndex,
+  );
+  Character copyWithCompanion(CharactersCompanion data) {
+    return Character(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      personality: data.personality.present
+          ? data.personality.value
+          : this.personality,
+      scenario: data.scenario.present ? data.scenario.value : this.scenario,
+      firstMessage: data.firstMessage.present
+          ? data.firstMessage.value
+          : this.firstMessage,
+      mesExample: data.mesExample.present
+          ? data.mesExample.value
+          : this.mesExample,
+      systemPrompt: data.systemPrompt.present
+          ? data.systemPrompt.value
+          : this.systemPrompt,
+      postHistoryInstructions: data.postHistoryInstructions.present
+          ? data.postHistoryInstructions.value
+          : this.postHistoryInstructions,
+      alternateGreetings: data.alternateGreetings.present
+          ? data.alternateGreetings.value
+          : this.alternateGreetings,
+      tags: data.tags.present ? data.tags.value : this.tags,
+      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
+      ttsVoice: data.ttsVoice.present ? data.ttsVoice.value : this.ttsVoice,
+      folderId: data.folderId.present ? data.folderId.value : this.folderId,
+      lorebook: data.lorebook.present ? data.lorebook.value : this.lorebook,
+      worldNames: data.worldNames.present
+          ? data.worldNames.value
+          : this.worldNames,
+      memorySources: data.memorySources.present
+          ? data.memorySources.value
+          : this.memorySources,
+      evolvedPersonality: data.evolvedPersonality.present
+          ? data.evolvedPersonality.value
+          : this.evolvedPersonality,
+      evolvedScenario: data.evolvedScenario.present
+          ? data.evolvedScenario.value
+          : this.evolvedScenario,
+      evolutionCount: data.evolutionCount.present
+          ? data.evolutionCount.value
+          : this.evolutionCount,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      primeAvatarIndex: data.primeAvatarIndex.present
+          ? data.primeAvatarIndex.value
+          : this.primeAvatarIndex,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Character(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('personality: $personality, ')
+          ..write('scenario: $scenario, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('mesExample: $mesExample, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('postHistoryInstructions: $postHistoryInstructions, ')
+          ..write('alternateGreetings: $alternateGreetings, ')
+          ..write('tags: $tags, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('ttsVoice: $ttsVoice, ')
+          ..write('folderId: $folderId, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('worldNames: $worldNames, ')
+          ..write('memorySources: $memorySources, ')
+          ..write('evolvedPersonality: $evolvedPersonality, ')
+          ..write('evolvedScenario: $evolvedScenario, ')
+          ..write('evolutionCount: $evolutionCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('primeAvatarIndex: $primeAvatarIndex')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    name,
+    description,
+    personality,
+    scenario,
+    firstMessage,
+    mesExample,
+    systemPrompt,
+    postHistoryInstructions,
+    alternateGreetings,
+    tags,
+    imagePath,
+    ttsVoice,
+    folderId,
+    lorebook,
+    worldNames,
+    memorySources,
+    evolvedPersonality,
+    evolvedScenario,
+    evolutionCount,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    primeAvatarIndex,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Character &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.personality == this.personality &&
+          other.scenario == this.scenario &&
+          other.firstMessage == this.firstMessage &&
+          other.mesExample == this.mesExample &&
+          other.systemPrompt == this.systemPrompt &&
+          other.postHistoryInstructions == this.postHistoryInstructions &&
+          other.alternateGreetings == this.alternateGreetings &&
+          other.tags == this.tags &&
+          other.imagePath == this.imagePath &&
+          other.ttsVoice == this.ttsVoice &&
+          other.folderId == this.folderId &&
+          other.lorebook == this.lorebook &&
+          other.worldNames == this.worldNames &&
+          other.memorySources == this.memorySources &&
+          other.evolvedPersonality == this.evolvedPersonality &&
+          other.evolvedScenario == this.evolvedScenario &&
+          other.evolutionCount == this.evolutionCount &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.primeAvatarIndex == this.primeAvatarIndex);
+}
+
+class CharactersCompanion extends UpdateCompanion<Character> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> description;
+  final Value<String> personality;
+  final Value<String> scenario;
+  final Value<String> firstMessage;
+  final Value<String> mesExample;
+  final Value<String> systemPrompt;
+  final Value<String> postHistoryInstructions;
+  final Value<String> alternateGreetings;
+  final Value<String> tags;
+  final Value<String?> imagePath;
+  final Value<String?> ttsVoice;
+  final Value<String?> folderId;
+  final Value<String?> lorebook;
+  final Value<String> worldNames;
+  final Value<String> memorySources;
+  final Value<String> evolvedPersonality;
+  final Value<String> evolvedScenario;
+  final Value<int> evolutionCount;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> primeAvatarIndex;
+  final Value<int> rowid;
+  const CharactersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.personality = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.mesExample = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.postHistoryInstructions = const Value.absent(),
+    this.alternateGreetings = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.imagePath = const Value.absent(),
+    this.ttsVoice = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.worldNames = const Value.absent(),
+    this.memorySources = const Value.absent(),
+    this.evolvedPersonality = const Value.absent(),
+    this.evolvedScenario = const Value.absent(),
+    this.evolutionCount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.primeAvatarIndex = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CharactersCompanion.insert({
+    required String id,
+    required String name,
+    this.description = const Value.absent(),
+    this.personality = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.mesExample = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.postHistoryInstructions = const Value.absent(),
+    this.alternateGreetings = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.imagePath = const Value.absent(),
+    this.ttsVoice = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.worldNames = const Value.absent(),
+    this.memorySources = const Value.absent(),
+    this.evolvedPersonality = const Value.absent(),
+    this.evolvedScenario = const Value.absent(),
+    this.evolutionCount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.primeAvatarIndex = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<Character> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? personality,
+    Expression<String>? scenario,
+    Expression<String>? firstMessage,
+    Expression<String>? mesExample,
+    Expression<String>? systemPrompt,
+    Expression<String>? postHistoryInstructions,
+    Expression<String>? alternateGreetings,
+    Expression<String>? tags,
+    Expression<String>? imagePath,
+    Expression<String>? ttsVoice,
+    Expression<String>? folderId,
+    Expression<String>? lorebook,
+    Expression<String>? worldNames,
+    Expression<String>? memorySources,
+    Expression<String>? evolvedPersonality,
+    Expression<String>? evolvedScenario,
+    Expression<int>? evolutionCount,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? primeAvatarIndex,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (personality != null) 'personality': personality,
+      if (scenario != null) 'scenario': scenario,
+      if (firstMessage != null) 'first_message': firstMessage,
+      if (mesExample != null) 'mes_example': mesExample,
+      if (systemPrompt != null) 'system_prompt': systemPrompt,
+      if (postHistoryInstructions != null)
+        'post_history_instructions': postHistoryInstructions,
+      if (alternateGreetings != null) 'alternate_greetings': alternateGreetings,
+      if (tags != null) 'tags': tags,
+      if (imagePath != null) 'image_path': imagePath,
+      if (ttsVoice != null) 'tts_voice': ttsVoice,
+      if (folderId != null) 'folder_id': folderId,
+      if (lorebook != null) 'lorebook': lorebook,
+      if (worldNames != null) 'world_names': worldNames,
+      if (memorySources != null) 'memory_sources': memorySources,
+      if (evolvedPersonality != null) 'evolved_personality': evolvedPersonality,
+      if (evolvedScenario != null) 'evolved_scenario': evolvedScenario,
+      if (evolutionCount != null) 'evolution_count': evolutionCount,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (primeAvatarIndex != null) 'prime_avatar_index': primeAvatarIndex,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CharactersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? description,
+    Value<String>? personality,
+    Value<String>? scenario,
+    Value<String>? firstMessage,
+    Value<String>? mesExample,
+    Value<String>? systemPrompt,
+    Value<String>? postHistoryInstructions,
+    Value<String>? alternateGreetings,
+    Value<String>? tags,
+    Value<String?>? imagePath,
+    Value<String?>? ttsVoice,
+    Value<String?>? folderId,
+    Value<String?>? lorebook,
+    Value<String>? worldNames,
+    Value<String>? memorySources,
+    Value<String>? evolvedPersonality,
+    Value<String>? evolvedScenario,
+    Value<int>? evolutionCount,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? primeAvatarIndex,
+    Value<int>? rowid,
+  }) {
+    return CharactersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      personality: personality ?? this.personality,
+      scenario: scenario ?? this.scenario,
+      firstMessage: firstMessage ?? this.firstMessage,
+      mesExample: mesExample ?? this.mesExample,
+      systemPrompt: systemPrompt ?? this.systemPrompt,
+      postHistoryInstructions:
+          postHistoryInstructions ?? this.postHistoryInstructions,
+      alternateGreetings: alternateGreetings ?? this.alternateGreetings,
+      tags: tags ?? this.tags,
+      imagePath: imagePath ?? this.imagePath,
+      ttsVoice: ttsVoice ?? this.ttsVoice,
+      folderId: folderId ?? this.folderId,
+      lorebook: lorebook ?? this.lorebook,
+      worldNames: worldNames ?? this.worldNames,
+      memorySources: memorySources ?? this.memorySources,
+      evolvedPersonality: evolvedPersonality ?? this.evolvedPersonality,
+      evolvedScenario: evolvedScenario ?? this.evolvedScenario,
+      evolutionCount: evolutionCount ?? this.evolutionCount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      primeAvatarIndex: primeAvatarIndex ?? this.primeAvatarIndex,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (personality.present) {
+      map['personality'] = Variable<String>(personality.value);
+    }
+    if (scenario.present) {
+      map['scenario'] = Variable<String>(scenario.value);
+    }
+    if (firstMessage.present) {
+      map['first_message'] = Variable<String>(firstMessage.value);
+    }
+    if (mesExample.present) {
+      map['mes_example'] = Variable<String>(mesExample.value);
+    }
+    if (systemPrompt.present) {
+      map['system_prompt'] = Variable<String>(systemPrompt.value);
+    }
+    if (postHistoryInstructions.present) {
+      map['post_history_instructions'] = Variable<String>(
+        postHistoryInstructions.value,
+      );
+    }
+    if (alternateGreetings.present) {
+      map['alternate_greetings'] = Variable<String>(alternateGreetings.value);
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
+    }
+    if (imagePath.present) {
+      map['image_path'] = Variable<String>(imagePath.value);
+    }
+    if (ttsVoice.present) {
+      map['tts_voice'] = Variable<String>(ttsVoice.value);
+    }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
+    if (lorebook.present) {
+      map['lorebook'] = Variable<String>(lorebook.value);
+    }
+    if (worldNames.present) {
+      map['world_names'] = Variable<String>(worldNames.value);
+    }
+    if (memorySources.present) {
+      map['memory_sources'] = Variable<String>(memorySources.value);
+    }
+    if (evolvedPersonality.present) {
+      map['evolved_personality'] = Variable<String>(evolvedPersonality.value);
+    }
+    if (evolvedScenario.present) {
+      map['evolved_scenario'] = Variable<String>(evolvedScenario.value);
+    }
+    if (evolutionCount.present) {
+      map['evolution_count'] = Variable<int>(evolutionCount.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (primeAvatarIndex.present) {
+      map['prime_avatar_index'] = Variable<int>(primeAvatarIndex.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CharactersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('personality: $personality, ')
+          ..write('scenario: $scenario, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('mesExample: $mesExample, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('postHistoryInstructions: $postHistoryInstructions, ')
+          ..write('alternateGreetings: $alternateGreetings, ')
+          ..write('tags: $tags, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('ttsVoice: $ttsVoice, ')
+          ..write('folderId: $folderId, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('worldNames: $worldNames, ')
+          ..write('memorySources: $memorySources, ')
+          ..write('evolvedPersonality: $evolvedPersonality, ')
+          ..write('evolvedScenario: $evolvedScenario, ')
+          ..write('evolutionCount: $evolutionCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('primeAvatarIndex: $primeAvatarIndex, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<String> groupId = GeneratedColumn<String>(
+    'group_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _authorNoteMeta = const VerificationMeta(
+    'authorNote',
+  );
+  @override
+  late final GeneratedColumn<String> authorNote = GeneratedColumn<String>(
+    'author_note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _authorNoteDepthMeta = const VerificationMeta(
+    'authorNoteDepth',
+  );
+  @override
+  late final GeneratedColumn<int> authorNoteDepth = GeneratedColumn<int>(
+    'author_note_depth',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(4),
+  );
+  static const VerificationMeta _summaryMeta = const VerificationMeta(
+    'summary',
+  );
+  @override
+  late final GeneratedColumn<String> summary = GeneratedColumn<String>(
+    'summary',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _summaryLastIndexMeta = const VerificationMeta(
+    'summaryLastIndex',
+  );
+  @override
+  late final GeneratedColumn<int> summaryLastIndex = GeneratedColumn<int>(
+    'summary_last_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _worldsInitializedMeta = const VerificationMeta(
+    'worldsInitialized',
+  );
+  @override
+  late final GeneratedColumn<bool> worldsInitialized = GeneratedColumn<bool>(
+    'worlds_initialized',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("worlds_initialized" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _parentSessionMeta = const VerificationMeta(
+    'parentSession',
+  );
+  @override
+  late final GeneratedColumn<String> parentSession = GeneratedColumn<String>(
+    'parent_session',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _forkIndexMeta = const VerificationMeta(
+    'forkIndex',
+  );
+  @override
+  late final GeneratedColumn<int> forkIndex = GeneratedColumn<int>(
+    'fork_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _affectionScoreMeta = const VerificationMeta(
+    'affectionScore',
+  );
+  @override
+  late final GeneratedColumn<int> affectionScore = GeneratedColumn<int>(
+    'affection_score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _relationshipTierMeta = const VerificationMeta(
+    'relationshipTier',
+  );
+  @override
+  late final GeneratedColumn<int> relationshipTier = GeneratedColumn<int>(
+    'relationship_tier',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _longTermScoreMeta = const VerificationMeta(
+    'longTermScore',
+  );
+  @override
+  late final GeneratedColumn<int> longTermScore = GeneratedColumn<int>(
+    'long_term_score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _longTermTierMeta = const VerificationMeta(
+    'longTermTier',
+  );
+  @override
+  late final GeneratedColumn<int> longTermTier = GeneratedColumn<int>(
+    'long_term_tier',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _turnsSinceLongTermCheckMeta =
+      const VerificationMeta('turnsSinceLongTermCheck');
+  @override
+  late final GeneratedColumn<int> turnsSinceLongTermCheck =
+      GeneratedColumn<int>(
+        'turns_since_long_term_check',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      );
+  static const VerificationMeta _shortTermDeltasSummaryMeta =
+      const VerificationMeta('shortTermDeltasSummary');
+  @override
+  late final GeneratedColumn<int> shortTermDeltasSummary = GeneratedColumn<int>(
+    'short_term_deltas_summary',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _realismEnabledMeta = const VerificationMeta(
+    'realismEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> realismEnabled = GeneratedColumn<bool>(
+    'realism_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("realism_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _shortTermMoodMeta = const VerificationMeta(
+    'shortTermMood',
+  );
+  @override
+  late final GeneratedColumn<int> shortTermMood = GeneratedColumn<int>(
+    'short_term_mood',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _moodDecayCounterMeta = const VerificationMeta(
+    'moodDecayCounter',
+  );
+  @override
+  late final GeneratedColumn<int> moodDecayCounter = GeneratedColumn<int>(
+    'mood_decay_counter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _characterEmotionMeta = const VerificationMeta(
+    'characterEmotion',
+  );
+  @override
+  late final GeneratedColumn<String> characterEmotion = GeneratedColumn<String>(
+    'character_emotion',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _emotionIntensityMeta = const VerificationMeta(
+    'emotionIntensity',
+  );
+  @override
+  late final GeneratedColumn<String> emotionIntensity = GeneratedColumn<String>(
+    'emotion_intensity',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _timeOfDayMeta = const VerificationMeta(
+    'timeOfDay',
+  );
+  @override
+  late final GeneratedColumn<String> timeOfDay = GeneratedColumn<String>(
+    'time_of_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('morning'),
+  );
+  static const VerificationMeta _dayCountMeta = const VerificationMeta(
+    'dayCount',
+  );
+  @override
+  late final GeneratedColumn<int> dayCount = GeneratedColumn<int>(
+    'day_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _startDayOfWeekMeta = const VerificationMeta(
+    'startDayOfWeek',
+  );
+  @override
+  late final GeneratedColumn<int> startDayOfWeek = GeneratedColumn<int>(
+    'start_day_of_week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _storyClockMeta = const VerificationMeta(
+    'storyClock',
+  );
+  @override
+  late final GeneratedColumn<String> storyClock = GeneratedColumn<String>(
+    'story_clock',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _storyStartDateMeta = const VerificationMeta(
+    'storyStartDate',
+  );
+  @override
+  late final GeneratedColumn<String> storyStartDate = GeneratedColumn<String>(
+    'story_start_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nsfwCooldownEnabledMeta =
+      const VerificationMeta('nsfwCooldownEnabled');
+  @override
+  late final GeneratedColumn<bool> nsfwCooldownEnabled = GeneratedColumn<bool>(
+    'nsfw_cooldown_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("nsfw_cooldown_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _passageOfTimeEnabledMeta =
+      const VerificationMeta('passageOfTimeEnabled');
+  @override
+  late final GeneratedColumn<bool> passageOfTimeEnabled = GeneratedColumn<bool>(
+    'passage_of_time_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("passage_of_time_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _passageOfTimeGateMigratedMeta =
+      const VerificationMeta('passageOfTimeGateMigrated');
+  @override
+  late final GeneratedColumn<bool> passageOfTimeGateMigrated =
+      GeneratedColumn<bool>(
+        'passage_of_time_gate_migrated',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("passage_of_time_gate_migrated" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _arousalLevelMeta = const VerificationMeta(
+    'arousalLevel',
+  );
+  @override
+  late final GeneratedColumn<int> arousalLevel = GeneratedColumn<int>(
+    'arousal_level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _cooldownTurnsRemainingMeta =
+      const VerificationMeta('cooldownTurnsRemaining');
+  @override
+  late final GeneratedColumn<int> cooldownTurnsRemaining = GeneratedColumn<int>(
+    'cooldown_turns_remaining',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _cooldownTurnsTotalMeta =
+      const VerificationMeta('cooldownTurnsTotal');
+  @override
+  late final GeneratedColumn<int> cooldownTurnsTotal = GeneratedColumn<int>(
+    'cooldown_turns_total',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _refractoryMinutesRemainingMeta =
+      const VerificationMeta('refractoryMinutesRemaining');
+  @override
+  late final GeneratedColumn<int> refractoryMinutesRemaining =
+      GeneratedColumn<int>(
+        'refractory_minutes_remaining',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _refractoryMinutesTotalMeta =
+      const VerificationMeta('refractoryMinutesTotal');
+  @override
+  late final GeneratedColumn<int> refractoryMinutesTotal = GeneratedColumn<int>(
+    'refractory_minutes_total',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _refractoryOpenedMeta = const VerificationMeta(
+    'refractoryOpened',
+  );
+  @override
+  late final GeneratedColumn<bool> refractoryOpened = GeneratedColumn<bool>(
+    'refractory_opened',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("refractory_opened" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _trustLevelMeta = const VerificationMeta(
+    'trustLevel',
+  );
+  @override
+  late final GeneratedColumn<int> trustLevel = GeneratedColumn<int>(
+    'trust_level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _activeFixationMeta = const VerificationMeta(
+    'activeFixation',
+  );
+  @override
+  late final GeneratedColumn<String> activeFixation = GeneratedColumn<String>(
+    'active_fixation',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _fixationLifespanMeta = const VerificationMeta(
+    'fixationLifespan',
+  );
+  @override
+  late final GeneratedColumn<int> fixationLifespan = GeneratedColumn<int>(
+    'fixation_lifespan',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _spatialStanceMeta = const VerificationMeta(
+    'spatialStance',
+  );
+  @override
+  late final GeneratedColumn<String> spatialStance = GeneratedColumn<String>(
+    'spatial_stance',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _withUserMeta = const VerificationMeta(
+    'withUser',
+  );
+  @override
+  late final GeneratedColumn<bool> withUser = GeneratedColumn<bool>(
+    'with_user',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("with_user" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _trustRepairPendingMeta =
+      const VerificationMeta('trustRepairPending');
+  @override
+  late final GeneratedColumn<bool> trustRepairPending = GeneratedColumn<bool>(
+    'trust_repair_pending',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("trust_repair_pending" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _chaosModeEnabledMeta = const VerificationMeta(
+    'chaosModeEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> chaosModeEnabled = GeneratedColumn<bool>(
+    'chaos_mode_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("chaos_mode_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _chaosPressureMeta = const VerificationMeta(
+    'chaosPressure',
+  );
+  @override
+  late final GeneratedColumn<int> chaosPressure = GeneratedColumn<int>(
+    'chaos_pressure',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _needsSimEnabledMeta = const VerificationMeta(
+    'needsSimEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> needsSimEnabled = GeneratedColumn<bool>(
+    'needs_sim_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("needs_sim_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _needsVectorMeta = const VerificationMeta(
+    'needsVector',
+  );
+  @override
+  late final GeneratedColumn<String> needsVector = GeneratedColumn<String>(
+    'needs_vector',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pocketsMeta = const VerificationMeta(
+    'pockets',
+  );
+  @override
+  late final GeneratedColumn<String> pockets = GeneratedColumn<String>(
+    'pockets',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _todayObjectiveIdMeta = const VerificationMeta(
+    'todayObjectiveId',
+  );
+  @override
+  late final GeneratedColumn<String> todayObjectiveId = GeneratedColumn<String>(
+    'today_objective_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evolvedPersonalityMeta =
+      const VerificationMeta('evolvedPersonality');
+  @override
+  late final GeneratedColumn<String> evolvedPersonality =
+      GeneratedColumn<String>(
+        'evolved_personality',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _evolvedScenarioMeta = const VerificationMeta(
+    'evolvedScenario',
+  );
+  @override
+  late final GeneratedColumn<String> evolvedScenario = GeneratedColumn<String>(
+    'evolved_scenario',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _evolutionCountMeta = const VerificationMeta(
+    'evolutionCount',
+  );
+  @override
+  late final GeneratedColumn<int> evolutionCount = GeneratedColumn<int>(
+    'evolution_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _groupEvolvedPersonalitiesMeta =
+      const VerificationMeta('groupEvolvedPersonalities');
+  @override
+  late final GeneratedColumn<String> groupEvolvedPersonalities =
+      GeneratedColumn<String>(
+        'group_evolved_personalities',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _groupEvolvedScenariosMeta =
+      const VerificationMeta('groupEvolvedScenarios');
+  @override
+  late final GeneratedColumn<String> groupEvolvedScenarios =
+      GeneratedColumn<String>(
+        'group_evolved_scenarios',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _generationSettingsMeta =
+      const VerificationMeta('generationSettings');
+  @override
+  late final GeneratedColumn<String> generationSettings =
+      GeneratedColumn<String>(
+        'generation_settings',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _userPersonaIdMeta = const VerificationMeta(
+    'userPersonaId',
+  );
+  @override
+  late final GeneratedColumn<String> userPersonaId = GeneratedColumn<String>(
+    'user_persona_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedLookAvatarIdMeta =
+      const VerificationMeta('selectedLookAvatarId');
+  @override
+  late final GeneratedColumn<String> selectedLookAvatarId =
+      GeneratedColumn<String>(
+        'selected_look_avatar_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _themeOverridesMeta = const VerificationMeta(
+    'themeOverrides',
+  );
+  @override
+  late final GeneratedColumn<String> themeOverrides = GeneratedColumn<String>(
+    'theme_overrides',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contextBudgetJsonMeta = const VerificationMeta(
+    'contextBudgetJson',
+  );
+  @override
+  late final GeneratedColumn<String> contextBudgetJson =
+      GeneratedColumn<String>(
+        'context_budget_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _objectivesEnabledMeta = const VerificationMeta(
+    'objectivesEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> objectivesEnabled = GeneratedColumn<bool>(
+    'objectives_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("objectives_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _groupRealismStateMeta = const VerificationMeta(
+    'groupRealismState',
+  );
+  @override
+  late final GeneratedColumn<String> groupRealismState =
+      GeneratedColumn<String>(
+        'group_realism_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    characterId,
+    groupId,
+    name,
+    description,
+    authorNote,
+    authorNoteDepth,
+    summary,
+    summaryLastIndex,
+    worldsInitialized,
+    parentSession,
+    forkIndex,
+    affectionScore,
+    relationshipTier,
+    longTermScore,
+    longTermTier,
+    turnsSinceLongTermCheck,
+    shortTermDeltasSummary,
+    realismEnabled,
+    shortTermMood,
+    moodDecayCounter,
+    characterEmotion,
+    emotionIntensity,
+    timeOfDay,
+    dayCount,
+    startDayOfWeek,
+    storyClock,
+    storyStartDate,
+    nsfwCooldownEnabled,
+    passageOfTimeEnabled,
+    passageOfTimeGateMigrated,
+    arousalLevel,
+    cooldownTurnsRemaining,
+    cooldownTurnsTotal,
+    refractoryMinutesRemaining,
+    refractoryMinutesTotal,
+    refractoryOpened,
+    trustLevel,
+    activeFixation,
+    fixationLifespan,
+    spatialStance,
+    withUser,
+    trustRepairPending,
+    chaosModeEnabled,
+    chaosPressure,
+    needsSimEnabled,
+    needsVector,
+    pockets,
+    todayObjectiveId,
+    evolvedPersonality,
+    evolvedScenario,
+    evolutionCount,
+    groupEvolvedPersonalities,
+    groupEvolvedScenarios,
+    generationSettings,
+    userPersonaId,
+    selectedLookAvatarId,
+    themeOverrides,
+    contextBudgetJson,
+    objectivesEnabled,
+    groupRealismState,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Session> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('author_note')) {
+      context.handle(
+        _authorNoteMeta,
+        authorNote.isAcceptableOrUnknown(data['author_note']!, _authorNoteMeta),
+      );
+    }
+    if (data.containsKey('author_note_depth')) {
+      context.handle(
+        _authorNoteDepthMeta,
+        authorNoteDepth.isAcceptableOrUnknown(
+          data['author_note_depth']!,
+          _authorNoteDepthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('summary')) {
+      context.handle(
+        _summaryMeta,
+        summary.isAcceptableOrUnknown(data['summary']!, _summaryMeta),
+      );
+    }
+    if (data.containsKey('summary_last_index')) {
+      context.handle(
+        _summaryLastIndexMeta,
+        summaryLastIndex.isAcceptableOrUnknown(
+          data['summary_last_index']!,
+          _summaryLastIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('worlds_initialized')) {
+      context.handle(
+        _worldsInitializedMeta,
+        worldsInitialized.isAcceptableOrUnknown(
+          data['worlds_initialized']!,
+          _worldsInitializedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('parent_session')) {
+      context.handle(
+        _parentSessionMeta,
+        parentSession.isAcceptableOrUnknown(
+          data['parent_session']!,
+          _parentSessionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fork_index')) {
+      context.handle(
+        _forkIndexMeta,
+        forkIndex.isAcceptableOrUnknown(data['fork_index']!, _forkIndexMeta),
+      );
+    }
+    if (data.containsKey('affection_score')) {
+      context.handle(
+        _affectionScoreMeta,
+        affectionScore.isAcceptableOrUnknown(
+          data['affection_score']!,
+          _affectionScoreMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relationship_tier')) {
+      context.handle(
+        _relationshipTierMeta,
+        relationshipTier.isAcceptableOrUnknown(
+          data['relationship_tier']!,
+          _relationshipTierMeta,
+        ),
+      );
+    }
+    if (data.containsKey('long_term_score')) {
+      context.handle(
+        _longTermScoreMeta,
+        longTermScore.isAcceptableOrUnknown(
+          data['long_term_score']!,
+          _longTermScoreMeta,
+        ),
+      );
+    }
+    if (data.containsKey('long_term_tier')) {
+      context.handle(
+        _longTermTierMeta,
+        longTermTier.isAcceptableOrUnknown(
+          data['long_term_tier']!,
+          _longTermTierMeta,
+        ),
+      );
+    }
+    if (data.containsKey('turns_since_long_term_check')) {
+      context.handle(
+        _turnsSinceLongTermCheckMeta,
+        turnsSinceLongTermCheck.isAcceptableOrUnknown(
+          data['turns_since_long_term_check']!,
+          _turnsSinceLongTermCheckMeta,
+        ),
+      );
+    }
+    if (data.containsKey('short_term_deltas_summary')) {
+      context.handle(
+        _shortTermDeltasSummaryMeta,
+        shortTermDeltasSummary.isAcceptableOrUnknown(
+          data['short_term_deltas_summary']!,
+          _shortTermDeltasSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('realism_enabled')) {
+      context.handle(
+        _realismEnabledMeta,
+        realismEnabled.isAcceptableOrUnknown(
+          data['realism_enabled']!,
+          _realismEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('short_term_mood')) {
+      context.handle(
+        _shortTermMoodMeta,
+        shortTermMood.isAcceptableOrUnknown(
+          data['short_term_mood']!,
+          _shortTermMoodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mood_decay_counter')) {
+      context.handle(
+        _moodDecayCounterMeta,
+        moodDecayCounter.isAcceptableOrUnknown(
+          data['mood_decay_counter']!,
+          _moodDecayCounterMeta,
+        ),
+      );
+    }
+    if (data.containsKey('character_emotion')) {
+      context.handle(
+        _characterEmotionMeta,
+        characterEmotion.isAcceptableOrUnknown(
+          data['character_emotion']!,
+          _characterEmotionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emotion_intensity')) {
+      context.handle(
+        _emotionIntensityMeta,
+        emotionIntensity.isAcceptableOrUnknown(
+          data['emotion_intensity']!,
+          _emotionIntensityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('time_of_day')) {
+      context.handle(
+        _timeOfDayMeta,
+        timeOfDay.isAcceptableOrUnknown(data['time_of_day']!, _timeOfDayMeta),
+      );
+    }
+    if (data.containsKey('day_count')) {
+      context.handle(
+        _dayCountMeta,
+        dayCount.isAcceptableOrUnknown(data['day_count']!, _dayCountMeta),
+      );
+    }
+    if (data.containsKey('start_day_of_week')) {
+      context.handle(
+        _startDayOfWeekMeta,
+        startDayOfWeek.isAcceptableOrUnknown(
+          data['start_day_of_week']!,
+          _startDayOfWeekMeta,
+        ),
+      );
+    }
+    if (data.containsKey('story_clock')) {
+      context.handle(
+        _storyClockMeta,
+        storyClock.isAcceptableOrUnknown(data['story_clock']!, _storyClockMeta),
+      );
+    }
+    if (data.containsKey('story_start_date')) {
+      context.handle(
+        _storyStartDateMeta,
+        storyStartDate.isAcceptableOrUnknown(
+          data['story_start_date']!,
+          _storyStartDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('nsfw_cooldown_enabled')) {
+      context.handle(
+        _nsfwCooldownEnabledMeta,
+        nsfwCooldownEnabled.isAcceptableOrUnknown(
+          data['nsfw_cooldown_enabled']!,
+          _nsfwCooldownEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('passage_of_time_enabled')) {
+      context.handle(
+        _passageOfTimeEnabledMeta,
+        passageOfTimeEnabled.isAcceptableOrUnknown(
+          data['passage_of_time_enabled']!,
+          _passageOfTimeEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('passage_of_time_gate_migrated')) {
+      context.handle(
+        _passageOfTimeGateMigratedMeta,
+        passageOfTimeGateMigrated.isAcceptableOrUnknown(
+          data['passage_of_time_gate_migrated']!,
+          _passageOfTimeGateMigratedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('arousal_level')) {
+      context.handle(
+        _arousalLevelMeta,
+        arousalLevel.isAcceptableOrUnknown(
+          data['arousal_level']!,
+          _arousalLevelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cooldown_turns_remaining')) {
+      context.handle(
+        _cooldownTurnsRemainingMeta,
+        cooldownTurnsRemaining.isAcceptableOrUnknown(
+          data['cooldown_turns_remaining']!,
+          _cooldownTurnsRemainingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cooldown_turns_total')) {
+      context.handle(
+        _cooldownTurnsTotalMeta,
+        cooldownTurnsTotal.isAcceptableOrUnknown(
+          data['cooldown_turns_total']!,
+          _cooldownTurnsTotalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('refractory_minutes_remaining')) {
+      context.handle(
+        _refractoryMinutesRemainingMeta,
+        refractoryMinutesRemaining.isAcceptableOrUnknown(
+          data['refractory_minutes_remaining']!,
+          _refractoryMinutesRemainingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('refractory_minutes_total')) {
+      context.handle(
+        _refractoryMinutesTotalMeta,
+        refractoryMinutesTotal.isAcceptableOrUnknown(
+          data['refractory_minutes_total']!,
+          _refractoryMinutesTotalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('refractory_opened')) {
+      context.handle(
+        _refractoryOpenedMeta,
+        refractoryOpened.isAcceptableOrUnknown(
+          data['refractory_opened']!,
+          _refractoryOpenedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trust_level')) {
+      context.handle(
+        _trustLevelMeta,
+        trustLevel.isAcceptableOrUnknown(data['trust_level']!, _trustLevelMeta),
+      );
+    }
+    if (data.containsKey('active_fixation')) {
+      context.handle(
+        _activeFixationMeta,
+        activeFixation.isAcceptableOrUnknown(
+          data['active_fixation']!,
+          _activeFixationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fixation_lifespan')) {
+      context.handle(
+        _fixationLifespanMeta,
+        fixationLifespan.isAcceptableOrUnknown(
+          data['fixation_lifespan']!,
+          _fixationLifespanMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spatial_stance')) {
+      context.handle(
+        _spatialStanceMeta,
+        spatialStance.isAcceptableOrUnknown(
+          data['spatial_stance']!,
+          _spatialStanceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('with_user')) {
+      context.handle(
+        _withUserMeta,
+        withUser.isAcceptableOrUnknown(data['with_user']!, _withUserMeta),
+      );
+    }
+    if (data.containsKey('trust_repair_pending')) {
+      context.handle(
+        _trustRepairPendingMeta,
+        trustRepairPending.isAcceptableOrUnknown(
+          data['trust_repair_pending']!,
+          _trustRepairPendingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chaos_mode_enabled')) {
+      context.handle(
+        _chaosModeEnabledMeta,
+        chaosModeEnabled.isAcceptableOrUnknown(
+          data['chaos_mode_enabled']!,
+          _chaosModeEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chaos_pressure')) {
+      context.handle(
+        _chaosPressureMeta,
+        chaosPressure.isAcceptableOrUnknown(
+          data['chaos_pressure']!,
+          _chaosPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('needs_sim_enabled')) {
+      context.handle(
+        _needsSimEnabledMeta,
+        needsSimEnabled.isAcceptableOrUnknown(
+          data['needs_sim_enabled']!,
+          _needsSimEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('needs_vector')) {
+      context.handle(
+        _needsVectorMeta,
+        needsVector.isAcceptableOrUnknown(
+          data['needs_vector']!,
+          _needsVectorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pockets')) {
+      context.handle(
+        _pocketsMeta,
+        pockets.isAcceptableOrUnknown(data['pockets']!, _pocketsMeta),
+      );
+    }
+    if (data.containsKey('today_objective_id')) {
+      context.handle(
+        _todayObjectiveIdMeta,
+        todayObjectiveId.isAcceptableOrUnknown(
+          data['today_objective_id']!,
+          _todayObjectiveIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolved_personality')) {
+      context.handle(
+        _evolvedPersonalityMeta,
+        evolvedPersonality.isAcceptableOrUnknown(
+          data['evolved_personality']!,
+          _evolvedPersonalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolved_scenario')) {
+      context.handle(
+        _evolvedScenarioMeta,
+        evolvedScenario.isAcceptableOrUnknown(
+          data['evolved_scenario']!,
+          _evolvedScenarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evolution_count')) {
+      context.handle(
+        _evolutionCountMeta,
+        evolutionCount.isAcceptableOrUnknown(
+          data['evolution_count']!,
+          _evolutionCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('group_evolved_personalities')) {
+      context.handle(
+        _groupEvolvedPersonalitiesMeta,
+        groupEvolvedPersonalities.isAcceptableOrUnknown(
+          data['group_evolved_personalities']!,
+          _groupEvolvedPersonalitiesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('group_evolved_scenarios')) {
+      context.handle(
+        _groupEvolvedScenariosMeta,
+        groupEvolvedScenarios.isAcceptableOrUnknown(
+          data['group_evolved_scenarios']!,
+          _groupEvolvedScenariosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('generation_settings')) {
+      context.handle(
+        _generationSettingsMeta,
+        generationSettings.isAcceptableOrUnknown(
+          data['generation_settings']!,
+          _generationSettingsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('user_persona_id')) {
+      context.handle(
+        _userPersonaIdMeta,
+        userPersonaId.isAcceptableOrUnknown(
+          data['user_persona_id']!,
+          _userPersonaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_look_avatar_id')) {
+      context.handle(
+        _selectedLookAvatarIdMeta,
+        selectedLookAvatarId.isAcceptableOrUnknown(
+          data['selected_look_avatar_id']!,
+          _selectedLookAvatarIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('theme_overrides')) {
+      context.handle(
+        _themeOverridesMeta,
+        themeOverrides.isAcceptableOrUnknown(
+          data['theme_overrides']!,
+          _themeOverridesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('context_budget_json')) {
+      context.handle(
+        _contextBudgetJsonMeta,
+        contextBudgetJson.isAcceptableOrUnknown(
+          data['context_budget_json']!,
+          _contextBudgetJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('objectives_enabled')) {
+      context.handle(
+        _objectivesEnabledMeta,
+        objectivesEnabled.isAcceptableOrUnknown(
+          data['objectives_enabled']!,
+          _objectivesEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('group_realism_state')) {
+      context.handle(
+        _groupRealismStateMeta,
+        groupRealismState.isAcceptableOrUnknown(
+          data['group_realism_state']!,
+          _groupRealismStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Session map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Session(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      ),
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_id'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      authorNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}author_note'],
+      )!,
+      authorNoteDepth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}author_note_depth'],
+      )!,
+      summary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}summary'],
+      ),
+      summaryLastIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}summary_last_index'],
+      ),
+      worldsInitialized: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}worlds_initialized'],
+      )!,
+      parentSession: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_session'],
+      ),
+      forkIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fork_index'],
+      ),
+      affectionScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}affection_score'],
+      )!,
+      relationshipTier: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}relationship_tier'],
+      )!,
+      longTermScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}long_term_score'],
+      )!,
+      longTermTier: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}long_term_tier'],
+      )!,
+      turnsSinceLongTermCheck: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}turns_since_long_term_check'],
+      )!,
+      shortTermDeltasSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}short_term_deltas_summary'],
+      )!,
+      realismEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}realism_enabled'],
+      )!,
+      shortTermMood: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}short_term_mood'],
+      )!,
+      moodDecayCounter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mood_decay_counter'],
+      )!,
+      characterEmotion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_emotion'],
+      )!,
+      emotionIntensity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emotion_intensity'],
+      )!,
+      timeOfDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time_of_day'],
+      )!,
+      dayCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_count'],
+      )!,
+      startDayOfWeek: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_day_of_week'],
+      )!,
+      storyClock: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}story_clock'],
+      ),
+      storyStartDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}story_start_date'],
+      ),
+      nsfwCooldownEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}nsfw_cooldown_enabled'],
+      )!,
+      passageOfTimeEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}passage_of_time_enabled'],
+      )!,
+      passageOfTimeGateMigrated: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}passage_of_time_gate_migrated'],
+      )!,
+      arousalLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}arousal_level'],
+      )!,
+      cooldownTurnsRemaining: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cooldown_turns_remaining'],
+      )!,
+      cooldownTurnsTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cooldown_turns_total'],
+      )!,
+      refractoryMinutesRemaining: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}refractory_minutes_remaining'],
+      ),
+      refractoryMinutesTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}refractory_minutes_total'],
+      ),
+      refractoryOpened: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}refractory_opened'],
+      ),
+      trustLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}trust_level'],
+      )!,
+      activeFixation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}active_fixation'],
+      )!,
+      fixationLifespan: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fixation_lifespan'],
+      )!,
+      spatialStance: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spatial_stance'],
+      )!,
+      withUser: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}with_user'],
+      ),
+      trustRepairPending: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}trust_repair_pending'],
+      )!,
+      chaosModeEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}chaos_mode_enabled'],
+      )!,
+      chaosPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chaos_pressure'],
+      )!,
+      needsSimEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}needs_sim_enabled'],
+      )!,
+      needsVector: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}needs_vector'],
+      ),
+      pockets: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pockets'],
+      ),
+      todayObjectiveId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}today_objective_id'],
+      ),
+      evolvedPersonality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evolved_personality'],
+      )!,
+      evolvedScenario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evolved_scenario'],
+      )!,
+      evolutionCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}evolution_count'],
+      )!,
+      groupEvolvedPersonalities: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_evolved_personalities'],
+      )!,
+      groupEvolvedScenarios: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_evolved_scenarios'],
+      )!,
+      generationSettings: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}generation_settings'],
+      ),
+      userPersonaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_persona_id'],
+      ),
+      selectedLookAvatarId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_look_avatar_id'],
+      ),
+      themeOverrides: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}theme_overrides'],
+      ),
+      contextBudgetJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}context_budget_json'],
+      ),
+      objectivesEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}objectives_enabled'],
+      )!,
+      groupRealismState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_realism_state'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $SessionsTable createAlias(String alias) {
+    return $SessionsTable(attachedDatabase, alias);
+  }
+}
+
+class Session extends DataClass implements Insertable<Session> {
+  final String id;
+  final String? characterId;
+  final String? groupId;
+  final String? name;
+  final String? description;
+  final String authorNote;
+  final int authorNoteDepth;
+  final String? summary;
+  final int? summaryLastIndex;
+
+  /// True once this chat's world attachments have been decided — either seeded
+  /// at creation, back-filled from the character, or set by hand (including
+  /// deliberately emptied). Lets an empty list mean "the user removed them"
+  /// instead of "this chat predates the character having a world", so a
+  /// back-fill can never undo a deliberate detach.
+  final bool worldsInitialized;
+  final String? parentSession;
+  final int? forkIndex;
+  final int affectionScore;
+  final int relationshipTier;
+  final int longTermScore;
+  final int longTermTier;
+  final int turnsSinceLongTermCheck;
+  final int shortTermDeltasSummary;
+  final bool realismEnabled;
+  final int shortTermMood;
+  final int moodDecayCounter;
+  final String characterEmotion;
+  final String emotionIntensity;
+  final String timeOfDay;
+  final int dayCount;
+  final int startDayOfWeek;
+  final String? storyClock;
+  final String? storyStartDate;
+  final bool nsfwCooldownEnabled;
+  final bool passageOfTimeEnabled;
+
+  /// v53 — leftover `passage_of_time_enabled` is storage only. Porch
+  /// Life `passageOfTimeDefault` is the live gate. First hydrate after
+  /// this column exists logs the leftover once and sets this true so
+  /// we stop rewriting it as if it were a gate.
+  final bool passageOfTimeGateMigrated;
+  final int arousalLevel;
+  final int cooldownTurnsRemaining;
+  final int cooldownTurnsTotal;
+
+  /// v55 — the refractory in story minutes (cooldown_turns_* above are no
+  /// longer written). Nullable, no default: NULL marks a row from before
+  /// minutes, whose turns the load reads once as turns × 15.
+  final int? refractoryMinutesRemaining;
+  final int? refractoryMinutesTotal;
+
+  /// v55 — the opening afterglow turn has been spoken. NULL as above.
+  final bool? refractoryOpened;
+  final int trustLevel;
+  final String activeFixation;
+  final int fixationLifespan;
+  final String spatialStance;
+
+  /// v49 — 1:1 glance bit. NULL = unknown (keyword fallback).
+  /// Group members keep theirs in group_realism_state.
+  final bool? withUser;
+  final bool trustRepairPending;
+  final bool chaosModeEnabled;
+  final int chaosPressure;
+  final bool needsSimEnabled;
+  final String? needsVector;
+
+  /// v47 — the 1:1 speaker's Pockets record, as `{worn: [...], carrying: [...]}`.
+  ///
+  /// The mirror of [needsVector], and it exists for the same reason. Group
+  /// chats persist their per-member pockets inside `group_realism_state`, so
+  /// they always survived a reload; a 1:1 chat had NO home for the record at
+  /// all. It lived in memory, snapshotted into each message's `realism_state`
+  /// — but that snapshot is only restored on regen, swipe and delete, never on
+  /// session load. So closing a 1:1 chat and reopening it emptied their pockets,
+  /// while the feature's own description promised the opposite. Straight
+  /// 1:1-vs-group parity break.
+  ///
+  /// Nullable with no default: NULL means "nothing recorded", which is the
+  /// honest value both for every chat that predates this column and for any
+  /// chat where Pockets is switched off.
+  final String? pockets;
+
+  /// v48 — the live Today side-quest row for this chat, or null if none.
+  ///
+  /// Shape is not enough: a user-typed secondary is also isPrimary false,
+  /// tasks [], servedAmbition null. Persist the id so reload rebinds this
+  /// row and never guesses among secondaries. Nullable, no default: every
+  /// chat older than the column has no Today hold.
+  final String? todayObjectiveId;
+  final String evolvedPersonality;
+  final String evolvedScenario;
+  final int evolutionCount;
+  final String groupEvolvedPersonalities;
+  final String groupEvolvedScenarios;
+  final String? generationSettings;
+  final String? userPersonaId;
+
+  /// The gallery "look" (avatar) selected for THIS chat, or null → show the
+  /// character's library face (`imagePath`). Per-chat selection over the global
+  /// look collection. Nullable + additive.
+  final String? selectedLookAvatarId;
+
+  /// Per-chat theme overrides JSON. Was repair-only until 2026-08-04 — fresh
+  /// createAll() DBs (unit tests) lacked it. No schemaVersion bump: live DBs
+  /// get it from the always-on repair before open() returns. Raw-SQL access.
+  final String? themeOverrides;
+  final String? contextBudgetJson;
+
+  /// Per-chat Objectives switch (v45). Defaults TRUE because objectives have
+  /// always run unconditionally — every existing row must keep behaving
+  /// exactly as it did, so the migration's default is the no-op value.
+  /// AND-gated against the global `objectivesEnabled` the same way
+  /// [needsSimEnabled] is gated against `needsSimDefault`.
+  final bool objectivesEnabled;
+
+  /// Live per-character realism/needs state for group sessions.
+  /// JSON map: { charId: { emotion, needs, affection, trust, fixation, relationships, ... } }
+  /// Replaces the old hidden __group_state__ checkpoint message system (clean break in v30).
+  /// Only populated for sessions where groupId is not null.
+  final String groupRealismState;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Session({
+    required this.id,
+    this.characterId,
+    this.groupId,
+    this.name,
+    this.description,
+    required this.authorNote,
+    required this.authorNoteDepth,
+    this.summary,
+    this.summaryLastIndex,
+    required this.worldsInitialized,
+    this.parentSession,
+    this.forkIndex,
+    required this.affectionScore,
+    required this.relationshipTier,
+    required this.longTermScore,
+    required this.longTermTier,
+    required this.turnsSinceLongTermCheck,
+    required this.shortTermDeltasSummary,
+    required this.realismEnabled,
+    required this.shortTermMood,
+    required this.moodDecayCounter,
+    required this.characterEmotion,
+    required this.emotionIntensity,
+    required this.timeOfDay,
+    required this.dayCount,
+    required this.startDayOfWeek,
+    this.storyClock,
+    this.storyStartDate,
+    required this.nsfwCooldownEnabled,
+    required this.passageOfTimeEnabled,
+    required this.passageOfTimeGateMigrated,
+    required this.arousalLevel,
+    required this.cooldownTurnsRemaining,
+    required this.cooldownTurnsTotal,
+    this.refractoryMinutesRemaining,
+    this.refractoryMinutesTotal,
+    this.refractoryOpened,
+    required this.trustLevel,
+    required this.activeFixation,
+    required this.fixationLifespan,
+    required this.spatialStance,
+    this.withUser,
+    required this.trustRepairPending,
+    required this.chaosModeEnabled,
+    required this.chaosPressure,
+    required this.needsSimEnabled,
+    this.needsVector,
+    this.pockets,
+    this.todayObjectiveId,
+    required this.evolvedPersonality,
+    required this.evolvedScenario,
+    required this.evolutionCount,
+    required this.groupEvolvedPersonalities,
+    required this.groupEvolvedScenarios,
+    this.generationSettings,
+    this.userPersonaId,
+    this.selectedLookAvatarId,
+    this.themeOverrides,
+    this.contextBudgetJson,
+    required this.objectivesEnabled,
+    required this.groupRealismState,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || characterId != null) {
+      map['character_id'] = Variable<String>(characterId);
+    }
+    if (!nullToAbsent || groupId != null) {
+      map['group_id'] = Variable<String>(groupId);
+    }
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['author_note'] = Variable<String>(authorNote);
+    map['author_note_depth'] = Variable<int>(authorNoteDepth);
+    if (!nullToAbsent || summary != null) {
+      map['summary'] = Variable<String>(summary);
+    }
+    if (!nullToAbsent || summaryLastIndex != null) {
+      map['summary_last_index'] = Variable<int>(summaryLastIndex);
+    }
+    map['worlds_initialized'] = Variable<bool>(worldsInitialized);
+    if (!nullToAbsent || parentSession != null) {
+      map['parent_session'] = Variable<String>(parentSession);
+    }
+    if (!nullToAbsent || forkIndex != null) {
+      map['fork_index'] = Variable<int>(forkIndex);
+    }
+    map['affection_score'] = Variable<int>(affectionScore);
+    map['relationship_tier'] = Variable<int>(relationshipTier);
+    map['long_term_score'] = Variable<int>(longTermScore);
+    map['long_term_tier'] = Variable<int>(longTermTier);
+    map['turns_since_long_term_check'] = Variable<int>(turnsSinceLongTermCheck);
+    map['short_term_deltas_summary'] = Variable<int>(shortTermDeltasSummary);
+    map['realism_enabled'] = Variable<bool>(realismEnabled);
+    map['short_term_mood'] = Variable<int>(shortTermMood);
+    map['mood_decay_counter'] = Variable<int>(moodDecayCounter);
+    map['character_emotion'] = Variable<String>(characterEmotion);
+    map['emotion_intensity'] = Variable<String>(emotionIntensity);
+    map['time_of_day'] = Variable<String>(timeOfDay);
+    map['day_count'] = Variable<int>(dayCount);
+    map['start_day_of_week'] = Variable<int>(startDayOfWeek);
+    if (!nullToAbsent || storyClock != null) {
+      map['story_clock'] = Variable<String>(storyClock);
+    }
+    if (!nullToAbsent || storyStartDate != null) {
+      map['story_start_date'] = Variable<String>(storyStartDate);
+    }
+    map['nsfw_cooldown_enabled'] = Variable<bool>(nsfwCooldownEnabled);
+    map['passage_of_time_enabled'] = Variable<bool>(passageOfTimeEnabled);
+    map['passage_of_time_gate_migrated'] = Variable<bool>(
+      passageOfTimeGateMigrated,
+    );
+    map['arousal_level'] = Variable<int>(arousalLevel);
+    map['cooldown_turns_remaining'] = Variable<int>(cooldownTurnsRemaining);
+    map['cooldown_turns_total'] = Variable<int>(cooldownTurnsTotal);
+    if (!nullToAbsent || refractoryMinutesRemaining != null) {
+      map['refractory_minutes_remaining'] = Variable<int>(
+        refractoryMinutesRemaining,
+      );
+    }
+    if (!nullToAbsent || refractoryMinutesTotal != null) {
+      map['refractory_minutes_total'] = Variable<int>(refractoryMinutesTotal);
+    }
+    if (!nullToAbsent || refractoryOpened != null) {
+      map['refractory_opened'] = Variable<bool>(refractoryOpened);
+    }
+    map['trust_level'] = Variable<int>(trustLevel);
+    map['active_fixation'] = Variable<String>(activeFixation);
+    map['fixation_lifespan'] = Variable<int>(fixationLifespan);
+    map['spatial_stance'] = Variable<String>(spatialStance);
+    if (!nullToAbsent || withUser != null) {
+      map['with_user'] = Variable<bool>(withUser);
+    }
+    map['trust_repair_pending'] = Variable<bool>(trustRepairPending);
+    map['chaos_mode_enabled'] = Variable<bool>(chaosModeEnabled);
+    map['chaos_pressure'] = Variable<int>(chaosPressure);
+    map['needs_sim_enabled'] = Variable<bool>(needsSimEnabled);
+    if (!nullToAbsent || needsVector != null) {
+      map['needs_vector'] = Variable<String>(needsVector);
+    }
+    if (!nullToAbsent || pockets != null) {
+      map['pockets'] = Variable<String>(pockets);
+    }
+    if (!nullToAbsent || todayObjectiveId != null) {
+      map['today_objective_id'] = Variable<String>(todayObjectiveId);
+    }
+    map['evolved_personality'] = Variable<String>(evolvedPersonality);
+    map['evolved_scenario'] = Variable<String>(evolvedScenario);
+    map['evolution_count'] = Variable<int>(evolutionCount);
+    map['group_evolved_personalities'] = Variable<String>(
+      groupEvolvedPersonalities,
+    );
+    map['group_evolved_scenarios'] = Variable<String>(groupEvolvedScenarios);
+    if (!nullToAbsent || generationSettings != null) {
+      map['generation_settings'] = Variable<String>(generationSettings);
+    }
+    if (!nullToAbsent || userPersonaId != null) {
+      map['user_persona_id'] = Variable<String>(userPersonaId);
+    }
+    if (!nullToAbsent || selectedLookAvatarId != null) {
+      map['selected_look_avatar_id'] = Variable<String>(selectedLookAvatarId);
+    }
+    if (!nullToAbsent || themeOverrides != null) {
+      map['theme_overrides'] = Variable<String>(themeOverrides);
+    }
+    if (!nullToAbsent || contextBudgetJson != null) {
+      map['context_budget_json'] = Variable<String>(contextBudgetJson);
+    }
+    map['objectives_enabled'] = Variable<bool>(objectivesEnabled);
+    map['group_realism_state'] = Variable<String>(groupRealismState);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  SessionsCompanion toCompanion(bool nullToAbsent) {
+    return SessionsCompanion(
+      id: Value(id),
+      characterId: characterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(characterId),
+      groupId: groupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(groupId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      authorNote: Value(authorNote),
+      authorNoteDepth: Value(authorNoteDepth),
+      summary: summary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(summary),
+      summaryLastIndex: summaryLastIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(summaryLastIndex),
+      worldsInitialized: Value(worldsInitialized),
+      parentSession: parentSession == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentSession),
+      forkIndex: forkIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(forkIndex),
+      affectionScore: Value(affectionScore),
+      relationshipTier: Value(relationshipTier),
+      longTermScore: Value(longTermScore),
+      longTermTier: Value(longTermTier),
+      turnsSinceLongTermCheck: Value(turnsSinceLongTermCheck),
+      shortTermDeltasSummary: Value(shortTermDeltasSummary),
+      realismEnabled: Value(realismEnabled),
+      shortTermMood: Value(shortTermMood),
+      moodDecayCounter: Value(moodDecayCounter),
+      characterEmotion: Value(characterEmotion),
+      emotionIntensity: Value(emotionIntensity),
+      timeOfDay: Value(timeOfDay),
+      dayCount: Value(dayCount),
+      startDayOfWeek: Value(startDayOfWeek),
+      storyClock: storyClock == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storyClock),
+      storyStartDate: storyStartDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storyStartDate),
+      nsfwCooldownEnabled: Value(nsfwCooldownEnabled),
+      passageOfTimeEnabled: Value(passageOfTimeEnabled),
+      passageOfTimeGateMigrated: Value(passageOfTimeGateMigrated),
+      arousalLevel: Value(arousalLevel),
+      cooldownTurnsRemaining: Value(cooldownTurnsRemaining),
+      cooldownTurnsTotal: Value(cooldownTurnsTotal),
+      refractoryMinutesRemaining:
+          refractoryMinutesRemaining == null && nullToAbsent
+          ? const Value.absent()
+          : Value(refractoryMinutesRemaining),
+      refractoryMinutesTotal: refractoryMinutesTotal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(refractoryMinutesTotal),
+      refractoryOpened: refractoryOpened == null && nullToAbsent
+          ? const Value.absent()
+          : Value(refractoryOpened),
+      trustLevel: Value(trustLevel),
+      activeFixation: Value(activeFixation),
+      fixationLifespan: Value(fixationLifespan),
+      spatialStance: Value(spatialStance),
+      withUser: withUser == null && nullToAbsent
+          ? const Value.absent()
+          : Value(withUser),
+      trustRepairPending: Value(trustRepairPending),
+      chaosModeEnabled: Value(chaosModeEnabled),
+      chaosPressure: Value(chaosPressure),
+      needsSimEnabled: Value(needsSimEnabled),
+      needsVector: needsVector == null && nullToAbsent
+          ? const Value.absent()
+          : Value(needsVector),
+      pockets: pockets == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pockets),
+      todayObjectiveId: todayObjectiveId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(todayObjectiveId),
+      evolvedPersonality: Value(evolvedPersonality),
+      evolvedScenario: Value(evolvedScenario),
+      evolutionCount: Value(evolutionCount),
+      groupEvolvedPersonalities: Value(groupEvolvedPersonalities),
+      groupEvolvedScenarios: Value(groupEvolvedScenarios),
+      generationSettings: generationSettings == null && nullToAbsent
+          ? const Value.absent()
+          : Value(generationSettings),
+      userPersonaId: userPersonaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userPersonaId),
+      selectedLookAvatarId: selectedLookAvatarId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedLookAvatarId),
+      themeOverrides: themeOverrides == null && nullToAbsent
+          ? const Value.absent()
+          : Value(themeOverrides),
+      contextBudgetJson: contextBudgetJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contextBudgetJson),
+      objectivesEnabled: Value(objectivesEnabled),
+      groupRealismState: Value(groupRealismState),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Session.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Session(
+      id: serializer.fromJson<String>(json['id']),
+      characterId: serializer.fromJson<String?>(json['characterId']),
+      groupId: serializer.fromJson<String?>(json['groupId']),
+      name: serializer.fromJson<String?>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      authorNote: serializer.fromJson<String>(json['authorNote']),
+      authorNoteDepth: serializer.fromJson<int>(json['authorNoteDepth']),
+      summary: serializer.fromJson<String?>(json['summary']),
+      summaryLastIndex: serializer.fromJson<int?>(json['summaryLastIndex']),
+      worldsInitialized: serializer.fromJson<bool>(json['worldsInitialized']),
+      parentSession: serializer.fromJson<String?>(json['parentSession']),
+      forkIndex: serializer.fromJson<int?>(json['forkIndex']),
+      affectionScore: serializer.fromJson<int>(json['affectionScore']),
+      relationshipTier: serializer.fromJson<int>(json['relationshipTier']),
+      longTermScore: serializer.fromJson<int>(json['longTermScore']),
+      longTermTier: serializer.fromJson<int>(json['longTermTier']),
+      turnsSinceLongTermCheck: serializer.fromJson<int>(
+        json['turnsSinceLongTermCheck'],
+      ),
+      shortTermDeltasSummary: serializer.fromJson<int>(
+        json['shortTermDeltasSummary'],
+      ),
+      realismEnabled: serializer.fromJson<bool>(json['realismEnabled']),
+      shortTermMood: serializer.fromJson<int>(json['shortTermMood']),
+      moodDecayCounter: serializer.fromJson<int>(json['moodDecayCounter']),
+      characterEmotion: serializer.fromJson<String>(json['characterEmotion']),
+      emotionIntensity: serializer.fromJson<String>(json['emotionIntensity']),
+      timeOfDay: serializer.fromJson<String>(json['timeOfDay']),
+      dayCount: serializer.fromJson<int>(json['dayCount']),
+      startDayOfWeek: serializer.fromJson<int>(json['startDayOfWeek']),
+      storyClock: serializer.fromJson<String?>(json['storyClock']),
+      storyStartDate: serializer.fromJson<String?>(json['storyStartDate']),
+      nsfwCooldownEnabled: serializer.fromJson<bool>(
+        json['nsfwCooldownEnabled'],
+      ),
+      passageOfTimeEnabled: serializer.fromJson<bool>(
+        json['passageOfTimeEnabled'],
+      ),
+      passageOfTimeGateMigrated: serializer.fromJson<bool>(
+        json['passageOfTimeGateMigrated'],
+      ),
+      arousalLevel: serializer.fromJson<int>(json['arousalLevel']),
+      cooldownTurnsRemaining: serializer.fromJson<int>(
+        json['cooldownTurnsRemaining'],
+      ),
+      cooldownTurnsTotal: serializer.fromJson<int>(json['cooldownTurnsTotal']),
+      refractoryMinutesRemaining: serializer.fromJson<int?>(
+        json['refractoryMinutesRemaining'],
+      ),
+      refractoryMinutesTotal: serializer.fromJson<int?>(
+        json['refractoryMinutesTotal'],
+      ),
+      refractoryOpened: serializer.fromJson<bool?>(json['refractoryOpened']),
+      trustLevel: serializer.fromJson<int>(json['trustLevel']),
+      activeFixation: serializer.fromJson<String>(json['activeFixation']),
+      fixationLifespan: serializer.fromJson<int>(json['fixationLifespan']),
+      spatialStance: serializer.fromJson<String>(json['spatialStance']),
+      withUser: serializer.fromJson<bool?>(json['withUser']),
+      trustRepairPending: serializer.fromJson<bool>(json['trustRepairPending']),
+      chaosModeEnabled: serializer.fromJson<bool>(json['chaosModeEnabled']),
+      chaosPressure: serializer.fromJson<int>(json['chaosPressure']),
+      needsSimEnabled: serializer.fromJson<bool>(json['needsSimEnabled']),
+      needsVector: serializer.fromJson<String?>(json['needsVector']),
+      pockets: serializer.fromJson<String?>(json['pockets']),
+      todayObjectiveId: serializer.fromJson<String?>(json['todayObjectiveId']),
+      evolvedPersonality: serializer.fromJson<String>(
+        json['evolvedPersonality'],
+      ),
+      evolvedScenario: serializer.fromJson<String>(json['evolvedScenario']),
+      evolutionCount: serializer.fromJson<int>(json['evolutionCount']),
+      groupEvolvedPersonalities: serializer.fromJson<String>(
+        json['groupEvolvedPersonalities'],
+      ),
+      groupEvolvedScenarios: serializer.fromJson<String>(
+        json['groupEvolvedScenarios'],
+      ),
+      generationSettings: serializer.fromJson<String?>(
+        json['generationSettings'],
+      ),
+      userPersonaId: serializer.fromJson<String?>(json['userPersonaId']),
+      selectedLookAvatarId: serializer.fromJson<String?>(
+        json['selectedLookAvatarId'],
+      ),
+      themeOverrides: serializer.fromJson<String?>(json['themeOverrides']),
+      contextBudgetJson: serializer.fromJson<String?>(
+        json['contextBudgetJson'],
+      ),
+      objectivesEnabled: serializer.fromJson<bool>(json['objectivesEnabled']),
+      groupRealismState: serializer.fromJson<String>(json['groupRealismState']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'characterId': serializer.toJson<String?>(characterId),
+      'groupId': serializer.toJson<String?>(groupId),
+      'name': serializer.toJson<String?>(name),
+      'description': serializer.toJson<String?>(description),
+      'authorNote': serializer.toJson<String>(authorNote),
+      'authorNoteDepth': serializer.toJson<int>(authorNoteDepth),
+      'summary': serializer.toJson<String?>(summary),
+      'summaryLastIndex': serializer.toJson<int?>(summaryLastIndex),
+      'worldsInitialized': serializer.toJson<bool>(worldsInitialized),
+      'parentSession': serializer.toJson<String?>(parentSession),
+      'forkIndex': serializer.toJson<int?>(forkIndex),
+      'affectionScore': serializer.toJson<int>(affectionScore),
+      'relationshipTier': serializer.toJson<int>(relationshipTier),
+      'longTermScore': serializer.toJson<int>(longTermScore),
+      'longTermTier': serializer.toJson<int>(longTermTier),
+      'turnsSinceLongTermCheck': serializer.toJson<int>(
+        turnsSinceLongTermCheck,
+      ),
+      'shortTermDeltasSummary': serializer.toJson<int>(shortTermDeltasSummary),
+      'realismEnabled': serializer.toJson<bool>(realismEnabled),
+      'shortTermMood': serializer.toJson<int>(shortTermMood),
+      'moodDecayCounter': serializer.toJson<int>(moodDecayCounter),
+      'characterEmotion': serializer.toJson<String>(characterEmotion),
+      'emotionIntensity': serializer.toJson<String>(emotionIntensity),
+      'timeOfDay': serializer.toJson<String>(timeOfDay),
+      'dayCount': serializer.toJson<int>(dayCount),
+      'startDayOfWeek': serializer.toJson<int>(startDayOfWeek),
+      'storyClock': serializer.toJson<String?>(storyClock),
+      'storyStartDate': serializer.toJson<String?>(storyStartDate),
+      'nsfwCooldownEnabled': serializer.toJson<bool>(nsfwCooldownEnabled),
+      'passageOfTimeEnabled': serializer.toJson<bool>(passageOfTimeEnabled),
+      'passageOfTimeGateMigrated': serializer.toJson<bool>(
+        passageOfTimeGateMigrated,
+      ),
+      'arousalLevel': serializer.toJson<int>(arousalLevel),
+      'cooldownTurnsRemaining': serializer.toJson<int>(cooldownTurnsRemaining),
+      'cooldownTurnsTotal': serializer.toJson<int>(cooldownTurnsTotal),
+      'refractoryMinutesRemaining': serializer.toJson<int?>(
+        refractoryMinutesRemaining,
+      ),
+      'refractoryMinutesTotal': serializer.toJson<int?>(refractoryMinutesTotal),
+      'refractoryOpened': serializer.toJson<bool?>(refractoryOpened),
+      'trustLevel': serializer.toJson<int>(trustLevel),
+      'activeFixation': serializer.toJson<String>(activeFixation),
+      'fixationLifespan': serializer.toJson<int>(fixationLifespan),
+      'spatialStance': serializer.toJson<String>(spatialStance),
+      'withUser': serializer.toJson<bool?>(withUser),
+      'trustRepairPending': serializer.toJson<bool>(trustRepairPending),
+      'chaosModeEnabled': serializer.toJson<bool>(chaosModeEnabled),
+      'chaosPressure': serializer.toJson<int>(chaosPressure),
+      'needsSimEnabled': serializer.toJson<bool>(needsSimEnabled),
+      'needsVector': serializer.toJson<String?>(needsVector),
+      'pockets': serializer.toJson<String?>(pockets),
+      'todayObjectiveId': serializer.toJson<String?>(todayObjectiveId),
+      'evolvedPersonality': serializer.toJson<String>(evolvedPersonality),
+      'evolvedScenario': serializer.toJson<String>(evolvedScenario),
+      'evolutionCount': serializer.toJson<int>(evolutionCount),
+      'groupEvolvedPersonalities': serializer.toJson<String>(
+        groupEvolvedPersonalities,
+      ),
+      'groupEvolvedScenarios': serializer.toJson<String>(groupEvolvedScenarios),
+      'generationSettings': serializer.toJson<String?>(generationSettings),
+      'userPersonaId': serializer.toJson<String?>(userPersonaId),
+      'selectedLookAvatarId': serializer.toJson<String?>(selectedLookAvatarId),
+      'themeOverrides': serializer.toJson<String?>(themeOverrides),
+      'contextBudgetJson': serializer.toJson<String?>(contextBudgetJson),
+      'objectivesEnabled': serializer.toJson<bool>(objectivesEnabled),
+      'groupRealismState': serializer.toJson<String>(groupRealismState),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Session copyWith({
+    String? id,
+    Value<String?> characterId = const Value.absent(),
+    Value<String?> groupId = const Value.absent(),
+    Value<String?> name = const Value.absent(),
+    Value<String?> description = const Value.absent(),
+    String? authorNote,
+    int? authorNoteDepth,
+    Value<String?> summary = const Value.absent(),
+    Value<int?> summaryLastIndex = const Value.absent(),
+    bool? worldsInitialized,
+    Value<String?> parentSession = const Value.absent(),
+    Value<int?> forkIndex = const Value.absent(),
+    int? affectionScore,
+    int? relationshipTier,
+    int? longTermScore,
+    int? longTermTier,
+    int? turnsSinceLongTermCheck,
+    int? shortTermDeltasSummary,
+    bool? realismEnabled,
+    int? shortTermMood,
+    int? moodDecayCounter,
+    String? characterEmotion,
+    String? emotionIntensity,
+    String? timeOfDay,
+    int? dayCount,
+    int? startDayOfWeek,
+    Value<String?> storyClock = const Value.absent(),
+    Value<String?> storyStartDate = const Value.absent(),
+    bool? nsfwCooldownEnabled,
+    bool? passageOfTimeEnabled,
+    bool? passageOfTimeGateMigrated,
+    int? arousalLevel,
+    int? cooldownTurnsRemaining,
+    int? cooldownTurnsTotal,
+    Value<int?> refractoryMinutesRemaining = const Value.absent(),
+    Value<int?> refractoryMinutesTotal = const Value.absent(),
+    Value<bool?> refractoryOpened = const Value.absent(),
+    int? trustLevel,
+    String? activeFixation,
+    int? fixationLifespan,
+    String? spatialStance,
+    Value<bool?> withUser = const Value.absent(),
+    bool? trustRepairPending,
+    bool? chaosModeEnabled,
+    int? chaosPressure,
+    bool? needsSimEnabled,
+    Value<String?> needsVector = const Value.absent(),
+    Value<String?> pockets = const Value.absent(),
+    Value<String?> todayObjectiveId = const Value.absent(),
+    String? evolvedPersonality,
+    String? evolvedScenario,
+    int? evolutionCount,
+    String? groupEvolvedPersonalities,
+    String? groupEvolvedScenarios,
+    Value<String?> generationSettings = const Value.absent(),
+    Value<String?> userPersonaId = const Value.absent(),
+    Value<String?> selectedLookAvatarId = const Value.absent(),
+    Value<String?> themeOverrides = const Value.absent(),
+    Value<String?> contextBudgetJson = const Value.absent(),
+    bool? objectivesEnabled,
+    String? groupRealismState,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Session(
+    id: id ?? this.id,
+    characterId: characterId.present ? characterId.value : this.characterId,
+    groupId: groupId.present ? groupId.value : this.groupId,
+    name: name.present ? name.value : this.name,
+    description: description.present ? description.value : this.description,
+    authorNote: authorNote ?? this.authorNote,
+    authorNoteDepth: authorNoteDepth ?? this.authorNoteDepth,
+    summary: summary.present ? summary.value : this.summary,
+    summaryLastIndex: summaryLastIndex.present
+        ? summaryLastIndex.value
+        : this.summaryLastIndex,
+    worldsInitialized: worldsInitialized ?? this.worldsInitialized,
+    parentSession: parentSession.present
+        ? parentSession.value
+        : this.parentSession,
+    forkIndex: forkIndex.present ? forkIndex.value : this.forkIndex,
+    affectionScore: affectionScore ?? this.affectionScore,
+    relationshipTier: relationshipTier ?? this.relationshipTier,
+    longTermScore: longTermScore ?? this.longTermScore,
+    longTermTier: longTermTier ?? this.longTermTier,
+    turnsSinceLongTermCheck:
+        turnsSinceLongTermCheck ?? this.turnsSinceLongTermCheck,
+    shortTermDeltasSummary:
+        shortTermDeltasSummary ?? this.shortTermDeltasSummary,
+    realismEnabled: realismEnabled ?? this.realismEnabled,
+    shortTermMood: shortTermMood ?? this.shortTermMood,
+    moodDecayCounter: moodDecayCounter ?? this.moodDecayCounter,
+    characterEmotion: characterEmotion ?? this.characterEmotion,
+    emotionIntensity: emotionIntensity ?? this.emotionIntensity,
+    timeOfDay: timeOfDay ?? this.timeOfDay,
+    dayCount: dayCount ?? this.dayCount,
+    startDayOfWeek: startDayOfWeek ?? this.startDayOfWeek,
+    storyClock: storyClock.present ? storyClock.value : this.storyClock,
+    storyStartDate: storyStartDate.present
+        ? storyStartDate.value
+        : this.storyStartDate,
+    nsfwCooldownEnabled: nsfwCooldownEnabled ?? this.nsfwCooldownEnabled,
+    passageOfTimeEnabled: passageOfTimeEnabled ?? this.passageOfTimeEnabled,
+    passageOfTimeGateMigrated:
+        passageOfTimeGateMigrated ?? this.passageOfTimeGateMigrated,
+    arousalLevel: arousalLevel ?? this.arousalLevel,
+    cooldownTurnsRemaining:
+        cooldownTurnsRemaining ?? this.cooldownTurnsRemaining,
+    cooldownTurnsTotal: cooldownTurnsTotal ?? this.cooldownTurnsTotal,
+    refractoryMinutesRemaining: refractoryMinutesRemaining.present
+        ? refractoryMinutesRemaining.value
+        : this.refractoryMinutesRemaining,
+    refractoryMinutesTotal: refractoryMinutesTotal.present
+        ? refractoryMinutesTotal.value
+        : this.refractoryMinutesTotal,
+    refractoryOpened: refractoryOpened.present
+        ? refractoryOpened.value
+        : this.refractoryOpened,
+    trustLevel: trustLevel ?? this.trustLevel,
+    activeFixation: activeFixation ?? this.activeFixation,
+    fixationLifespan: fixationLifespan ?? this.fixationLifespan,
+    spatialStance: spatialStance ?? this.spatialStance,
+    withUser: withUser.present ? withUser.value : this.withUser,
+    trustRepairPending: trustRepairPending ?? this.trustRepairPending,
+    chaosModeEnabled: chaosModeEnabled ?? this.chaosModeEnabled,
+    chaosPressure: chaosPressure ?? this.chaosPressure,
+    needsSimEnabled: needsSimEnabled ?? this.needsSimEnabled,
+    needsVector: needsVector.present ? needsVector.value : this.needsVector,
+    pockets: pockets.present ? pockets.value : this.pockets,
+    todayObjectiveId: todayObjectiveId.present
+        ? todayObjectiveId.value
+        : this.todayObjectiveId,
+    evolvedPersonality: evolvedPersonality ?? this.evolvedPersonality,
+    evolvedScenario: evolvedScenario ?? this.evolvedScenario,
+    evolutionCount: evolutionCount ?? this.evolutionCount,
+    groupEvolvedPersonalities:
+        groupEvolvedPersonalities ?? this.groupEvolvedPersonalities,
+    groupEvolvedScenarios: groupEvolvedScenarios ?? this.groupEvolvedScenarios,
+    generationSettings: generationSettings.present
+        ? generationSettings.value
+        : this.generationSettings,
+    userPersonaId: userPersonaId.present
+        ? userPersonaId.value
+        : this.userPersonaId,
+    selectedLookAvatarId: selectedLookAvatarId.present
+        ? selectedLookAvatarId.value
+        : this.selectedLookAvatarId,
+    themeOverrides: themeOverrides.present
+        ? themeOverrides.value
+        : this.themeOverrides,
+    contextBudgetJson: contextBudgetJson.present
+        ? contextBudgetJson.value
+        : this.contextBudgetJson,
+    objectivesEnabled: objectivesEnabled ?? this.objectivesEnabled,
+    groupRealismState: groupRealismState ?? this.groupRealismState,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Session copyWithCompanion(SessionsCompanion data) {
+    return Session(
+      id: data.id.present ? data.id.value : this.id,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      authorNote: data.authorNote.present
+          ? data.authorNote.value
+          : this.authorNote,
+      authorNoteDepth: data.authorNoteDepth.present
+          ? data.authorNoteDepth.value
+          : this.authorNoteDepth,
+      summary: data.summary.present ? data.summary.value : this.summary,
+      summaryLastIndex: data.summaryLastIndex.present
+          ? data.summaryLastIndex.value
+          : this.summaryLastIndex,
+      worldsInitialized: data.worldsInitialized.present
+          ? data.worldsInitialized.value
+          : this.worldsInitialized,
+      parentSession: data.parentSession.present
+          ? data.parentSession.value
+          : this.parentSession,
+      forkIndex: data.forkIndex.present ? data.forkIndex.value : this.forkIndex,
+      affectionScore: data.affectionScore.present
+          ? data.affectionScore.value
+          : this.affectionScore,
+      relationshipTier: data.relationshipTier.present
+          ? data.relationshipTier.value
+          : this.relationshipTier,
+      longTermScore: data.longTermScore.present
+          ? data.longTermScore.value
+          : this.longTermScore,
+      longTermTier: data.longTermTier.present
+          ? data.longTermTier.value
+          : this.longTermTier,
+      turnsSinceLongTermCheck: data.turnsSinceLongTermCheck.present
+          ? data.turnsSinceLongTermCheck.value
+          : this.turnsSinceLongTermCheck,
+      shortTermDeltasSummary: data.shortTermDeltasSummary.present
+          ? data.shortTermDeltasSummary.value
+          : this.shortTermDeltasSummary,
+      realismEnabled: data.realismEnabled.present
+          ? data.realismEnabled.value
+          : this.realismEnabled,
+      shortTermMood: data.shortTermMood.present
+          ? data.shortTermMood.value
+          : this.shortTermMood,
+      moodDecayCounter: data.moodDecayCounter.present
+          ? data.moodDecayCounter.value
+          : this.moodDecayCounter,
+      characterEmotion: data.characterEmotion.present
+          ? data.characterEmotion.value
+          : this.characterEmotion,
+      emotionIntensity: data.emotionIntensity.present
+          ? data.emotionIntensity.value
+          : this.emotionIntensity,
+      timeOfDay: data.timeOfDay.present ? data.timeOfDay.value : this.timeOfDay,
+      dayCount: data.dayCount.present ? data.dayCount.value : this.dayCount,
+      startDayOfWeek: data.startDayOfWeek.present
+          ? data.startDayOfWeek.value
+          : this.startDayOfWeek,
+      storyClock: data.storyClock.present
+          ? data.storyClock.value
+          : this.storyClock,
+      storyStartDate: data.storyStartDate.present
+          ? data.storyStartDate.value
+          : this.storyStartDate,
+      nsfwCooldownEnabled: data.nsfwCooldownEnabled.present
+          ? data.nsfwCooldownEnabled.value
+          : this.nsfwCooldownEnabled,
+      passageOfTimeEnabled: data.passageOfTimeEnabled.present
+          ? data.passageOfTimeEnabled.value
+          : this.passageOfTimeEnabled,
+      passageOfTimeGateMigrated: data.passageOfTimeGateMigrated.present
+          ? data.passageOfTimeGateMigrated.value
+          : this.passageOfTimeGateMigrated,
+      arousalLevel: data.arousalLevel.present
+          ? data.arousalLevel.value
+          : this.arousalLevel,
+      cooldownTurnsRemaining: data.cooldownTurnsRemaining.present
+          ? data.cooldownTurnsRemaining.value
+          : this.cooldownTurnsRemaining,
+      cooldownTurnsTotal: data.cooldownTurnsTotal.present
+          ? data.cooldownTurnsTotal.value
+          : this.cooldownTurnsTotal,
+      refractoryMinutesRemaining: data.refractoryMinutesRemaining.present
+          ? data.refractoryMinutesRemaining.value
+          : this.refractoryMinutesRemaining,
+      refractoryMinutesTotal: data.refractoryMinutesTotal.present
+          ? data.refractoryMinutesTotal.value
+          : this.refractoryMinutesTotal,
+      refractoryOpened: data.refractoryOpened.present
+          ? data.refractoryOpened.value
+          : this.refractoryOpened,
+      trustLevel: data.trustLevel.present
+          ? data.trustLevel.value
+          : this.trustLevel,
+      activeFixation: data.activeFixation.present
+          ? data.activeFixation.value
+          : this.activeFixation,
+      fixationLifespan: data.fixationLifespan.present
+          ? data.fixationLifespan.value
+          : this.fixationLifespan,
+      spatialStance: data.spatialStance.present
+          ? data.spatialStance.value
+          : this.spatialStance,
+      withUser: data.withUser.present ? data.withUser.value : this.withUser,
+      trustRepairPending: data.trustRepairPending.present
+          ? data.trustRepairPending.value
+          : this.trustRepairPending,
+      chaosModeEnabled: data.chaosModeEnabled.present
+          ? data.chaosModeEnabled.value
+          : this.chaosModeEnabled,
+      chaosPressure: data.chaosPressure.present
+          ? data.chaosPressure.value
+          : this.chaosPressure,
+      needsSimEnabled: data.needsSimEnabled.present
+          ? data.needsSimEnabled.value
+          : this.needsSimEnabled,
+      needsVector: data.needsVector.present
+          ? data.needsVector.value
+          : this.needsVector,
+      pockets: data.pockets.present ? data.pockets.value : this.pockets,
+      todayObjectiveId: data.todayObjectiveId.present
+          ? data.todayObjectiveId.value
+          : this.todayObjectiveId,
+      evolvedPersonality: data.evolvedPersonality.present
+          ? data.evolvedPersonality.value
+          : this.evolvedPersonality,
+      evolvedScenario: data.evolvedScenario.present
+          ? data.evolvedScenario.value
+          : this.evolvedScenario,
+      evolutionCount: data.evolutionCount.present
+          ? data.evolutionCount.value
+          : this.evolutionCount,
+      groupEvolvedPersonalities: data.groupEvolvedPersonalities.present
+          ? data.groupEvolvedPersonalities.value
+          : this.groupEvolvedPersonalities,
+      groupEvolvedScenarios: data.groupEvolvedScenarios.present
+          ? data.groupEvolvedScenarios.value
+          : this.groupEvolvedScenarios,
+      generationSettings: data.generationSettings.present
+          ? data.generationSettings.value
+          : this.generationSettings,
+      userPersonaId: data.userPersonaId.present
+          ? data.userPersonaId.value
+          : this.userPersonaId,
+      selectedLookAvatarId: data.selectedLookAvatarId.present
+          ? data.selectedLookAvatarId.value
+          : this.selectedLookAvatarId,
+      themeOverrides: data.themeOverrides.present
+          ? data.themeOverrides.value
+          : this.themeOverrides,
+      contextBudgetJson: data.contextBudgetJson.present
+          ? data.contextBudgetJson.value
+          : this.contextBudgetJson,
+      objectivesEnabled: data.objectivesEnabled.present
+          ? data.objectivesEnabled.value
+          : this.objectivesEnabled,
+      groupRealismState: data.groupRealismState.present
+          ? data.groupRealismState.value
+          : this.groupRealismState,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Session(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('groupId: $groupId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('authorNote: $authorNote, ')
+          ..write('authorNoteDepth: $authorNoteDepth, ')
+          ..write('summary: $summary, ')
+          ..write('summaryLastIndex: $summaryLastIndex, ')
+          ..write('worldsInitialized: $worldsInitialized, ')
+          ..write('parentSession: $parentSession, ')
+          ..write('forkIndex: $forkIndex, ')
+          ..write('affectionScore: $affectionScore, ')
+          ..write('relationshipTier: $relationshipTier, ')
+          ..write('longTermScore: $longTermScore, ')
+          ..write('longTermTier: $longTermTier, ')
+          ..write('turnsSinceLongTermCheck: $turnsSinceLongTermCheck, ')
+          ..write('shortTermDeltasSummary: $shortTermDeltasSummary, ')
+          ..write('realismEnabled: $realismEnabled, ')
+          ..write('shortTermMood: $shortTermMood, ')
+          ..write('moodDecayCounter: $moodDecayCounter, ')
+          ..write('characterEmotion: $characterEmotion, ')
+          ..write('emotionIntensity: $emotionIntensity, ')
+          ..write('timeOfDay: $timeOfDay, ')
+          ..write('dayCount: $dayCount, ')
+          ..write('startDayOfWeek: $startDayOfWeek, ')
+          ..write('storyClock: $storyClock, ')
+          ..write('storyStartDate: $storyStartDate, ')
+          ..write('nsfwCooldownEnabled: $nsfwCooldownEnabled, ')
+          ..write('passageOfTimeEnabled: $passageOfTimeEnabled, ')
+          ..write('passageOfTimeGateMigrated: $passageOfTimeGateMigrated, ')
+          ..write('arousalLevel: $arousalLevel, ')
+          ..write('cooldownTurnsRemaining: $cooldownTurnsRemaining, ')
+          ..write('cooldownTurnsTotal: $cooldownTurnsTotal, ')
+          ..write('refractoryMinutesRemaining: $refractoryMinutesRemaining, ')
+          ..write('refractoryMinutesTotal: $refractoryMinutesTotal, ')
+          ..write('refractoryOpened: $refractoryOpened, ')
+          ..write('trustLevel: $trustLevel, ')
+          ..write('activeFixation: $activeFixation, ')
+          ..write('fixationLifespan: $fixationLifespan, ')
+          ..write('spatialStance: $spatialStance, ')
+          ..write('withUser: $withUser, ')
+          ..write('trustRepairPending: $trustRepairPending, ')
+          ..write('chaosModeEnabled: $chaosModeEnabled, ')
+          ..write('chaosPressure: $chaosPressure, ')
+          ..write('needsSimEnabled: $needsSimEnabled, ')
+          ..write('needsVector: $needsVector, ')
+          ..write('pockets: $pockets, ')
+          ..write('todayObjectiveId: $todayObjectiveId, ')
+          ..write('evolvedPersonality: $evolvedPersonality, ')
+          ..write('evolvedScenario: $evolvedScenario, ')
+          ..write('evolutionCount: $evolutionCount, ')
+          ..write('groupEvolvedPersonalities: $groupEvolvedPersonalities, ')
+          ..write('groupEvolvedScenarios: $groupEvolvedScenarios, ')
+          ..write('generationSettings: $generationSettings, ')
+          ..write('userPersonaId: $userPersonaId, ')
+          ..write('selectedLookAvatarId: $selectedLookAvatarId, ')
+          ..write('themeOverrides: $themeOverrides, ')
+          ..write('contextBudgetJson: $contextBudgetJson, ')
+          ..write('objectivesEnabled: $objectivesEnabled, ')
+          ..write('groupRealismState: $groupRealismState, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    characterId,
+    groupId,
+    name,
+    description,
+    authorNote,
+    authorNoteDepth,
+    summary,
+    summaryLastIndex,
+    worldsInitialized,
+    parentSession,
+    forkIndex,
+    affectionScore,
+    relationshipTier,
+    longTermScore,
+    longTermTier,
+    turnsSinceLongTermCheck,
+    shortTermDeltasSummary,
+    realismEnabled,
+    shortTermMood,
+    moodDecayCounter,
+    characterEmotion,
+    emotionIntensity,
+    timeOfDay,
+    dayCount,
+    startDayOfWeek,
+    storyClock,
+    storyStartDate,
+    nsfwCooldownEnabled,
+    passageOfTimeEnabled,
+    passageOfTimeGateMigrated,
+    arousalLevel,
+    cooldownTurnsRemaining,
+    cooldownTurnsTotal,
+    refractoryMinutesRemaining,
+    refractoryMinutesTotal,
+    refractoryOpened,
+    trustLevel,
+    activeFixation,
+    fixationLifespan,
+    spatialStance,
+    withUser,
+    trustRepairPending,
+    chaosModeEnabled,
+    chaosPressure,
+    needsSimEnabled,
+    needsVector,
+    pockets,
+    todayObjectiveId,
+    evolvedPersonality,
+    evolvedScenario,
+    evolutionCount,
+    groupEvolvedPersonalities,
+    groupEvolvedScenarios,
+    generationSettings,
+    userPersonaId,
+    selectedLookAvatarId,
+    themeOverrides,
+    contextBudgetJson,
+    objectivesEnabled,
+    groupRealismState,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Session &&
+          other.id == this.id &&
+          other.characterId == this.characterId &&
+          other.groupId == this.groupId &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.authorNote == this.authorNote &&
+          other.authorNoteDepth == this.authorNoteDepth &&
+          other.summary == this.summary &&
+          other.summaryLastIndex == this.summaryLastIndex &&
+          other.worldsInitialized == this.worldsInitialized &&
+          other.parentSession == this.parentSession &&
+          other.forkIndex == this.forkIndex &&
+          other.affectionScore == this.affectionScore &&
+          other.relationshipTier == this.relationshipTier &&
+          other.longTermScore == this.longTermScore &&
+          other.longTermTier == this.longTermTier &&
+          other.turnsSinceLongTermCheck == this.turnsSinceLongTermCheck &&
+          other.shortTermDeltasSummary == this.shortTermDeltasSummary &&
+          other.realismEnabled == this.realismEnabled &&
+          other.shortTermMood == this.shortTermMood &&
+          other.moodDecayCounter == this.moodDecayCounter &&
+          other.characterEmotion == this.characterEmotion &&
+          other.emotionIntensity == this.emotionIntensity &&
+          other.timeOfDay == this.timeOfDay &&
+          other.dayCount == this.dayCount &&
+          other.startDayOfWeek == this.startDayOfWeek &&
+          other.storyClock == this.storyClock &&
+          other.storyStartDate == this.storyStartDate &&
+          other.nsfwCooldownEnabled == this.nsfwCooldownEnabled &&
+          other.passageOfTimeEnabled == this.passageOfTimeEnabled &&
+          other.passageOfTimeGateMigrated == this.passageOfTimeGateMigrated &&
+          other.arousalLevel == this.arousalLevel &&
+          other.cooldownTurnsRemaining == this.cooldownTurnsRemaining &&
+          other.cooldownTurnsTotal == this.cooldownTurnsTotal &&
+          other.refractoryMinutesRemaining == this.refractoryMinutesRemaining &&
+          other.refractoryMinutesTotal == this.refractoryMinutesTotal &&
+          other.refractoryOpened == this.refractoryOpened &&
+          other.trustLevel == this.trustLevel &&
+          other.activeFixation == this.activeFixation &&
+          other.fixationLifespan == this.fixationLifespan &&
+          other.spatialStance == this.spatialStance &&
+          other.withUser == this.withUser &&
+          other.trustRepairPending == this.trustRepairPending &&
+          other.chaosModeEnabled == this.chaosModeEnabled &&
+          other.chaosPressure == this.chaosPressure &&
+          other.needsSimEnabled == this.needsSimEnabled &&
+          other.needsVector == this.needsVector &&
+          other.pockets == this.pockets &&
+          other.todayObjectiveId == this.todayObjectiveId &&
+          other.evolvedPersonality == this.evolvedPersonality &&
+          other.evolvedScenario == this.evolvedScenario &&
+          other.evolutionCount == this.evolutionCount &&
+          other.groupEvolvedPersonalities == this.groupEvolvedPersonalities &&
+          other.groupEvolvedScenarios == this.groupEvolvedScenarios &&
+          other.generationSettings == this.generationSettings &&
+          other.userPersonaId == this.userPersonaId &&
+          other.selectedLookAvatarId == this.selectedLookAvatarId &&
+          other.themeOverrides == this.themeOverrides &&
+          other.contextBudgetJson == this.contextBudgetJson &&
+          other.objectivesEnabled == this.objectivesEnabled &&
+          other.groupRealismState == this.groupRealismState &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class SessionsCompanion extends UpdateCompanion<Session> {
+  final Value<String> id;
+  final Value<String?> characterId;
+  final Value<String?> groupId;
+  final Value<String?> name;
+  final Value<String?> description;
+  final Value<String> authorNote;
+  final Value<int> authorNoteDepth;
+  final Value<String?> summary;
+  final Value<int?> summaryLastIndex;
+  final Value<bool> worldsInitialized;
+  final Value<String?> parentSession;
+  final Value<int?> forkIndex;
+  final Value<int> affectionScore;
+  final Value<int> relationshipTier;
+  final Value<int> longTermScore;
+  final Value<int> longTermTier;
+  final Value<int> turnsSinceLongTermCheck;
+  final Value<int> shortTermDeltasSummary;
+  final Value<bool> realismEnabled;
+  final Value<int> shortTermMood;
+  final Value<int> moodDecayCounter;
+  final Value<String> characterEmotion;
+  final Value<String> emotionIntensity;
+  final Value<String> timeOfDay;
+  final Value<int> dayCount;
+  final Value<int> startDayOfWeek;
+  final Value<String?> storyClock;
+  final Value<String?> storyStartDate;
+  final Value<bool> nsfwCooldownEnabled;
+  final Value<bool> passageOfTimeEnabled;
+  final Value<bool> passageOfTimeGateMigrated;
+  final Value<int> arousalLevel;
+  final Value<int> cooldownTurnsRemaining;
+  final Value<int> cooldownTurnsTotal;
+  final Value<int?> refractoryMinutesRemaining;
+  final Value<int?> refractoryMinutesTotal;
+  final Value<bool?> refractoryOpened;
+  final Value<int> trustLevel;
+  final Value<String> activeFixation;
+  final Value<int> fixationLifespan;
+  final Value<String> spatialStance;
+  final Value<bool?> withUser;
+  final Value<bool> trustRepairPending;
+  final Value<bool> chaosModeEnabled;
+  final Value<int> chaosPressure;
+  final Value<bool> needsSimEnabled;
+  final Value<String?> needsVector;
+  final Value<String?> pockets;
+  final Value<String?> todayObjectiveId;
+  final Value<String> evolvedPersonality;
+  final Value<String> evolvedScenario;
+  final Value<int> evolutionCount;
+  final Value<String> groupEvolvedPersonalities;
+  final Value<String> groupEvolvedScenarios;
+  final Value<String?> generationSettings;
+  final Value<String?> userPersonaId;
+  final Value<String?> selectedLookAvatarId;
+  final Value<String?> themeOverrides;
+  final Value<String?> contextBudgetJson;
+  final Value<bool> objectivesEnabled;
+  final Value<String> groupRealismState;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const SessionsCompanion({
+    this.id = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.authorNote = const Value.absent(),
+    this.authorNoteDepth = const Value.absent(),
+    this.summary = const Value.absent(),
+    this.summaryLastIndex = const Value.absent(),
+    this.worldsInitialized = const Value.absent(),
+    this.parentSession = const Value.absent(),
+    this.forkIndex = const Value.absent(),
+    this.affectionScore = const Value.absent(),
+    this.relationshipTier = const Value.absent(),
+    this.longTermScore = const Value.absent(),
+    this.longTermTier = const Value.absent(),
+    this.turnsSinceLongTermCheck = const Value.absent(),
+    this.shortTermDeltasSummary = const Value.absent(),
+    this.realismEnabled = const Value.absent(),
+    this.shortTermMood = const Value.absent(),
+    this.moodDecayCounter = const Value.absent(),
+    this.characterEmotion = const Value.absent(),
+    this.emotionIntensity = const Value.absent(),
+    this.timeOfDay = const Value.absent(),
+    this.dayCount = const Value.absent(),
+    this.startDayOfWeek = const Value.absent(),
+    this.storyClock = const Value.absent(),
+    this.storyStartDate = const Value.absent(),
+    this.nsfwCooldownEnabled = const Value.absent(),
+    this.passageOfTimeEnabled = const Value.absent(),
+    this.passageOfTimeGateMigrated = const Value.absent(),
+    this.arousalLevel = const Value.absent(),
+    this.cooldownTurnsRemaining = const Value.absent(),
+    this.cooldownTurnsTotal = const Value.absent(),
+    this.refractoryMinutesRemaining = const Value.absent(),
+    this.refractoryMinutesTotal = const Value.absent(),
+    this.refractoryOpened = const Value.absent(),
+    this.trustLevel = const Value.absent(),
+    this.activeFixation = const Value.absent(),
+    this.fixationLifespan = const Value.absent(),
+    this.spatialStance = const Value.absent(),
+    this.withUser = const Value.absent(),
+    this.trustRepairPending = const Value.absent(),
+    this.chaosModeEnabled = const Value.absent(),
+    this.chaosPressure = const Value.absent(),
+    this.needsSimEnabled = const Value.absent(),
+    this.needsVector = const Value.absent(),
+    this.pockets = const Value.absent(),
+    this.todayObjectiveId = const Value.absent(),
+    this.evolvedPersonality = const Value.absent(),
+    this.evolvedScenario = const Value.absent(),
+    this.evolutionCount = const Value.absent(),
+    this.groupEvolvedPersonalities = const Value.absent(),
+    this.groupEvolvedScenarios = const Value.absent(),
+    this.generationSettings = const Value.absent(),
+    this.userPersonaId = const Value.absent(),
+    this.selectedLookAvatarId = const Value.absent(),
+    this.themeOverrides = const Value.absent(),
+    this.contextBudgetJson = const Value.absent(),
+    this.objectivesEnabled = const Value.absent(),
+    this.groupRealismState = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SessionsCompanion.insert({
+    required String id,
+    this.characterId = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.authorNote = const Value.absent(),
+    this.authorNoteDepth = const Value.absent(),
+    this.summary = const Value.absent(),
+    this.summaryLastIndex = const Value.absent(),
+    this.worldsInitialized = const Value.absent(),
+    this.parentSession = const Value.absent(),
+    this.forkIndex = const Value.absent(),
+    this.affectionScore = const Value.absent(),
+    this.relationshipTier = const Value.absent(),
+    this.longTermScore = const Value.absent(),
+    this.longTermTier = const Value.absent(),
+    this.turnsSinceLongTermCheck = const Value.absent(),
+    this.shortTermDeltasSummary = const Value.absent(),
+    this.realismEnabled = const Value.absent(),
+    this.shortTermMood = const Value.absent(),
+    this.moodDecayCounter = const Value.absent(),
+    this.characterEmotion = const Value.absent(),
+    this.emotionIntensity = const Value.absent(),
+    this.timeOfDay = const Value.absent(),
+    this.dayCount = const Value.absent(),
+    this.startDayOfWeek = const Value.absent(),
+    this.storyClock = const Value.absent(),
+    this.storyStartDate = const Value.absent(),
+    this.nsfwCooldownEnabled = const Value.absent(),
+    this.passageOfTimeEnabled = const Value.absent(),
+    this.passageOfTimeGateMigrated = const Value.absent(),
+    this.arousalLevel = const Value.absent(),
+    this.cooldownTurnsRemaining = const Value.absent(),
+    this.cooldownTurnsTotal = const Value.absent(),
+    this.refractoryMinutesRemaining = const Value.absent(),
+    this.refractoryMinutesTotal = const Value.absent(),
+    this.refractoryOpened = const Value.absent(),
+    this.trustLevel = const Value.absent(),
+    this.activeFixation = const Value.absent(),
+    this.fixationLifespan = const Value.absent(),
+    this.spatialStance = const Value.absent(),
+    this.withUser = const Value.absent(),
+    this.trustRepairPending = const Value.absent(),
+    this.chaosModeEnabled = const Value.absent(),
+    this.chaosPressure = const Value.absent(),
+    this.needsSimEnabled = const Value.absent(),
+    this.needsVector = const Value.absent(),
+    this.pockets = const Value.absent(),
+    this.todayObjectiveId = const Value.absent(),
+    this.evolvedPersonality = const Value.absent(),
+    this.evolvedScenario = const Value.absent(),
+    this.evolutionCount = const Value.absent(),
+    this.groupEvolvedPersonalities = const Value.absent(),
+    this.groupEvolvedScenarios = const Value.absent(),
+    this.generationSettings = const Value.absent(),
+    this.userPersonaId = const Value.absent(),
+    this.selectedLookAvatarId = const Value.absent(),
+    this.themeOverrides = const Value.absent(),
+    this.contextBudgetJson = const Value.absent(),
+    this.objectivesEnabled = const Value.absent(),
+    this.groupRealismState = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<Session> custom({
+    Expression<String>? id,
+    Expression<String>? characterId,
+    Expression<String>? groupId,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? authorNote,
+    Expression<int>? authorNoteDepth,
+    Expression<String>? summary,
+    Expression<int>? summaryLastIndex,
+    Expression<bool>? worldsInitialized,
+    Expression<String>? parentSession,
+    Expression<int>? forkIndex,
+    Expression<int>? affectionScore,
+    Expression<int>? relationshipTier,
+    Expression<int>? longTermScore,
+    Expression<int>? longTermTier,
+    Expression<int>? turnsSinceLongTermCheck,
+    Expression<int>? shortTermDeltasSummary,
+    Expression<bool>? realismEnabled,
+    Expression<int>? shortTermMood,
+    Expression<int>? moodDecayCounter,
+    Expression<String>? characterEmotion,
+    Expression<String>? emotionIntensity,
+    Expression<String>? timeOfDay,
+    Expression<int>? dayCount,
+    Expression<int>? startDayOfWeek,
+    Expression<String>? storyClock,
+    Expression<String>? storyStartDate,
+    Expression<bool>? nsfwCooldownEnabled,
+    Expression<bool>? passageOfTimeEnabled,
+    Expression<bool>? passageOfTimeGateMigrated,
+    Expression<int>? arousalLevel,
+    Expression<int>? cooldownTurnsRemaining,
+    Expression<int>? cooldownTurnsTotal,
+    Expression<int>? refractoryMinutesRemaining,
+    Expression<int>? refractoryMinutesTotal,
+    Expression<bool>? refractoryOpened,
+    Expression<int>? trustLevel,
+    Expression<String>? activeFixation,
+    Expression<int>? fixationLifespan,
+    Expression<String>? spatialStance,
+    Expression<bool>? withUser,
+    Expression<bool>? trustRepairPending,
+    Expression<bool>? chaosModeEnabled,
+    Expression<int>? chaosPressure,
+    Expression<bool>? needsSimEnabled,
+    Expression<String>? needsVector,
+    Expression<String>? pockets,
+    Expression<String>? todayObjectiveId,
+    Expression<String>? evolvedPersonality,
+    Expression<String>? evolvedScenario,
+    Expression<int>? evolutionCount,
+    Expression<String>? groupEvolvedPersonalities,
+    Expression<String>? groupEvolvedScenarios,
+    Expression<String>? generationSettings,
+    Expression<String>? userPersonaId,
+    Expression<String>? selectedLookAvatarId,
+    Expression<String>? themeOverrides,
+    Expression<String>? contextBudgetJson,
+    Expression<bool>? objectivesEnabled,
+    Expression<String>? groupRealismState,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (characterId != null) 'character_id': characterId,
+      if (groupId != null) 'group_id': groupId,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (authorNote != null) 'author_note': authorNote,
+      if (authorNoteDepth != null) 'author_note_depth': authorNoteDepth,
+      if (summary != null) 'summary': summary,
+      if (summaryLastIndex != null) 'summary_last_index': summaryLastIndex,
+      if (worldsInitialized != null) 'worlds_initialized': worldsInitialized,
+      if (parentSession != null) 'parent_session': parentSession,
+      if (forkIndex != null) 'fork_index': forkIndex,
+      if (affectionScore != null) 'affection_score': affectionScore,
+      if (relationshipTier != null) 'relationship_tier': relationshipTier,
+      if (longTermScore != null) 'long_term_score': longTermScore,
+      if (longTermTier != null) 'long_term_tier': longTermTier,
+      if (turnsSinceLongTermCheck != null)
+        'turns_since_long_term_check': turnsSinceLongTermCheck,
+      if (shortTermDeltasSummary != null)
+        'short_term_deltas_summary': shortTermDeltasSummary,
+      if (realismEnabled != null) 'realism_enabled': realismEnabled,
+      if (shortTermMood != null) 'short_term_mood': shortTermMood,
+      if (moodDecayCounter != null) 'mood_decay_counter': moodDecayCounter,
+      if (characterEmotion != null) 'character_emotion': characterEmotion,
+      if (emotionIntensity != null) 'emotion_intensity': emotionIntensity,
+      if (timeOfDay != null) 'time_of_day': timeOfDay,
+      if (dayCount != null) 'day_count': dayCount,
+      if (startDayOfWeek != null) 'start_day_of_week': startDayOfWeek,
+      if (storyClock != null) 'story_clock': storyClock,
+      if (storyStartDate != null) 'story_start_date': storyStartDate,
+      if (nsfwCooldownEnabled != null)
+        'nsfw_cooldown_enabled': nsfwCooldownEnabled,
+      if (passageOfTimeEnabled != null)
+        'passage_of_time_enabled': passageOfTimeEnabled,
+      if (passageOfTimeGateMigrated != null)
+        'passage_of_time_gate_migrated': passageOfTimeGateMigrated,
+      if (arousalLevel != null) 'arousal_level': arousalLevel,
+      if (cooldownTurnsRemaining != null)
+        'cooldown_turns_remaining': cooldownTurnsRemaining,
+      if (cooldownTurnsTotal != null)
+        'cooldown_turns_total': cooldownTurnsTotal,
+      if (refractoryMinutesRemaining != null)
+        'refractory_minutes_remaining': refractoryMinutesRemaining,
+      if (refractoryMinutesTotal != null)
+        'refractory_minutes_total': refractoryMinutesTotal,
+      if (refractoryOpened != null) 'refractory_opened': refractoryOpened,
+      if (trustLevel != null) 'trust_level': trustLevel,
+      if (activeFixation != null) 'active_fixation': activeFixation,
+      if (fixationLifespan != null) 'fixation_lifespan': fixationLifespan,
+      if (spatialStance != null) 'spatial_stance': spatialStance,
+      if (withUser != null) 'with_user': withUser,
+      if (trustRepairPending != null)
+        'trust_repair_pending': trustRepairPending,
+      if (chaosModeEnabled != null) 'chaos_mode_enabled': chaosModeEnabled,
+      if (chaosPressure != null) 'chaos_pressure': chaosPressure,
+      if (needsSimEnabled != null) 'needs_sim_enabled': needsSimEnabled,
+      if (needsVector != null) 'needs_vector': needsVector,
+      if (pockets != null) 'pockets': pockets,
+      if (todayObjectiveId != null) 'today_objective_id': todayObjectiveId,
+      if (evolvedPersonality != null) 'evolved_personality': evolvedPersonality,
+      if (evolvedScenario != null) 'evolved_scenario': evolvedScenario,
+      if (evolutionCount != null) 'evolution_count': evolutionCount,
+      if (groupEvolvedPersonalities != null)
+        'group_evolved_personalities': groupEvolvedPersonalities,
+      if (groupEvolvedScenarios != null)
+        'group_evolved_scenarios': groupEvolvedScenarios,
+      if (generationSettings != null) 'generation_settings': generationSettings,
+      if (userPersonaId != null) 'user_persona_id': userPersonaId,
+      if (selectedLookAvatarId != null)
+        'selected_look_avatar_id': selectedLookAvatarId,
+      if (themeOverrides != null) 'theme_overrides': themeOverrides,
+      if (contextBudgetJson != null) 'context_budget_json': contextBudgetJson,
+      if (objectivesEnabled != null) 'objectives_enabled': objectivesEnabled,
+      if (groupRealismState != null) 'group_realism_state': groupRealismState,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? characterId,
+    Value<String?>? groupId,
+    Value<String?>? name,
+    Value<String?>? description,
+    Value<String>? authorNote,
+    Value<int>? authorNoteDepth,
+    Value<String?>? summary,
+    Value<int?>? summaryLastIndex,
+    Value<bool>? worldsInitialized,
+    Value<String?>? parentSession,
+    Value<int?>? forkIndex,
+    Value<int>? affectionScore,
+    Value<int>? relationshipTier,
+    Value<int>? longTermScore,
+    Value<int>? longTermTier,
+    Value<int>? turnsSinceLongTermCheck,
+    Value<int>? shortTermDeltasSummary,
+    Value<bool>? realismEnabled,
+    Value<int>? shortTermMood,
+    Value<int>? moodDecayCounter,
+    Value<String>? characterEmotion,
+    Value<String>? emotionIntensity,
+    Value<String>? timeOfDay,
+    Value<int>? dayCount,
+    Value<int>? startDayOfWeek,
+    Value<String?>? storyClock,
+    Value<String?>? storyStartDate,
+    Value<bool>? nsfwCooldownEnabled,
+    Value<bool>? passageOfTimeEnabled,
+    Value<bool>? passageOfTimeGateMigrated,
+    Value<int>? arousalLevel,
+    Value<int>? cooldownTurnsRemaining,
+    Value<int>? cooldownTurnsTotal,
+    Value<int?>? refractoryMinutesRemaining,
+    Value<int?>? refractoryMinutesTotal,
+    Value<bool?>? refractoryOpened,
+    Value<int>? trustLevel,
+    Value<String>? activeFixation,
+    Value<int>? fixationLifespan,
+    Value<String>? spatialStance,
+    Value<bool?>? withUser,
+    Value<bool>? trustRepairPending,
+    Value<bool>? chaosModeEnabled,
+    Value<int>? chaosPressure,
+    Value<bool>? needsSimEnabled,
+    Value<String?>? needsVector,
+    Value<String?>? pockets,
+    Value<String?>? todayObjectiveId,
+    Value<String>? evolvedPersonality,
+    Value<String>? evolvedScenario,
+    Value<int>? evolutionCount,
+    Value<String>? groupEvolvedPersonalities,
+    Value<String>? groupEvolvedScenarios,
+    Value<String?>? generationSettings,
+    Value<String?>? userPersonaId,
+    Value<String?>? selectedLookAvatarId,
+    Value<String?>? themeOverrides,
+    Value<String?>? contextBudgetJson,
+    Value<bool>? objectivesEnabled,
+    Value<String>? groupRealismState,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return SessionsCompanion(
+      id: id ?? this.id,
+      characterId: characterId ?? this.characterId,
+      groupId: groupId ?? this.groupId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      authorNote: authorNote ?? this.authorNote,
+      authorNoteDepth: authorNoteDepth ?? this.authorNoteDepth,
+      summary: summary ?? this.summary,
+      summaryLastIndex: summaryLastIndex ?? this.summaryLastIndex,
+      worldsInitialized: worldsInitialized ?? this.worldsInitialized,
+      parentSession: parentSession ?? this.parentSession,
+      forkIndex: forkIndex ?? this.forkIndex,
+      affectionScore: affectionScore ?? this.affectionScore,
+      relationshipTier: relationshipTier ?? this.relationshipTier,
+      longTermScore: longTermScore ?? this.longTermScore,
+      longTermTier: longTermTier ?? this.longTermTier,
+      turnsSinceLongTermCheck:
+          turnsSinceLongTermCheck ?? this.turnsSinceLongTermCheck,
+      shortTermDeltasSummary:
+          shortTermDeltasSummary ?? this.shortTermDeltasSummary,
+      realismEnabled: realismEnabled ?? this.realismEnabled,
+      shortTermMood: shortTermMood ?? this.shortTermMood,
+      moodDecayCounter: moodDecayCounter ?? this.moodDecayCounter,
+      characterEmotion: characterEmotion ?? this.characterEmotion,
+      emotionIntensity: emotionIntensity ?? this.emotionIntensity,
+      timeOfDay: timeOfDay ?? this.timeOfDay,
+      dayCount: dayCount ?? this.dayCount,
+      startDayOfWeek: startDayOfWeek ?? this.startDayOfWeek,
+      storyClock: storyClock ?? this.storyClock,
+      storyStartDate: storyStartDate ?? this.storyStartDate,
+      nsfwCooldownEnabled: nsfwCooldownEnabled ?? this.nsfwCooldownEnabled,
+      passageOfTimeEnabled: passageOfTimeEnabled ?? this.passageOfTimeEnabled,
+      passageOfTimeGateMigrated:
+          passageOfTimeGateMigrated ?? this.passageOfTimeGateMigrated,
+      arousalLevel: arousalLevel ?? this.arousalLevel,
+      cooldownTurnsRemaining:
+          cooldownTurnsRemaining ?? this.cooldownTurnsRemaining,
+      cooldownTurnsTotal: cooldownTurnsTotal ?? this.cooldownTurnsTotal,
+      refractoryMinutesRemaining:
+          refractoryMinutesRemaining ?? this.refractoryMinutesRemaining,
+      refractoryMinutesTotal:
+          refractoryMinutesTotal ?? this.refractoryMinutesTotal,
+      refractoryOpened: refractoryOpened ?? this.refractoryOpened,
+      trustLevel: trustLevel ?? this.trustLevel,
+      activeFixation: activeFixation ?? this.activeFixation,
+      fixationLifespan: fixationLifespan ?? this.fixationLifespan,
+      spatialStance: spatialStance ?? this.spatialStance,
+      withUser: withUser ?? this.withUser,
+      trustRepairPending: trustRepairPending ?? this.trustRepairPending,
+      chaosModeEnabled: chaosModeEnabled ?? this.chaosModeEnabled,
+      chaosPressure: chaosPressure ?? this.chaosPressure,
+      needsSimEnabled: needsSimEnabled ?? this.needsSimEnabled,
+      needsVector: needsVector ?? this.needsVector,
+      pockets: pockets ?? this.pockets,
+      todayObjectiveId: todayObjectiveId ?? this.todayObjectiveId,
+      evolvedPersonality: evolvedPersonality ?? this.evolvedPersonality,
+      evolvedScenario: evolvedScenario ?? this.evolvedScenario,
+      evolutionCount: evolutionCount ?? this.evolutionCount,
+      groupEvolvedPersonalities:
+          groupEvolvedPersonalities ?? this.groupEvolvedPersonalities,
+      groupEvolvedScenarios:
+          groupEvolvedScenarios ?? this.groupEvolvedScenarios,
+      generationSettings: generationSettings ?? this.generationSettings,
+      userPersonaId: userPersonaId ?? this.userPersonaId,
+      selectedLookAvatarId: selectedLookAvatarId ?? this.selectedLookAvatarId,
+      themeOverrides: themeOverrides ?? this.themeOverrides,
+      contextBudgetJson: contextBudgetJson ?? this.contextBudgetJson,
+      objectivesEnabled: objectivesEnabled ?? this.objectivesEnabled,
+      groupRealismState: groupRealismState ?? this.groupRealismState,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (groupId.present) {
+      map['group_id'] = Variable<String>(groupId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (authorNote.present) {
+      map['author_note'] = Variable<String>(authorNote.value);
+    }
+    if (authorNoteDepth.present) {
+      map['author_note_depth'] = Variable<int>(authorNoteDepth.value);
+    }
+    if (summary.present) {
+      map['summary'] = Variable<String>(summary.value);
+    }
+    if (summaryLastIndex.present) {
+      map['summary_last_index'] = Variable<int>(summaryLastIndex.value);
+    }
+    if (worldsInitialized.present) {
+      map['worlds_initialized'] = Variable<bool>(worldsInitialized.value);
+    }
+    if (parentSession.present) {
+      map['parent_session'] = Variable<String>(parentSession.value);
+    }
+    if (forkIndex.present) {
+      map['fork_index'] = Variable<int>(forkIndex.value);
+    }
+    if (affectionScore.present) {
+      map['affection_score'] = Variable<int>(affectionScore.value);
+    }
+    if (relationshipTier.present) {
+      map['relationship_tier'] = Variable<int>(relationshipTier.value);
+    }
+    if (longTermScore.present) {
+      map['long_term_score'] = Variable<int>(longTermScore.value);
+    }
+    if (longTermTier.present) {
+      map['long_term_tier'] = Variable<int>(longTermTier.value);
+    }
+    if (turnsSinceLongTermCheck.present) {
+      map['turns_since_long_term_check'] = Variable<int>(
+        turnsSinceLongTermCheck.value,
+      );
+    }
+    if (shortTermDeltasSummary.present) {
+      map['short_term_deltas_summary'] = Variable<int>(
+        shortTermDeltasSummary.value,
+      );
+    }
+    if (realismEnabled.present) {
+      map['realism_enabled'] = Variable<bool>(realismEnabled.value);
+    }
+    if (shortTermMood.present) {
+      map['short_term_mood'] = Variable<int>(shortTermMood.value);
+    }
+    if (moodDecayCounter.present) {
+      map['mood_decay_counter'] = Variable<int>(moodDecayCounter.value);
+    }
+    if (characterEmotion.present) {
+      map['character_emotion'] = Variable<String>(characterEmotion.value);
+    }
+    if (emotionIntensity.present) {
+      map['emotion_intensity'] = Variable<String>(emotionIntensity.value);
+    }
+    if (timeOfDay.present) {
+      map['time_of_day'] = Variable<String>(timeOfDay.value);
+    }
+    if (dayCount.present) {
+      map['day_count'] = Variable<int>(dayCount.value);
+    }
+    if (startDayOfWeek.present) {
+      map['start_day_of_week'] = Variable<int>(startDayOfWeek.value);
+    }
+    if (storyClock.present) {
+      map['story_clock'] = Variable<String>(storyClock.value);
+    }
+    if (storyStartDate.present) {
+      map['story_start_date'] = Variable<String>(storyStartDate.value);
+    }
+    if (nsfwCooldownEnabled.present) {
+      map['nsfw_cooldown_enabled'] = Variable<bool>(nsfwCooldownEnabled.value);
+    }
+    if (passageOfTimeEnabled.present) {
+      map['passage_of_time_enabled'] = Variable<bool>(
+        passageOfTimeEnabled.value,
+      );
+    }
+    if (passageOfTimeGateMigrated.present) {
+      map['passage_of_time_gate_migrated'] = Variable<bool>(
+        passageOfTimeGateMigrated.value,
+      );
+    }
+    if (arousalLevel.present) {
+      map['arousal_level'] = Variable<int>(arousalLevel.value);
+    }
+    if (cooldownTurnsRemaining.present) {
+      map['cooldown_turns_remaining'] = Variable<int>(
+        cooldownTurnsRemaining.value,
+      );
+    }
+    if (cooldownTurnsTotal.present) {
+      map['cooldown_turns_total'] = Variable<int>(cooldownTurnsTotal.value);
+    }
+    if (refractoryMinutesRemaining.present) {
+      map['refractory_minutes_remaining'] = Variable<int>(
+        refractoryMinutesRemaining.value,
+      );
+    }
+    if (refractoryMinutesTotal.present) {
+      map['refractory_minutes_total'] = Variable<int>(
+        refractoryMinutesTotal.value,
+      );
+    }
+    if (refractoryOpened.present) {
+      map['refractory_opened'] = Variable<bool>(refractoryOpened.value);
+    }
+    if (trustLevel.present) {
+      map['trust_level'] = Variable<int>(trustLevel.value);
+    }
+    if (activeFixation.present) {
+      map['active_fixation'] = Variable<String>(activeFixation.value);
+    }
+    if (fixationLifespan.present) {
+      map['fixation_lifespan'] = Variable<int>(fixationLifespan.value);
+    }
+    if (spatialStance.present) {
+      map['spatial_stance'] = Variable<String>(spatialStance.value);
+    }
+    if (withUser.present) {
+      map['with_user'] = Variable<bool>(withUser.value);
+    }
+    if (trustRepairPending.present) {
+      map['trust_repair_pending'] = Variable<bool>(trustRepairPending.value);
+    }
+    if (chaosModeEnabled.present) {
+      map['chaos_mode_enabled'] = Variable<bool>(chaosModeEnabled.value);
+    }
+    if (chaosPressure.present) {
+      map['chaos_pressure'] = Variable<int>(chaosPressure.value);
+    }
+    if (needsSimEnabled.present) {
+      map['needs_sim_enabled'] = Variable<bool>(needsSimEnabled.value);
+    }
+    if (needsVector.present) {
+      map['needs_vector'] = Variable<String>(needsVector.value);
+    }
+    if (pockets.present) {
+      map['pockets'] = Variable<String>(pockets.value);
+    }
+    if (todayObjectiveId.present) {
+      map['today_objective_id'] = Variable<String>(todayObjectiveId.value);
+    }
+    if (evolvedPersonality.present) {
+      map['evolved_personality'] = Variable<String>(evolvedPersonality.value);
+    }
+    if (evolvedScenario.present) {
+      map['evolved_scenario'] = Variable<String>(evolvedScenario.value);
+    }
+    if (evolutionCount.present) {
+      map['evolution_count'] = Variable<int>(evolutionCount.value);
+    }
+    if (groupEvolvedPersonalities.present) {
+      map['group_evolved_personalities'] = Variable<String>(
+        groupEvolvedPersonalities.value,
+      );
+    }
+    if (groupEvolvedScenarios.present) {
+      map['group_evolved_scenarios'] = Variable<String>(
+        groupEvolvedScenarios.value,
+      );
+    }
+    if (generationSettings.present) {
+      map['generation_settings'] = Variable<String>(generationSettings.value);
+    }
+    if (userPersonaId.present) {
+      map['user_persona_id'] = Variable<String>(userPersonaId.value);
+    }
+    if (selectedLookAvatarId.present) {
+      map['selected_look_avatar_id'] = Variable<String>(
+        selectedLookAvatarId.value,
+      );
+    }
+    if (themeOverrides.present) {
+      map['theme_overrides'] = Variable<String>(themeOverrides.value);
+    }
+    if (contextBudgetJson.present) {
+      map['context_budget_json'] = Variable<String>(contextBudgetJson.value);
+    }
+    if (objectivesEnabled.present) {
+      map['objectives_enabled'] = Variable<bool>(objectivesEnabled.value);
+    }
+    if (groupRealismState.present) {
+      map['group_realism_state'] = Variable<String>(groupRealismState.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('groupId: $groupId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('authorNote: $authorNote, ')
+          ..write('authorNoteDepth: $authorNoteDepth, ')
+          ..write('summary: $summary, ')
+          ..write('summaryLastIndex: $summaryLastIndex, ')
+          ..write('worldsInitialized: $worldsInitialized, ')
+          ..write('parentSession: $parentSession, ')
+          ..write('forkIndex: $forkIndex, ')
+          ..write('affectionScore: $affectionScore, ')
+          ..write('relationshipTier: $relationshipTier, ')
+          ..write('longTermScore: $longTermScore, ')
+          ..write('longTermTier: $longTermTier, ')
+          ..write('turnsSinceLongTermCheck: $turnsSinceLongTermCheck, ')
+          ..write('shortTermDeltasSummary: $shortTermDeltasSummary, ')
+          ..write('realismEnabled: $realismEnabled, ')
+          ..write('shortTermMood: $shortTermMood, ')
+          ..write('moodDecayCounter: $moodDecayCounter, ')
+          ..write('characterEmotion: $characterEmotion, ')
+          ..write('emotionIntensity: $emotionIntensity, ')
+          ..write('timeOfDay: $timeOfDay, ')
+          ..write('dayCount: $dayCount, ')
+          ..write('startDayOfWeek: $startDayOfWeek, ')
+          ..write('storyClock: $storyClock, ')
+          ..write('storyStartDate: $storyStartDate, ')
+          ..write('nsfwCooldownEnabled: $nsfwCooldownEnabled, ')
+          ..write('passageOfTimeEnabled: $passageOfTimeEnabled, ')
+          ..write('passageOfTimeGateMigrated: $passageOfTimeGateMigrated, ')
+          ..write('arousalLevel: $arousalLevel, ')
+          ..write('cooldownTurnsRemaining: $cooldownTurnsRemaining, ')
+          ..write('cooldownTurnsTotal: $cooldownTurnsTotal, ')
+          ..write('refractoryMinutesRemaining: $refractoryMinutesRemaining, ')
+          ..write('refractoryMinutesTotal: $refractoryMinutesTotal, ')
+          ..write('refractoryOpened: $refractoryOpened, ')
+          ..write('trustLevel: $trustLevel, ')
+          ..write('activeFixation: $activeFixation, ')
+          ..write('fixationLifespan: $fixationLifespan, ')
+          ..write('spatialStance: $spatialStance, ')
+          ..write('withUser: $withUser, ')
+          ..write('trustRepairPending: $trustRepairPending, ')
+          ..write('chaosModeEnabled: $chaosModeEnabled, ')
+          ..write('chaosPressure: $chaosPressure, ')
+          ..write('needsSimEnabled: $needsSimEnabled, ')
+          ..write('needsVector: $needsVector, ')
+          ..write('pockets: $pockets, ')
+          ..write('todayObjectiveId: $todayObjectiveId, ')
+          ..write('evolvedPersonality: $evolvedPersonality, ')
+          ..write('evolvedScenario: $evolvedScenario, ')
+          ..write('evolutionCount: $evolutionCount, ')
+          ..write('groupEvolvedPersonalities: $groupEvolvedPersonalities, ')
+          ..write('groupEvolvedScenarios: $groupEvolvedScenarios, ')
+          ..write('generationSettings: $generationSettings, ')
+          ..write('userPersonaId: $userPersonaId, ')
+          ..write('selectedLookAvatarId: $selectedLookAvatarId, ')
+          ..write('themeOverrides: $themeOverrides, ')
+          ..write('contextBudgetJson: $contextBudgetJson, ')
+          ..write('objectivesEnabled: $objectivesEnabled, ')
+          ..write('groupRealismState: $groupRealismState, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _senderMeta = const VerificationMeta('sender');
+  @override
+  late final GeneratedColumn<String> sender = GeneratedColumn<String>(
+    'sender',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isUserMeta = const VerificationMeta('isUser');
+  @override
+  late final GeneratedColumn<bool> isUser = GeneratedColumn<bool>(
+    'is_user',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_user" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _swipesMeta = const VerificationMeta('swipes');
+  @override
+  late final GeneratedColumn<String> swipes = GeneratedColumn<String>(
+    'swipes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _swipeIndexMeta = const VerificationMeta(
+    'swipeIndex',
+  );
+  @override
+  late final GeneratedColumn<int> swipeIndex = GeneratedColumn<int>(
+    'swipe_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _swipeDurationsMeta = const VerificationMeta(
+    'swipeDurations',
+  );
+  @override
+  late final GeneratedColumn<String> swipeDurations = GeneratedColumn<String>(
+    'swipe_durations',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _metadataMeta = const VerificationMeta(
+    'metadata',
+  );
+  @override
+  late final GeneratedColumn<String> metadata = GeneratedColumn<String>(
+    'metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _swipeMetadataMeta = const VerificationMeta(
+    'swipeMetadata',
+  );
+  @override
+  late final GeneratedColumn<String> swipeMetadata = GeneratedColumn<String>(
+    'swipe_metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    position,
+    sender,
+    isUser,
+    characterId,
+    swipes,
+    swipeIndex,
+    swipeDurations,
+    metadata,
+    swipeMetadata,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Message> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('sender')) {
+      context.handle(
+        _senderMeta,
+        sender.isAcceptableOrUnknown(data['sender']!, _senderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_senderMeta);
+    }
+    if (data.containsKey('is_user')) {
+      context.handle(
+        _isUserMeta,
+        isUser.isAcceptableOrUnknown(data['is_user']!, _isUserMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isUserMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('swipes')) {
+      context.handle(
+        _swipesMeta,
+        swipes.isAcceptableOrUnknown(data['swipes']!, _swipesMeta),
+      );
+    }
+    if (data.containsKey('swipe_index')) {
+      context.handle(
+        _swipeIndexMeta,
+        swipeIndex.isAcceptableOrUnknown(data['swipe_index']!, _swipeIndexMeta),
+      );
+    }
+    if (data.containsKey('swipe_durations')) {
+      context.handle(
+        _swipeDurationsMeta,
+        swipeDurations.isAcceptableOrUnknown(
+          data['swipe_durations']!,
+          _swipeDurationsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('metadata')) {
+      context.handle(
+        _metadataMeta,
+        metadata.isAcceptableOrUnknown(data['metadata']!, _metadataMeta),
+      );
+    }
+    if (data.containsKey('swipe_metadata')) {
+      context.handle(
+        _swipeMetadataMeta,
+        swipeMetadata.isAcceptableOrUnknown(
+          data['swipe_metadata']!,
+          _swipeMetadataMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Message map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Message(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      sender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sender'],
+      )!,
+      isUser: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_user'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      ),
+      swipes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}swipes'],
+      )!,
+      swipeIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}swipe_index'],
+      )!,
+      swipeDurations: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}swipe_durations'],
+      )!,
+      metadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}metadata'],
+      ),
+      swipeMetadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}swipe_metadata'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $MessagesTable createAlias(String alias) {
+    return $MessagesTable(attachedDatabase, alias);
+  }
+}
+
+class Message extends DataClass implements Insertable<Message> {
+  final String id;
+  final String sessionId;
+  final int position;
+  final String sender;
+  final bool isUser;
+  final String? characterId;
+  final String swipes;
+  final int swipeIndex;
+  final String swipeDurations;
+  final String? metadata;
+  final String? swipeMetadata;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Message({
+    required this.id,
+    required this.sessionId,
+    required this.position,
+    required this.sender,
+    required this.isUser,
+    this.characterId,
+    required this.swipes,
+    required this.swipeIndex,
+    required this.swipeDurations,
+    this.metadata,
+    this.swipeMetadata,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['position'] = Variable<int>(position);
+    map['sender'] = Variable<String>(sender);
+    map['is_user'] = Variable<bool>(isUser);
+    if (!nullToAbsent || characterId != null) {
+      map['character_id'] = Variable<String>(characterId);
+    }
+    map['swipes'] = Variable<String>(swipes);
+    map['swipe_index'] = Variable<int>(swipeIndex);
+    map['swipe_durations'] = Variable<String>(swipeDurations);
+    if (!nullToAbsent || metadata != null) {
+      map['metadata'] = Variable<String>(metadata);
+    }
+    if (!nullToAbsent || swipeMetadata != null) {
+      map['swipe_metadata'] = Variable<String>(swipeMetadata);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  MessagesCompanion toCompanion(bool nullToAbsent) {
+    return MessagesCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      position: Value(position),
+      sender: Value(sender),
+      isUser: Value(isUser),
+      characterId: characterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(characterId),
+      swipes: Value(swipes),
+      swipeIndex: Value(swipeIndex),
+      swipeDurations: Value(swipeDurations),
+      metadata: metadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metadata),
+      swipeMetadata: swipeMetadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(swipeMetadata),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Message.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Message(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      position: serializer.fromJson<int>(json['position']),
+      sender: serializer.fromJson<String>(json['sender']),
+      isUser: serializer.fromJson<bool>(json['isUser']),
+      characterId: serializer.fromJson<String?>(json['characterId']),
+      swipes: serializer.fromJson<String>(json['swipes']),
+      swipeIndex: serializer.fromJson<int>(json['swipeIndex']),
+      swipeDurations: serializer.fromJson<String>(json['swipeDurations']),
+      metadata: serializer.fromJson<String?>(json['metadata']),
+      swipeMetadata: serializer.fromJson<String?>(json['swipeMetadata']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'position': serializer.toJson<int>(position),
+      'sender': serializer.toJson<String>(sender),
+      'isUser': serializer.toJson<bool>(isUser),
+      'characterId': serializer.toJson<String?>(characterId),
+      'swipes': serializer.toJson<String>(swipes),
+      'swipeIndex': serializer.toJson<int>(swipeIndex),
+      'swipeDurations': serializer.toJson<String>(swipeDurations),
+      'metadata': serializer.toJson<String?>(metadata),
+      'swipeMetadata': serializer.toJson<String?>(swipeMetadata),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Message copyWith({
+    String? id,
+    String? sessionId,
+    int? position,
+    String? sender,
+    bool? isUser,
+    Value<String?> characterId = const Value.absent(),
+    String? swipes,
+    int? swipeIndex,
+    String? swipeDurations,
+    Value<String?> metadata = const Value.absent(),
+    Value<String?> swipeMetadata = const Value.absent(),
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Message(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    position: position ?? this.position,
+    sender: sender ?? this.sender,
+    isUser: isUser ?? this.isUser,
+    characterId: characterId.present ? characterId.value : this.characterId,
+    swipes: swipes ?? this.swipes,
+    swipeIndex: swipeIndex ?? this.swipeIndex,
+    swipeDurations: swipeDurations ?? this.swipeDurations,
+    metadata: metadata.present ? metadata.value : this.metadata,
+    swipeMetadata: swipeMetadata.present
+        ? swipeMetadata.value
+        : this.swipeMetadata,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Message copyWithCompanion(MessagesCompanion data) {
+    return Message(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      position: data.position.present ? data.position.value : this.position,
+      sender: data.sender.present ? data.sender.value : this.sender,
+      isUser: data.isUser.present ? data.isUser.value : this.isUser,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      swipes: data.swipes.present ? data.swipes.value : this.swipes,
+      swipeIndex: data.swipeIndex.present
+          ? data.swipeIndex.value
+          : this.swipeIndex,
+      swipeDurations: data.swipeDurations.present
+          ? data.swipeDurations.value
+          : this.swipeDurations,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+      swipeMetadata: data.swipeMetadata.present
+          ? data.swipeMetadata.value
+          : this.swipeMetadata,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Message(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('position: $position, ')
+          ..write('sender: $sender, ')
+          ..write('isUser: $isUser, ')
+          ..write('characterId: $characterId, ')
+          ..write('swipes: $swipes, ')
+          ..write('swipeIndex: $swipeIndex, ')
+          ..write('swipeDurations: $swipeDurations, ')
+          ..write('metadata: $metadata, ')
+          ..write('swipeMetadata: $swipeMetadata, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sessionId,
+    position,
+    sender,
+    isUser,
+    characterId,
+    swipes,
+    swipeIndex,
+    swipeDurations,
+    metadata,
+    swipeMetadata,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Message &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.position == this.position &&
+          other.sender == this.sender &&
+          other.isUser == this.isUser &&
+          other.characterId == this.characterId &&
+          other.swipes == this.swipes &&
+          other.swipeIndex == this.swipeIndex &&
+          other.swipeDurations == this.swipeDurations &&
+          other.metadata == this.metadata &&
+          other.swipeMetadata == this.swipeMetadata &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class MessagesCompanion extends UpdateCompanion<Message> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<int> position;
+  final Value<String> sender;
+  final Value<bool> isUser;
+  final Value<String?> characterId;
+  final Value<String> swipes;
+  final Value<int> swipeIndex;
+  final Value<String> swipeDurations;
+  final Value<String?> metadata;
+  final Value<String?> swipeMetadata;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const MessagesCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.sender = const Value.absent(),
+    this.isUser = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.swipes = const Value.absent(),
+    this.swipeIndex = const Value.absent(),
+    this.swipeDurations = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.swipeMetadata = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MessagesCompanion.insert({
+    required String id,
+    required String sessionId,
+    required int position,
+    required String sender,
+    required bool isUser,
+    this.characterId = const Value.absent(),
+    this.swipes = const Value.absent(),
+    this.swipeIndex = const Value.absent(),
+    this.swipeDurations = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.swipeMetadata = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       position = Value(position),
+       sender = Value(sender),
+       isUser = Value(isUser);
+  static Insertable<Message> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<int>? position,
+    Expression<String>? sender,
+    Expression<bool>? isUser,
+    Expression<String>? characterId,
+    Expression<String>? swipes,
+    Expression<int>? swipeIndex,
+    Expression<String>? swipeDurations,
+    Expression<String>? metadata,
+    Expression<String>? swipeMetadata,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (position != null) 'position': position,
+      if (sender != null) 'sender': sender,
+      if (isUser != null) 'is_user': isUser,
+      if (characterId != null) 'character_id': characterId,
+      if (swipes != null) 'swipes': swipes,
+      if (swipeIndex != null) 'swipe_index': swipeIndex,
+      if (swipeDurations != null) 'swipe_durations': swipeDurations,
+      if (metadata != null) 'metadata': metadata,
+      if (swipeMetadata != null) 'swipe_metadata': swipeMetadata,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<int>? position,
+    Value<String>? sender,
+    Value<bool>? isUser,
+    Value<String?>? characterId,
+    Value<String>? swipes,
+    Value<int>? swipeIndex,
+    Value<String>? swipeDurations,
+    Value<String?>? metadata,
+    Value<String?>? swipeMetadata,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return MessagesCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      position: position ?? this.position,
+      sender: sender ?? this.sender,
+      isUser: isUser ?? this.isUser,
+      characterId: characterId ?? this.characterId,
+      swipes: swipes ?? this.swipes,
+      swipeIndex: swipeIndex ?? this.swipeIndex,
+      swipeDurations: swipeDurations ?? this.swipeDurations,
+      metadata: metadata ?? this.metadata,
+      swipeMetadata: swipeMetadata ?? this.swipeMetadata,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (sender.present) {
+      map['sender'] = Variable<String>(sender.value);
+    }
+    if (isUser.present) {
+      map['is_user'] = Variable<bool>(isUser.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (swipes.present) {
+      map['swipes'] = Variable<String>(swipes.value);
+    }
+    if (swipeIndex.present) {
+      map['swipe_index'] = Variable<int>(swipeIndex.value);
+    }
+    if (swipeDurations.present) {
+      map['swipe_durations'] = Variable<String>(swipeDurations.value);
+    }
+    if (metadata.present) {
+      map['metadata'] = Variable<String>(metadata.value);
+    }
+    if (swipeMetadata.present) {
+      map['swipe_metadata'] = Variable<String>(swipeMetadata.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('position: $position, ')
+          ..write('sender: $sender, ')
+          ..write('isUser: $isUser, ')
+          ..write('characterId: $characterId, ')
+          ..write('swipes: $swipes, ')
+          ..write('swipeIndex: $swipeIndex, ')
+          ..write('swipeDurations: $swipeDurations, ')
+          ..write('metadata: $metadata, ')
+          ..write('swipeMetadata: $swipeMetadata, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GroupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdsMeta = const VerificationMeta(
+    'characterIds',
+  );
+  @override
+  late final GeneratedColumn<String> characterIds = GeneratedColumn<String>(
+    'character_ids',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _turnOrderMeta = const VerificationMeta(
+    'turnOrder',
+  );
+  @override
+  late final GeneratedColumn<String> turnOrder = GeneratedColumn<String>(
+    'turn_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('roundRobin'),
+  );
+  static const VerificationMeta _autoAdvanceMeta = const VerificationMeta(
+    'autoAdvance',
+  );
+  @override
+  late final GeneratedColumn<bool> autoAdvance = GeneratedColumn<bool>(
+    'auto_advance',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_advance" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _directorModeMeta = const VerificationMeta(
+    'directorMode',
+  );
+  @override
+  late final GeneratedColumn<bool> directorMode = GeneratedColumn<bool>(
+    'director_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("director_mode" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _firstMessageMeta = const VerificationMeta(
+    'firstMessage',
+  );
+  @override
+  late final GeneratedColumn<String> firstMessage = GeneratedColumn<String>(
+    'first_message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _scenarioMeta = const VerificationMeta(
+    'scenario',
+  );
+  @override
+  late final GeneratedColumn<String> scenario = GeneratedColumn<String>(
+    'scenario',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _systemPromptMeta = const VerificationMeta(
+    'systemPrompt',
+  );
+  @override
+  late final GeneratedColumn<String> systemPrompt = GeneratedColumn<String>(
+    'system_prompt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _defaultMemberRealismStateMeta =
+      const VerificationMeta('defaultMemberRealismState');
+  @override
+  late final GeneratedColumn<String> defaultMemberRealismState =
+      GeneratedColumn<String>(
+        'default_member_realism_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _chaosModeEnabledMeta = const VerificationMeta(
+    'chaosModeEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> chaosModeEnabled = GeneratedColumn<bool>(
+    'chaos_mode_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("chaos_mode_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _chaosNsfwEnabledMeta = const VerificationMeta(
+    'chaosNsfwEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> chaosNsfwEnabled = GeneratedColumn<bool>(
+    'chaos_nsfw_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("chaos_nsfw_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _groupLorebookMeta = const VerificationMeta(
+    'groupLorebook',
+  );
+  @override
+  late final GeneratedColumn<String> groupLorebook = GeneratedColumn<String>(
+    'group_lorebook',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _worldIdsMeta = const VerificationMeta(
+    'worldIds',
+  );
+  @override
+  late final GeneratedColumn<String> worldIds = GeneratedColumn<String>(
+    'world_ids',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _inheritCharacterLorebooksMeta =
+      const VerificationMeta('inheritCharacterLorebooks');
+  @override
+  late final GeneratedColumn<bool> inheritCharacterLorebooks =
+      GeneratedColumn<bool>(
+        'inherit_character_lorebooks',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("inherit_character_lorebooks" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
+  static const VerificationMeta _baselineRealismStateMeta =
+      const VerificationMeta('baselineRealismState');
+  @override
+  late final GeneratedColumn<String> baselineRealismState =
+      GeneratedColumn<String>(
+        'baseline_realism_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _characterSystemPromptsMeta =
+      const VerificationMeta('characterSystemPrompts');
+  @override
+  late final GeneratedColumn<String> characterSystemPrompts =
+      GeneratedColumn<String>(
+        'character_system_prompts',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _stableIdMeta = const VerificationMeta(
+    'stableId',
+  );
+  @override
+  late final GeneratedColumn<String> stableId = GeneratedColumn<String>(
+    'stable_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _folderIdMeta = const VerificationMeta(
+    'folderId',
+  );
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+    'folder_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    characterIds,
+    turnOrder,
+    autoAdvance,
+    directorMode,
+    firstMessage,
+    scenario,
+    systemPrompt,
+    defaultMemberRealismState,
+    chaosModeEnabled,
+    chaosNsfwEnabled,
+    groupLorebook,
+    worldIds,
+    inheritCharacterLorebooks,
+    baselineRealismState,
+    characterSystemPrompts,
+    stableId,
+    folderId,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'groups';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Group> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('character_ids')) {
+      context.handle(
+        _characterIdsMeta,
+        characterIds.isAcceptableOrUnknown(
+          data['character_ids']!,
+          _characterIdsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('turn_order')) {
+      context.handle(
+        _turnOrderMeta,
+        turnOrder.isAcceptableOrUnknown(data['turn_order']!, _turnOrderMeta),
+      );
+    }
+    if (data.containsKey('auto_advance')) {
+      context.handle(
+        _autoAdvanceMeta,
+        autoAdvance.isAcceptableOrUnknown(
+          data['auto_advance']!,
+          _autoAdvanceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('director_mode')) {
+      context.handle(
+        _directorModeMeta,
+        directorMode.isAcceptableOrUnknown(
+          data['director_mode']!,
+          _directorModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('first_message')) {
+      context.handle(
+        _firstMessageMeta,
+        firstMessage.isAcceptableOrUnknown(
+          data['first_message']!,
+          _firstMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scenario')) {
+      context.handle(
+        _scenarioMeta,
+        scenario.isAcceptableOrUnknown(data['scenario']!, _scenarioMeta),
+      );
+    }
+    if (data.containsKey('system_prompt')) {
+      context.handle(
+        _systemPromptMeta,
+        systemPrompt.isAcceptableOrUnknown(
+          data['system_prompt']!,
+          _systemPromptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('default_member_realism_state')) {
+      context.handle(
+        _defaultMemberRealismStateMeta,
+        defaultMemberRealismState.isAcceptableOrUnknown(
+          data['default_member_realism_state']!,
+          _defaultMemberRealismStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chaos_mode_enabled')) {
+      context.handle(
+        _chaosModeEnabledMeta,
+        chaosModeEnabled.isAcceptableOrUnknown(
+          data['chaos_mode_enabled']!,
+          _chaosModeEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chaos_nsfw_enabled')) {
+      context.handle(
+        _chaosNsfwEnabledMeta,
+        chaosNsfwEnabled.isAcceptableOrUnknown(
+          data['chaos_nsfw_enabled']!,
+          _chaosNsfwEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('group_lorebook')) {
+      context.handle(
+        _groupLorebookMeta,
+        groupLorebook.isAcceptableOrUnknown(
+          data['group_lorebook']!,
+          _groupLorebookMeta,
+        ),
+      );
+    }
+    if (data.containsKey('world_ids')) {
+      context.handle(
+        _worldIdsMeta,
+        worldIds.isAcceptableOrUnknown(data['world_ids']!, _worldIdsMeta),
+      );
+    }
+    if (data.containsKey('inherit_character_lorebooks')) {
+      context.handle(
+        _inheritCharacterLorebooksMeta,
+        inheritCharacterLorebooks.isAcceptableOrUnknown(
+          data['inherit_character_lorebooks']!,
+          _inheritCharacterLorebooksMeta,
+        ),
+      );
+    }
+    if (data.containsKey('baseline_realism_state')) {
+      context.handle(
+        _baselineRealismStateMeta,
+        baselineRealismState.isAcceptableOrUnknown(
+          data['baseline_realism_state']!,
+          _baselineRealismStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('character_system_prompts')) {
+      context.handle(
+        _characterSystemPromptsMeta,
+        characterSystemPrompts.isAcceptableOrUnknown(
+          data['character_system_prompts']!,
+          _characterSystemPromptsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('stable_id')) {
+      context.handle(
+        _stableIdMeta,
+        stableId.isAcceptableOrUnknown(data['stable_id']!, _stableIdMeta),
+      );
+    }
+    if (data.containsKey('folder_id')) {
+      context.handle(
+        _folderIdMeta,
+        folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Group map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Group(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      characterIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_ids'],
+      )!,
+      turnOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}turn_order'],
+      )!,
+      autoAdvance: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_advance'],
+      )!,
+      directorMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}director_mode'],
+      )!,
+      firstMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}first_message'],
+      )!,
+      scenario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scenario'],
+      )!,
+      systemPrompt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}system_prompt'],
+      )!,
+      defaultMemberRealismState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}default_member_realism_state'],
+      )!,
+      chaosModeEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}chaos_mode_enabled'],
+      )!,
+      chaosNsfwEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}chaos_nsfw_enabled'],
+      )!,
+      groupLorebook: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_lorebook'],
+      )!,
+      worldIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}world_ids'],
+      )!,
+      inheritCharacterLorebooks: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}inherit_character_lorebooks'],
+      )!,
+      baselineRealismState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}baseline_realism_state'],
+      )!,
+      characterSystemPrompts: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_system_prompts'],
+      )!,
+      stableId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}stable_id'],
+      ),
+      folderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_id'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $GroupsTable createAlias(String alias) {
+    return $GroupsTable(attachedDatabase, alias);
+  }
+}
+
+class Group extends DataClass implements Insertable<Group> {
+  final String id;
+  final String name;
+  final String characterIds;
+  final String turnOrder;
+  final bool autoAdvance;
+  final bool directorMode;
+  final String firstMessage;
+  final String scenario;
+  final String systemPrompt;
+
+  /// Portable default realism/needs state for this group definition.
+  /// JSON: { charId: { emotion, needs, affection, trust, fixation, relationships, ... } }
+  /// Used for Group Card export/import and as seed when starting new group sessions
+  /// or splitting group members to solo characters.
+  /// Added in schema v30 as part of proper DB-backed group realism (clean break from
+  /// old hidden __group_state__ checkpoint messages).
+  final String defaultMemberRealismState;
+  final bool chaosModeEnabled;
+  final bool chaosNsfwEnabled;
+  final String groupLorebook;
+  final String worldIds;
+  final bool inheritCharacterLorebooks;
+
+  /// Immutable creation-time baseline realism/needs seed for this group definition.
+  /// JSON shape is identical to defaultMemberRealismState and sessions.group_realism_state.
+  /// This is the frozen seed captured at group creation / Group Card import time only.
+  /// Distinct from defaultMemberRealismState (which can be updated later for new sessions).
+  /// Clean column (not a blob) per v30 philosophy of explicit storage — makes the
+  /// immutable-seed contract visible to code and to external direct-SQL tools.
+  /// Added in schema v31.
+  final String baselineRealismState;
+
+  /// Per-character system prompt overrides scoped to this group.
+  /// Stored as a first-class JSON column (Map&lt;String, String&gt; keyed by stable charId).
+  ///
+  /// This was previously the last remaining "Path B" transitional hack stored inside
+  /// the defaultMemberRealismState JSON blob. As of v32 it has its own proper column.
+  /// The old extraction/promotion logic inside the realism blob has been fully removed.
+  ///
+  /// Takes precedence over a character's normal system prompt when that character
+  /// speaks inside this specific group, but sits under the group-level systemPrompt.
+  final String characterSystemPrompts;
+
+  /// Portable, device-independent stable id for this group (schema v34).
+  ///
+  /// Distinct from [id] (a device-local `group_<timestamp>` handle): this id
+  /// travels in the exported Group Card and is preserved on import, so a shared
+  /// group can be UPDATED in place on The Stoop (no duplicate) and re-associated
+  /// after switching devices — the group analogue of a character's stable id.
+  /// Nullable + additive. Generated lazily in code.
+  final String? stableId;
+
+  /// Home-screen folder membership (schema v42), the group analogue of
+  /// Characters.folderId. Null = top level. Nullable + additive.
+  final String? folderId;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Group({
+    required this.id,
+    required this.name,
+    required this.characterIds,
+    required this.turnOrder,
+    required this.autoAdvance,
+    required this.directorMode,
+    required this.firstMessage,
+    required this.scenario,
+    required this.systemPrompt,
+    required this.defaultMemberRealismState,
+    required this.chaosModeEnabled,
+    required this.chaosNsfwEnabled,
+    required this.groupLorebook,
+    required this.worldIds,
+    required this.inheritCharacterLorebooks,
+    required this.baselineRealismState,
+    required this.characterSystemPrompts,
+    this.stableId,
+    this.folderId,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['character_ids'] = Variable<String>(characterIds);
+    map['turn_order'] = Variable<String>(turnOrder);
+    map['auto_advance'] = Variable<bool>(autoAdvance);
+    map['director_mode'] = Variable<bool>(directorMode);
+    map['first_message'] = Variable<String>(firstMessage);
+    map['scenario'] = Variable<String>(scenario);
+    map['system_prompt'] = Variable<String>(systemPrompt);
+    map['default_member_realism_state'] = Variable<String>(
+      defaultMemberRealismState,
+    );
+    map['chaos_mode_enabled'] = Variable<bool>(chaosModeEnabled);
+    map['chaos_nsfw_enabled'] = Variable<bool>(chaosNsfwEnabled);
+    map['group_lorebook'] = Variable<String>(groupLorebook);
+    map['world_ids'] = Variable<String>(worldIds);
+    map['inherit_character_lorebooks'] = Variable<bool>(
+      inheritCharacterLorebooks,
+    );
+    map['baseline_realism_state'] = Variable<String>(baselineRealismState);
+    map['character_system_prompts'] = Variable<String>(characterSystemPrompts);
+    if (!nullToAbsent || stableId != null) {
+      map['stable_id'] = Variable<String>(stableId);
+    }
+    if (!nullToAbsent || folderId != null) {
+      map['folder_id'] = Variable<String>(folderId);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  GroupsCompanion toCompanion(bool nullToAbsent) {
+    return GroupsCompanion(
+      id: Value(id),
+      name: Value(name),
+      characterIds: Value(characterIds),
+      turnOrder: Value(turnOrder),
+      autoAdvance: Value(autoAdvance),
+      directorMode: Value(directorMode),
+      firstMessage: Value(firstMessage),
+      scenario: Value(scenario),
+      systemPrompt: Value(systemPrompt),
+      defaultMemberRealismState: Value(defaultMemberRealismState),
+      chaosModeEnabled: Value(chaosModeEnabled),
+      chaosNsfwEnabled: Value(chaosNsfwEnabled),
+      groupLorebook: Value(groupLorebook),
+      worldIds: Value(worldIds),
+      inheritCharacterLorebooks: Value(inheritCharacterLorebooks),
+      baselineRealismState: Value(baselineRealismState),
+      characterSystemPrompts: Value(characterSystemPrompts),
+      stableId: stableId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stableId),
+      folderId: folderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(folderId),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Group.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Group(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      characterIds: serializer.fromJson<String>(json['characterIds']),
+      turnOrder: serializer.fromJson<String>(json['turnOrder']),
+      autoAdvance: serializer.fromJson<bool>(json['autoAdvance']),
+      directorMode: serializer.fromJson<bool>(json['directorMode']),
+      firstMessage: serializer.fromJson<String>(json['firstMessage']),
+      scenario: serializer.fromJson<String>(json['scenario']),
+      systemPrompt: serializer.fromJson<String>(json['systemPrompt']),
+      defaultMemberRealismState: serializer.fromJson<String>(
+        json['defaultMemberRealismState'],
+      ),
+      chaosModeEnabled: serializer.fromJson<bool>(json['chaosModeEnabled']),
+      chaosNsfwEnabled: serializer.fromJson<bool>(json['chaosNsfwEnabled']),
+      groupLorebook: serializer.fromJson<String>(json['groupLorebook']),
+      worldIds: serializer.fromJson<String>(json['worldIds']),
+      inheritCharacterLorebooks: serializer.fromJson<bool>(
+        json['inheritCharacterLorebooks'],
+      ),
+      baselineRealismState: serializer.fromJson<String>(
+        json['baselineRealismState'],
+      ),
+      characterSystemPrompts: serializer.fromJson<String>(
+        json['characterSystemPrompts'],
+      ),
+      stableId: serializer.fromJson<String?>(json['stableId']),
+      folderId: serializer.fromJson<String?>(json['folderId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'characterIds': serializer.toJson<String>(characterIds),
+      'turnOrder': serializer.toJson<String>(turnOrder),
+      'autoAdvance': serializer.toJson<bool>(autoAdvance),
+      'directorMode': serializer.toJson<bool>(directorMode),
+      'firstMessage': serializer.toJson<String>(firstMessage),
+      'scenario': serializer.toJson<String>(scenario),
+      'systemPrompt': serializer.toJson<String>(systemPrompt),
+      'defaultMemberRealismState': serializer.toJson<String>(
+        defaultMemberRealismState,
+      ),
+      'chaosModeEnabled': serializer.toJson<bool>(chaosModeEnabled),
+      'chaosNsfwEnabled': serializer.toJson<bool>(chaosNsfwEnabled),
+      'groupLorebook': serializer.toJson<String>(groupLorebook),
+      'worldIds': serializer.toJson<String>(worldIds),
+      'inheritCharacterLorebooks': serializer.toJson<bool>(
+        inheritCharacterLorebooks,
+      ),
+      'baselineRealismState': serializer.toJson<String>(baselineRealismState),
+      'characterSystemPrompts': serializer.toJson<String>(
+        characterSystemPrompts,
+      ),
+      'stableId': serializer.toJson<String?>(stableId),
+      'folderId': serializer.toJson<String?>(folderId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Group copyWith({
+    String? id,
+    String? name,
+    String? characterIds,
+    String? turnOrder,
+    bool? autoAdvance,
+    bool? directorMode,
+    String? firstMessage,
+    String? scenario,
+    String? systemPrompt,
+    String? defaultMemberRealismState,
+    bool? chaosModeEnabled,
+    bool? chaosNsfwEnabled,
+    String? groupLorebook,
+    String? worldIds,
+    bool? inheritCharacterLorebooks,
+    String? baselineRealismState,
+    String? characterSystemPrompts,
+    Value<String?> stableId = const Value.absent(),
+    Value<String?> folderId = const Value.absent(),
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Group(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    characterIds: characterIds ?? this.characterIds,
+    turnOrder: turnOrder ?? this.turnOrder,
+    autoAdvance: autoAdvance ?? this.autoAdvance,
+    directorMode: directorMode ?? this.directorMode,
+    firstMessage: firstMessage ?? this.firstMessage,
+    scenario: scenario ?? this.scenario,
+    systemPrompt: systemPrompt ?? this.systemPrompt,
+    defaultMemberRealismState:
+        defaultMemberRealismState ?? this.defaultMemberRealismState,
+    chaosModeEnabled: chaosModeEnabled ?? this.chaosModeEnabled,
+    chaosNsfwEnabled: chaosNsfwEnabled ?? this.chaosNsfwEnabled,
+    groupLorebook: groupLorebook ?? this.groupLorebook,
+    worldIds: worldIds ?? this.worldIds,
+    inheritCharacterLorebooks:
+        inheritCharacterLorebooks ?? this.inheritCharacterLorebooks,
+    baselineRealismState: baselineRealismState ?? this.baselineRealismState,
+    characterSystemPrompts:
+        characterSystemPrompts ?? this.characterSystemPrompts,
+    stableId: stableId.present ? stableId.value : this.stableId,
+    folderId: folderId.present ? folderId.value : this.folderId,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Group copyWithCompanion(GroupsCompanion data) {
+    return Group(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      characterIds: data.characterIds.present
+          ? data.characterIds.value
+          : this.characterIds,
+      turnOrder: data.turnOrder.present ? data.turnOrder.value : this.turnOrder,
+      autoAdvance: data.autoAdvance.present
+          ? data.autoAdvance.value
+          : this.autoAdvance,
+      directorMode: data.directorMode.present
+          ? data.directorMode.value
+          : this.directorMode,
+      firstMessage: data.firstMessage.present
+          ? data.firstMessage.value
+          : this.firstMessage,
+      scenario: data.scenario.present ? data.scenario.value : this.scenario,
+      systemPrompt: data.systemPrompt.present
+          ? data.systemPrompt.value
+          : this.systemPrompt,
+      defaultMemberRealismState: data.defaultMemberRealismState.present
+          ? data.defaultMemberRealismState.value
+          : this.defaultMemberRealismState,
+      chaosModeEnabled: data.chaosModeEnabled.present
+          ? data.chaosModeEnabled.value
+          : this.chaosModeEnabled,
+      chaosNsfwEnabled: data.chaosNsfwEnabled.present
+          ? data.chaosNsfwEnabled.value
+          : this.chaosNsfwEnabled,
+      groupLorebook: data.groupLorebook.present
+          ? data.groupLorebook.value
+          : this.groupLorebook,
+      worldIds: data.worldIds.present ? data.worldIds.value : this.worldIds,
+      inheritCharacterLorebooks: data.inheritCharacterLorebooks.present
+          ? data.inheritCharacterLorebooks.value
+          : this.inheritCharacterLorebooks,
+      baselineRealismState: data.baselineRealismState.present
+          ? data.baselineRealismState.value
+          : this.baselineRealismState,
+      characterSystemPrompts: data.characterSystemPrompts.present
+          ? data.characterSystemPrompts.value
+          : this.characterSystemPrompts,
+      stableId: data.stableId.present ? data.stableId.value : this.stableId,
+      folderId: data.folderId.present ? data.folderId.value : this.folderId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Group(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('characterIds: $characterIds, ')
+          ..write('turnOrder: $turnOrder, ')
+          ..write('autoAdvance: $autoAdvance, ')
+          ..write('directorMode: $directorMode, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('scenario: $scenario, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('defaultMemberRealismState: $defaultMemberRealismState, ')
+          ..write('chaosModeEnabled: $chaosModeEnabled, ')
+          ..write('chaosNsfwEnabled: $chaosNsfwEnabled, ')
+          ..write('groupLorebook: $groupLorebook, ')
+          ..write('worldIds: $worldIds, ')
+          ..write('inheritCharacterLorebooks: $inheritCharacterLorebooks, ')
+          ..write('baselineRealismState: $baselineRealismState, ')
+          ..write('characterSystemPrompts: $characterSystemPrompts, ')
+          ..write('stableId: $stableId, ')
+          ..write('folderId: $folderId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    name,
+    characterIds,
+    turnOrder,
+    autoAdvance,
+    directorMode,
+    firstMessage,
+    scenario,
+    systemPrompt,
+    defaultMemberRealismState,
+    chaosModeEnabled,
+    chaosNsfwEnabled,
+    groupLorebook,
+    worldIds,
+    inheritCharacterLorebooks,
+    baselineRealismState,
+    characterSystemPrompts,
+    stableId,
+    folderId,
+    updatedAt,
+    deletedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Group &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.characterIds == this.characterIds &&
+          other.turnOrder == this.turnOrder &&
+          other.autoAdvance == this.autoAdvance &&
+          other.directorMode == this.directorMode &&
+          other.firstMessage == this.firstMessage &&
+          other.scenario == this.scenario &&
+          other.systemPrompt == this.systemPrompt &&
+          other.defaultMemberRealismState == this.defaultMemberRealismState &&
+          other.chaosModeEnabled == this.chaosModeEnabled &&
+          other.chaosNsfwEnabled == this.chaosNsfwEnabled &&
+          other.groupLorebook == this.groupLorebook &&
+          other.worldIds == this.worldIds &&
+          other.inheritCharacterLorebooks == this.inheritCharacterLorebooks &&
+          other.baselineRealismState == this.baselineRealismState &&
+          other.characterSystemPrompts == this.characterSystemPrompts &&
+          other.stableId == this.stableId &&
+          other.folderId == this.folderId &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class GroupsCompanion extends UpdateCompanion<Group> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> characterIds;
+  final Value<String> turnOrder;
+  final Value<bool> autoAdvance;
+  final Value<bool> directorMode;
+  final Value<String> firstMessage;
+  final Value<String> scenario;
+  final Value<String> systemPrompt;
+  final Value<String> defaultMemberRealismState;
+  final Value<bool> chaosModeEnabled;
+  final Value<bool> chaosNsfwEnabled;
+  final Value<String> groupLorebook;
+  final Value<String> worldIds;
+  final Value<bool> inheritCharacterLorebooks;
+  final Value<String> baselineRealismState;
+  final Value<String> characterSystemPrompts;
+  final Value<String?> stableId;
+  final Value<String?> folderId;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const GroupsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.characterIds = const Value.absent(),
+    this.turnOrder = const Value.absent(),
+    this.autoAdvance = const Value.absent(),
+    this.directorMode = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.defaultMemberRealismState = const Value.absent(),
+    this.chaosModeEnabled = const Value.absent(),
+    this.chaosNsfwEnabled = const Value.absent(),
+    this.groupLorebook = const Value.absent(),
+    this.worldIds = const Value.absent(),
+    this.inheritCharacterLorebooks = const Value.absent(),
+    this.baselineRealismState = const Value.absent(),
+    this.characterSystemPrompts = const Value.absent(),
+    this.stableId = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GroupsCompanion.insert({
+    required String id,
+    required String name,
+    this.characterIds = const Value.absent(),
+    this.turnOrder = const Value.absent(),
+    this.autoAdvance = const Value.absent(),
+    this.directorMode = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.defaultMemberRealismState = const Value.absent(),
+    this.chaosModeEnabled = const Value.absent(),
+    this.chaosNsfwEnabled = const Value.absent(),
+    this.groupLorebook = const Value.absent(),
+    this.worldIds = const Value.absent(),
+    this.inheritCharacterLorebooks = const Value.absent(),
+    this.baselineRealismState = const Value.absent(),
+    this.characterSystemPrompts = const Value.absent(),
+    this.stableId = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<Group> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? characterIds,
+    Expression<String>? turnOrder,
+    Expression<bool>? autoAdvance,
+    Expression<bool>? directorMode,
+    Expression<String>? firstMessage,
+    Expression<String>? scenario,
+    Expression<String>? systemPrompt,
+    Expression<String>? defaultMemberRealismState,
+    Expression<bool>? chaosModeEnabled,
+    Expression<bool>? chaosNsfwEnabled,
+    Expression<String>? groupLorebook,
+    Expression<String>? worldIds,
+    Expression<bool>? inheritCharacterLorebooks,
+    Expression<String>? baselineRealismState,
+    Expression<String>? characterSystemPrompts,
+    Expression<String>? stableId,
+    Expression<String>? folderId,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (characterIds != null) 'character_ids': characterIds,
+      if (turnOrder != null) 'turn_order': turnOrder,
+      if (autoAdvance != null) 'auto_advance': autoAdvance,
+      if (directorMode != null) 'director_mode': directorMode,
+      if (firstMessage != null) 'first_message': firstMessage,
+      if (scenario != null) 'scenario': scenario,
+      if (systemPrompt != null) 'system_prompt': systemPrompt,
+      if (defaultMemberRealismState != null)
+        'default_member_realism_state': defaultMemberRealismState,
+      if (chaosModeEnabled != null) 'chaos_mode_enabled': chaosModeEnabled,
+      if (chaosNsfwEnabled != null) 'chaos_nsfw_enabled': chaosNsfwEnabled,
+      if (groupLorebook != null) 'group_lorebook': groupLorebook,
+      if (worldIds != null) 'world_ids': worldIds,
+      if (inheritCharacterLorebooks != null)
+        'inherit_character_lorebooks': inheritCharacterLorebooks,
+      if (baselineRealismState != null)
+        'baseline_realism_state': baselineRealismState,
+      if (characterSystemPrompts != null)
+        'character_system_prompts': characterSystemPrompts,
+      if (stableId != null) 'stable_id': stableId,
+      if (folderId != null) 'folder_id': folderId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GroupsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? characterIds,
+    Value<String>? turnOrder,
+    Value<bool>? autoAdvance,
+    Value<bool>? directorMode,
+    Value<String>? firstMessage,
+    Value<String>? scenario,
+    Value<String>? systemPrompt,
+    Value<String>? defaultMemberRealismState,
+    Value<bool>? chaosModeEnabled,
+    Value<bool>? chaosNsfwEnabled,
+    Value<String>? groupLorebook,
+    Value<String>? worldIds,
+    Value<bool>? inheritCharacterLorebooks,
+    Value<String>? baselineRealismState,
+    Value<String>? characterSystemPrompts,
+    Value<String?>? stableId,
+    Value<String?>? folderId,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return GroupsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      characterIds: characterIds ?? this.characterIds,
+      turnOrder: turnOrder ?? this.turnOrder,
+      autoAdvance: autoAdvance ?? this.autoAdvance,
+      directorMode: directorMode ?? this.directorMode,
+      firstMessage: firstMessage ?? this.firstMessage,
+      scenario: scenario ?? this.scenario,
+      systemPrompt: systemPrompt ?? this.systemPrompt,
+      defaultMemberRealismState:
+          defaultMemberRealismState ?? this.defaultMemberRealismState,
+      chaosModeEnabled: chaosModeEnabled ?? this.chaosModeEnabled,
+      chaosNsfwEnabled: chaosNsfwEnabled ?? this.chaosNsfwEnabled,
+      groupLorebook: groupLorebook ?? this.groupLorebook,
+      worldIds: worldIds ?? this.worldIds,
+      inheritCharacterLorebooks:
+          inheritCharacterLorebooks ?? this.inheritCharacterLorebooks,
+      baselineRealismState: baselineRealismState ?? this.baselineRealismState,
+      characterSystemPrompts:
+          characterSystemPrompts ?? this.characterSystemPrompts,
+      stableId: stableId ?? this.stableId,
+      folderId: folderId ?? this.folderId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (characterIds.present) {
+      map['character_ids'] = Variable<String>(characterIds.value);
+    }
+    if (turnOrder.present) {
+      map['turn_order'] = Variable<String>(turnOrder.value);
+    }
+    if (autoAdvance.present) {
+      map['auto_advance'] = Variable<bool>(autoAdvance.value);
+    }
+    if (directorMode.present) {
+      map['director_mode'] = Variable<bool>(directorMode.value);
+    }
+    if (firstMessage.present) {
+      map['first_message'] = Variable<String>(firstMessage.value);
+    }
+    if (scenario.present) {
+      map['scenario'] = Variable<String>(scenario.value);
+    }
+    if (systemPrompt.present) {
+      map['system_prompt'] = Variable<String>(systemPrompt.value);
+    }
+    if (defaultMemberRealismState.present) {
+      map['default_member_realism_state'] = Variable<String>(
+        defaultMemberRealismState.value,
+      );
+    }
+    if (chaosModeEnabled.present) {
+      map['chaos_mode_enabled'] = Variable<bool>(chaosModeEnabled.value);
+    }
+    if (chaosNsfwEnabled.present) {
+      map['chaos_nsfw_enabled'] = Variable<bool>(chaosNsfwEnabled.value);
+    }
+    if (groupLorebook.present) {
+      map['group_lorebook'] = Variable<String>(groupLorebook.value);
+    }
+    if (worldIds.present) {
+      map['world_ids'] = Variable<String>(worldIds.value);
+    }
+    if (inheritCharacterLorebooks.present) {
+      map['inherit_character_lorebooks'] = Variable<bool>(
+        inheritCharacterLorebooks.value,
+      );
+    }
+    if (baselineRealismState.present) {
+      map['baseline_realism_state'] = Variable<String>(
+        baselineRealismState.value,
+      );
+    }
+    if (characterSystemPrompts.present) {
+      map['character_system_prompts'] = Variable<String>(
+        characterSystemPrompts.value,
+      );
+    }
+    if (stableId.present) {
+      map['stable_id'] = Variable<String>(stableId.value);
+    }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GroupsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('characterIds: $characterIds, ')
+          ..write('turnOrder: $turnOrder, ')
+          ..write('autoAdvance: $autoAdvance, ')
+          ..write('directorMode: $directorMode, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('scenario: $scenario, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('defaultMemberRealismState: $defaultMemberRealismState, ')
+          ..write('chaosModeEnabled: $chaosModeEnabled, ')
+          ..write('chaosNsfwEnabled: $chaosNsfwEnabled, ')
+          ..write('groupLorebook: $groupLorebook, ')
+          ..write('worldIds: $worldIds, ')
+          ..write('inheritCharacterLorebooks: $inheritCharacterLorebooks, ')
+          ..write('baselineRealismState: $baselineRealismState, ')
+          ..write('characterSystemPrompts: $characterSystemPrompts, ')
+          ..write('stableId: $stableId, ')
+          ..write('folderId: $folderId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FoldersTable extends Folders with TableInfo<$FoldersTable, Folder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FoldersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    parentId,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'folders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Folder> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Folder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Folder(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $FoldersTable createAlias(String alias) {
+    return $FoldersTable(attachedDatabase, alias);
+  }
+}
+
+class Folder extends DataClass implements Insertable<Folder> {
+  final String id;
+  final String name;
+  final String? parentId;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Folder({
+    required this.id,
+    required this.name,
+    this.parentId,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  FoldersCompanion toCompanion(bool nullToAbsent) {
+    return FoldersCompanion(
+      id: Value(id),
+      name: Value(name),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Folder.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Folder(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'parentId': serializer.toJson<String?>(parentId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Folder copyWith({
+    String? id,
+    String? name,
+    Value<String?> parentId = const Value.absent(),
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Folder(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    parentId: parentId.present ? parentId.value : this.parentId,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Folder copyWithCompanion(FoldersCompanion data) {
+    return Folder(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Folder(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('parentId: $parentId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, parentId, updatedAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Folder &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.parentId == this.parentId &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class FoldersCompanion extends UpdateCompanion<Folder> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> parentId;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const FoldersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FoldersCompanion.insert({
+    required String id,
+    required String name,
+    this.parentId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<Folder> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? parentId,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (parentId != null) 'parent_id': parentId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FoldersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? parentId,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return FoldersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      parentId: parentId ?? this.parentId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FoldersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('parentId: $parentId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PersonasTable extends Personas with TableInfo<$PersonasTable, Persona> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('User'),
+  );
+  static const VerificationMeta _personaMeta = const VerificationMeta(
+    'persona',
+  );
+  @override
+  late final GeneratedColumn<String> persona = GeneratedColumn<String>(
+    'persona',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _learnedFactsMeta = const VerificationMeta(
+    'learnedFacts',
+  );
+  @override
+  late final GeneratedColumn<String> learnedFacts = GeneratedColumn<String>(
+    'learned_facts',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _avatarPathMeta = const VerificationMeta(
+    'avatarPath',
+  );
+  @override
+  late final GeneratedColumn<String> avatarPath = GeneratedColumn<String>(
+    'avatar_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _birthdayMeta = const VerificationMeta(
+    'birthday',
+  );
+  @override
+  late final GeneratedColumn<String> birthday = GeneratedColumn<String>(
+    'birthday',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    name,
+    persona,
+    learnedFacts,
+    avatarPath,
+    birthday,
+    isActive,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'personas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Persona> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('persona')) {
+      context.handle(
+        _personaMeta,
+        persona.isAcceptableOrUnknown(data['persona']!, _personaMeta),
+      );
+    }
+    if (data.containsKey('learned_facts')) {
+      context.handle(
+        _learnedFactsMeta,
+        learnedFacts.isAcceptableOrUnknown(
+          data['learned_facts']!,
+          _learnedFactsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('avatar_path')) {
+      context.handle(
+        _avatarPathMeta,
+        avatarPath.isAcceptableOrUnknown(data['avatar_path']!, _avatarPathMeta),
+      );
+    }
+    if (data.containsKey('birthday')) {
+      context.handle(
+        _birthdayMeta,
+        birthday.isAcceptableOrUnknown(data['birthday']!, _birthdayMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Persona map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Persona(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      persona: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}persona'],
+      )!,
+      learnedFacts: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}learned_facts'],
+      )!,
+      avatarPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}avatar_path'],
+      ),
+      birthday: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}birthday'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $PersonasTable createAlias(String alias) {
+    return $PersonasTable(attachedDatabase, alias);
+  }
+}
+
+class Persona extends DataClass implements Insertable<Persona> {
+  final String id;
+  final String title;
+  final String name;
+  final String persona;
+  final String learnedFacts;
+  final String? avatarPath;
+
+  /// v50 — optional calendar birthday (`YYYY-MM-DD`). NULL = unset.
+  /// Feb 29 is rejected in code; the column does not enforce it.
+  final String? birthday;
+  final bool isActive;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Persona({
+    required this.id,
+    required this.title,
+    required this.name,
+    required this.persona,
+    required this.learnedFacts,
+    this.avatarPath,
+    this.birthday,
+    required this.isActive,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['name'] = Variable<String>(name);
+    map['persona'] = Variable<String>(persona);
+    map['learned_facts'] = Variable<String>(learnedFacts);
+    if (!nullToAbsent || avatarPath != null) {
+      map['avatar_path'] = Variable<String>(avatarPath);
+    }
+    if (!nullToAbsent || birthday != null) {
+      map['birthday'] = Variable<String>(birthday);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  PersonasCompanion toCompanion(bool nullToAbsent) {
+    return PersonasCompanion(
+      id: Value(id),
+      title: Value(title),
+      name: Value(name),
+      persona: Value(persona),
+      learnedFacts: Value(learnedFacts),
+      avatarPath: avatarPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarPath),
+      birthday: birthday == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthday),
+      isActive: Value(isActive),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Persona.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Persona(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      name: serializer.fromJson<String>(json['name']),
+      persona: serializer.fromJson<String>(json['persona']),
+      learnedFacts: serializer.fromJson<String>(json['learnedFacts']),
+      avatarPath: serializer.fromJson<String?>(json['avatarPath']),
+      birthday: serializer.fromJson<String?>(json['birthday']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'name': serializer.toJson<String>(name),
+      'persona': serializer.toJson<String>(persona),
+      'learnedFacts': serializer.toJson<String>(learnedFacts),
+      'avatarPath': serializer.toJson<String?>(avatarPath),
+      'birthday': serializer.toJson<String?>(birthday),
+      'isActive': serializer.toJson<bool>(isActive),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Persona copyWith({
+    String? id,
+    String? title,
+    String? name,
+    String? persona,
+    String? learnedFacts,
+    Value<String?> avatarPath = const Value.absent(),
+    Value<String?> birthday = const Value.absent(),
+    bool? isActive,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Persona(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    name: name ?? this.name,
+    persona: persona ?? this.persona,
+    learnedFacts: learnedFacts ?? this.learnedFacts,
+    avatarPath: avatarPath.present ? avatarPath.value : this.avatarPath,
+    birthday: birthday.present ? birthday.value : this.birthday,
+    isActive: isActive ?? this.isActive,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Persona copyWithCompanion(PersonasCompanion data) {
+    return Persona(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      name: data.name.present ? data.name.value : this.name,
+      persona: data.persona.present ? data.persona.value : this.persona,
+      learnedFacts: data.learnedFacts.present
+          ? data.learnedFacts.value
+          : this.learnedFacts,
+      avatarPath: data.avatarPath.present
+          ? data.avatarPath.value
+          : this.avatarPath,
+      birthday: data.birthday.present ? data.birthday.value : this.birthday,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Persona(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('name: $name, ')
+          ..write('persona: $persona, ')
+          ..write('learnedFacts: $learnedFacts, ')
+          ..write('avatarPath: $avatarPath, ')
+          ..write('birthday: $birthday, ')
+          ..write('isActive: $isActive, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    name,
+    persona,
+    learnedFacts,
+    avatarPath,
+    birthday,
+    isActive,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Persona &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.name == this.name &&
+          other.persona == this.persona &&
+          other.learnedFacts == this.learnedFacts &&
+          other.avatarPath == this.avatarPath &&
+          other.birthday == this.birthday &&
+          other.isActive == this.isActive &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class PersonasCompanion extends UpdateCompanion<Persona> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> name;
+  final Value<String> persona;
+  final Value<String> learnedFacts;
+  final Value<String?> avatarPath;
+  final Value<String?> birthday;
+  final Value<bool> isActive;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const PersonasCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.name = const Value.absent(),
+    this.persona = const Value.absent(),
+    this.learnedFacts = const Value.absent(),
+    this.avatarPath = const Value.absent(),
+    this.birthday = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PersonasCompanion.insert({
+    required String id,
+    this.title = const Value.absent(),
+    this.name = const Value.absent(),
+    this.persona = const Value.absent(),
+    this.learnedFacts = const Value.absent(),
+    this.avatarPath = const Value.absent(),
+    this.birthday = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<Persona> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? name,
+    Expression<String>? persona,
+    Expression<String>? learnedFacts,
+    Expression<String>? avatarPath,
+    Expression<String>? birthday,
+    Expression<bool>? isActive,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (name != null) 'name': name,
+      if (persona != null) 'persona': persona,
+      if (learnedFacts != null) 'learned_facts': learnedFacts,
+      if (avatarPath != null) 'avatar_path': avatarPath,
+      if (birthday != null) 'birthday': birthday,
+      if (isActive != null) 'is_active': isActive,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PersonasCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String>? name,
+    Value<String>? persona,
+    Value<String>? learnedFacts,
+    Value<String?>? avatarPath,
+    Value<String?>? birthday,
+    Value<bool>? isActive,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return PersonasCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      name: name ?? this.name,
+      persona: persona ?? this.persona,
+      learnedFacts: learnedFacts ?? this.learnedFacts,
+      avatarPath: avatarPath ?? this.avatarPath,
+      birthday: birthday ?? this.birthday,
+      isActive: isActive ?? this.isActive,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (persona.present) {
+      map['persona'] = Variable<String>(persona.value);
+    }
+    if (learnedFacts.present) {
+      map['learned_facts'] = Variable<String>(learnedFacts.value);
+    }
+    if (avatarPath.present) {
+      map['avatar_path'] = Variable<String>(avatarPath.value);
+    }
+    if (birthday.present) {
+      map['birthday'] = Variable<String>(birthday.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonasCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('name: $name, ')
+          ..write('persona: $persona, ')
+          ..write('learnedFacts: $learnedFacts, ')
+          ..write('avatarPath: $avatarPath, ')
+          ..write('birthday: $birthday, ')
+          ..write('isActive: $isActive, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WorldsTable extends Worlds with TableInfo<$WorldsTable, World> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WorldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _lorebookMeta = const VerificationMeta(
+    'lorebook',
+  );
+  @override
+  late final GeneratedColumn<String> lorebook = GeneratedColumn<String>(
+    'lorebook',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _linkedCharacterNameMeta =
+      const VerificationMeta('linkedCharacterName');
+  @override
+  late final GeneratedColumn<String> linkedCharacterName =
+      GeneratedColumn<String>(
+        'linked_character_name',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _coverImageMeta = const VerificationMeta(
+    'coverImage',
+  );
+  @override
+  late final GeneratedColumn<String> coverImage = GeneratedColumn<String>(
+    'cover_image',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _formatVersionMeta = const VerificationMeta(
+    'formatVersion',
+  );
+  @override
+  late final GeneratedColumn<int> formatVersion = GeneratedColumn<int>(
+    'format_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<String> sourceId = GeneratedColumn<String>(
+    'source_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _linkedCharacterIdMeta = const VerificationMeta(
+    'linkedCharacterId',
+  );
+  @override
+  late final GeneratedColumn<String> linkedCharacterId =
+      GeneratedColumn<String>(
+        'linked_character_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _biomeIdMeta = const VerificationMeta(
+    'biomeId',
+  );
+  @override
+  late final GeneratedColumn<String> biomeId = GeneratedColumn<String>(
+    'biome_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _biomeJsonMeta = const VerificationMeta(
+    'biomeJson',
+  );
+  @override
+  late final GeneratedColumn<String> biomeJson = GeneratedColumn<String>(
+    'biome_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _injectDescriptionMeta = const VerificationMeta(
+    'injectDescription',
+  );
+  @override
+  late final GeneratedColumn<bool> injectDescription = GeneratedColumn<bool>(
+    'inject_description',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("inject_description" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _climateEnabledMeta = const VerificationMeta(
+    'climateEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> climateEnabled = GeneratedColumn<bool>(
+    'climate_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("climate_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _placeTraitsMeta = const VerificationMeta(
+    'placeTraits',
+  );
+  @override
+  late final GeneratedColumn<String> placeTraits = GeneratedColumn<String>(
+    'place_traits',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    description,
+    lorebook,
+    linkedCharacterName,
+    coverImage,
+    formatVersion,
+    sourceId,
+    linkedCharacterId,
+    biomeId,
+    biomeJson,
+    injectDescription,
+    climateEnabled,
+    placeTraits,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'worlds';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<World> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lorebook')) {
+      context.handle(
+        _lorebookMeta,
+        lorebook.isAcceptableOrUnknown(data['lorebook']!, _lorebookMeta),
+      );
+    }
+    if (data.containsKey('linked_character_name')) {
+      context.handle(
+        _linkedCharacterNameMeta,
+        linkedCharacterName.isAcceptableOrUnknown(
+          data['linked_character_name']!,
+          _linkedCharacterNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cover_image')) {
+      context.handle(
+        _coverImageMeta,
+        coverImage.isAcceptableOrUnknown(data['cover_image']!, _coverImageMeta),
+      );
+    }
+    if (data.containsKey('format_version')) {
+      context.handle(
+        _formatVersionMeta,
+        formatVersion.isAcceptableOrUnknown(
+          data['format_version']!,
+          _formatVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    }
+    if (data.containsKey('linked_character_id')) {
+      context.handle(
+        _linkedCharacterIdMeta,
+        linkedCharacterId.isAcceptableOrUnknown(
+          data['linked_character_id']!,
+          _linkedCharacterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('biome_id')) {
+      context.handle(
+        _biomeIdMeta,
+        biomeId.isAcceptableOrUnknown(data['biome_id']!, _biomeIdMeta),
+      );
+    }
+    if (data.containsKey('biome_json')) {
+      context.handle(
+        _biomeJsonMeta,
+        biomeJson.isAcceptableOrUnknown(data['biome_json']!, _biomeJsonMeta),
+      );
+    }
+    if (data.containsKey('inject_description')) {
+      context.handle(
+        _injectDescriptionMeta,
+        injectDescription.isAcceptableOrUnknown(
+          data['inject_description']!,
+          _injectDescriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('climate_enabled')) {
+      context.handle(
+        _climateEnabledMeta,
+        climateEnabled.isAcceptableOrUnknown(
+          data['climate_enabled']!,
+          _climateEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('place_traits')) {
+      context.handle(
+        _placeTraitsMeta,
+        placeTraits.isAcceptableOrUnknown(
+          data['place_traits']!,
+          _placeTraitsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  World map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return World(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      lorebook: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lorebook'],
+      ),
+      linkedCharacterName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_character_name'],
+      ),
+      coverImage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cover_image'],
+      ),
+      formatVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}format_version'],
+      )!,
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_id'],
+      ),
+      linkedCharacterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_character_id'],
+      ),
+      biomeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}biome_id'],
+      ),
+      biomeJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}biome_json'],
+      ),
+      injectDescription: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}inject_description'],
+      )!,
+      climateEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}climate_enabled'],
+      )!,
+      placeTraits: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_traits'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $WorldsTable createAlias(String alias) {
+    return $WorldsTable(attachedDatabase, alias);
+  }
+}
+
+class World extends DataClass implements Insertable<World> {
+  final String id;
+  final String name;
+  final String description;
+  final String? lorebook;
+  final String? linkedCharacterName;
+  final String? coverImage;
+  final int formatVersion;
+  final String? sourceId;
+  final String? linkedCharacterId;
+
+  /// Built-in biome id; null ⇒ temperate.
+  final String? biomeId;
+
+  /// Full custom biome JSON (phase 2); null when using a built-in.
+  final String? biomeJson;
+
+  /// Description injection opt-in; false for rows migrated from library labels.
+  final bool injectDescription;
+
+  /// v51 — per-world climate/weather/atmosphere/gravity plug. Default ON so
+  /// every existing world keeps its weather machine; false is a lorebook-only
+  /// bookshelf world. SQLite INTEGER 1/0, same shape as [injectDescription].
+  final bool climateEnabled;
+
+  /// v41 — place traits JSON (atmosphere/gravity enums + future trait keys;
+  /// one flexible column so new traits never need another migration).
+  final String? placeTraits;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const World({
+    required this.id,
+    required this.name,
+    required this.description,
+    this.lorebook,
+    this.linkedCharacterName,
+    this.coverImage,
+    required this.formatVersion,
+    this.sourceId,
+    this.linkedCharacterId,
+    this.biomeId,
+    this.biomeJson,
+    required this.injectDescription,
+    required this.climateEnabled,
+    this.placeTraits,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['description'] = Variable<String>(description);
+    if (!nullToAbsent || lorebook != null) {
+      map['lorebook'] = Variable<String>(lorebook);
+    }
+    if (!nullToAbsent || linkedCharacterName != null) {
+      map['linked_character_name'] = Variable<String>(linkedCharacterName);
+    }
+    if (!nullToAbsent || coverImage != null) {
+      map['cover_image'] = Variable<String>(coverImage);
+    }
+    map['format_version'] = Variable<int>(formatVersion);
+    if (!nullToAbsent || sourceId != null) {
+      map['source_id'] = Variable<String>(sourceId);
+    }
+    if (!nullToAbsent || linkedCharacterId != null) {
+      map['linked_character_id'] = Variable<String>(linkedCharacterId);
+    }
+    if (!nullToAbsent || biomeId != null) {
+      map['biome_id'] = Variable<String>(biomeId);
+    }
+    if (!nullToAbsent || biomeJson != null) {
+      map['biome_json'] = Variable<String>(biomeJson);
+    }
+    map['inject_description'] = Variable<bool>(injectDescription);
+    map['climate_enabled'] = Variable<bool>(climateEnabled);
+    if (!nullToAbsent || placeTraits != null) {
+      map['place_traits'] = Variable<String>(placeTraits);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  WorldsCompanion toCompanion(bool nullToAbsent) {
+    return WorldsCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: Value(description),
+      lorebook: lorebook == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lorebook),
+      linkedCharacterName: linkedCharacterName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedCharacterName),
+      coverImage: coverImage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverImage),
+      formatVersion: Value(formatVersion),
+      sourceId: sourceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceId),
+      linkedCharacterId: linkedCharacterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedCharacterId),
+      biomeId: biomeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(biomeId),
+      biomeJson: biomeJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(biomeJson),
+      injectDescription: Value(injectDescription),
+      climateEnabled: Value(climateEnabled),
+      placeTraits: placeTraits == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeTraits),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory World.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return World(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String>(json['description']),
+      lorebook: serializer.fromJson<String?>(json['lorebook']),
+      linkedCharacterName: serializer.fromJson<String?>(
+        json['linkedCharacterName'],
+      ),
+      coverImage: serializer.fromJson<String?>(json['coverImage']),
+      formatVersion: serializer.fromJson<int>(json['formatVersion']),
+      sourceId: serializer.fromJson<String?>(json['sourceId']),
+      linkedCharacterId: serializer.fromJson<String?>(
+        json['linkedCharacterId'],
+      ),
+      biomeId: serializer.fromJson<String?>(json['biomeId']),
+      biomeJson: serializer.fromJson<String?>(json['biomeJson']),
+      injectDescription: serializer.fromJson<bool>(json['injectDescription']),
+      climateEnabled: serializer.fromJson<bool>(json['climateEnabled']),
+      placeTraits: serializer.fromJson<String?>(json['placeTraits']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String>(description),
+      'lorebook': serializer.toJson<String?>(lorebook),
+      'linkedCharacterName': serializer.toJson<String?>(linkedCharacterName),
+      'coverImage': serializer.toJson<String?>(coverImage),
+      'formatVersion': serializer.toJson<int>(formatVersion),
+      'sourceId': serializer.toJson<String?>(sourceId),
+      'linkedCharacterId': serializer.toJson<String?>(linkedCharacterId),
+      'biomeId': serializer.toJson<String?>(biomeId),
+      'biomeJson': serializer.toJson<String?>(biomeJson),
+      'injectDescription': serializer.toJson<bool>(injectDescription),
+      'climateEnabled': serializer.toJson<bool>(climateEnabled),
+      'placeTraits': serializer.toJson<String?>(placeTraits),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  World copyWith({
+    String? id,
+    String? name,
+    String? description,
+    Value<String?> lorebook = const Value.absent(),
+    Value<String?> linkedCharacterName = const Value.absent(),
+    Value<String?> coverImage = const Value.absent(),
+    int? formatVersion,
+    Value<String?> sourceId = const Value.absent(),
+    Value<String?> linkedCharacterId = const Value.absent(),
+    Value<String?> biomeId = const Value.absent(),
+    Value<String?> biomeJson = const Value.absent(),
+    bool? injectDescription,
+    bool? climateEnabled,
+    Value<String?> placeTraits = const Value.absent(),
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => World(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description ?? this.description,
+    lorebook: lorebook.present ? lorebook.value : this.lorebook,
+    linkedCharacterName: linkedCharacterName.present
+        ? linkedCharacterName.value
+        : this.linkedCharacterName,
+    coverImage: coverImage.present ? coverImage.value : this.coverImage,
+    formatVersion: formatVersion ?? this.formatVersion,
+    sourceId: sourceId.present ? sourceId.value : this.sourceId,
+    linkedCharacterId: linkedCharacterId.present
+        ? linkedCharacterId.value
+        : this.linkedCharacterId,
+    biomeId: biomeId.present ? biomeId.value : this.biomeId,
+    biomeJson: biomeJson.present ? biomeJson.value : this.biomeJson,
+    injectDescription: injectDescription ?? this.injectDescription,
+    climateEnabled: climateEnabled ?? this.climateEnabled,
+    placeTraits: placeTraits.present ? placeTraits.value : this.placeTraits,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  World copyWithCompanion(WorldsCompanion data) {
+    return World(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      lorebook: data.lorebook.present ? data.lorebook.value : this.lorebook,
+      linkedCharacterName: data.linkedCharacterName.present
+          ? data.linkedCharacterName.value
+          : this.linkedCharacterName,
+      coverImage: data.coverImage.present
+          ? data.coverImage.value
+          : this.coverImage,
+      formatVersion: data.formatVersion.present
+          ? data.formatVersion.value
+          : this.formatVersion,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      linkedCharacterId: data.linkedCharacterId.present
+          ? data.linkedCharacterId.value
+          : this.linkedCharacterId,
+      biomeId: data.biomeId.present ? data.biomeId.value : this.biomeId,
+      biomeJson: data.biomeJson.present ? data.biomeJson.value : this.biomeJson,
+      injectDescription: data.injectDescription.present
+          ? data.injectDescription.value
+          : this.injectDescription,
+      climateEnabled: data.climateEnabled.present
+          ? data.climateEnabled.value
+          : this.climateEnabled,
+      placeTraits: data.placeTraits.present
+          ? data.placeTraits.value
+          : this.placeTraits,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('World(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('linkedCharacterName: $linkedCharacterName, ')
+          ..write('coverImage: $coverImage, ')
+          ..write('formatVersion: $formatVersion, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('linkedCharacterId: $linkedCharacterId, ')
+          ..write('biomeId: $biomeId, ')
+          ..write('biomeJson: $biomeJson, ')
+          ..write('injectDescription: $injectDescription, ')
+          ..write('climateEnabled: $climateEnabled, ')
+          ..write('placeTraits: $placeTraits, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    description,
+    lorebook,
+    linkedCharacterName,
+    coverImage,
+    formatVersion,
+    sourceId,
+    linkedCharacterId,
+    biomeId,
+    biomeJson,
+    injectDescription,
+    climateEnabled,
+    placeTraits,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is World &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.lorebook == this.lorebook &&
+          other.linkedCharacterName == this.linkedCharacterName &&
+          other.coverImage == this.coverImage &&
+          other.formatVersion == this.formatVersion &&
+          other.sourceId == this.sourceId &&
+          other.linkedCharacterId == this.linkedCharacterId &&
+          other.biomeId == this.biomeId &&
+          other.biomeJson == this.biomeJson &&
+          other.injectDescription == this.injectDescription &&
+          other.climateEnabled == this.climateEnabled &&
+          other.placeTraits == this.placeTraits &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class WorldsCompanion extends UpdateCompanion<World> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> description;
+  final Value<String?> lorebook;
+  final Value<String?> linkedCharacterName;
+  final Value<String?> coverImage;
+  final Value<int> formatVersion;
+  final Value<String?> sourceId;
+  final Value<String?> linkedCharacterId;
+  final Value<String?> biomeId;
+  final Value<String?> biomeJson;
+  final Value<bool> injectDescription;
+  final Value<bool> climateEnabled;
+  final Value<String?> placeTraits;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const WorldsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.linkedCharacterName = const Value.absent(),
+    this.coverImage = const Value.absent(),
+    this.formatVersion = const Value.absent(),
+    this.sourceId = const Value.absent(),
+    this.linkedCharacterId = const Value.absent(),
+    this.biomeId = const Value.absent(),
+    this.biomeJson = const Value.absent(),
+    this.injectDescription = const Value.absent(),
+    this.climateEnabled = const Value.absent(),
+    this.placeTraits = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WorldsCompanion.insert({
+    required String id,
+    required String name,
+    this.description = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.linkedCharacterName = const Value.absent(),
+    this.coverImage = const Value.absent(),
+    this.formatVersion = const Value.absent(),
+    this.sourceId = const Value.absent(),
+    this.linkedCharacterId = const Value.absent(),
+    this.biomeId = const Value.absent(),
+    this.biomeJson = const Value.absent(),
+    this.injectDescription = const Value.absent(),
+    this.climateEnabled = const Value.absent(),
+    this.placeTraits = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<World> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? lorebook,
+    Expression<String>? linkedCharacterName,
+    Expression<String>? coverImage,
+    Expression<int>? formatVersion,
+    Expression<String>? sourceId,
+    Expression<String>? linkedCharacterId,
+    Expression<String>? biomeId,
+    Expression<String>? biomeJson,
+    Expression<bool>? injectDescription,
+    Expression<bool>? climateEnabled,
+    Expression<String>? placeTraits,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (lorebook != null) 'lorebook': lorebook,
+      if (linkedCharacterName != null)
+        'linked_character_name': linkedCharacterName,
+      if (coverImage != null) 'cover_image': coverImage,
+      if (formatVersion != null) 'format_version': formatVersion,
+      if (sourceId != null) 'source_id': sourceId,
+      if (linkedCharacterId != null) 'linked_character_id': linkedCharacterId,
+      if (biomeId != null) 'biome_id': biomeId,
+      if (biomeJson != null) 'biome_json': biomeJson,
+      if (injectDescription != null) 'inject_description': injectDescription,
+      if (climateEnabled != null) 'climate_enabled': climateEnabled,
+      if (placeTraits != null) 'place_traits': placeTraits,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WorldsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? description,
+    Value<String?>? lorebook,
+    Value<String?>? linkedCharacterName,
+    Value<String?>? coverImage,
+    Value<int>? formatVersion,
+    Value<String?>? sourceId,
+    Value<String?>? linkedCharacterId,
+    Value<String?>? biomeId,
+    Value<String?>? biomeJson,
+    Value<bool>? injectDescription,
+    Value<bool>? climateEnabled,
+    Value<String?>? placeTraits,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return WorldsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      lorebook: lorebook ?? this.lorebook,
+      linkedCharacterName: linkedCharacterName ?? this.linkedCharacterName,
+      coverImage: coverImage ?? this.coverImage,
+      formatVersion: formatVersion ?? this.formatVersion,
+      sourceId: sourceId ?? this.sourceId,
+      linkedCharacterId: linkedCharacterId ?? this.linkedCharacterId,
+      biomeId: biomeId ?? this.biomeId,
+      biomeJson: biomeJson ?? this.biomeJson,
+      injectDescription: injectDescription ?? this.injectDescription,
+      climateEnabled: climateEnabled ?? this.climateEnabled,
+      placeTraits: placeTraits ?? this.placeTraits,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (lorebook.present) {
+      map['lorebook'] = Variable<String>(lorebook.value);
+    }
+    if (linkedCharacterName.present) {
+      map['linked_character_name'] = Variable<String>(
+        linkedCharacterName.value,
+      );
+    }
+    if (coverImage.present) {
+      map['cover_image'] = Variable<String>(coverImage.value);
+    }
+    if (formatVersion.present) {
+      map['format_version'] = Variable<int>(formatVersion.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<String>(sourceId.value);
+    }
+    if (linkedCharacterId.present) {
+      map['linked_character_id'] = Variable<String>(linkedCharacterId.value);
+    }
+    if (biomeId.present) {
+      map['biome_id'] = Variable<String>(biomeId.value);
+    }
+    if (biomeJson.present) {
+      map['biome_json'] = Variable<String>(biomeJson.value);
+    }
+    if (injectDescription.present) {
+      map['inject_description'] = Variable<bool>(injectDescription.value);
+    }
+    if (climateEnabled.present) {
+      map['climate_enabled'] = Variable<bool>(climateEnabled.value);
+    }
+    if (placeTraits.present) {
+      map['place_traits'] = Variable<String>(placeTraits.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorldsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('linkedCharacterName: $linkedCharacterName, ')
+          ..write('coverImage: $coverImage, ')
+          ..write('formatVersion: $formatVersion, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('linkedCharacterId: $linkedCharacterId, ')
+          ..write('biomeId: $biomeId, ')
+          ..write('biomeJson: $biomeJson, ')
+          ..write('injectDescription: $injectDescription, ')
+          ..write('climateEnabled: $climateEnabled, ')
+          ..write('placeTraits: $placeTraits, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChatWorldsTable extends ChatWorlds
+    with TableInfo<$ChatWorldsTable, ChatWorld> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChatWorldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chatIdMeta = const VerificationMeta('chatId');
+  @override
+  late final GeneratedColumn<String> chatId = GeneratedColumn<String>(
+    'chat_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _worldIdMeta = const VerificationMeta(
+    'worldId',
+  );
+  @override
+  late final GeneratedColumn<String> worldId = GeneratedColumn<String>(
+    'world_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isPrimaryMeta = const VerificationMeta(
+    'isPrimary',
+  );
+  @override
+  late final GeneratedColumn<bool> isPrimary = GeneratedColumn<bool>(
+    'is_primary',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_primary" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    chatId,
+    worldId,
+    sortOrder,
+    isPrimary,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chat_worlds';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChatWorld> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('chat_id')) {
+      context.handle(
+        _chatIdMeta,
+        chatId.isAcceptableOrUnknown(data['chat_id']!, _chatIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chatIdMeta);
+    }
+    if (data.containsKey('world_id')) {
+      context.handle(
+        _worldIdMeta,
+        worldId.isAcceptableOrUnknown(data['world_id']!, _worldIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_worldIdMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_primary')) {
+      context.handle(
+        _isPrimaryMeta,
+        isPrimary.isAcceptableOrUnknown(data['is_primary']!, _isPrimaryMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChatWorld map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChatWorld(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      chatId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chat_id'],
+      )!,
+      worldId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}world_id'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isPrimary: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_primary'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ChatWorldsTable createAlias(String alias) {
+    return $ChatWorldsTable(attachedDatabase, alias);
+  }
+}
+
+class ChatWorld extends DataClass implements Insertable<ChatWorld> {
+  final String id;
+  final String chatId;
+  final String worldId;
+  final int sortOrder;
+
+  /// v52 — Setting (Primary) vs Lore role for this chat. Slot role beats the
+  /// world file's climateEnabled at runtime: a climate-on Mars in Lore stays
+  /// lore-only for the session. Default false (lore).
+  final bool isPrimary;
+  final DateTime createdAt;
+  const ChatWorld({
+    required this.id,
+    required this.chatId,
+    required this.worldId,
+    required this.sortOrder,
+    required this.isPrimary,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['chat_id'] = Variable<String>(chatId);
+    map['world_id'] = Variable<String>(worldId);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_primary'] = Variable<bool>(isPrimary);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ChatWorldsCompanion toCompanion(bool nullToAbsent) {
+    return ChatWorldsCompanion(
+      id: Value(id),
+      chatId: Value(chatId),
+      worldId: Value(worldId),
+      sortOrder: Value(sortOrder),
+      isPrimary: Value(isPrimary),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ChatWorld.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChatWorld(
+      id: serializer.fromJson<String>(json['id']),
+      chatId: serializer.fromJson<String>(json['chatId']),
+      worldId: serializer.fromJson<String>(json['worldId']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isPrimary: serializer.fromJson<bool>(json['isPrimary']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'chatId': serializer.toJson<String>(chatId),
+      'worldId': serializer.toJson<String>(worldId),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isPrimary': serializer.toJson<bool>(isPrimary),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ChatWorld copyWith({
+    String? id,
+    String? chatId,
+    String? worldId,
+    int? sortOrder,
+    bool? isPrimary,
+    DateTime? createdAt,
+  }) => ChatWorld(
+    id: id ?? this.id,
+    chatId: chatId ?? this.chatId,
+    worldId: worldId ?? this.worldId,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isPrimary: isPrimary ?? this.isPrimary,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ChatWorld copyWithCompanion(ChatWorldsCompanion data) {
+    return ChatWorld(
+      id: data.id.present ? data.id.value : this.id,
+      chatId: data.chatId.present ? data.chatId.value : this.chatId,
+      worldId: data.worldId.present ? data.worldId.value : this.worldId,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isPrimary: data.isPrimary.present ? data.isPrimary.value : this.isPrimary,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatWorld(')
+          ..write('id: $id, ')
+          ..write('chatId: $chatId, ')
+          ..write('worldId: $worldId, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, chatId, worldId, sortOrder, isPrimary, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChatWorld &&
+          other.id == this.id &&
+          other.chatId == this.chatId &&
+          other.worldId == this.worldId &&
+          other.sortOrder == this.sortOrder &&
+          other.isPrimary == this.isPrimary &&
+          other.createdAt == this.createdAt);
+}
+
+class ChatWorldsCompanion extends UpdateCompanion<ChatWorld> {
+  final Value<String> id;
+  final Value<String> chatId;
+  final Value<String> worldId;
+  final Value<int> sortOrder;
+  final Value<bool> isPrimary;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ChatWorldsCompanion({
+    this.id = const Value.absent(),
+    this.chatId = const Value.absent(),
+    this.worldId = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChatWorldsCompanion.insert({
+    required String id,
+    required String chatId,
+    required String worldId,
+    this.sortOrder = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       chatId = Value(chatId),
+       worldId = Value(worldId);
+  static Insertable<ChatWorld> custom({
+    Expression<String>? id,
+    Expression<String>? chatId,
+    Expression<String>? worldId,
+    Expression<int>? sortOrder,
+    Expression<bool>? isPrimary,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (chatId != null) 'chat_id': chatId,
+      if (worldId != null) 'world_id': worldId,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isPrimary != null) 'is_primary': isPrimary,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChatWorldsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? chatId,
+    Value<String>? worldId,
+    Value<int>? sortOrder,
+    Value<bool>? isPrimary,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ChatWorldsCompanion(
+      id: id ?? this.id,
+      chatId: chatId ?? this.chatId,
+      worldId: worldId ?? this.worldId,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isPrimary: isPrimary ?? this.isPrimary,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (chatId.present) {
+      map['chat_id'] = Variable<String>(chatId.value);
+    }
+    if (worldId.present) {
+      map['world_id'] = Variable<String>(worldId.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isPrimary.present) {
+      map['is_primary'] = Variable<bool>(isPrimary.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatWorldsCompanion(')
+          ..write('id: $id, ')
+          ..write('chatId: $chatId, ')
+          ..write('worldId: $worldId, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChatBiomeSpansTable extends ChatBiomeSpans
+    with TableInfo<$ChatBiomeSpansTable, ChatBiomeSpan> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChatBiomeSpansTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chatIdMeta = const VerificationMeta('chatId');
+  @override
+  late final GeneratedColumn<String> chatId = GeneratedColumn<String>(
+    'chat_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _effectiveFromDayMeta = const VerificationMeta(
+    'effectiveFromDay',
+  );
+  @override
+  late final GeneratedColumn<int> effectiveFromDay = GeneratedColumn<int>(
+    'effective_from_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _biomeJsonMeta = const VerificationMeta(
+    'biomeJson',
+  );
+  @override
+  late final GeneratedColumn<String> biomeJson = GeneratedColumn<String>(
+    'biome_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    chatId,
+    effectiveFromDay,
+    biomeJson,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chat_biome_spans';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChatBiomeSpan> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('chat_id')) {
+      context.handle(
+        _chatIdMeta,
+        chatId.isAcceptableOrUnknown(data['chat_id']!, _chatIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chatIdMeta);
+    }
+    if (data.containsKey('effective_from_day')) {
+      context.handle(
+        _effectiveFromDayMeta,
+        effectiveFromDay.isAcceptableOrUnknown(
+          data['effective_from_day']!,
+          _effectiveFromDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_effectiveFromDayMeta);
+    }
+    if (data.containsKey('biome_json')) {
+      context.handle(
+        _biomeJsonMeta,
+        biomeJson.isAcceptableOrUnknown(data['biome_json']!, _biomeJsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_biomeJsonMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChatBiomeSpan map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChatBiomeSpan(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      chatId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chat_id'],
+      )!,
+      effectiveFromDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}effective_from_day'],
+      )!,
+      biomeJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}biome_json'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ChatBiomeSpansTable createAlias(String alias) {
+    return $ChatBiomeSpansTable(attachedDatabase, alias);
+  }
+}
+
+class ChatBiomeSpan extends DataClass implements Insertable<ChatBiomeSpan> {
+  final String id;
+  final String chatId;
+  final int effectiveFromDay;
+  final String biomeJson;
+  final DateTime createdAt;
+  const ChatBiomeSpan({
+    required this.id,
+    required this.chatId,
+    required this.effectiveFromDay,
+    required this.biomeJson,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['chat_id'] = Variable<String>(chatId);
+    map['effective_from_day'] = Variable<int>(effectiveFromDay);
+    map['biome_json'] = Variable<String>(biomeJson);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ChatBiomeSpansCompanion toCompanion(bool nullToAbsent) {
+    return ChatBiomeSpansCompanion(
+      id: Value(id),
+      chatId: Value(chatId),
+      effectiveFromDay: Value(effectiveFromDay),
+      biomeJson: Value(biomeJson),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ChatBiomeSpan.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChatBiomeSpan(
+      id: serializer.fromJson<String>(json['id']),
+      chatId: serializer.fromJson<String>(json['chatId']),
+      effectiveFromDay: serializer.fromJson<int>(json['effectiveFromDay']),
+      biomeJson: serializer.fromJson<String>(json['biomeJson']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'chatId': serializer.toJson<String>(chatId),
+      'effectiveFromDay': serializer.toJson<int>(effectiveFromDay),
+      'biomeJson': serializer.toJson<String>(biomeJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ChatBiomeSpan copyWith({
+    String? id,
+    String? chatId,
+    int? effectiveFromDay,
+    String? biomeJson,
+    DateTime? createdAt,
+  }) => ChatBiomeSpan(
+    id: id ?? this.id,
+    chatId: chatId ?? this.chatId,
+    effectiveFromDay: effectiveFromDay ?? this.effectiveFromDay,
+    biomeJson: biomeJson ?? this.biomeJson,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ChatBiomeSpan copyWithCompanion(ChatBiomeSpansCompanion data) {
+    return ChatBiomeSpan(
+      id: data.id.present ? data.id.value : this.id,
+      chatId: data.chatId.present ? data.chatId.value : this.chatId,
+      effectiveFromDay: data.effectiveFromDay.present
+          ? data.effectiveFromDay.value
+          : this.effectiveFromDay,
+      biomeJson: data.biomeJson.present ? data.biomeJson.value : this.biomeJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatBiomeSpan(')
+          ..write('id: $id, ')
+          ..write('chatId: $chatId, ')
+          ..write('effectiveFromDay: $effectiveFromDay, ')
+          ..write('biomeJson: $biomeJson, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, chatId, effectiveFromDay, biomeJson, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChatBiomeSpan &&
+          other.id == this.id &&
+          other.chatId == this.chatId &&
+          other.effectiveFromDay == this.effectiveFromDay &&
+          other.biomeJson == this.biomeJson &&
+          other.createdAt == this.createdAt);
+}
+
+class ChatBiomeSpansCompanion extends UpdateCompanion<ChatBiomeSpan> {
+  final Value<String> id;
+  final Value<String> chatId;
+  final Value<int> effectiveFromDay;
+  final Value<String> biomeJson;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ChatBiomeSpansCompanion({
+    this.id = const Value.absent(),
+    this.chatId = const Value.absent(),
+    this.effectiveFromDay = const Value.absent(),
+    this.biomeJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChatBiomeSpansCompanion.insert({
+    required String id,
+    required String chatId,
+    required int effectiveFromDay,
+    required String biomeJson,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       chatId = Value(chatId),
+       effectiveFromDay = Value(effectiveFromDay),
+       biomeJson = Value(biomeJson);
+  static Insertable<ChatBiomeSpan> custom({
+    Expression<String>? id,
+    Expression<String>? chatId,
+    Expression<int>? effectiveFromDay,
+    Expression<String>? biomeJson,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (chatId != null) 'chat_id': chatId,
+      if (effectiveFromDay != null) 'effective_from_day': effectiveFromDay,
+      if (biomeJson != null) 'biome_json': biomeJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChatBiomeSpansCompanion copyWith({
+    Value<String>? id,
+    Value<String>? chatId,
+    Value<int>? effectiveFromDay,
+    Value<String>? biomeJson,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ChatBiomeSpansCompanion(
+      id: id ?? this.id,
+      chatId: chatId ?? this.chatId,
+      effectiveFromDay: effectiveFromDay ?? this.effectiveFromDay,
+      biomeJson: biomeJson ?? this.biomeJson,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (chatId.present) {
+      map['chat_id'] = Variable<String>(chatId.value);
+    }
+    if (effectiveFromDay.present) {
+      map['effective_from_day'] = Variable<int>(effectiveFromDay.value);
+    }
+    if (biomeJson.present) {
+      map['biome_json'] = Variable<String>(biomeJson.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatBiomeSpansCompanion(')
+          ..write('id: $id, ')
+          ..write('chatId: $chatId, ')
+          ..write('effectiveFromDay: $effectiveFromDay, ')
+          ..write('biomeJson: $biomeJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MessageEmbeddingsTable extends MessageEmbeddings
+    with TableInfo<$MessageEmbeddingsTable, MessageEmbedding> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MessageEmbeddingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _positionStartMeta = const VerificationMeta(
+    'positionStart',
+  );
+  @override
+  late final GeneratedColumn<int> positionStart = GeneratedColumn<int>(
+    'position_start',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionEndMeta = const VerificationMeta(
+    'positionEnd',
+  );
+  @override
+  late final GeneratedColumn<int> positionEnd = GeneratedColumn<int>(
+    'position_end',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _embeddingMeta = const VerificationMeta(
+    'embedding',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> embedding = GeneratedColumn<Uint8List>(
+    'embedding',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dimensionsMeta = const VerificationMeta(
+    'dimensions',
+  );
+  @override
+  late final GeneratedColumn<int> dimensions = GeneratedColumn<int>(
+    'dimensions',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _memoryTypeMeta = const VerificationMeta(
+    'memoryType',
+  );
+  @override
+  late final GeneratedColumn<String> memoryType = GeneratedColumn<String>(
+    'memory_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('message'),
+  );
+  static const VerificationMeta _metadataMeta = const VerificationMeta(
+    'metadata',
+  );
+  @override
+  late final GeneratedColumn<String> metadata = GeneratedColumn<String>(
+    'metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    characterId,
+    positionStart,
+    positionEnd,
+    content,
+    embedding,
+    dimensions,
+    createdAt,
+    memoryType,
+    metadata,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'message_embeddings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MessageEmbedding> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('position_start')) {
+      context.handle(
+        _positionStartMeta,
+        positionStart.isAcceptableOrUnknown(
+          data['position_start']!,
+          _positionStartMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_positionStartMeta);
+    }
+    if (data.containsKey('position_end')) {
+      context.handle(
+        _positionEndMeta,
+        positionEnd.isAcceptableOrUnknown(
+          data['position_end']!,
+          _positionEndMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_positionEndMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('embedding')) {
+      context.handle(
+        _embeddingMeta,
+        embedding.isAcceptableOrUnknown(data['embedding']!, _embeddingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_embeddingMeta);
+    }
+    if (data.containsKey('dimensions')) {
+      context.handle(
+        _dimensionsMeta,
+        dimensions.isAcceptableOrUnknown(data['dimensions']!, _dimensionsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dimensionsMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('memory_type')) {
+      context.handle(
+        _memoryTypeMeta,
+        memoryType.isAcceptableOrUnknown(data['memory_type']!, _memoryTypeMeta),
+      );
+    }
+    if (data.containsKey('metadata')) {
+      context.handle(
+        _metadataMeta,
+        metadata.isAcceptableOrUnknown(data['metadata']!, _metadataMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MessageEmbedding map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MessageEmbedding(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      ),
+      positionStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position_start'],
+      )!,
+      positionEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position_end'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      embedding: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}embedding'],
+      )!,
+      dimensions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dimensions'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      memoryType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}memory_type'],
+      )!,
+      metadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}metadata'],
+      ),
+    );
+  }
+
+  @override
+  $MessageEmbeddingsTable createAlias(String alias) {
+    return $MessageEmbeddingsTable(attachedDatabase, alias);
+  }
+}
+
+class MessageEmbedding extends DataClass
+    implements Insertable<MessageEmbedding> {
+  final String id;
+  final String sessionId;
+  final String? characterId;
+  final int positionStart;
+  final int positionEnd;
+  final String content;
+  final Uint8List embedding;
+  final int dimensions;
+  final DateTime createdAt;
+
+  /// 'message' for normal RAG windows (default). DORMANT: the 'needs_event'
+  /// type (and its writer/reader in MemoryService) was removed with the
+  /// Journal work — column kept for additive-migration safety.
+  final String memoryType;
+
+  /// Optional JSON blob for event details. DORMANT (see memoryType) —
+  /// null for ordinary message embeddings.
+  final String? metadata;
+  const MessageEmbedding({
+    required this.id,
+    required this.sessionId,
+    this.characterId,
+    required this.positionStart,
+    required this.positionEnd,
+    required this.content,
+    required this.embedding,
+    required this.dimensions,
+    required this.createdAt,
+    required this.memoryType,
+    this.metadata,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    if (!nullToAbsent || characterId != null) {
+      map['character_id'] = Variable<String>(characterId);
+    }
+    map['position_start'] = Variable<int>(positionStart);
+    map['position_end'] = Variable<int>(positionEnd);
+    map['content'] = Variable<String>(content);
+    map['embedding'] = Variable<Uint8List>(embedding);
+    map['dimensions'] = Variable<int>(dimensions);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['memory_type'] = Variable<String>(memoryType);
+    if (!nullToAbsent || metadata != null) {
+      map['metadata'] = Variable<String>(metadata);
+    }
+    return map;
+  }
+
+  MessageEmbeddingsCompanion toCompanion(bool nullToAbsent) {
+    return MessageEmbeddingsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      characterId: characterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(characterId),
+      positionStart: Value(positionStart),
+      positionEnd: Value(positionEnd),
+      content: Value(content),
+      embedding: Value(embedding),
+      dimensions: Value(dimensions),
+      createdAt: Value(createdAt),
+      memoryType: Value(memoryType),
+      metadata: metadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metadata),
+    );
+  }
+
+  factory MessageEmbedding.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MessageEmbedding(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      characterId: serializer.fromJson<String?>(json['characterId']),
+      positionStart: serializer.fromJson<int>(json['positionStart']),
+      positionEnd: serializer.fromJson<int>(json['positionEnd']),
+      content: serializer.fromJson<String>(json['content']),
+      embedding: serializer.fromJson<Uint8List>(json['embedding']),
+      dimensions: serializer.fromJson<int>(json['dimensions']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      memoryType: serializer.fromJson<String>(json['memoryType']),
+      metadata: serializer.fromJson<String?>(json['metadata']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'characterId': serializer.toJson<String?>(characterId),
+      'positionStart': serializer.toJson<int>(positionStart),
+      'positionEnd': serializer.toJson<int>(positionEnd),
+      'content': serializer.toJson<String>(content),
+      'embedding': serializer.toJson<Uint8List>(embedding),
+      'dimensions': serializer.toJson<int>(dimensions),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'memoryType': serializer.toJson<String>(memoryType),
+      'metadata': serializer.toJson<String?>(metadata),
+    };
+  }
+
+  MessageEmbedding copyWith({
+    String? id,
+    String? sessionId,
+    Value<String?> characterId = const Value.absent(),
+    int? positionStart,
+    int? positionEnd,
+    String? content,
+    Uint8List? embedding,
+    int? dimensions,
+    DateTime? createdAt,
+    String? memoryType,
+    Value<String?> metadata = const Value.absent(),
+  }) => MessageEmbedding(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    characterId: characterId.present ? characterId.value : this.characterId,
+    positionStart: positionStart ?? this.positionStart,
+    positionEnd: positionEnd ?? this.positionEnd,
+    content: content ?? this.content,
+    embedding: embedding ?? this.embedding,
+    dimensions: dimensions ?? this.dimensions,
+    createdAt: createdAt ?? this.createdAt,
+    memoryType: memoryType ?? this.memoryType,
+    metadata: metadata.present ? metadata.value : this.metadata,
+  );
+  MessageEmbedding copyWithCompanion(MessageEmbeddingsCompanion data) {
+    return MessageEmbedding(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      positionStart: data.positionStart.present
+          ? data.positionStart.value
+          : this.positionStart,
+      positionEnd: data.positionEnd.present
+          ? data.positionEnd.value
+          : this.positionEnd,
+      content: data.content.present ? data.content.value : this.content,
+      embedding: data.embedding.present ? data.embedding.value : this.embedding,
+      dimensions: data.dimensions.present
+          ? data.dimensions.value
+          : this.dimensions,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      memoryType: data.memoryType.present
+          ? data.memoryType.value
+          : this.memoryType,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageEmbedding(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('positionStart: $positionStart, ')
+          ..write('positionEnd: $positionEnd, ')
+          ..write('content: $content, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('memoryType: $memoryType, ')
+          ..write('metadata: $metadata')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sessionId,
+    characterId,
+    positionStart,
+    positionEnd,
+    content,
+    $driftBlobEquality.hash(embedding),
+    dimensions,
+    createdAt,
+    memoryType,
+    metadata,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MessageEmbedding &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.characterId == this.characterId &&
+          other.positionStart == this.positionStart &&
+          other.positionEnd == this.positionEnd &&
+          other.content == this.content &&
+          $driftBlobEquality.equals(other.embedding, this.embedding) &&
+          other.dimensions == this.dimensions &&
+          other.createdAt == this.createdAt &&
+          other.memoryType == this.memoryType &&
+          other.metadata == this.metadata);
+}
+
+class MessageEmbeddingsCompanion extends UpdateCompanion<MessageEmbedding> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String?> characterId;
+  final Value<int> positionStart;
+  final Value<int> positionEnd;
+  final Value<String> content;
+  final Value<Uint8List> embedding;
+  final Value<int> dimensions;
+  final Value<DateTime> createdAt;
+  final Value<String> memoryType;
+  final Value<String?> metadata;
+  final Value<int> rowid;
+  const MessageEmbeddingsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.positionStart = const Value.absent(),
+    this.positionEnd = const Value.absent(),
+    this.content = const Value.absent(),
+    this.embedding = const Value.absent(),
+    this.dimensions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.memoryType = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MessageEmbeddingsCompanion.insert({
+    required String id,
+    required String sessionId,
+    this.characterId = const Value.absent(),
+    required int positionStart,
+    required int positionEnd,
+    required String content,
+    required Uint8List embedding,
+    required int dimensions,
+    this.createdAt = const Value.absent(),
+    this.memoryType = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       positionStart = Value(positionStart),
+       positionEnd = Value(positionEnd),
+       content = Value(content),
+       embedding = Value(embedding),
+       dimensions = Value(dimensions);
+  static Insertable<MessageEmbedding> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? characterId,
+    Expression<int>? positionStart,
+    Expression<int>? positionEnd,
+    Expression<String>? content,
+    Expression<Uint8List>? embedding,
+    Expression<int>? dimensions,
+    Expression<DateTime>? createdAt,
+    Expression<String>? memoryType,
+    Expression<String>? metadata,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (characterId != null) 'character_id': characterId,
+      if (positionStart != null) 'position_start': positionStart,
+      if (positionEnd != null) 'position_end': positionEnd,
+      if (content != null) 'content': content,
+      if (embedding != null) 'embedding': embedding,
+      if (dimensions != null) 'dimensions': dimensions,
+      if (createdAt != null) 'created_at': createdAt,
+      if (memoryType != null) 'memory_type': memoryType,
+      if (metadata != null) 'metadata': metadata,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MessageEmbeddingsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<String?>? characterId,
+    Value<int>? positionStart,
+    Value<int>? positionEnd,
+    Value<String>? content,
+    Value<Uint8List>? embedding,
+    Value<int>? dimensions,
+    Value<DateTime>? createdAt,
+    Value<String>? memoryType,
+    Value<String?>? metadata,
+    Value<int>? rowid,
+  }) {
+    return MessageEmbeddingsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      characterId: characterId ?? this.characterId,
+      positionStart: positionStart ?? this.positionStart,
+      positionEnd: positionEnd ?? this.positionEnd,
+      content: content ?? this.content,
+      embedding: embedding ?? this.embedding,
+      dimensions: dimensions ?? this.dimensions,
+      createdAt: createdAt ?? this.createdAt,
+      memoryType: memoryType ?? this.memoryType,
+      metadata: metadata ?? this.metadata,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (positionStart.present) {
+      map['position_start'] = Variable<int>(positionStart.value);
+    }
+    if (positionEnd.present) {
+      map['position_end'] = Variable<int>(positionEnd.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (embedding.present) {
+      map['embedding'] = Variable<Uint8List>(embedding.value);
+    }
+    if (dimensions.present) {
+      map['dimensions'] = Variable<int>(dimensions.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (memoryType.present) {
+      map['memory_type'] = Variable<String>(memoryType.value);
+    }
+    if (metadata.present) {
+      map['metadata'] = Variable<String>(metadata.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageEmbeddingsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('positionStart: $positionStart, ')
+          ..write('positionEnd: $positionEnd, ')
+          ..write('content: $content, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('memoryType: $memoryType, ')
+          ..write('metadata: $metadata, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DataBankEntriesTable extends DataBankEntries
+    with TableInfo<$DataBankEntriesTable, DataBankEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DataBankEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _embeddingMeta = const VerificationMeta(
+    'embedding',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> embedding = GeneratedColumn<Uint8List>(
+    'embedding',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dimensionsMeta = const VerificationMeta(
+    'dimensions',
+  );
+  @override
+  late final GeneratedColumn<int> dimensions = GeneratedColumn<int>(
+    'dimensions',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    characterId,
+    title,
+    content,
+    embedding,
+    dimensions,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'data_bank_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DataBankEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_characterIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('embedding')) {
+      context.handle(
+        _embeddingMeta,
+        embedding.isAcceptableOrUnknown(data['embedding']!, _embeddingMeta),
+      );
+    }
+    if (data.containsKey('dimensions')) {
+      context.handle(
+        _dimensionsMeta,
+        dimensions.isAcceptableOrUnknown(data['dimensions']!, _dimensionsMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DataBankEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DataBankEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      embedding: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}embedding'],
+      ),
+      dimensions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dimensions'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DataBankEntriesTable createAlias(String alias) {
+    return $DataBankEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class DataBankEntry extends DataClass implements Insertable<DataBankEntry> {
+  final String id;
+  final String characterId;
+  final String title;
+  final String content;
+  final Uint8List? embedding;
+  final int dimensions;
+  final DateTime createdAt;
+  const DataBankEntry({
+    required this.id,
+    required this.characterId,
+    required this.title,
+    required this.content,
+    this.embedding,
+    required this.dimensions,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['character_id'] = Variable<String>(characterId);
+    map['title'] = Variable<String>(title);
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || embedding != null) {
+      map['embedding'] = Variable<Uint8List>(embedding);
+    }
+    map['dimensions'] = Variable<int>(dimensions);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DataBankEntriesCompanion toCompanion(bool nullToAbsent) {
+    return DataBankEntriesCompanion(
+      id: Value(id),
+      characterId: Value(characterId),
+      title: Value(title),
+      content: Value(content),
+      embedding: embedding == null && nullToAbsent
+          ? const Value.absent()
+          : Value(embedding),
+      dimensions: Value(dimensions),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory DataBankEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DataBankEntry(
+      id: serializer.fromJson<String>(json['id']),
+      characterId: serializer.fromJson<String>(json['characterId']),
+      title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
+      embedding: serializer.fromJson<Uint8List?>(json['embedding']),
+      dimensions: serializer.fromJson<int>(json['dimensions']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'characterId': serializer.toJson<String>(characterId),
+      'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
+      'embedding': serializer.toJson<Uint8List?>(embedding),
+      'dimensions': serializer.toJson<int>(dimensions),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DataBankEntry copyWith({
+    String? id,
+    String? characterId,
+    String? title,
+    String? content,
+    Value<Uint8List?> embedding = const Value.absent(),
+    int? dimensions,
+    DateTime? createdAt,
+  }) => DataBankEntry(
+    id: id ?? this.id,
+    characterId: characterId ?? this.characterId,
+    title: title ?? this.title,
+    content: content ?? this.content,
+    embedding: embedding.present ? embedding.value : this.embedding,
+    dimensions: dimensions ?? this.dimensions,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  DataBankEntry copyWithCompanion(DataBankEntriesCompanion data) {
+    return DataBankEntry(
+      id: data.id.present ? data.id.value : this.id,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      embedding: data.embedding.present ? data.embedding.value : this.embedding,
+      dimensions: data.dimensions.present
+          ? data.dimensions.value
+          : this.dimensions,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DataBankEntry(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    characterId,
+    title,
+    content,
+    $driftBlobEquality.hash(embedding),
+    dimensions,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DataBankEntry &&
+          other.id == this.id &&
+          other.characterId == this.characterId &&
+          other.title == this.title &&
+          other.content == this.content &&
+          $driftBlobEquality.equals(other.embedding, this.embedding) &&
+          other.dimensions == this.dimensions &&
+          other.createdAt == this.createdAt);
+}
+
+class DataBankEntriesCompanion extends UpdateCompanion<DataBankEntry> {
+  final Value<String> id;
+  final Value<String> characterId;
+  final Value<String> title;
+  final Value<String> content;
+  final Value<Uint8List?> embedding;
+  final Value<int> dimensions;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const DataBankEntriesCompanion({
+    this.id = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.content = const Value.absent(),
+    this.embedding = const Value.absent(),
+    this.dimensions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DataBankEntriesCompanion.insert({
+    required String id,
+    required String characterId,
+    required String title,
+    required String content,
+    this.embedding = const Value.absent(),
+    this.dimensions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       characterId = Value(characterId),
+       title = Value(title),
+       content = Value(content);
+  static Insertable<DataBankEntry> custom({
+    Expression<String>? id,
+    Expression<String>? characterId,
+    Expression<String>? title,
+    Expression<String>? content,
+    Expression<Uint8List>? embedding,
+    Expression<int>? dimensions,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (characterId != null) 'character_id': characterId,
+      if (title != null) 'title': title,
+      if (content != null) 'content': content,
+      if (embedding != null) 'embedding': embedding,
+      if (dimensions != null) 'dimensions': dimensions,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DataBankEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? characterId,
+    Value<String>? title,
+    Value<String>? content,
+    Value<Uint8List?>? embedding,
+    Value<int>? dimensions,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return DataBankEntriesCompanion(
+      id: id ?? this.id,
+      characterId: characterId ?? this.characterId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      embedding: embedding ?? this.embedding,
+      dimensions: dimensions ?? this.dimensions,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (embedding.present) {
+      map['embedding'] = Variable<Uint8List>(embedding.value);
+    }
+    if (dimensions.present) {
+      map['dimensions'] = Variable<int>(dimensions.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DataBankEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $JournalMemoriesTable extends JournalMemories
+    with TableInfo<$JournalMemoriesTable, JournalMemoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JournalMemoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMessageIdsMeta = const VerificationMeta(
+    'sourceMessageIds',
+  );
+  @override
+  late final GeneratedColumn<String> sourceMessageIds = GeneratedColumn<String>(
+    'source_message_ids',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('moment'),
+  );
+  static const VerificationMeta _emotionLabelMeta = const VerificationMeta(
+    'emotionLabel',
+  );
+  @override
+  late final GeneratedColumn<String> emotionLabel = GeneratedColumn<String>(
+    'emotion_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emotionIntensityMeta = const VerificationMeta(
+    'emotionIntensity',
+  );
+  @override
+  late final GeneratedColumn<String> emotionIntensity = GeneratedColumn<String>(
+    'emotion_intensity',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originalEmotionLabelMeta =
+      const VerificationMeta('originalEmotionLabel');
+  @override
+  late final GeneratedColumn<String> originalEmotionLabel =
+      GeneratedColumn<String>(
+        'original_emotion_label',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _heatMeta = const VerificationMeta('heat');
+  @override
+  late final GeneratedColumn<double> heat = GeneratedColumn<double>(
+    'heat',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1.0),
+  );
+  static const VerificationMeta _accessCountMeta = const VerificationMeta(
+    'accessCount',
+  );
+  @override
+  late final GeneratedColumn<int> accessCount = GeneratedColumn<int>(
+    'access_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+    'pinned',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pinned" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _embeddingMeta = const VerificationMeta(
+    'embedding',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> embedding = GeneratedColumn<Uint8List>(
+    'embedding',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dimensionsMeta = const VerificationMeta(
+    'dimensions',
+  );
+  @override
+  late final GeneratedColumn<int> dimensions = GeneratedColumn<int>(
+    'dimensions',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _lastAccessedAtMeta = const VerificationMeta(
+    'lastAccessedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastAccessedAt =
+      GeneratedColumn<DateTime>(
+        'last_accessed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _metadataMeta = const VerificationMeta(
+    'metadata',
+  );
+  @override
+  late final GeneratedColumn<String> metadata = GeneratedColumn<String>(
+    'metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    characterId,
+    sourceMessageIds,
+    content,
+    category,
+    emotionLabel,
+    emotionIntensity,
+    originalEmotionLabel,
+    heat,
+    accessCount,
+    pinned,
+    embedding,
+    dimensions,
+    createdAt,
+    lastAccessedAt,
+    updatedAt,
+    metadata,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_memories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalMemoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_characterIdMeta);
+    }
+    if (data.containsKey('source_message_ids')) {
+      context.handle(
+        _sourceMessageIdsMeta,
+        sourceMessageIds.isAcceptableOrUnknown(
+          data['source_message_ids']!,
+          _sourceMessageIdsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    if (data.containsKey('emotion_label')) {
+      context.handle(
+        _emotionLabelMeta,
+        emotionLabel.isAcceptableOrUnknown(
+          data['emotion_label']!,
+          _emotionLabelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emotion_intensity')) {
+      context.handle(
+        _emotionIntensityMeta,
+        emotionIntensity.isAcceptableOrUnknown(
+          data['emotion_intensity']!,
+          _emotionIntensityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('original_emotion_label')) {
+      context.handle(
+        _originalEmotionLabelMeta,
+        originalEmotionLabel.isAcceptableOrUnknown(
+          data['original_emotion_label']!,
+          _originalEmotionLabelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('heat')) {
+      context.handle(
+        _heatMeta,
+        heat.isAcceptableOrUnknown(data['heat']!, _heatMeta),
+      );
+    }
+    if (data.containsKey('access_count')) {
+      context.handle(
+        _accessCountMeta,
+        accessCount.isAcceptableOrUnknown(
+          data['access_count']!,
+          _accessCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(
+        _pinnedMeta,
+        pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta),
+      );
+    }
+    if (data.containsKey('embedding')) {
+      context.handle(
+        _embeddingMeta,
+        embedding.isAcceptableOrUnknown(data['embedding']!, _embeddingMeta),
+      );
+    }
+    if (data.containsKey('dimensions')) {
+      context.handle(
+        _dimensionsMeta,
+        dimensions.isAcceptableOrUnknown(data['dimensions']!, _dimensionsMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('last_accessed_at')) {
+      context.handle(
+        _lastAccessedAtMeta,
+        lastAccessedAt.isAcceptableOrUnknown(
+          data['last_accessed_at']!,
+          _lastAccessedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('metadata')) {
+      context.handle(
+        _metadataMeta,
+        metadata.isAcceptableOrUnknown(data['metadata']!, _metadataMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  JournalMemoryData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalMemoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      )!,
+      sourceMessageIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_message_ids'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      emotionLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emotion_label'],
+      ),
+      emotionIntensity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emotion_intensity'],
+      ),
+      originalEmotionLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original_emotion_label'],
+      ),
+      heat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}heat'],
+      )!,
+      accessCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}access_count'],
+      )!,
+      pinned: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pinned'],
+      )!,
+      embedding: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}embedding'],
+      ),
+      dimensions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dimensions'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      lastAccessedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_accessed_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      metadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}metadata'],
+      ),
+    );
+  }
+
+  @override
+  $JournalMemoriesTable createAlias(String alias) {
+    return $JournalMemoriesTable(attachedDatabase, alias);
+  }
+}
+
+class JournalMemoryData extends DataClass
+    implements Insertable<JournalMemoryData> {
+  final String id;
+  final String sessionId;
+  final String characterId;
+
+  /// JSON array of int message POSITIONS (not DB ids — message UUIDs are
+  /// regenerated on every save, so positions are the stable receipt, same
+  /// trade-off MessageEmbeddings.positionStart/End already makes).
+  final String? sourceMessageIds;
+  final String content;
+  final String category;
+  final String? emotionLabel;
+  final String? emotionIntensity;
+  final String? originalEmotionLabel;
+  final double heat;
+  final int accessCount;
+  final bool pinned;
+  final Uint8List? embedding;
+  final int dimensions;
+  final DateTime createdAt;
+  final DateTime lastAccessedAt;
+  final DateTime updatedAt;
+  final String? metadata;
+  const JournalMemoryData({
+    required this.id,
+    required this.sessionId,
+    required this.characterId,
+    this.sourceMessageIds,
+    required this.content,
+    required this.category,
+    this.emotionLabel,
+    this.emotionIntensity,
+    this.originalEmotionLabel,
+    required this.heat,
+    required this.accessCount,
+    required this.pinned,
+    this.embedding,
+    required this.dimensions,
+    required this.createdAt,
+    required this.lastAccessedAt,
+    required this.updatedAt,
+    this.metadata,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['character_id'] = Variable<String>(characterId);
+    if (!nullToAbsent || sourceMessageIds != null) {
+      map['source_message_ids'] = Variable<String>(sourceMessageIds);
+    }
+    map['content'] = Variable<String>(content);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || emotionLabel != null) {
+      map['emotion_label'] = Variable<String>(emotionLabel);
+    }
+    if (!nullToAbsent || emotionIntensity != null) {
+      map['emotion_intensity'] = Variable<String>(emotionIntensity);
+    }
+    if (!nullToAbsent || originalEmotionLabel != null) {
+      map['original_emotion_label'] = Variable<String>(originalEmotionLabel);
+    }
+    map['heat'] = Variable<double>(heat);
+    map['access_count'] = Variable<int>(accessCount);
+    map['pinned'] = Variable<bool>(pinned);
+    if (!nullToAbsent || embedding != null) {
+      map['embedding'] = Variable<Uint8List>(embedding);
+    }
+    map['dimensions'] = Variable<int>(dimensions);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['last_accessed_at'] = Variable<DateTime>(lastAccessedAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || metadata != null) {
+      map['metadata'] = Variable<String>(metadata);
+    }
+    return map;
+  }
+
+  JournalMemoriesCompanion toCompanion(bool nullToAbsent) {
+    return JournalMemoriesCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      characterId: Value(characterId),
+      sourceMessageIds: sourceMessageIds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceMessageIds),
+      content: Value(content),
+      category: Value(category),
+      emotionLabel: emotionLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emotionLabel),
+      emotionIntensity: emotionIntensity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emotionIntensity),
+      originalEmotionLabel: originalEmotionLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalEmotionLabel),
+      heat: Value(heat),
+      accessCount: Value(accessCount),
+      pinned: Value(pinned),
+      embedding: embedding == null && nullToAbsent
+          ? const Value.absent()
+          : Value(embedding),
+      dimensions: Value(dimensions),
+      createdAt: Value(createdAt),
+      lastAccessedAt: Value(lastAccessedAt),
+      updatedAt: Value(updatedAt),
+      metadata: metadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metadata),
+    );
+  }
+
+  factory JournalMemoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalMemoryData(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      characterId: serializer.fromJson<String>(json['characterId']),
+      sourceMessageIds: serializer.fromJson<String?>(json['sourceMessageIds']),
+      content: serializer.fromJson<String>(json['content']),
+      category: serializer.fromJson<String>(json['category']),
+      emotionLabel: serializer.fromJson<String?>(json['emotionLabel']),
+      emotionIntensity: serializer.fromJson<String?>(json['emotionIntensity']),
+      originalEmotionLabel: serializer.fromJson<String?>(
+        json['originalEmotionLabel'],
+      ),
+      heat: serializer.fromJson<double>(json['heat']),
+      accessCount: serializer.fromJson<int>(json['accessCount']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+      embedding: serializer.fromJson<Uint8List?>(json['embedding']),
+      dimensions: serializer.fromJson<int>(json['dimensions']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lastAccessedAt: serializer.fromJson<DateTime>(json['lastAccessedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      metadata: serializer.fromJson<String?>(json['metadata']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'characterId': serializer.toJson<String>(characterId),
+      'sourceMessageIds': serializer.toJson<String?>(sourceMessageIds),
+      'content': serializer.toJson<String>(content),
+      'category': serializer.toJson<String>(category),
+      'emotionLabel': serializer.toJson<String?>(emotionLabel),
+      'emotionIntensity': serializer.toJson<String?>(emotionIntensity),
+      'originalEmotionLabel': serializer.toJson<String?>(originalEmotionLabel),
+      'heat': serializer.toJson<double>(heat),
+      'accessCount': serializer.toJson<int>(accessCount),
+      'pinned': serializer.toJson<bool>(pinned),
+      'embedding': serializer.toJson<Uint8List?>(embedding),
+      'dimensions': serializer.toJson<int>(dimensions),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lastAccessedAt': serializer.toJson<DateTime>(lastAccessedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'metadata': serializer.toJson<String?>(metadata),
+    };
+  }
+
+  JournalMemoryData copyWith({
+    String? id,
+    String? sessionId,
+    String? characterId,
+    Value<String?> sourceMessageIds = const Value.absent(),
+    String? content,
+    String? category,
+    Value<String?> emotionLabel = const Value.absent(),
+    Value<String?> emotionIntensity = const Value.absent(),
+    Value<String?> originalEmotionLabel = const Value.absent(),
+    double? heat,
+    int? accessCount,
+    bool? pinned,
+    Value<Uint8List?> embedding = const Value.absent(),
+    int? dimensions,
+    DateTime? createdAt,
+    DateTime? lastAccessedAt,
+    DateTime? updatedAt,
+    Value<String?> metadata = const Value.absent(),
+  }) => JournalMemoryData(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    characterId: characterId ?? this.characterId,
+    sourceMessageIds: sourceMessageIds.present
+        ? sourceMessageIds.value
+        : this.sourceMessageIds,
+    content: content ?? this.content,
+    category: category ?? this.category,
+    emotionLabel: emotionLabel.present ? emotionLabel.value : this.emotionLabel,
+    emotionIntensity: emotionIntensity.present
+        ? emotionIntensity.value
+        : this.emotionIntensity,
+    originalEmotionLabel: originalEmotionLabel.present
+        ? originalEmotionLabel.value
+        : this.originalEmotionLabel,
+    heat: heat ?? this.heat,
+    accessCount: accessCount ?? this.accessCount,
+    pinned: pinned ?? this.pinned,
+    embedding: embedding.present ? embedding.value : this.embedding,
+    dimensions: dimensions ?? this.dimensions,
+    createdAt: createdAt ?? this.createdAt,
+    lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    metadata: metadata.present ? metadata.value : this.metadata,
+  );
+  JournalMemoryData copyWithCompanion(JournalMemoriesCompanion data) {
+    return JournalMemoryData(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      sourceMessageIds: data.sourceMessageIds.present
+          ? data.sourceMessageIds.value
+          : this.sourceMessageIds,
+      content: data.content.present ? data.content.value : this.content,
+      category: data.category.present ? data.category.value : this.category,
+      emotionLabel: data.emotionLabel.present
+          ? data.emotionLabel.value
+          : this.emotionLabel,
+      emotionIntensity: data.emotionIntensity.present
+          ? data.emotionIntensity.value
+          : this.emotionIntensity,
+      originalEmotionLabel: data.originalEmotionLabel.present
+          ? data.originalEmotionLabel.value
+          : this.originalEmotionLabel,
+      heat: data.heat.present ? data.heat.value : this.heat,
+      accessCount: data.accessCount.present
+          ? data.accessCount.value
+          : this.accessCount,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+      embedding: data.embedding.present ? data.embedding.value : this.embedding,
+      dimensions: data.dimensions.present
+          ? data.dimensions.value
+          : this.dimensions,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastAccessedAt: data.lastAccessedAt.present
+          ? data.lastAccessedAt.value
+          : this.lastAccessedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalMemoryData(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('sourceMessageIds: $sourceMessageIds, ')
+          ..write('content: $content, ')
+          ..write('category: $category, ')
+          ..write('emotionLabel: $emotionLabel, ')
+          ..write('emotionIntensity: $emotionIntensity, ')
+          ..write('originalEmotionLabel: $originalEmotionLabel, ')
+          ..write('heat: $heat, ')
+          ..write('accessCount: $accessCount, ')
+          ..write('pinned: $pinned, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('metadata: $metadata')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sessionId,
+    characterId,
+    sourceMessageIds,
+    content,
+    category,
+    emotionLabel,
+    emotionIntensity,
+    originalEmotionLabel,
+    heat,
+    accessCount,
+    pinned,
+    $driftBlobEquality.hash(embedding),
+    dimensions,
+    createdAt,
+    lastAccessedAt,
+    updatedAt,
+    metadata,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalMemoryData &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.characterId == this.characterId &&
+          other.sourceMessageIds == this.sourceMessageIds &&
+          other.content == this.content &&
+          other.category == this.category &&
+          other.emotionLabel == this.emotionLabel &&
+          other.emotionIntensity == this.emotionIntensity &&
+          other.originalEmotionLabel == this.originalEmotionLabel &&
+          other.heat == this.heat &&
+          other.accessCount == this.accessCount &&
+          other.pinned == this.pinned &&
+          $driftBlobEquality.equals(other.embedding, this.embedding) &&
+          other.dimensions == this.dimensions &&
+          other.createdAt == this.createdAt &&
+          other.lastAccessedAt == this.lastAccessedAt &&
+          other.updatedAt == this.updatedAt &&
+          other.metadata == this.metadata);
+}
+
+class JournalMemoriesCompanion extends UpdateCompanion<JournalMemoryData> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> characterId;
+  final Value<String?> sourceMessageIds;
+  final Value<String> content;
+  final Value<String> category;
+  final Value<String?> emotionLabel;
+  final Value<String?> emotionIntensity;
+  final Value<String?> originalEmotionLabel;
+  final Value<double> heat;
+  final Value<int> accessCount;
+  final Value<bool> pinned;
+  final Value<Uint8List?> embedding;
+  final Value<int> dimensions;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> lastAccessedAt;
+  final Value<DateTime> updatedAt;
+  final Value<String?> metadata;
+  final Value<int> rowid;
+  const JournalMemoriesCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.sourceMessageIds = const Value.absent(),
+    this.content = const Value.absent(),
+    this.category = const Value.absent(),
+    this.emotionLabel = const Value.absent(),
+    this.emotionIntensity = const Value.absent(),
+    this.originalEmotionLabel = const Value.absent(),
+    this.heat = const Value.absent(),
+    this.accessCount = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.embedding = const Value.absent(),
+    this.dimensions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastAccessedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JournalMemoriesCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String characterId,
+    this.sourceMessageIds = const Value.absent(),
+    required String content,
+    this.category = const Value.absent(),
+    this.emotionLabel = const Value.absent(),
+    this.emotionIntensity = const Value.absent(),
+    this.originalEmotionLabel = const Value.absent(),
+    this.heat = const Value.absent(),
+    this.accessCount = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.embedding = const Value.absent(),
+    this.dimensions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastAccessedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       characterId = Value(characterId),
+       content = Value(content);
+  static Insertable<JournalMemoryData> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? characterId,
+    Expression<String>? sourceMessageIds,
+    Expression<String>? content,
+    Expression<String>? category,
+    Expression<String>? emotionLabel,
+    Expression<String>? emotionIntensity,
+    Expression<String>? originalEmotionLabel,
+    Expression<double>? heat,
+    Expression<int>? accessCount,
+    Expression<bool>? pinned,
+    Expression<Uint8List>? embedding,
+    Expression<int>? dimensions,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? lastAccessedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? metadata,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (characterId != null) 'character_id': characterId,
+      if (sourceMessageIds != null) 'source_message_ids': sourceMessageIds,
+      if (content != null) 'content': content,
+      if (category != null) 'category': category,
+      if (emotionLabel != null) 'emotion_label': emotionLabel,
+      if (emotionIntensity != null) 'emotion_intensity': emotionIntensity,
+      if (originalEmotionLabel != null)
+        'original_emotion_label': originalEmotionLabel,
+      if (heat != null) 'heat': heat,
+      if (accessCount != null) 'access_count': accessCount,
+      if (pinned != null) 'pinned': pinned,
+      if (embedding != null) 'embedding': embedding,
+      if (dimensions != null) 'dimensions': dimensions,
+      if (createdAt != null) 'created_at': createdAt,
+      if (lastAccessedAt != null) 'last_accessed_at': lastAccessedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (metadata != null) 'metadata': metadata,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JournalMemoriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<String>? characterId,
+    Value<String?>? sourceMessageIds,
+    Value<String>? content,
+    Value<String>? category,
+    Value<String?>? emotionLabel,
+    Value<String?>? emotionIntensity,
+    Value<String?>? originalEmotionLabel,
+    Value<double>? heat,
+    Value<int>? accessCount,
+    Value<bool>? pinned,
+    Value<Uint8List?>? embedding,
+    Value<int>? dimensions,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? lastAccessedAt,
+    Value<DateTime>? updatedAt,
+    Value<String?>? metadata,
+    Value<int>? rowid,
+  }) {
+    return JournalMemoriesCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      characterId: characterId ?? this.characterId,
+      sourceMessageIds: sourceMessageIds ?? this.sourceMessageIds,
+      content: content ?? this.content,
+      category: category ?? this.category,
+      emotionLabel: emotionLabel ?? this.emotionLabel,
+      emotionIntensity: emotionIntensity ?? this.emotionIntensity,
+      originalEmotionLabel: originalEmotionLabel ?? this.originalEmotionLabel,
+      heat: heat ?? this.heat,
+      accessCount: accessCount ?? this.accessCount,
+      pinned: pinned ?? this.pinned,
+      embedding: embedding ?? this.embedding,
+      dimensions: dimensions ?? this.dimensions,
+      createdAt: createdAt ?? this.createdAt,
+      lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      metadata: metadata ?? this.metadata,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (sourceMessageIds.present) {
+      map['source_message_ids'] = Variable<String>(sourceMessageIds.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (emotionLabel.present) {
+      map['emotion_label'] = Variable<String>(emotionLabel.value);
+    }
+    if (emotionIntensity.present) {
+      map['emotion_intensity'] = Variable<String>(emotionIntensity.value);
+    }
+    if (originalEmotionLabel.present) {
+      map['original_emotion_label'] = Variable<String>(
+        originalEmotionLabel.value,
+      );
+    }
+    if (heat.present) {
+      map['heat'] = Variable<double>(heat.value);
+    }
+    if (accessCount.present) {
+      map['access_count'] = Variable<int>(accessCount.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (embedding.present) {
+      map['embedding'] = Variable<Uint8List>(embedding.value);
+    }
+    if (dimensions.present) {
+      map['dimensions'] = Variable<int>(dimensions.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (lastAccessedAt.present) {
+      map['last_accessed_at'] = Variable<DateTime>(lastAccessedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (metadata.present) {
+      map['metadata'] = Variable<String>(metadata.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalMemoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('sourceMessageIds: $sourceMessageIds, ')
+          ..write('content: $content, ')
+          ..write('category: $category, ')
+          ..write('emotionLabel: $emotionLabel, ')
+          ..write('emotionIntensity: $emotionIntensity, ')
+          ..write('originalEmotionLabel: $originalEmotionLabel, ')
+          ..write('heat: $heat, ')
+          ..write('accessCount: $accessCount, ')
+          ..write('pinned: $pinned, ')
+          ..write('embedding: $embedding, ')
+          ..write('dimensions: $dimensions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('metadata: $metadata, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GrowthRingsTable extends GrowthRings
+    with TableInfo<$GrowthRingsTable, GrowthRingData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GrowthRingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('trait'),
+  );
+  static const VerificationMeta _strengthMeta = const VerificationMeta(
+    'strength',
+  );
+  @override
+  late final GeneratedColumn<double> strength = GeneratedColumn<double>(
+    'strength',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.3),
+  );
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+    'pinned',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pinned" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _retiredMeta = const VerificationMeta(
+    'retired',
+  );
+  @override
+  late final GeneratedColumn<bool> retired = GeneratedColumn<bool>(
+    'retired',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("retired" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sourceMessageIdsMeta = const VerificationMeta(
+    'sourceMessageIds',
+  );
+  @override
+  late final GeneratedColumn<String> sourceMessageIds = GeneratedColumn<String>(
+    'source_message_ids',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _lastReinforcedAtMeta = const VerificationMeta(
+    'lastReinforcedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastReinforcedAt =
+      GeneratedColumn<DateTime>(
+        'last_reinforced_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _metadataMeta = const VerificationMeta(
+    'metadata',
+  );
+  @override
+  late final GeneratedColumn<String> metadata = GeneratedColumn<String>(
+    'metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    characterId,
+    content,
+    category,
+    strength,
+    pinned,
+    retired,
+    sourceMessageIds,
+    createdAt,
+    lastReinforcedAt,
+    updatedAt,
+    metadata,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'growth_rings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GrowthRingData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_characterIdMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    if (data.containsKey('strength')) {
+      context.handle(
+        _strengthMeta,
+        strength.isAcceptableOrUnknown(data['strength']!, _strengthMeta),
+      );
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(
+        _pinnedMeta,
+        pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta),
+      );
+    }
+    if (data.containsKey('retired')) {
+      context.handle(
+        _retiredMeta,
+        retired.isAcceptableOrUnknown(data['retired']!, _retiredMeta),
+      );
+    }
+    if (data.containsKey('source_message_ids')) {
+      context.handle(
+        _sourceMessageIdsMeta,
+        sourceMessageIds.isAcceptableOrUnknown(
+          data['source_message_ids']!,
+          _sourceMessageIdsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('last_reinforced_at')) {
+      context.handle(
+        _lastReinforcedAtMeta,
+        lastReinforcedAt.isAcceptableOrUnknown(
+          data['last_reinforced_at']!,
+          _lastReinforcedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('metadata')) {
+      context.handle(
+        _metadataMeta,
+        metadata.isAcceptableOrUnknown(data['metadata']!, _metadataMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GrowthRingData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GrowthRingData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      strength: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}strength'],
+      )!,
+      pinned: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pinned'],
+      )!,
+      retired: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}retired'],
+      )!,
+      sourceMessageIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_message_ids'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      lastReinforcedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_reinforced_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      metadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}metadata'],
+      ),
+    );
+  }
+
+  @override
+  $GrowthRingsTable createAlias(String alias) {
+    return $GrowthRingsTable(attachedDatabase, alias);
+  }
+}
+
+class GrowthRingData extends DataClass implements Insertable<GrowthRingData> {
+  final String id;
+  final String sessionId;
+  final String characterId;
+  final String content;
+  final String category;
+  final double strength;
+  final bool pinned;
+  final bool retired;
+
+  /// JSON array of int message POSITIONS (receipts; reinforcement appends).
+  /// Positions, not DB ids — same trade-off as JournalMemories.
+  final String? sourceMessageIds;
+  final DateTime createdAt;
+  final DateTime lastReinforcedAt;
+  final DateTime updatedAt;
+  final String? metadata;
+  const GrowthRingData({
+    required this.id,
+    required this.sessionId,
+    required this.characterId,
+    required this.content,
+    required this.category,
+    required this.strength,
+    required this.pinned,
+    required this.retired,
+    this.sourceMessageIds,
+    required this.createdAt,
+    required this.lastReinforcedAt,
+    required this.updatedAt,
+    this.metadata,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['character_id'] = Variable<String>(characterId);
+    map['content'] = Variable<String>(content);
+    map['category'] = Variable<String>(category);
+    map['strength'] = Variable<double>(strength);
+    map['pinned'] = Variable<bool>(pinned);
+    map['retired'] = Variable<bool>(retired);
+    if (!nullToAbsent || sourceMessageIds != null) {
+      map['source_message_ids'] = Variable<String>(sourceMessageIds);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['last_reinforced_at'] = Variable<DateTime>(lastReinforcedAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || metadata != null) {
+      map['metadata'] = Variable<String>(metadata);
+    }
+    return map;
+  }
+
+  GrowthRingsCompanion toCompanion(bool nullToAbsent) {
+    return GrowthRingsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      characterId: Value(characterId),
+      content: Value(content),
+      category: Value(category),
+      strength: Value(strength),
+      pinned: Value(pinned),
+      retired: Value(retired),
+      sourceMessageIds: sourceMessageIds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceMessageIds),
+      createdAt: Value(createdAt),
+      lastReinforcedAt: Value(lastReinforcedAt),
+      updatedAt: Value(updatedAt),
+      metadata: metadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metadata),
+    );
+  }
+
+  factory GrowthRingData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GrowthRingData(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      characterId: serializer.fromJson<String>(json['characterId']),
+      content: serializer.fromJson<String>(json['content']),
+      category: serializer.fromJson<String>(json['category']),
+      strength: serializer.fromJson<double>(json['strength']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+      retired: serializer.fromJson<bool>(json['retired']),
+      sourceMessageIds: serializer.fromJson<String?>(json['sourceMessageIds']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lastReinforcedAt: serializer.fromJson<DateTime>(json['lastReinforcedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      metadata: serializer.fromJson<String?>(json['metadata']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'characterId': serializer.toJson<String>(characterId),
+      'content': serializer.toJson<String>(content),
+      'category': serializer.toJson<String>(category),
+      'strength': serializer.toJson<double>(strength),
+      'pinned': serializer.toJson<bool>(pinned),
+      'retired': serializer.toJson<bool>(retired),
+      'sourceMessageIds': serializer.toJson<String?>(sourceMessageIds),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lastReinforcedAt': serializer.toJson<DateTime>(lastReinforcedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'metadata': serializer.toJson<String?>(metadata),
+    };
+  }
+
+  GrowthRingData copyWith({
+    String? id,
+    String? sessionId,
+    String? characterId,
+    String? content,
+    String? category,
+    double? strength,
+    bool? pinned,
+    bool? retired,
+    Value<String?> sourceMessageIds = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? lastReinforcedAt,
+    DateTime? updatedAt,
+    Value<String?> metadata = const Value.absent(),
+  }) => GrowthRingData(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    characterId: characterId ?? this.characterId,
+    content: content ?? this.content,
+    category: category ?? this.category,
+    strength: strength ?? this.strength,
+    pinned: pinned ?? this.pinned,
+    retired: retired ?? this.retired,
+    sourceMessageIds: sourceMessageIds.present
+        ? sourceMessageIds.value
+        : this.sourceMessageIds,
+    createdAt: createdAt ?? this.createdAt,
+    lastReinforcedAt: lastReinforcedAt ?? this.lastReinforcedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    metadata: metadata.present ? metadata.value : this.metadata,
+  );
+  GrowthRingData copyWithCompanion(GrowthRingsCompanion data) {
+    return GrowthRingData(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      content: data.content.present ? data.content.value : this.content,
+      category: data.category.present ? data.category.value : this.category,
+      strength: data.strength.present ? data.strength.value : this.strength,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+      retired: data.retired.present ? data.retired.value : this.retired,
+      sourceMessageIds: data.sourceMessageIds.present
+          ? data.sourceMessageIds.value
+          : this.sourceMessageIds,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastReinforcedAt: data.lastReinforcedAt.present
+          ? data.lastReinforcedAt.value
+          : this.lastReinforcedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GrowthRingData(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('content: $content, ')
+          ..write('category: $category, ')
+          ..write('strength: $strength, ')
+          ..write('pinned: $pinned, ')
+          ..write('retired: $retired, ')
+          ..write('sourceMessageIds: $sourceMessageIds, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastReinforcedAt: $lastReinforcedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('metadata: $metadata')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sessionId,
+    characterId,
+    content,
+    category,
+    strength,
+    pinned,
+    retired,
+    sourceMessageIds,
+    createdAt,
+    lastReinforcedAt,
+    updatedAt,
+    metadata,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GrowthRingData &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.characterId == this.characterId &&
+          other.content == this.content &&
+          other.category == this.category &&
+          other.strength == this.strength &&
+          other.pinned == this.pinned &&
+          other.retired == this.retired &&
+          other.sourceMessageIds == this.sourceMessageIds &&
+          other.createdAt == this.createdAt &&
+          other.lastReinforcedAt == this.lastReinforcedAt &&
+          other.updatedAt == this.updatedAt &&
+          other.metadata == this.metadata);
+}
+
+class GrowthRingsCompanion extends UpdateCompanion<GrowthRingData> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> characterId;
+  final Value<String> content;
+  final Value<String> category;
+  final Value<double> strength;
+  final Value<bool> pinned;
+  final Value<bool> retired;
+  final Value<String?> sourceMessageIds;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> lastReinforcedAt;
+  final Value<DateTime> updatedAt;
+  final Value<String?> metadata;
+  final Value<int> rowid;
+  const GrowthRingsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.content = const Value.absent(),
+    this.category = const Value.absent(),
+    this.strength = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.retired = const Value.absent(),
+    this.sourceMessageIds = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastReinforcedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GrowthRingsCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String characterId,
+    required String content,
+    this.category = const Value.absent(),
+    this.strength = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.retired = const Value.absent(),
+    this.sourceMessageIds = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastReinforcedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       characterId = Value(characterId),
+       content = Value(content);
+  static Insertable<GrowthRingData> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? characterId,
+    Expression<String>? content,
+    Expression<String>? category,
+    Expression<double>? strength,
+    Expression<bool>? pinned,
+    Expression<bool>? retired,
+    Expression<String>? sourceMessageIds,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? lastReinforcedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? metadata,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (characterId != null) 'character_id': characterId,
+      if (content != null) 'content': content,
+      if (category != null) 'category': category,
+      if (strength != null) 'strength': strength,
+      if (pinned != null) 'pinned': pinned,
+      if (retired != null) 'retired': retired,
+      if (sourceMessageIds != null) 'source_message_ids': sourceMessageIds,
+      if (createdAt != null) 'created_at': createdAt,
+      if (lastReinforcedAt != null) 'last_reinforced_at': lastReinforcedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (metadata != null) 'metadata': metadata,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GrowthRingsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<String>? characterId,
+    Value<String>? content,
+    Value<String>? category,
+    Value<double>? strength,
+    Value<bool>? pinned,
+    Value<bool>? retired,
+    Value<String?>? sourceMessageIds,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? lastReinforcedAt,
+    Value<DateTime>? updatedAt,
+    Value<String?>? metadata,
+    Value<int>? rowid,
+  }) {
+    return GrowthRingsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      characterId: characterId ?? this.characterId,
+      content: content ?? this.content,
+      category: category ?? this.category,
+      strength: strength ?? this.strength,
+      pinned: pinned ?? this.pinned,
+      retired: retired ?? this.retired,
+      sourceMessageIds: sourceMessageIds ?? this.sourceMessageIds,
+      createdAt: createdAt ?? this.createdAt,
+      lastReinforcedAt: lastReinforcedAt ?? this.lastReinforcedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      metadata: metadata ?? this.metadata,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (strength.present) {
+      map['strength'] = Variable<double>(strength.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (retired.present) {
+      map['retired'] = Variable<bool>(retired.value);
+    }
+    if (sourceMessageIds.present) {
+      map['source_message_ids'] = Variable<String>(sourceMessageIds.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (lastReinforcedAt.present) {
+      map['last_reinforced_at'] = Variable<DateTime>(lastReinforcedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (metadata.present) {
+      map['metadata'] = Variable<String>(metadata.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GrowthRingsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('characterId: $characterId, ')
+          ..write('content: $content, ')
+          ..write('category: $category, ')
+          ..write('strength: $strength, ')
+          ..write('pinned: $pinned, ')
+          ..write('retired: $retired, ')
+          ..write('sourceMessageIds: $sourceMessageIds, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastReinforcedAt: $lastReinforcedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('metadata: $metadata, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GrowthStateTable extends GrowthState
+    with TableInfo<$GrowthStateTable, GrowthStateData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GrowthStateTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cursorMeta = const VerificationMeta('cursor');
+  @override
+  late final GeneratedColumn<int> cursor = GeneratedColumn<int>(
+    'cursor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [sessionId, cursor];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'growth_state';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GrowthStateData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('cursor')) {
+      context.handle(
+        _cursorMeta,
+        cursor.isAcceptableOrUnknown(data['cursor']!, _cursorMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId};
+  @override
+  GrowthStateData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GrowthStateData(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      cursor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cursor'],
+      )!,
+    );
+  }
+
+  @override
+  $GrowthStateTable createAlias(String alias) {
+    return $GrowthStateTable(attachedDatabase, alias);
+  }
+}
+
+class GrowthStateData extends DataClass implements Insertable<GrowthStateData> {
+  final String sessionId;
+  final int cursor;
+  const GrowthStateData({required this.sessionId, required this.cursor});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
+    map['cursor'] = Variable<int>(cursor);
+    return map;
+  }
+
+  GrowthStateCompanion toCompanion(bool nullToAbsent) {
+    return GrowthStateCompanion(
+      sessionId: Value(sessionId),
+      cursor: Value(cursor),
+    );
+  }
+
+  factory GrowthStateData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GrowthStateData(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      cursor: serializer.fromJson<int>(json['cursor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
+      'cursor': serializer.toJson<int>(cursor),
+    };
+  }
+
+  GrowthStateData copyWith({String? sessionId, int? cursor}) => GrowthStateData(
+    sessionId: sessionId ?? this.sessionId,
+    cursor: cursor ?? this.cursor,
+  );
+  GrowthStateData copyWithCompanion(GrowthStateCompanion data) {
+    return GrowthStateData(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      cursor: data.cursor.present ? data.cursor.value : this.cursor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GrowthStateData(')
+          ..write('sessionId: $sessionId, ')
+          ..write('cursor: $cursor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(sessionId, cursor);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GrowthStateData &&
+          other.sessionId == this.sessionId &&
+          other.cursor == this.cursor);
+}
+
+class GrowthStateCompanion extends UpdateCompanion<GrowthStateData> {
+  final Value<String> sessionId;
+  final Value<int> cursor;
+  final Value<int> rowid;
+  const GrowthStateCompanion({
+    this.sessionId = const Value.absent(),
+    this.cursor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GrowthStateCompanion.insert({
+    required String sessionId,
+    this.cursor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId);
+  static Insertable<GrowthStateData> custom({
+    Expression<String>? sessionId,
+    Expression<int>? cursor,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (cursor != null) 'cursor': cursor,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GrowthStateCompanion copyWith({
+    Value<String>? sessionId,
+    Value<int>? cursor,
+    Value<int>? rowid,
+  }) {
+    return GrowthStateCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      cursor: cursor ?? this.cursor,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (cursor.present) {
+      map['cursor'] = Variable<int>(cursor.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GrowthStateCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('cursor: $cursor, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ObjectivesTable extends Objectives
+    with TableInfo<$ObjectivesTable, Objective> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ObjectivesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chatIdMeta = const VerificationMeta('chatId');
+  @override
+  late final GeneratedColumn<String> chatId = GeneratedColumn<String>(
+    'chat_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _objectiveMeta = const VerificationMeta(
+    'objective',
+  );
+  @override
+  late final GeneratedColumn<String> objective = GeneratedColumn<String>(
+    'objective',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tasksMeta = const VerificationMeta('tasks');
+  @override
+  late final GeneratedColumn<String> tasks = GeneratedColumn<String>(
+    'tasks',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  @override
+  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isPrimaryMeta = const VerificationMeta(
+    'isPrimary',
+  );
+  @override
+  late final GeneratedColumn<bool> isPrimary = GeneratedColumn<bool>(
+    'is_primary',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_primary" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _checkFrequencyMeta = const VerificationMeta(
+    'checkFrequency',
+  );
+  @override
+  late final GeneratedColumn<int> checkFrequency = GeneratedColumn<int>(
+    'check_frequency',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(3),
+  );
+  static const VerificationMeta _injectionDepthMeta = const VerificationMeta(
+    'injectionDepth',
+  );
+  @override
+  late final GeneratedColumn<int> injectionDepth = GeneratedColumn<int>(
+    'injection_depth',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(4),
+  );
+  static const VerificationMeta _servedAmbitionMeta = const VerificationMeta(
+    'servedAmbition',
+  );
+  @override
+  late final GeneratedColumn<String> servedAmbition = GeneratedColumn<String>(
+    'served_ambition',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    characterId,
+    chatId,
+    objective,
+    tasks,
+    active,
+    isPrimary,
+    checkFrequency,
+    injectionDepth,
+    servedAmbition,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'objectives';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Objective> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_characterIdMeta);
+    }
+    if (data.containsKey('chat_id')) {
+      context.handle(
+        _chatIdMeta,
+        chatId.isAcceptableOrUnknown(data['chat_id']!, _chatIdMeta),
+      );
+    }
+    if (data.containsKey('objective')) {
+      context.handle(
+        _objectiveMeta,
+        objective.isAcceptableOrUnknown(data['objective']!, _objectiveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_objectiveMeta);
+    }
+    if (data.containsKey('tasks')) {
+      context.handle(
+        _tasksMeta,
+        tasks.isAcceptableOrUnknown(data['tasks']!, _tasksMeta),
+      );
+    }
+    if (data.containsKey('active')) {
+      context.handle(
+        _activeMeta,
+        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    }
+    if (data.containsKey('is_primary')) {
+      context.handle(
+        _isPrimaryMeta,
+        isPrimary.isAcceptableOrUnknown(data['is_primary']!, _isPrimaryMeta),
+      );
+    }
+    if (data.containsKey('check_frequency')) {
+      context.handle(
+        _checkFrequencyMeta,
+        checkFrequency.isAcceptableOrUnknown(
+          data['check_frequency']!,
+          _checkFrequencyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('injection_depth')) {
+      context.handle(
+        _injectionDepthMeta,
+        injectionDepth.isAcceptableOrUnknown(
+          data['injection_depth']!,
+          _injectionDepthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('served_ambition')) {
+      context.handle(
+        _servedAmbitionMeta,
+        servedAmbition.isAcceptableOrUnknown(
+          data['served_ambition']!,
+          _servedAmbitionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Objective map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Objective(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      )!,
+      chatId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chat_id'],
+      ),
+      objective: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}objective'],
+      )!,
+      tasks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tasks'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      isPrimary: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_primary'],
+      )!,
+      checkFrequency: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}check_frequency'],
+      )!,
+      injectionDepth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}injection_depth'],
+      )!,
+      servedAmbition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}served_ambition'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ObjectivesTable createAlias(String alias) {
+    return $ObjectivesTable(attachedDatabase, alias);
+  }
+}
+
+class Objective extends DataClass implements Insertable<Objective> {
+  final String id;
+  final String characterId;
+  final String? chatId;
+  final String objective;
+  final String tasks;
+  final bool active;
+  final bool isPrimary;
+  final int checkFrequency;
+  final int injectionDepth;
+
+  /// v46 — the ambition this objective is a step toward, stored as the
+  /// ambition's TEXT (the same string the card authors and the journal
+  /// progress cards key on), or NULL for a situational quest that serves no
+  /// long-term goal.
+  ///
+  /// Nullable with no default on purpose: NULL is a real, common answer, not
+  /// a missing value. Ambition (the mountain) → Objectives (the switchbacks)
+  /// → Tasks (the steps); most switchbacks are on the mountain, but life
+  /// happens and some are not.
+  ///
+  /// Text and not an index: ambitions live in the card's `ambitions` list,
+  /// which the author can reorder or edit at any time, so a stored index
+  /// would silently start pointing at a different goal. The text is what
+  /// AmbitionService already keys progress on, so the two agree by
+  /// construction.
+  final String? servedAmbition;
+  final DateTime createdAt;
+  const Objective({
+    required this.id,
+    required this.characterId,
+    this.chatId,
+    required this.objective,
+    required this.tasks,
+    required this.active,
+    required this.isPrimary,
+    required this.checkFrequency,
+    required this.injectionDepth,
+    this.servedAmbition,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['character_id'] = Variable<String>(characterId);
+    if (!nullToAbsent || chatId != null) {
+      map['chat_id'] = Variable<String>(chatId);
+    }
+    map['objective'] = Variable<String>(objective);
+    map['tasks'] = Variable<String>(tasks);
+    map['active'] = Variable<bool>(active);
+    map['is_primary'] = Variable<bool>(isPrimary);
+    map['check_frequency'] = Variable<int>(checkFrequency);
+    map['injection_depth'] = Variable<int>(injectionDepth);
+    if (!nullToAbsent || servedAmbition != null) {
+      map['served_ambition'] = Variable<String>(servedAmbition);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ObjectivesCompanion toCompanion(bool nullToAbsent) {
+    return ObjectivesCompanion(
+      id: Value(id),
+      characterId: Value(characterId),
+      chatId: chatId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chatId),
+      objective: Value(objective),
+      tasks: Value(tasks),
+      active: Value(active),
+      isPrimary: Value(isPrimary),
+      checkFrequency: Value(checkFrequency),
+      injectionDepth: Value(injectionDepth),
+      servedAmbition: servedAmbition == null && nullToAbsent
+          ? const Value.absent()
+          : Value(servedAmbition),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Objective.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Objective(
+      id: serializer.fromJson<String>(json['id']),
+      characterId: serializer.fromJson<String>(json['characterId']),
+      chatId: serializer.fromJson<String?>(json['chatId']),
+      objective: serializer.fromJson<String>(json['objective']),
+      tasks: serializer.fromJson<String>(json['tasks']),
+      active: serializer.fromJson<bool>(json['active']),
+      isPrimary: serializer.fromJson<bool>(json['isPrimary']),
+      checkFrequency: serializer.fromJson<int>(json['checkFrequency']),
+      injectionDepth: serializer.fromJson<int>(json['injectionDepth']),
+      servedAmbition: serializer.fromJson<String?>(json['servedAmbition']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'characterId': serializer.toJson<String>(characterId),
+      'chatId': serializer.toJson<String?>(chatId),
+      'objective': serializer.toJson<String>(objective),
+      'tasks': serializer.toJson<String>(tasks),
+      'active': serializer.toJson<bool>(active),
+      'isPrimary': serializer.toJson<bool>(isPrimary),
+      'checkFrequency': serializer.toJson<int>(checkFrequency),
+      'injectionDepth': serializer.toJson<int>(injectionDepth),
+      'servedAmbition': serializer.toJson<String?>(servedAmbition),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Objective copyWith({
+    String? id,
+    String? characterId,
+    Value<String?> chatId = const Value.absent(),
+    String? objective,
+    String? tasks,
+    bool? active,
+    bool? isPrimary,
+    int? checkFrequency,
+    int? injectionDepth,
+    Value<String?> servedAmbition = const Value.absent(),
+    DateTime? createdAt,
+  }) => Objective(
+    id: id ?? this.id,
+    characterId: characterId ?? this.characterId,
+    chatId: chatId.present ? chatId.value : this.chatId,
+    objective: objective ?? this.objective,
+    tasks: tasks ?? this.tasks,
+    active: active ?? this.active,
+    isPrimary: isPrimary ?? this.isPrimary,
+    checkFrequency: checkFrequency ?? this.checkFrequency,
+    injectionDepth: injectionDepth ?? this.injectionDepth,
+    servedAmbition: servedAmbition.present
+        ? servedAmbition.value
+        : this.servedAmbition,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Objective copyWithCompanion(ObjectivesCompanion data) {
+    return Objective(
+      id: data.id.present ? data.id.value : this.id,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      chatId: data.chatId.present ? data.chatId.value : this.chatId,
+      objective: data.objective.present ? data.objective.value : this.objective,
+      tasks: data.tasks.present ? data.tasks.value : this.tasks,
+      active: data.active.present ? data.active.value : this.active,
+      isPrimary: data.isPrimary.present ? data.isPrimary.value : this.isPrimary,
+      checkFrequency: data.checkFrequency.present
+          ? data.checkFrequency.value
+          : this.checkFrequency,
+      injectionDepth: data.injectionDepth.present
+          ? data.injectionDepth.value
+          : this.injectionDepth,
+      servedAmbition: data.servedAmbition.present
+          ? data.servedAmbition.value
+          : this.servedAmbition,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Objective(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('chatId: $chatId, ')
+          ..write('objective: $objective, ')
+          ..write('tasks: $tasks, ')
+          ..write('active: $active, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('checkFrequency: $checkFrequency, ')
+          ..write('injectionDepth: $injectionDepth, ')
+          ..write('servedAmbition: $servedAmbition, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    characterId,
+    chatId,
+    objective,
+    tasks,
+    active,
+    isPrimary,
+    checkFrequency,
+    injectionDepth,
+    servedAmbition,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Objective &&
+          other.id == this.id &&
+          other.characterId == this.characterId &&
+          other.chatId == this.chatId &&
+          other.objective == this.objective &&
+          other.tasks == this.tasks &&
+          other.active == this.active &&
+          other.isPrimary == this.isPrimary &&
+          other.checkFrequency == this.checkFrequency &&
+          other.injectionDepth == this.injectionDepth &&
+          other.servedAmbition == this.servedAmbition &&
+          other.createdAt == this.createdAt);
+}
+
+class ObjectivesCompanion extends UpdateCompanion<Objective> {
+  final Value<String> id;
+  final Value<String> characterId;
+  final Value<String?> chatId;
+  final Value<String> objective;
+  final Value<String> tasks;
+  final Value<bool> active;
+  final Value<bool> isPrimary;
+  final Value<int> checkFrequency;
+  final Value<int> injectionDepth;
+  final Value<String?> servedAmbition;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ObjectivesCompanion({
+    this.id = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.chatId = const Value.absent(),
+    this.objective = const Value.absent(),
+    this.tasks = const Value.absent(),
+    this.active = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.checkFrequency = const Value.absent(),
+    this.injectionDepth = const Value.absent(),
+    this.servedAmbition = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ObjectivesCompanion.insert({
+    required String id,
+    required String characterId,
+    this.chatId = const Value.absent(),
+    required String objective,
+    this.tasks = const Value.absent(),
+    this.active = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.checkFrequency = const Value.absent(),
+    this.injectionDepth = const Value.absent(),
+    this.servedAmbition = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       characterId = Value(characterId),
+       objective = Value(objective);
+  static Insertable<Objective> custom({
+    Expression<String>? id,
+    Expression<String>? characterId,
+    Expression<String>? chatId,
+    Expression<String>? objective,
+    Expression<String>? tasks,
+    Expression<bool>? active,
+    Expression<bool>? isPrimary,
+    Expression<int>? checkFrequency,
+    Expression<int>? injectionDepth,
+    Expression<String>? servedAmbition,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (characterId != null) 'character_id': characterId,
+      if (chatId != null) 'chat_id': chatId,
+      if (objective != null) 'objective': objective,
+      if (tasks != null) 'tasks': tasks,
+      if (active != null) 'active': active,
+      if (isPrimary != null) 'is_primary': isPrimary,
+      if (checkFrequency != null) 'check_frequency': checkFrequency,
+      if (injectionDepth != null) 'injection_depth': injectionDepth,
+      if (servedAmbition != null) 'served_ambition': servedAmbition,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ObjectivesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? characterId,
+    Value<String?>? chatId,
+    Value<String>? objective,
+    Value<String>? tasks,
+    Value<bool>? active,
+    Value<bool>? isPrimary,
+    Value<int>? checkFrequency,
+    Value<int>? injectionDepth,
+    Value<String?>? servedAmbition,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ObjectivesCompanion(
+      id: id ?? this.id,
+      characterId: characterId ?? this.characterId,
+      chatId: chatId ?? this.chatId,
+      objective: objective ?? this.objective,
+      tasks: tasks ?? this.tasks,
+      active: active ?? this.active,
+      isPrimary: isPrimary ?? this.isPrimary,
+      checkFrequency: checkFrequency ?? this.checkFrequency,
+      injectionDepth: injectionDepth ?? this.injectionDepth,
+      servedAmbition: servedAmbition ?? this.servedAmbition,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (chatId.present) {
+      map['chat_id'] = Variable<String>(chatId.value);
+    }
+    if (objective.present) {
+      map['objective'] = Variable<String>(objective.value);
+    }
+    if (tasks.present) {
+      map['tasks'] = Variable<String>(tasks.value);
+    }
+    if (active.present) {
+      map['active'] = Variable<bool>(active.value);
+    }
+    if (isPrimary.present) {
+      map['is_primary'] = Variable<bool>(isPrimary.value);
+    }
+    if (checkFrequency.present) {
+      map['check_frequency'] = Variable<int>(checkFrequency.value);
+    }
+    if (injectionDepth.present) {
+      map['injection_depth'] = Variable<int>(injectionDepth.value);
+    }
+    if (servedAmbition.present) {
+      map['served_ambition'] = Variable<String>(servedAmbition.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ObjectivesCompanion(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('chatId: $chatId, ')
+          ..write('objective: $objective, ')
+          ..write('tasks: $tasks, ')
+          ..write('active: $active, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('checkFrequency: $checkFrequency, ')
+          ..write('injectionDepth: $injectionDepth, ')
+          ..write('servedAmbition: $servedAmbition, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StoryProjectsTable extends StoryProjects
+    with TableInfo<$StoryProjectsTable, StoryProject> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StoryProjectsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('Untitled Story'),
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<String> data = GeneratedColumn<String>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    data,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'story_projects';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoryProject> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StoryProject map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoryProject(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}data'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $StoryProjectsTable createAlias(String alias) {
+    return $StoryProjectsTable(attachedDatabase, alias);
+  }
+}
+
+class StoryProject extends DataClass implements Insertable<StoryProject> {
+  final String id;
+  final String title;
+  final String data;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const StoryProject({
+    required this.id,
+    required this.title,
+    required this.data,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['data'] = Variable<String>(data);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  StoryProjectsCompanion toCompanion(bool nullToAbsent) {
+    return StoryProjectsCompanion(
+      id: Value(id),
+      title: Value(title),
+      data: Value(data),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory StoryProject.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoryProject(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      data: serializer.fromJson<String>(json['data']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'data': serializer.toJson<String>(data),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  StoryProject copyWith({
+    String? id,
+    String? title,
+    String? data,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => StoryProject(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    data: data ?? this.data,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  StoryProject copyWithCompanion(StoryProjectsCompanion data) {
+    return StoryProject(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      data: data.data.present ? data.data.value : this.data,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryProject(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('data: $data, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, title, data, createdAt, updatedAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoryProject &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.data == this.data &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class StoryProjectsCompanion extends UpdateCompanion<StoryProject> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> data;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const StoryProjectsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.data = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StoryProjectsCompanion.insert({
+    required String id,
+    this.title = const Value.absent(),
+    required String data,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       data = Value(data);
+  static Insertable<StoryProject> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? data,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (data != null) 'data': data,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StoryProjectsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String>? data,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return StoryProjectsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      data: data ?? this.data,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<String>(data.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryProjectsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('data: $data, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SyncMetaTable extends SyncMeta
+    with TableInfo<$SyncMetaTable, SyncMetaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SyncMetaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastModifiedAtMeta = const VerificationMeta(
+    'lastModifiedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModifiedAt =
+      GeneratedColumn<DateTime>(
+        'last_modified_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [id, version, lastModifiedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_meta';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SyncMetaData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('last_modified_at')) {
+      context.handle(
+        _lastModifiedAtMeta,
+        lastModifiedAt.isAcceptableOrUnknown(
+          data['last_modified_at']!,
+          _lastModifiedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SyncMetaData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncMetaData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      lastModifiedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SyncMetaTable createAlias(String alias) {
+    return $SyncMetaTable(attachedDatabase, alias);
+  }
+}
+
+class SyncMetaData extends DataClass implements Insertable<SyncMetaData> {
+  final int id;
+  final int version;
+  final DateTime lastModifiedAt;
+  const SyncMetaData({
+    required this.id,
+    required this.version,
+    required this.lastModifiedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['version'] = Variable<int>(version);
+    map['last_modified_at'] = Variable<DateTime>(lastModifiedAt);
+    return map;
+  }
+
+  SyncMetaCompanion toCompanion(bool nullToAbsent) {
+    return SyncMetaCompanion(
+      id: Value(id),
+      version: Value(version),
+      lastModifiedAt: Value(lastModifiedAt),
+    );
+  }
+
+  factory SyncMetaData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncMetaData(
+      id: serializer.fromJson<int>(json['id']),
+      version: serializer.fromJson<int>(json['version']),
+      lastModifiedAt: serializer.fromJson<DateTime>(json['lastModifiedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'version': serializer.toJson<int>(version),
+      'lastModifiedAt': serializer.toJson<DateTime>(lastModifiedAt),
+    };
+  }
+
+  SyncMetaData copyWith({int? id, int? version, DateTime? lastModifiedAt}) =>
+      SyncMetaData(
+        id: id ?? this.id,
+        version: version ?? this.version,
+        lastModifiedAt: lastModifiedAt ?? this.lastModifiedAt,
+      );
+  SyncMetaData copyWithCompanion(SyncMetaCompanion data) {
+    return SyncMetaData(
+      id: data.id.present ? data.id.value : this.id,
+      version: data.version.present ? data.version.value : this.version,
+      lastModifiedAt: data.lastModifiedAt.present
+          ? data.lastModifiedAt.value
+          : this.lastModifiedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncMetaData(')
+          ..write('id: $id, ')
+          ..write('version: $version, ')
+          ..write('lastModifiedAt: $lastModifiedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, version, lastModifiedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncMetaData &&
+          other.id == this.id &&
+          other.version == this.version &&
+          other.lastModifiedAt == this.lastModifiedAt);
+}
+
+class SyncMetaCompanion extends UpdateCompanion<SyncMetaData> {
+  final Value<int> id;
+  final Value<int> version;
+  final Value<DateTime> lastModifiedAt;
+  const SyncMetaCompanion({
+    this.id = const Value.absent(),
+    this.version = const Value.absent(),
+    this.lastModifiedAt = const Value.absent(),
+  });
+  SyncMetaCompanion.insert({
+    this.id = const Value.absent(),
+    this.version = const Value.absent(),
+    this.lastModifiedAt = const Value.absent(),
+  });
+  static Insertable<SyncMetaData> custom({
+    Expression<int>? id,
+    Expression<int>? version,
+    Expression<DateTime>? lastModifiedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (version != null) 'version': version,
+      if (lastModifiedAt != null) 'last_modified_at': lastModifiedAt,
+    });
+  }
+
+  SyncMetaCompanion copyWith({
+    Value<int>? id,
+    Value<int>? version,
+    Value<DateTime>? lastModifiedAt,
+  }) {
+    return SyncMetaCompanion(
+      id: id ?? this.id,
+      version: version ?? this.version,
+      lastModifiedAt: lastModifiedAt ?? this.lastModifiedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (lastModifiedAt.present) {
+      map['last_modified_at'] = Variable<DateTime>(lastModifiedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncMetaCompanion(')
+          ..write('id: $id, ')
+          ..write('version: $version, ')
+          ..write('lastModifiedAt: $lastModifiedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AvatarImagesTable extends AvatarImages
+    with TableInfo<$AvatarImagesTable, AvatarImage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AvatarImagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
+  );
+  @override
+  late final GeneratedColumn<String> characterId = GeneratedColumn<String>(
+    'character_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _filenameMeta = const VerificationMeta(
+    'filename',
+  );
+  @override
+  late final GeneratedColumn<String> filename = GeneratedColumn<String>(
+    'filename',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    characterId,
+    filename,
+    label,
+    displayOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'avatar_images';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AvatarImage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('character_id')) {
+      context.handle(
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_characterIdMeta);
+    }
+    if (data.containsKey('filename')) {
+      context.handle(
+        _filenameMeta,
+        filename.isAcceptableOrUnknown(data['filename']!, _filenameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_filenameMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AvatarImage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AvatarImage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      characterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}character_id'],
+      )!,
+      filename: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}filename'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      ),
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AvatarImagesTable createAlias(String alias) {
+    return $AvatarImagesTable(attachedDatabase, alias);
+  }
+}
+
+class AvatarImage extends DataClass implements Insertable<AvatarImage> {
+  final String id;
+  final String characterId;
+  final String filename;
+  final String? label;
+  final int displayOrder;
+  final DateTime createdAt;
+  const AvatarImage({
+    required this.id,
+    required this.characterId,
+    required this.filename,
+    this.label,
+    required this.displayOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['character_id'] = Variable<String>(characterId);
+    map['filename'] = Variable<String>(filename);
+    if (!nullToAbsent || label != null) {
+      map['label'] = Variable<String>(label);
+    }
+    map['display_order'] = Variable<int>(displayOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AvatarImagesCompanion toCompanion(bool nullToAbsent) {
+    return AvatarImagesCompanion(
+      id: Value(id),
+      characterId: Value(characterId),
+      filename: Value(filename),
+      label: label == null && nullToAbsent
+          ? const Value.absent()
+          : Value(label),
+      displayOrder: Value(displayOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory AvatarImage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AvatarImage(
+      id: serializer.fromJson<String>(json['id']),
+      characterId: serializer.fromJson<String>(json['characterId']),
+      filename: serializer.fromJson<String>(json['filename']),
+      label: serializer.fromJson<String?>(json['label']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'characterId': serializer.toJson<String>(characterId),
+      'filename': serializer.toJson<String>(filename),
+      'label': serializer.toJson<String?>(label),
+      'displayOrder': serializer.toJson<int>(displayOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  AvatarImage copyWith({
+    String? id,
+    String? characterId,
+    String? filename,
+    Value<String?> label = const Value.absent(),
+    int? displayOrder,
+    DateTime? createdAt,
+  }) => AvatarImage(
+    id: id ?? this.id,
+    characterId: characterId ?? this.characterId,
+    filename: filename ?? this.filename,
+    label: label.present ? label.value : this.label,
+    displayOrder: displayOrder ?? this.displayOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  AvatarImage copyWithCompanion(AvatarImagesCompanion data) {
+    return AvatarImage(
+      id: data.id.present ? data.id.value : this.id,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
+      filename: data.filename.present ? data.filename.value : this.filename,
+      label: data.label.present ? data.label.value : this.label,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AvatarImage(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('filename: $filename, ')
+          ..write('label: $label, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, characterId, filename, label, displayOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AvatarImage &&
+          other.id == this.id &&
+          other.characterId == this.characterId &&
+          other.filename == this.filename &&
+          other.label == this.label &&
+          other.displayOrder == this.displayOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class AvatarImagesCompanion extends UpdateCompanion<AvatarImage> {
+  final Value<String> id;
+  final Value<String> characterId;
+  final Value<String> filename;
+  final Value<String?> label;
+  final Value<int> displayOrder;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const AvatarImagesCompanion({
+    this.id = const Value.absent(),
+    this.characterId = const Value.absent(),
+    this.filename = const Value.absent(),
+    this.label = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AvatarImagesCompanion.insert({
+    required String id,
+    required String characterId,
+    required String filename,
+    this.label = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       characterId = Value(characterId),
+       filename = Value(filename);
+  static Insertable<AvatarImage> custom({
+    Expression<String>? id,
+    Expression<String>? characterId,
+    Expression<String>? filename,
+    Expression<String>? label,
+    Expression<int>? displayOrder,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (characterId != null) 'character_id': characterId,
+      if (filename != null) 'filename': filename,
+      if (label != null) 'label': label,
+      if (displayOrder != null) 'display_order': displayOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AvatarImagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? characterId,
+    Value<String>? filename,
+    Value<String?>? label,
+    Value<int>? displayOrder,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return AvatarImagesCompanion(
+      id: id ?? this.id,
+      characterId: characterId ?? this.characterId,
+      filename: filename ?? this.filename,
+      label: label ?? this.label,
+      displayOrder: displayOrder ?? this.displayOrder,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (characterId.present) {
+      map['character_id'] = Variable<String>(characterId.value);
+    }
+    if (filename.present) {
+      map['filename'] = Variable<String>(filename.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AvatarImagesCompanion(')
+          ..write('id: $id, ')
+          ..write('characterId: $characterId, ')
+          ..write('filename: $filename, ')
+          ..write('label: $label, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GroupMembersTable extends GroupMembers
+    with TableInfo<$GroupMembersTable, GroupMemberRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GroupMembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<String> groupId = GeneratedColumn<String>(
+    'group_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _personalityMeta = const VerificationMeta(
+    'personality',
+  );
+  @override
+  late final GeneratedColumn<String> personality = GeneratedColumn<String>(
+    'personality',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _scenarioMeta = const VerificationMeta(
+    'scenario',
+  );
+  @override
+  late final GeneratedColumn<String> scenario = GeneratedColumn<String>(
+    'scenario',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _firstMessageMeta = const VerificationMeta(
+    'firstMessage',
+  );
+  @override
+  late final GeneratedColumn<String> firstMessage = GeneratedColumn<String>(
+    'first_message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _mesExampleMeta = const VerificationMeta(
+    'mesExample',
+  );
+  @override
+  late final GeneratedColumn<String> mesExample = GeneratedColumn<String>(
+    'mes_example',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _systemPromptMeta = const VerificationMeta(
+    'systemPrompt',
+  );
+  @override
+  late final GeneratedColumn<String> systemPrompt = GeneratedColumn<String>(
+    'system_prompt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _postHistoryInstructionsMeta =
+      const VerificationMeta('postHistoryInstructions');
+  @override
+  late final GeneratedColumn<String> postHistoryInstructions =
+      GeneratedColumn<String>(
+        'post_history_instructions',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _alternateGreetingsMeta =
+      const VerificationMeta('alternateGreetings');
+  @override
+  late final GeneratedColumn<String> alternateGreetings =
+      GeneratedColumn<String>(
+        'alternate_greetings',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+    'tags',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _avatarFilenameMeta = const VerificationMeta(
+    'avatarFilename',
+  );
+  @override
+  late final GeneratedColumn<String> avatarFilename = GeneratedColumn<String>(
+    'avatar_filename',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ttsVoiceMeta = const VerificationMeta(
+    'ttsVoice',
+  );
+  @override
+  late final GeneratedColumn<String> ttsVoice = GeneratedColumn<String>(
+    'tts_voice',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lorebookMeta = const VerificationMeta(
+    'lorebook',
+  );
+  @override
+  late final GeneratedColumn<String> lorebook = GeneratedColumn<String>(
+    'lorebook',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _worldNamesMeta = const VerificationMeta(
+    'worldNames',
+  );
+  @override
+  late final GeneratedColumn<String> worldNames = GeneratedColumn<String>(
+    'world_names',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _frontPorchExtensionsMeta =
+      const VerificationMeta('frontPorchExtensions');
+  @override
+  late final GeneratedColumn<String> frontPorchExtensions =
+      GeneratedColumn<String>(
+        'front_porch_extensions',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _rawExtensionsMeta = const VerificationMeta(
+    'rawExtensions',
+  );
+  @override
+  late final GeneratedColumn<String> rawExtensions = GeneratedColumn<String>(
+    'raw_extensions',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _memberStateMeta = const VerificationMeta(
+    'memberState',
+  );
+  @override
+  late final GeneratedColumn<String> memberState = GeneratedColumn<String>(
+    'member_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    groupId,
+    name,
+    description,
+    personality,
+    scenario,
+    firstMessage,
+    mesExample,
+    systemPrompt,
+    postHistoryInstructions,
+    alternateGreetings,
+    tags,
+    avatarFilename,
+    ttsVoice,
+    lorebook,
+    worldNames,
+    frontPorchExtensions,
+    rawExtensions,
+    memberState,
+    updatedAt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'group_members';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GroupMemberRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('personality')) {
+      context.handle(
+        _personalityMeta,
+        personality.isAcceptableOrUnknown(
+          data['personality']!,
+          _personalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scenario')) {
+      context.handle(
+        _scenarioMeta,
+        scenario.isAcceptableOrUnknown(data['scenario']!, _scenarioMeta),
+      );
+    }
+    if (data.containsKey('first_message')) {
+      context.handle(
+        _firstMessageMeta,
+        firstMessage.isAcceptableOrUnknown(
+          data['first_message']!,
+          _firstMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mes_example')) {
+      context.handle(
+        _mesExampleMeta,
+        mesExample.isAcceptableOrUnknown(data['mes_example']!, _mesExampleMeta),
+      );
+    }
+    if (data.containsKey('system_prompt')) {
+      context.handle(
+        _systemPromptMeta,
+        systemPrompt.isAcceptableOrUnknown(
+          data['system_prompt']!,
+          _systemPromptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_history_instructions')) {
+      context.handle(
+        _postHistoryInstructionsMeta,
+        postHistoryInstructions.isAcceptableOrUnknown(
+          data['post_history_instructions']!,
+          _postHistoryInstructionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('alternate_greetings')) {
+      context.handle(
+        _alternateGreetingsMeta,
+        alternateGreetings.isAcceptableOrUnknown(
+          data['alternate_greetings']!,
+          _alternateGreetingsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+        _tagsMeta,
+        tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta),
+      );
+    }
+    if (data.containsKey('avatar_filename')) {
+      context.handle(
+        _avatarFilenameMeta,
+        avatarFilename.isAcceptableOrUnknown(
+          data['avatar_filename']!,
+          _avatarFilenameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tts_voice')) {
+      context.handle(
+        _ttsVoiceMeta,
+        ttsVoice.isAcceptableOrUnknown(data['tts_voice']!, _ttsVoiceMeta),
+      );
+    }
+    if (data.containsKey('lorebook')) {
+      context.handle(
+        _lorebookMeta,
+        lorebook.isAcceptableOrUnknown(data['lorebook']!, _lorebookMeta),
+      );
+    }
+    if (data.containsKey('world_names')) {
+      context.handle(
+        _worldNamesMeta,
+        worldNames.isAcceptableOrUnknown(data['world_names']!, _worldNamesMeta),
+      );
+    }
+    if (data.containsKey('front_porch_extensions')) {
+      context.handle(
+        _frontPorchExtensionsMeta,
+        frontPorchExtensions.isAcceptableOrUnknown(
+          data['front_porch_extensions']!,
+          _frontPorchExtensionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('raw_extensions')) {
+      context.handle(
+        _rawExtensionsMeta,
+        rawExtensions.isAcceptableOrUnknown(
+          data['raw_extensions']!,
+          _rawExtensionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('member_state')) {
+      context.handle(
+        _memberStateMeta,
+        memberState.isAcceptableOrUnknown(
+          data['member_state']!,
+          _memberStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GroupMemberRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GroupMemberRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      personality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}personality'],
+      )!,
+      scenario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scenario'],
+      )!,
+      firstMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}first_message'],
+      )!,
+      mesExample: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mes_example'],
+      )!,
+      systemPrompt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}system_prompt'],
+      )!,
+      postHistoryInstructions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_history_instructions'],
+      )!,
+      alternateGreetings: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alternate_greetings'],
+      )!,
+      tags: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tags'],
+      )!,
+      avatarFilename: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}avatar_filename'],
+      ),
+      ttsVoice: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tts_voice'],
+      ),
+      lorebook: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lorebook'],
+      ),
+      worldNames: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}world_names'],
+      )!,
+      frontPorchExtensions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front_porch_extensions'],
+      ),
+      rawExtensions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}raw_extensions'],
+      ),
+      memberState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}member_state'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $GroupMembersTable createAlias(String alias) {
+    return $GroupMembersTable(attachedDatabase, alias);
+  }
+}
+
+class GroupMemberRow extends DataClass implements Insertable<GroupMemberRow> {
+  final String id;
+  final String groupId;
+  final String name;
+  final String description;
+  final String personality;
+  final String scenario;
+  final String firstMessage;
+  final String mesExample;
+  final String systemPrompt;
+  final String postHistoryInstructions;
+  final String alternateGreetings;
+  final String tags;
+
+  /// Basename of the single primary PNG stored in this group's private avatars dir.
+  /// Resolved at runtime via StorageService.groupsDir + groupId + 'avatars' + this filename.
+  /// Never a full path, never an expression list.
+  final String? avatarFilename;
+  final String? ttsVoice;
+  final String? lorebook;
+  final String worldNames;
+
+  /// JSON of FrontPorchExtensions (realism defaults etc.) + any raw third-party extensions.
+  final String? frontPorchExtensions;
+  final String? rawExtensions;
+
+  /// Small JSON for any *group-scoped* per-member state that travels with the group definition
+  /// (e.g. initial realism seed fragments specific to this membership, or future overrides).
+  /// The primary evolving per-char realism + needs lives in sessions.group_realism_state
+  /// (keyed by these member UUIDs) and groups.defaultMemberRealismState (for seeds/export).
+  /// This column keeps the member rows free of "the card" blobs while still self-contained.
+  final String memberState;
+  final DateTime updatedAt;
+
+  /// IntColumn (not DateTime) DEFAULT 0 — byte-matches the repaired physical
+  /// shape. Was repair-only until 2026-08-04; see Sessions.themeOverrides.
+  final int createdAt;
+  const GroupMemberRow({
+    required this.id,
+    required this.groupId,
+    required this.name,
+    required this.description,
+    required this.personality,
+    required this.scenario,
+    required this.firstMessage,
+    required this.mesExample,
+    required this.systemPrompt,
+    required this.postHistoryInstructions,
+    required this.alternateGreetings,
+    required this.tags,
+    this.avatarFilename,
+    this.ttsVoice,
+    this.lorebook,
+    required this.worldNames,
+    this.frontPorchExtensions,
+    this.rawExtensions,
+    required this.memberState,
+    required this.updatedAt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['group_id'] = Variable<String>(groupId);
+    map['name'] = Variable<String>(name);
+    map['description'] = Variable<String>(description);
+    map['personality'] = Variable<String>(personality);
+    map['scenario'] = Variable<String>(scenario);
+    map['first_message'] = Variable<String>(firstMessage);
+    map['mes_example'] = Variable<String>(mesExample);
+    map['system_prompt'] = Variable<String>(systemPrompt);
+    map['post_history_instructions'] = Variable<String>(
+      postHistoryInstructions,
+    );
+    map['alternate_greetings'] = Variable<String>(alternateGreetings);
+    map['tags'] = Variable<String>(tags);
+    if (!nullToAbsent || avatarFilename != null) {
+      map['avatar_filename'] = Variable<String>(avatarFilename);
+    }
+    if (!nullToAbsent || ttsVoice != null) {
+      map['tts_voice'] = Variable<String>(ttsVoice);
+    }
+    if (!nullToAbsent || lorebook != null) {
+      map['lorebook'] = Variable<String>(lorebook);
+    }
+    map['world_names'] = Variable<String>(worldNames);
+    if (!nullToAbsent || frontPorchExtensions != null) {
+      map['front_porch_extensions'] = Variable<String>(frontPorchExtensions);
+    }
+    if (!nullToAbsent || rawExtensions != null) {
+      map['raw_extensions'] = Variable<String>(rawExtensions);
+    }
+    map['member_state'] = Variable<String>(memberState);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  GroupMembersCompanion toCompanion(bool nullToAbsent) {
+    return GroupMembersCompanion(
+      id: Value(id),
+      groupId: Value(groupId),
+      name: Value(name),
+      description: Value(description),
+      personality: Value(personality),
+      scenario: Value(scenario),
+      firstMessage: Value(firstMessage),
+      mesExample: Value(mesExample),
+      systemPrompt: Value(systemPrompt),
+      postHistoryInstructions: Value(postHistoryInstructions),
+      alternateGreetings: Value(alternateGreetings),
+      tags: Value(tags),
+      avatarFilename: avatarFilename == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarFilename),
+      ttsVoice: ttsVoice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ttsVoice),
+      lorebook: lorebook == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lorebook),
+      worldNames: Value(worldNames),
+      frontPorchExtensions: frontPorchExtensions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontPorchExtensions),
+      rawExtensions: rawExtensions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rawExtensions),
+      memberState: Value(memberState),
+      updatedAt: Value(updatedAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory GroupMemberRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GroupMemberRow(
+      id: serializer.fromJson<String>(json['id']),
+      groupId: serializer.fromJson<String>(json['groupId']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String>(json['description']),
+      personality: serializer.fromJson<String>(json['personality']),
+      scenario: serializer.fromJson<String>(json['scenario']),
+      firstMessage: serializer.fromJson<String>(json['firstMessage']),
+      mesExample: serializer.fromJson<String>(json['mesExample']),
+      systemPrompt: serializer.fromJson<String>(json['systemPrompt']),
+      postHistoryInstructions: serializer.fromJson<String>(
+        json['postHistoryInstructions'],
+      ),
+      alternateGreetings: serializer.fromJson<String>(
+        json['alternateGreetings'],
+      ),
+      tags: serializer.fromJson<String>(json['tags']),
+      avatarFilename: serializer.fromJson<String?>(json['avatarFilename']),
+      ttsVoice: serializer.fromJson<String?>(json['ttsVoice']),
+      lorebook: serializer.fromJson<String?>(json['lorebook']),
+      worldNames: serializer.fromJson<String>(json['worldNames']),
+      frontPorchExtensions: serializer.fromJson<String?>(
+        json['frontPorchExtensions'],
+      ),
+      rawExtensions: serializer.fromJson<String?>(json['rawExtensions']),
+      memberState: serializer.fromJson<String>(json['memberState']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'groupId': serializer.toJson<String>(groupId),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String>(description),
+      'personality': serializer.toJson<String>(personality),
+      'scenario': serializer.toJson<String>(scenario),
+      'firstMessage': serializer.toJson<String>(firstMessage),
+      'mesExample': serializer.toJson<String>(mesExample),
+      'systemPrompt': serializer.toJson<String>(systemPrompt),
+      'postHistoryInstructions': serializer.toJson<String>(
+        postHistoryInstructions,
+      ),
+      'alternateGreetings': serializer.toJson<String>(alternateGreetings),
+      'tags': serializer.toJson<String>(tags),
+      'avatarFilename': serializer.toJson<String?>(avatarFilename),
+      'ttsVoice': serializer.toJson<String?>(ttsVoice),
+      'lorebook': serializer.toJson<String?>(lorebook),
+      'worldNames': serializer.toJson<String>(worldNames),
+      'frontPorchExtensions': serializer.toJson<String?>(frontPorchExtensions),
+      'rawExtensions': serializer.toJson<String?>(rawExtensions),
+      'memberState': serializer.toJson<String>(memberState),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  GroupMemberRow copyWith({
+    String? id,
+    String? groupId,
+    String? name,
+    String? description,
+    String? personality,
+    String? scenario,
+    String? firstMessage,
+    String? mesExample,
+    String? systemPrompt,
+    String? postHistoryInstructions,
+    String? alternateGreetings,
+    String? tags,
+    Value<String?> avatarFilename = const Value.absent(),
+    Value<String?> ttsVoice = const Value.absent(),
+    Value<String?> lorebook = const Value.absent(),
+    String? worldNames,
+    Value<String?> frontPorchExtensions = const Value.absent(),
+    Value<String?> rawExtensions = const Value.absent(),
+    String? memberState,
+    DateTime? updatedAt,
+    int? createdAt,
+  }) => GroupMemberRow(
+    id: id ?? this.id,
+    groupId: groupId ?? this.groupId,
+    name: name ?? this.name,
+    description: description ?? this.description,
+    personality: personality ?? this.personality,
+    scenario: scenario ?? this.scenario,
+    firstMessage: firstMessage ?? this.firstMessage,
+    mesExample: mesExample ?? this.mesExample,
+    systemPrompt: systemPrompt ?? this.systemPrompt,
+    postHistoryInstructions:
+        postHistoryInstructions ?? this.postHistoryInstructions,
+    alternateGreetings: alternateGreetings ?? this.alternateGreetings,
+    tags: tags ?? this.tags,
+    avatarFilename: avatarFilename.present
+        ? avatarFilename.value
+        : this.avatarFilename,
+    ttsVoice: ttsVoice.present ? ttsVoice.value : this.ttsVoice,
+    lorebook: lorebook.present ? lorebook.value : this.lorebook,
+    worldNames: worldNames ?? this.worldNames,
+    frontPorchExtensions: frontPorchExtensions.present
+        ? frontPorchExtensions.value
+        : this.frontPorchExtensions,
+    rawExtensions: rawExtensions.present
+        ? rawExtensions.value
+        : this.rawExtensions,
+    memberState: memberState ?? this.memberState,
+    updatedAt: updatedAt ?? this.updatedAt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  GroupMemberRow copyWithCompanion(GroupMembersCompanion data) {
+    return GroupMemberRow(
+      id: data.id.present ? data.id.value : this.id,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      personality: data.personality.present
+          ? data.personality.value
+          : this.personality,
+      scenario: data.scenario.present ? data.scenario.value : this.scenario,
+      firstMessage: data.firstMessage.present
+          ? data.firstMessage.value
+          : this.firstMessage,
+      mesExample: data.mesExample.present
+          ? data.mesExample.value
+          : this.mesExample,
+      systemPrompt: data.systemPrompt.present
+          ? data.systemPrompt.value
+          : this.systemPrompt,
+      postHistoryInstructions: data.postHistoryInstructions.present
+          ? data.postHistoryInstructions.value
+          : this.postHistoryInstructions,
+      alternateGreetings: data.alternateGreetings.present
+          ? data.alternateGreetings.value
+          : this.alternateGreetings,
+      tags: data.tags.present ? data.tags.value : this.tags,
+      avatarFilename: data.avatarFilename.present
+          ? data.avatarFilename.value
+          : this.avatarFilename,
+      ttsVoice: data.ttsVoice.present ? data.ttsVoice.value : this.ttsVoice,
+      lorebook: data.lorebook.present ? data.lorebook.value : this.lorebook,
+      worldNames: data.worldNames.present
+          ? data.worldNames.value
+          : this.worldNames,
+      frontPorchExtensions: data.frontPorchExtensions.present
+          ? data.frontPorchExtensions.value
+          : this.frontPorchExtensions,
+      rawExtensions: data.rawExtensions.present
+          ? data.rawExtensions.value
+          : this.rawExtensions,
+      memberState: data.memberState.present
+          ? data.memberState.value
+          : this.memberState,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GroupMemberRow(')
+          ..write('id: $id, ')
+          ..write('groupId: $groupId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('personality: $personality, ')
+          ..write('scenario: $scenario, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('mesExample: $mesExample, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('postHistoryInstructions: $postHistoryInstructions, ')
+          ..write('alternateGreetings: $alternateGreetings, ')
+          ..write('tags: $tags, ')
+          ..write('avatarFilename: $avatarFilename, ')
+          ..write('ttsVoice: $ttsVoice, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('worldNames: $worldNames, ')
+          ..write('frontPorchExtensions: $frontPorchExtensions, ')
+          ..write('rawExtensions: $rawExtensions, ')
+          ..write('memberState: $memberState, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    groupId,
+    name,
+    description,
+    personality,
+    scenario,
+    firstMessage,
+    mesExample,
+    systemPrompt,
+    postHistoryInstructions,
+    alternateGreetings,
+    tags,
+    avatarFilename,
+    ttsVoice,
+    lorebook,
+    worldNames,
+    frontPorchExtensions,
+    rawExtensions,
+    memberState,
+    updatedAt,
+    createdAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GroupMemberRow &&
+          other.id == this.id &&
+          other.groupId == this.groupId &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.personality == this.personality &&
+          other.scenario == this.scenario &&
+          other.firstMessage == this.firstMessage &&
+          other.mesExample == this.mesExample &&
+          other.systemPrompt == this.systemPrompt &&
+          other.postHistoryInstructions == this.postHistoryInstructions &&
+          other.alternateGreetings == this.alternateGreetings &&
+          other.tags == this.tags &&
+          other.avatarFilename == this.avatarFilename &&
+          other.ttsVoice == this.ttsVoice &&
+          other.lorebook == this.lorebook &&
+          other.worldNames == this.worldNames &&
+          other.frontPorchExtensions == this.frontPorchExtensions &&
+          other.rawExtensions == this.rawExtensions &&
+          other.memberState == this.memberState &&
+          other.updatedAt == this.updatedAt &&
+          other.createdAt == this.createdAt);
+}
+
+class GroupMembersCompanion extends UpdateCompanion<GroupMemberRow> {
+  final Value<String> id;
+  final Value<String> groupId;
+  final Value<String> name;
+  final Value<String> description;
+  final Value<String> personality;
+  final Value<String> scenario;
+  final Value<String> firstMessage;
+  final Value<String> mesExample;
+  final Value<String> systemPrompt;
+  final Value<String> postHistoryInstructions;
+  final Value<String> alternateGreetings;
+  final Value<String> tags;
+  final Value<String?> avatarFilename;
+  final Value<String?> ttsVoice;
+  final Value<String?> lorebook;
+  final Value<String> worldNames;
+  final Value<String?> frontPorchExtensions;
+  final Value<String?> rawExtensions;
+  final Value<String> memberState;
+  final Value<DateTime> updatedAt;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const GroupMembersCompanion({
+    this.id = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.personality = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.mesExample = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.postHistoryInstructions = const Value.absent(),
+    this.alternateGreetings = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.avatarFilename = const Value.absent(),
+    this.ttsVoice = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.worldNames = const Value.absent(),
+    this.frontPorchExtensions = const Value.absent(),
+    this.rawExtensions = const Value.absent(),
+    this.memberState = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GroupMembersCompanion.insert({
+    required String id,
+    required String groupId,
+    required String name,
+    this.description = const Value.absent(),
+    this.personality = const Value.absent(),
+    this.scenario = const Value.absent(),
+    this.firstMessage = const Value.absent(),
+    this.mesExample = const Value.absent(),
+    this.systemPrompt = const Value.absent(),
+    this.postHistoryInstructions = const Value.absent(),
+    this.alternateGreetings = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.avatarFilename = const Value.absent(),
+    this.ttsVoice = const Value.absent(),
+    this.lorebook = const Value.absent(),
+    this.worldNames = const Value.absent(),
+    this.frontPorchExtensions = const Value.absent(),
+    this.rawExtensions = const Value.absent(),
+    this.memberState = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       groupId = Value(groupId),
+       name = Value(name);
+  static Insertable<GroupMemberRow> custom({
+    Expression<String>? id,
+    Expression<String>? groupId,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? personality,
+    Expression<String>? scenario,
+    Expression<String>? firstMessage,
+    Expression<String>? mesExample,
+    Expression<String>? systemPrompt,
+    Expression<String>? postHistoryInstructions,
+    Expression<String>? alternateGreetings,
+    Expression<String>? tags,
+    Expression<String>? avatarFilename,
+    Expression<String>? ttsVoice,
+    Expression<String>? lorebook,
+    Expression<String>? worldNames,
+    Expression<String>? frontPorchExtensions,
+    Expression<String>? rawExtensions,
+    Expression<String>? memberState,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (groupId != null) 'group_id': groupId,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (personality != null) 'personality': personality,
+      if (scenario != null) 'scenario': scenario,
+      if (firstMessage != null) 'first_message': firstMessage,
+      if (mesExample != null) 'mes_example': mesExample,
+      if (systemPrompt != null) 'system_prompt': systemPrompt,
+      if (postHistoryInstructions != null)
+        'post_history_instructions': postHistoryInstructions,
+      if (alternateGreetings != null) 'alternate_greetings': alternateGreetings,
+      if (tags != null) 'tags': tags,
+      if (avatarFilename != null) 'avatar_filename': avatarFilename,
+      if (ttsVoice != null) 'tts_voice': ttsVoice,
+      if (lorebook != null) 'lorebook': lorebook,
+      if (worldNames != null) 'world_names': worldNames,
+      if (frontPorchExtensions != null)
+        'front_porch_extensions': frontPorchExtensions,
+      if (rawExtensions != null) 'raw_extensions': rawExtensions,
+      if (memberState != null) 'member_state': memberState,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GroupMembersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? groupId,
+    Value<String>? name,
+    Value<String>? description,
+    Value<String>? personality,
+    Value<String>? scenario,
+    Value<String>? firstMessage,
+    Value<String>? mesExample,
+    Value<String>? systemPrompt,
+    Value<String>? postHistoryInstructions,
+    Value<String>? alternateGreetings,
+    Value<String>? tags,
+    Value<String?>? avatarFilename,
+    Value<String?>? ttsVoice,
+    Value<String?>? lorebook,
+    Value<String>? worldNames,
+    Value<String?>? frontPorchExtensions,
+    Value<String?>? rawExtensions,
+    Value<String>? memberState,
+    Value<DateTime>? updatedAt,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return GroupMembersCompanion(
+      id: id ?? this.id,
+      groupId: groupId ?? this.groupId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      personality: personality ?? this.personality,
+      scenario: scenario ?? this.scenario,
+      firstMessage: firstMessage ?? this.firstMessage,
+      mesExample: mesExample ?? this.mesExample,
+      systemPrompt: systemPrompt ?? this.systemPrompt,
+      postHistoryInstructions:
+          postHistoryInstructions ?? this.postHistoryInstructions,
+      alternateGreetings: alternateGreetings ?? this.alternateGreetings,
+      tags: tags ?? this.tags,
+      avatarFilename: avatarFilename ?? this.avatarFilename,
+      ttsVoice: ttsVoice ?? this.ttsVoice,
+      lorebook: lorebook ?? this.lorebook,
+      worldNames: worldNames ?? this.worldNames,
+      frontPorchExtensions: frontPorchExtensions ?? this.frontPorchExtensions,
+      rawExtensions: rawExtensions ?? this.rawExtensions,
+      memberState: memberState ?? this.memberState,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (groupId.present) {
+      map['group_id'] = Variable<String>(groupId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (personality.present) {
+      map['personality'] = Variable<String>(personality.value);
+    }
+    if (scenario.present) {
+      map['scenario'] = Variable<String>(scenario.value);
+    }
+    if (firstMessage.present) {
+      map['first_message'] = Variable<String>(firstMessage.value);
+    }
+    if (mesExample.present) {
+      map['mes_example'] = Variable<String>(mesExample.value);
+    }
+    if (systemPrompt.present) {
+      map['system_prompt'] = Variable<String>(systemPrompt.value);
+    }
+    if (postHistoryInstructions.present) {
+      map['post_history_instructions'] = Variable<String>(
+        postHistoryInstructions.value,
+      );
+    }
+    if (alternateGreetings.present) {
+      map['alternate_greetings'] = Variable<String>(alternateGreetings.value);
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
+    }
+    if (avatarFilename.present) {
+      map['avatar_filename'] = Variable<String>(avatarFilename.value);
+    }
+    if (ttsVoice.present) {
+      map['tts_voice'] = Variable<String>(ttsVoice.value);
+    }
+    if (lorebook.present) {
+      map['lorebook'] = Variable<String>(lorebook.value);
+    }
+    if (worldNames.present) {
+      map['world_names'] = Variable<String>(worldNames.value);
+    }
+    if (frontPorchExtensions.present) {
+      map['front_porch_extensions'] = Variable<String>(
+        frontPorchExtensions.value,
+      );
+    }
+    if (rawExtensions.present) {
+      map['raw_extensions'] = Variable<String>(rawExtensions.value);
+    }
+    if (memberState.present) {
+      map['member_state'] = Variable<String>(memberState.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GroupMembersCompanion(')
+          ..write('id: $id, ')
+          ..write('groupId: $groupId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('personality: $personality, ')
+          ..write('scenario: $scenario, ')
+          ..write('firstMessage: $firstMessage, ')
+          ..write('mesExample: $mesExample, ')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('postHistoryInstructions: $postHistoryInstructions, ')
+          ..write('alternateGreetings: $alternateGreetings, ')
+          ..write('tags: $tags, ')
+          ..write('avatarFilename: $avatarFilename, ')
+          ..write('ttsVoice: $ttsVoice, ')
+          ..write('lorebook: $lorebook, ')
+          ..write('worldNames: $worldNames, ')
+          ..write('frontPorchExtensions: $frontPorchExtensions, ')
+          ..write('rawExtensions: $rawExtensions, ')
+          ..write('memberState: $memberState, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WebAuthCredentialsTable extends WebAuthCredentials
+    with TableInfo<$WebAuthCredentialsTable, WebAuthCredential> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WebAuthCredentialsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _usernameMeta = const VerificationMeta(
+    'username',
+  );
+  @override
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+    'username',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _passwordHashMeta = const VerificationMeta(
+    'passwordHash',
+  );
+  @override
+  late final GeneratedColumn<String> passwordHash = GeneratedColumn<String>(
+    'password_hash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totpSecretMeta = const VerificationMeta(
+    'totpSecret',
+  );
+  @override
+  late final GeneratedColumn<String> totpSecret = GeneratedColumn<String>(
+    'totp_secret',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totpEnabledMeta = const VerificationMeta(
+    'totpEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> totpEnabled = GeneratedColumn<bool>(
+    'totp_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("totp_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _recoveryCodesMeta = const VerificationMeta(
+    'recoveryCodes',
+  );
+  @override
+  late final GeneratedColumn<String> recoveryCodes = GeneratedColumn<String>(
+    'recovery_codes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    username,
+    passwordHash,
+    totpSecret,
+    totpEnabled,
+    recoveryCodes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'web_auth_credentials';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WebAuthCredential> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('username')) {
+      context.handle(
+        _usernameMeta,
+        username.isAcceptableOrUnknown(data['username']!, _usernameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_usernameMeta);
+    }
+    if (data.containsKey('password_hash')) {
+      context.handle(
+        _passwordHashMeta,
+        passwordHash.isAcceptableOrUnknown(
+          data['password_hash']!,
+          _passwordHashMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_passwordHashMeta);
+    }
+    if (data.containsKey('totp_secret')) {
+      context.handle(
+        _totpSecretMeta,
+        totpSecret.isAcceptableOrUnknown(data['totp_secret']!, _totpSecretMeta),
+      );
+    }
+    if (data.containsKey('totp_enabled')) {
+      context.handle(
+        _totpEnabledMeta,
+        totpEnabled.isAcceptableOrUnknown(
+          data['totp_enabled']!,
+          _totpEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('recovery_codes')) {
+      context.handle(
+        _recoveryCodesMeta,
+        recoveryCodes.isAcceptableOrUnknown(
+          data['recovery_codes']!,
+          _recoveryCodesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WebAuthCredential map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WebAuthCredential(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      username: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}username'],
+      )!,
+      passwordHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}password_hash'],
+      )!,
+      totpSecret: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}totp_secret'],
+      ),
+      totpEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}totp_enabled'],
+      )!,
+      recoveryCodes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}recovery_codes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $WebAuthCredentialsTable createAlias(String alias) {
+    return $WebAuthCredentialsTable(attachedDatabase, alias);
+  }
+}
+
+class WebAuthCredential extends DataClass
+    implements Insertable<WebAuthCredential> {
+  final String id;
+  final String username;
+  final String passwordHash;
+  final String? totpSecret;
+  final bool totpEnabled;
+  final String? recoveryCodes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const WebAuthCredential({
+    required this.id,
+    required this.username,
+    required this.passwordHash,
+    this.totpSecret,
+    required this.totpEnabled,
+    this.recoveryCodes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['username'] = Variable<String>(username);
+    map['password_hash'] = Variable<String>(passwordHash);
+    if (!nullToAbsent || totpSecret != null) {
+      map['totp_secret'] = Variable<String>(totpSecret);
+    }
+    map['totp_enabled'] = Variable<bool>(totpEnabled);
+    if (!nullToAbsent || recoveryCodes != null) {
+      map['recovery_codes'] = Variable<String>(recoveryCodes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  WebAuthCredentialsCompanion toCompanion(bool nullToAbsent) {
+    return WebAuthCredentialsCompanion(
+      id: Value(id),
+      username: Value(username),
+      passwordHash: Value(passwordHash),
+      totpSecret: totpSecret == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totpSecret),
+      totpEnabled: Value(totpEnabled),
+      recoveryCodes: recoveryCodes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recoveryCodes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory WebAuthCredential.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WebAuthCredential(
+      id: serializer.fromJson<String>(json['id']),
+      username: serializer.fromJson<String>(json['username']),
+      passwordHash: serializer.fromJson<String>(json['passwordHash']),
+      totpSecret: serializer.fromJson<String?>(json['totpSecret']),
+      totpEnabled: serializer.fromJson<bool>(json['totpEnabled']),
+      recoveryCodes: serializer.fromJson<String?>(json['recoveryCodes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'username': serializer.toJson<String>(username),
+      'passwordHash': serializer.toJson<String>(passwordHash),
+      'totpSecret': serializer.toJson<String?>(totpSecret),
+      'totpEnabled': serializer.toJson<bool>(totpEnabled),
+      'recoveryCodes': serializer.toJson<String?>(recoveryCodes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  WebAuthCredential copyWith({
+    String? id,
+    String? username,
+    String? passwordHash,
+    Value<String?> totpSecret = const Value.absent(),
+    bool? totpEnabled,
+    Value<String?> recoveryCodes = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => WebAuthCredential(
+    id: id ?? this.id,
+    username: username ?? this.username,
+    passwordHash: passwordHash ?? this.passwordHash,
+    totpSecret: totpSecret.present ? totpSecret.value : this.totpSecret,
+    totpEnabled: totpEnabled ?? this.totpEnabled,
+    recoveryCodes: recoveryCodes.present
+        ? recoveryCodes.value
+        : this.recoveryCodes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  WebAuthCredential copyWithCompanion(WebAuthCredentialsCompanion data) {
+    return WebAuthCredential(
+      id: data.id.present ? data.id.value : this.id,
+      username: data.username.present ? data.username.value : this.username,
+      passwordHash: data.passwordHash.present
+          ? data.passwordHash.value
+          : this.passwordHash,
+      totpSecret: data.totpSecret.present
+          ? data.totpSecret.value
+          : this.totpSecret,
+      totpEnabled: data.totpEnabled.present
+          ? data.totpEnabled.value
+          : this.totpEnabled,
+      recoveryCodes: data.recoveryCodes.present
+          ? data.recoveryCodes.value
+          : this.recoveryCodes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WebAuthCredential(')
+          ..write('id: $id, ')
+          ..write('username: $username, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('totpSecret: $totpSecret, ')
+          ..write('totpEnabled: $totpEnabled, ')
+          ..write('recoveryCodes: $recoveryCodes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    username,
+    passwordHash,
+    totpSecret,
+    totpEnabled,
+    recoveryCodes,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WebAuthCredential &&
+          other.id == this.id &&
+          other.username == this.username &&
+          other.passwordHash == this.passwordHash &&
+          other.totpSecret == this.totpSecret &&
+          other.totpEnabled == this.totpEnabled &&
+          other.recoveryCodes == this.recoveryCodes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class WebAuthCredentialsCompanion extends UpdateCompanion<WebAuthCredential> {
+  final Value<String> id;
+  final Value<String> username;
+  final Value<String> passwordHash;
+  final Value<String?> totpSecret;
+  final Value<bool> totpEnabled;
+  final Value<String?> recoveryCodes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const WebAuthCredentialsCompanion({
+    this.id = const Value.absent(),
+    this.username = const Value.absent(),
+    this.passwordHash = const Value.absent(),
+    this.totpSecret = const Value.absent(),
+    this.totpEnabled = const Value.absent(),
+    this.recoveryCodes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WebAuthCredentialsCompanion.insert({
+    required String id,
+    required String username,
+    required String passwordHash,
+    this.totpSecret = const Value.absent(),
+    this.totpEnabled = const Value.absent(),
+    this.recoveryCodes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       username = Value(username),
+       passwordHash = Value(passwordHash);
+  static Insertable<WebAuthCredential> custom({
+    Expression<String>? id,
+    Expression<String>? username,
+    Expression<String>? passwordHash,
+    Expression<String>? totpSecret,
+    Expression<bool>? totpEnabled,
+    Expression<String>? recoveryCodes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (username != null) 'username': username,
+      if (passwordHash != null) 'password_hash': passwordHash,
+      if (totpSecret != null) 'totp_secret': totpSecret,
+      if (totpEnabled != null) 'totp_enabled': totpEnabled,
+      if (recoveryCodes != null) 'recovery_codes': recoveryCodes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WebAuthCredentialsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? username,
+    Value<String>? passwordHash,
+    Value<String?>? totpSecret,
+    Value<bool>? totpEnabled,
+    Value<String?>? recoveryCodes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return WebAuthCredentialsCompanion(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      passwordHash: passwordHash ?? this.passwordHash,
+      totpSecret: totpSecret ?? this.totpSecret,
+      totpEnabled: totpEnabled ?? this.totpEnabled,
+      recoveryCodes: recoveryCodes ?? this.recoveryCodes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (passwordHash.present) {
+      map['password_hash'] = Variable<String>(passwordHash.value);
+    }
+    if (totpSecret.present) {
+      map['totp_secret'] = Variable<String>(totpSecret.value);
+    }
+    if (totpEnabled.present) {
+      map['totp_enabled'] = Variable<bool>(totpEnabled.value);
+    }
+    if (recoveryCodes.present) {
+      map['recovery_codes'] = Variable<String>(recoveryCodes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WebAuthCredentialsCompanion(')
+          ..write('id: $id, ')
+          ..write('username: $username, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('totpSecret: $totpSecret, ')
+          ..write('totpEnabled: $totpEnabled, ')
+          ..write('recoveryCodes: $recoveryCodes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WebAuthSessionsTable extends WebAuthSessions
+    with TableInfo<$WebAuthSessionsTable, WebAuthSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WebAuthSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tokenHashMeta = const VerificationMeta(
+    'tokenHash',
+  );
+  @override
+  late final GeneratedColumn<String> tokenHash = GeneratedColumn<String>(
+    'token_hash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastSeenAtMeta = const VerificationMeta(
+    'lastSeenAt',
+  );
+  @override
+  late final GeneratedColumn<int> lastSeenAt = GeneratedColumn<int>(
+    'last_seen_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _expiresAtMeta = const VerificationMeta(
+    'expiresAt',
+  );
+  @override
+  late final GeneratedColumn<int> expiresAt = GeneratedColumn<int>(
+    'expires_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _userAgentMeta = const VerificationMeta(
+    'userAgent',
+  );
+  @override
+  late final GeneratedColumn<String> userAgent = GeneratedColumn<String>(
+    'user_agent',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ipMeta = const VerificationMeta('ip');
+  @override
+  late final GeneratedColumn<String> ip = GeneratedColumn<String>(
+    'ip',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _revokedMeta = const VerificationMeta(
+    'revoked',
+  );
+  @override
+  late final GeneratedColumn<bool> revoked = GeneratedColumn<bool>(
+    'revoked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("revoked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tokenHash,
+    userId,
+    createdAt,
+    lastSeenAt,
+    expiresAt,
+    userAgent,
+    ip,
+    revoked,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'web_auth_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WebAuthSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('token_hash')) {
+      context.handle(
+        _tokenHashMeta,
+        tokenHash.isAcceptableOrUnknown(data['token_hash']!, _tokenHashMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tokenHashMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('last_seen_at')) {
+      context.handle(
+        _lastSeenAtMeta,
+        lastSeenAt.isAcceptableOrUnknown(
+          data['last_seen_at']!,
+          _lastSeenAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('expires_at')) {
+      context.handle(
+        _expiresAtMeta,
+        expiresAt.isAcceptableOrUnknown(data['expires_at']!, _expiresAtMeta),
+      );
+    }
+    if (data.containsKey('user_agent')) {
+      context.handle(
+        _userAgentMeta,
+        userAgent.isAcceptableOrUnknown(data['user_agent']!, _userAgentMeta),
+      );
+    }
+    if (data.containsKey('ip')) {
+      context.handle(_ipMeta, ip.isAcceptableOrUnknown(data['ip']!, _ipMeta));
+    }
+    if (data.containsKey('revoked')) {
+      context.handle(
+        _revokedMeta,
+        revoked.isAcceptableOrUnknown(data['revoked']!, _revokedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WebAuthSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WebAuthSession(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tokenHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}token_hash'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      lastSeenAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_seen_at'],
+      )!,
+      expiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expires_at'],
+      )!,
+      userAgent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_agent'],
+      ),
+      ip: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ip'],
+      ),
+      revoked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}revoked'],
+      )!,
+    );
+  }
+
+  @override
+  $WebAuthSessionsTable createAlias(String alias) {
+    return $WebAuthSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class WebAuthSession extends DataClass implements Insertable<WebAuthSession> {
+  final String id;
+  final String tokenHash;
+  final String userId;
+  final int createdAt;
+  final int lastSeenAt;
+  final int expiresAt;
+  final String? userAgent;
+  final String? ip;
+  final bool revoked;
+  const WebAuthSession({
+    required this.id,
+    required this.tokenHash,
+    required this.userId,
+    required this.createdAt,
+    required this.lastSeenAt,
+    required this.expiresAt,
+    this.userAgent,
+    this.ip,
+    required this.revoked,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['token_hash'] = Variable<String>(tokenHash);
+    map['user_id'] = Variable<String>(userId);
+    map['created_at'] = Variable<int>(createdAt);
+    map['last_seen_at'] = Variable<int>(lastSeenAt);
+    map['expires_at'] = Variable<int>(expiresAt);
+    if (!nullToAbsent || userAgent != null) {
+      map['user_agent'] = Variable<String>(userAgent);
+    }
+    if (!nullToAbsent || ip != null) {
+      map['ip'] = Variable<String>(ip);
+    }
+    map['revoked'] = Variable<bool>(revoked);
+    return map;
+  }
+
+  WebAuthSessionsCompanion toCompanion(bool nullToAbsent) {
+    return WebAuthSessionsCompanion(
+      id: Value(id),
+      tokenHash: Value(tokenHash),
+      userId: Value(userId),
+      createdAt: Value(createdAt),
+      lastSeenAt: Value(lastSeenAt),
+      expiresAt: Value(expiresAt),
+      userAgent: userAgent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userAgent),
+      ip: ip == null && nullToAbsent ? const Value.absent() : Value(ip),
+      revoked: Value(revoked),
+    );
+  }
+
+  factory WebAuthSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WebAuthSession(
+      id: serializer.fromJson<String>(json['id']),
+      tokenHash: serializer.fromJson<String>(json['tokenHash']),
+      userId: serializer.fromJson<String>(json['userId']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      lastSeenAt: serializer.fromJson<int>(json['lastSeenAt']),
+      expiresAt: serializer.fromJson<int>(json['expiresAt']),
+      userAgent: serializer.fromJson<String?>(json['userAgent']),
+      ip: serializer.fromJson<String?>(json['ip']),
+      revoked: serializer.fromJson<bool>(json['revoked']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tokenHash': serializer.toJson<String>(tokenHash),
+      'userId': serializer.toJson<String>(userId),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'lastSeenAt': serializer.toJson<int>(lastSeenAt),
+      'expiresAt': serializer.toJson<int>(expiresAt),
+      'userAgent': serializer.toJson<String?>(userAgent),
+      'ip': serializer.toJson<String?>(ip),
+      'revoked': serializer.toJson<bool>(revoked),
+    };
+  }
+
+  WebAuthSession copyWith({
+    String? id,
+    String? tokenHash,
+    String? userId,
+    int? createdAt,
+    int? lastSeenAt,
+    int? expiresAt,
+    Value<String?> userAgent = const Value.absent(),
+    Value<String?> ip = const Value.absent(),
+    bool? revoked,
+  }) => WebAuthSession(
+    id: id ?? this.id,
+    tokenHash: tokenHash ?? this.tokenHash,
+    userId: userId ?? this.userId,
+    createdAt: createdAt ?? this.createdAt,
+    lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+    expiresAt: expiresAt ?? this.expiresAt,
+    userAgent: userAgent.present ? userAgent.value : this.userAgent,
+    ip: ip.present ? ip.value : this.ip,
+    revoked: revoked ?? this.revoked,
+  );
+  WebAuthSession copyWithCompanion(WebAuthSessionsCompanion data) {
+    return WebAuthSession(
+      id: data.id.present ? data.id.value : this.id,
+      tokenHash: data.tokenHash.present ? data.tokenHash.value : this.tokenHash,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastSeenAt: data.lastSeenAt.present
+          ? data.lastSeenAt.value
+          : this.lastSeenAt,
+      expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      userAgent: data.userAgent.present ? data.userAgent.value : this.userAgent,
+      ip: data.ip.present ? data.ip.value : this.ip,
+      revoked: data.revoked.present ? data.revoked.value : this.revoked,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WebAuthSession(')
+          ..write('id: $id, ')
+          ..write('tokenHash: $tokenHash, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('userAgent: $userAgent, ')
+          ..write('ip: $ip, ')
+          ..write('revoked: $revoked')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    tokenHash,
+    userId,
+    createdAt,
+    lastSeenAt,
+    expiresAt,
+    userAgent,
+    ip,
+    revoked,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WebAuthSession &&
+          other.id == this.id &&
+          other.tokenHash == this.tokenHash &&
+          other.userId == this.userId &&
+          other.createdAt == this.createdAt &&
+          other.lastSeenAt == this.lastSeenAt &&
+          other.expiresAt == this.expiresAt &&
+          other.userAgent == this.userAgent &&
+          other.ip == this.ip &&
+          other.revoked == this.revoked);
+}
+
+class WebAuthSessionsCompanion extends UpdateCompanion<WebAuthSession> {
+  final Value<String> id;
+  final Value<String> tokenHash;
+  final Value<String> userId;
+  final Value<int> createdAt;
+  final Value<int> lastSeenAt;
+  final Value<int> expiresAt;
+  final Value<String?> userAgent;
+  final Value<String?> ip;
+  final Value<bool> revoked;
+  final Value<int> rowid;
+  const WebAuthSessionsCompanion({
+    this.id = const Value.absent(),
+    this.tokenHash = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.userAgent = const Value.absent(),
+    this.ip = const Value.absent(),
+    this.revoked = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WebAuthSessionsCompanion.insert({
+    required String id,
+    required String tokenHash,
+    required String userId,
+    this.createdAt = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.userAgent = const Value.absent(),
+    this.ip = const Value.absent(),
+    this.revoked = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tokenHash = Value(tokenHash),
+       userId = Value(userId);
+  static Insertable<WebAuthSession> custom({
+    Expression<String>? id,
+    Expression<String>? tokenHash,
+    Expression<String>? userId,
+    Expression<int>? createdAt,
+    Expression<int>? lastSeenAt,
+    Expression<int>? expiresAt,
+    Expression<String>? userAgent,
+    Expression<String>? ip,
+    Expression<bool>? revoked,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tokenHash != null) 'token_hash': tokenHash,
+      if (userId != null) 'user_id': userId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (lastSeenAt != null) 'last_seen_at': lastSeenAt,
+      if (expiresAt != null) 'expires_at': expiresAt,
+      if (userAgent != null) 'user_agent': userAgent,
+      if (ip != null) 'ip': ip,
+      if (revoked != null) 'revoked': revoked,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WebAuthSessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tokenHash,
+    Value<String>? userId,
+    Value<int>? createdAt,
+    Value<int>? lastSeenAt,
+    Value<int>? expiresAt,
+    Value<String?>? userAgent,
+    Value<String?>? ip,
+    Value<bool>? revoked,
+    Value<int>? rowid,
+  }) {
+    return WebAuthSessionsCompanion(
+      id: id ?? this.id,
+      tokenHash: tokenHash ?? this.tokenHash,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+      expiresAt: expiresAt ?? this.expiresAt,
+      userAgent: userAgent ?? this.userAgent,
+      ip: ip ?? this.ip,
+      revoked: revoked ?? this.revoked,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tokenHash.present) {
+      map['token_hash'] = Variable<String>(tokenHash.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (lastSeenAt.present) {
+      map['last_seen_at'] = Variable<int>(lastSeenAt.value);
+    }
+    if (expiresAt.present) {
+      map['expires_at'] = Variable<int>(expiresAt.value);
+    }
+    if (userAgent.present) {
+      map['user_agent'] = Variable<String>(userAgent.value);
+    }
+    if (ip.present) {
+      map['ip'] = Variable<String>(ip.value);
+    }
+    if (revoked.present) {
+      map['revoked'] = Variable<bool>(revoked.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WebAuthSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('tokenHash: $tokenHash, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('userAgent: $userAgent, ')
+          ..write('ip: $ip, ')
+          ..write('revoked: $revoked, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$AppDatabase extends GeneratedDatabase {
+  _$AppDatabase(QueryExecutor e) : super(e);
+  late final $CharactersTable characters = $CharactersTable(this);
+  late final $SessionsTable sessions = $SessionsTable(this);
+  late final $MessagesTable messages = $MessagesTable(this);
+  late final $GroupsTable groups = $GroupsTable(this);
+  late final $FoldersTable folders = $FoldersTable(this);
+  late final $PersonasTable personas = $PersonasTable(this);
+  late final $WorldsTable worlds = $WorldsTable(this);
+  late final $ChatWorldsTable chatWorlds = $ChatWorldsTable(this);
+  late final $ChatBiomeSpansTable chatBiomeSpans = $ChatBiomeSpansTable(this);
+  late final $MessageEmbeddingsTable messageEmbeddings =
+      $MessageEmbeddingsTable(this);
+  late final $DataBankEntriesTable dataBankEntries = $DataBankEntriesTable(
+    this,
+  );
+  late final $JournalMemoriesTable journalMemories = $JournalMemoriesTable(
+    this,
+  );
+  late final $GrowthRingsTable growthRings = $GrowthRingsTable(this);
+  late final $GrowthStateTable growthState = $GrowthStateTable(this);
+  late final $ObjectivesTable objectives = $ObjectivesTable(this);
+  late final $StoryProjectsTable storyProjects = $StoryProjectsTable(this);
+  late final $SyncMetaTable syncMeta = $SyncMetaTable(this);
+  late final $AvatarImagesTable avatarImages = $AvatarImagesTable(this);
+  late final $GroupMembersTable groupMembers = $GroupMembersTable(this);
+  late final $WebAuthCredentialsTable webAuthCredentials =
+      $WebAuthCredentialsTable(this);
+  late final $WebAuthSessionsTable webAuthSessions = $WebAuthSessionsTable(
+    this,
+  );
+  late final Index journalMemoriesSessionCharacter = Index(
+    'journal_memories_session_character',
+    'CREATE INDEX journal_memories_session_character ON journal_memories (session_id, character_id)',
+  );
+  late final Index growthRingsSessionCharacter = Index(
+    'growth_rings_session_character',
+    'CREATE INDEX growth_rings_session_character ON growth_rings (session_id, character_id)',
+  );
+  @override
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  @override
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    characters,
+    sessions,
+    messages,
+    groups,
+    folders,
+    personas,
+    worlds,
+    chatWorlds,
+    chatBiomeSpans,
+    messageEmbeddings,
+    dataBankEntries,
+    journalMemories,
+    growthRings,
+    growthState,
+    objectives,
+    storyProjects,
+    syncMeta,
+    avatarImages,
+    groupMembers,
+    webAuthCredentials,
+    webAuthSessions,
+    journalMemoriesSessionCharacter,
+    growthRingsSessionCharacter,
+  ];
+}

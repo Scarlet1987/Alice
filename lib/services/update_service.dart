@@ -1,0 +1,479 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:front_porch_ai/app_version.dart';
+import 'package:front_porch_ai/services/security/verify_sha256.dart';
+import 'package:front_porch_ai/utils/native_exit.dart';
+
+part 'update_service_download.dart';
+part 'update_service_install.dart';
+
+// Note: app_version.dart was already imported — UpdateService already used
+// appVersion for _currentVersion. The isPreRelease getter now also guards
+// the update channel so stable builds can never be offered a beta update.
+
+/// Cross-platform self-update service.
+/// Checks GitHub Releases for new versions and downloads/runs the update.
+/// Supports Windows (Inno Setup), Linux (.deb), and macOS (.pkg —
+/// signed+notarized+stapled, the only macOS asset since the unsigned shim
+/// DMG was retired 2026-07-27; binaries old enough to predate the .pkg
+/// updater must manually download once).
+class UpdateService extends ChangeNotifier {
+  static const String _repoOwner = 'Scarlet1987';
+  static const String _repoName = 'Alice';
+  static const String _windowsAssetStable = 'Front_Porch_AI_Setup.exe';
+  static const String _windowsAssetBeta = 'Front_Porch_AI_Beta_Setup.exe';
+  static const String _windowsAssetNightly = 'Front_Porch_AI_Nightly_Setup.exe';
+  // Linux has no fixed asset name: Scarlet1987's releases publish one .deb
+  // per release (plus a Flatpak the updater does not consume), and the .deb
+  // name embeds the version — front-porch-ai_<version>_amd64.deb. There is
+  // no AppImage and no nightly-specific Linux asset, so every Linux channel
+  // matches this single pattern instead of an exact-name constant.
+  static final RegExp _linuxDebAssetPattern = RegExp(
+    r'^front-porch-ai_.+_amd64\.deb$',
+    caseSensitive: false,
+  );
+  // Primary (new canonical) asset names for macOS .pkg releases (signed+notarized).
+  static const String _macosAssetPkg = 'Front_Porch_AI.pkg';
+  static const String _macosAssetBetaPkg = 'Front_Porch_AI_MacOS.pkg';
+  static const String _macosAssetNightlyPkg = 'Front_Porch_AI_Nightly.pkg';
+  static const String _prefsKeyAutoCheck = 'update_auto_check';
+
+  String _currentVersion = '';
+  String _latestVersion = '';
+  String _latestReleaseTag = '';
+  String _downloadUrl = '';
+  String _releaseNotes = '';
+  bool _updateAvailable = false;
+  bool _checking = false;
+  bool _downloading = false;
+  bool _downloadComplete = false;
+  double _downloadProgress = 0.0;
+  bool _autoCheckEnabled = true;
+  String? _pendingInstallerPath;
+  // The actual asset filename chosen. Used so download names the temp file
+  // after the real remote asset (the extension drives the platform install
+  // dispatch at install time).
+  String _selectedAssetName = '';
+
+  String get currentVersion => _currentVersion;
+  String get latestVersion => _latestVersion;
+  String get releaseNotes => _releaseNotes;
+
+  /// URL to the GitHub release page for the latest version found by checkForUpdate().
+  /// Used by the update dialog for the "View on GitHub" fallback and for links inside
+  /// rendered release notes.
+  /// Uses the actual tag (e.g. "nightly-rawhide.20250519.xxx" or "v0.9.8") so links
+  /// are always correct for nightly, beta, and stable channels.
+  String get releaseUrl => _latestReleaseTag.isNotEmpty
+      ? 'https://github.com/$_repoOwner/$_repoName/releases/tag/$_latestReleaseTag'
+      : 'https://github.com/$_repoOwner/$_repoName/releases';
+  bool get updateAvailable => _updateAvailable;
+  bool get checking => _checking;
+  bool get downloading => _downloading;
+  bool get downloadComplete => _downloadComplete;
+  double get downloadProgress => _downloadProgress;
+  bool get autoCheckEnabled => _autoCheckEnabled;
+  bool get hasPendingInstaller => _pendingInstallerPath != null;
+
+  /// User-friendly version for UI display (avoids "vrawhide.2025..." for nightlies).
+  String get displayCurrentVersion => _formatVersionForDisplay(_currentVersion);
+  String get displayLatestVersion => _formatVersionForDisplay(_latestVersion);
+
+  String _formatVersionForDisplay(String v) {
+    if (v.isEmpty) return v;
+    final lower = v.toLowerCase();
+    if (lower.startsWith('rawhide') || lower.startsWith('nightly')) {
+      return v;
+    }
+    return 'v$v';
+  }
+
+  /// Callback invoked before the update installer runs.
+  /// Gives the host app a chance to stop child processes (e.g. KoboldCPP)
+  /// because exit(0) in installNow() bypasses the window close handler.
+  Future<void> Function()? _shutdownCallback;
+  void setShutdownCallback(Future<void> Function() callback) {
+    _shutdownCallback = callback;
+  }
+
+  /// Whether this platform supports self-update.
+  /// Windows: true when installed via the Inno Setup installer (.installed marker).
+  /// Linux: true when running as an AppImage ($APPIMAGE env var is set).
+  static bool get isSupported {
+    if (Platform.isWindows) {
+      final exeDir = File(Platform.resolvedExecutable).parent.path;
+      return File('$exeDir\\.installed').existsSync();
+    }
+    if (Platform.isLinux) {
+      return Platform.environment.containsKey('APPIMAGE');
+    }
+    if (Platform.isMacOS) {
+      // Supported when running as an .app bundle (not flutter run debug).
+      // Check that the executable is inside a .app/Contents/MacOS/ structure.
+      final exe = Platform.resolvedExecutable;
+      return exe.contains('.app/Contents/MacOS/');
+    }
+    return false;
+  }
+
+  /// Whether [name] is the published Linux update asset: the versioned
+  /// .deb (see [_linuxDebAssetPattern]). Name-only so tests can pin it on
+  /// any host; platform dispatch lives in [_matchesPlatformAsset].
+  @visibleForTesting
+  static bool isLinuxDebAssetName(String name) =>
+      _linuxDebAssetPattern.hasMatch(name);
+
+  /// Whether a release asset [name] is this platform's update package.
+  static bool _matchesPlatformAsset(String name) {
+    if (Platform.isLinux) return isLinuxDebAssetName(name);
+    return name == _platformAsset;
+  }
+
+  /// The correct asset name for this platform's update package.
+  /// Nightly (Rawhide), Beta, and Stable each use distinct filenames so the
+  /// three update channels never cross-pollinate (prevents data dir disasters).
+  /// Linux is the exception: it matches by pattern (see
+  /// [_matchesPlatformAsset]), so this getter returns '' there and remains
+  /// only as the download fallback for the fixed-name platforms.
+  static String get _platformAsset {
+    if (Platform.isWindows) {
+      if (isNightlyBuild) return _windowsAssetNightly;
+      return isPreRelease ? _windowsAssetBeta : _windowsAssetStable;
+    }
+    if (Platform.isLinux) {
+      return '';
+    }
+    if (Platform.isMacOS) {
+      // .pkg is the only macOS asset (the legacy shim DMG and its fallback
+      // probe were retired 2026-07-27).
+      if (isNightlyBuild) return _macosAssetNightlyPkg;
+      if (isPreRelease) return _macosAssetBetaPkg;
+      return _macosAssetPkg;
+    }
+    return '';
+  }
+
+  Future<void> initialize() async {
+    // Always set version so the sidebar displays it on every platform.
+    _currentVersion = appVersion;
+
+    if (!isSupported) {
+      notifyListeners();
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    _autoCheckEnabled = prefs.getBool(_prefsKeyAutoCheck) ?? true;
+    notifyListeners();
+  }
+
+  Future<void> setAutoCheckEnabled(bool enabled) async {
+    _autoCheckEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_prefsKeyAutoCheck, enabled);
+    notifyListeners();
+  }
+
+  /// Check GitHub Releases API for a newer version.
+  /// Returns true if an update is available.
+  Future<bool> checkForUpdate() async {
+    if (!isSupported || _checking) return false;
+
+    _checking = true;
+    notifyListeners();
+
+    try {
+      // Use the general /releases endpoint to find both stable and pre-releases.
+      // GitHub's /releases/latest endpoint ignores everything marked as pre-release.
+      //
+      // per_page=100 (GitHub's maximum) is load-bearing, not a tidy-up. The
+      // endpoint defaults to 30 and orders by the tag's created_at, and a
+      // nightly is published every day — so 30 entries is barely a month of
+      // history. A stable release would fall off the first page about a month
+      // after it shipped, and from then on [selectTargetRelease] would see no
+      // stable entry at all and offer the user nothing. Silently: a stable
+      // build that skipped one month of updates would simply stop being told
+      // that updates exist. 100 turns "one month" into "a few months"; a
+      // release cadence that ever outruns THAT needs real pagination here.
+      final response = await http.get(
+        Uri.parse(
+          'https://api.github.com/repos/$_repoOwner/$_repoName/releases'
+          '?per_page=100',
+        ),
+        headers: {'Accept': 'application/vnd.github.v3+json'},
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('Update check failed: ${response.statusCode}');
+        return false;
+      }
+
+      final List<dynamic> allReleases = jsonDecode(response.body);
+      if (allReleases.isEmpty) return false;
+
+      final targetRelease = selectTargetRelease(allReleases, isPreRelease);
+      if (targetRelease == null) return false;
+
+      final originalTag = (targetRelease['tag_name'] as String? ?? '');
+      final tagNameStripped = originalTag.replaceFirst(RegExp(r'^[vV]'), '');
+      final normalizedVersion = _normalizeForCompare(tagNameStripped);
+      final assets = targetRelease['assets'] as List<dynamic>? ?? [];
+
+      // Find the platform-specific update asset (now correctly picks
+      // Nightly/Beta/Stable). Linux matches by pattern instead of exact
+      // name: the .deb's filename embeds the version being downloaded.
+      String? installerUrl;
+      String? resolvedAssetName;
+      for (final asset in assets) {
+        final assetName = asset['name'] as String? ?? '';
+        if (_matchesPlatformAsset(assetName)) {
+          installerUrl = asset['browser_download_url'] as String?;
+          resolvedAssetName = assetName;
+          break;
+        }
+      }
+
+      if (installerUrl == null) {
+        debugPrint(
+          'No update asset for this platform found in release $originalTag',
+        );
+        return false;
+      }
+
+      _latestReleaseTag = originalTag;
+      _latestVersion = normalizedVersion;
+      _downloadUrl = installerUrl;
+      _selectedAssetName = resolvedAssetName ?? _platformAsset;
+      _releaseNotes = targetRelease['body'] as String? ?? '';
+      // The friendly "What's New" (including the macOS .pkg+shim transition note)
+      // comes from docs/<Branch>.md (e.g. docs/Rawhide.md) via the CI release_notes
+      // step; it is rendered in the in-app Update Available dialog.
+      _updateAvailable = _isNewerVersion(normalizedVersion, _currentVersion);
+
+      return _updateAvailable;
+    } catch (e) {
+      debugPrint('Update check error: $e');
+      return false;
+    } finally {
+      _checking = false;
+      notifyListeners();
+    }
+  }
+
+  void notify() => notifyListeners();
+
+  /// Download the installer to a temp directory.
+  /// Does NOT run it — call installNow() or let installOnClose() handle it.
+  Future<void> downloadUpdate() => _downloadUpdateImpl();
+
+  /// Reject a download that cannot be a real installer: a truncated stream
+  /// (received != Content-Length) or a body so small it is an error page,
+  /// not a binary — every installer this app ships is tens of MB, so 1 MB
+  /// is a generous floor. Returns the rejection reason, or null when valid.
+  @visibleForTesting
+  static String? validateInstallerDownload({
+    required int receivedBytes,
+    required int expectedBytes,
+  }) {
+    if (expectedBytes > 0 && receivedBytes != expectedBytes) {
+      return 'installer download truncated '
+          '($receivedBytes of $expectedBytes bytes)';
+    }
+    if (receivedBytes < 1024 * 1024) {
+      return 'installer download implausibly small ($receivedBytes bytes)';
+    }
+    return null;
+  }
+
+  /// Run the update immediately and exit (or relaunch on Linux/macOS).
+  Future<void> installNow() => _installNowImpl();
+
+  /// Run the pending update on app close.
+  /// Call this from the window close handler.
+  Future<void> installOnClose() => _installOnCloseImpl();
+
+  /// Picks the release this build's channel should be offered, out of the
+  /// full GitHub `/releases` list.
+  ///
+  /// Two invariants, both learned from field bugs:
+  ///  * **Channel isolation.** Stable and Beta/Nightly install to different
+  ///    paths and data dirs, so a stable build must never be handed a
+  ///    pre-release and vice-versa (`wantPrerelease` is this build's channel).
+  ///  * **"Newest" cannot depend on GitHub's list order OR on the Rawhide
+  ///    version string.** GitHub's `/releases` ordering is not reliably
+  ///    newest-published-first, and `rawhide.YYYYMMDD.<sha>` has no orderable
+  ///    field below the day — the trailing short SHA is a commit hash, not a
+  ///    monotonic build counter. The old code took the FIRST channel match and
+  ///    stopped, so a newer same-day manual build that GitHub listed *below* an
+  ///    older release was invisible (you couldn't distinguish or rank them by
+  ///    the tag, and index 0 was never revisited). We instead scan every
+  ///    channel match and keep the one with the newest publish timestamp, which
+  ///    is a true monotonic recency signal the version string can't provide.
+  @visibleForTesting
+  static Map<String, dynamic>? selectTargetRelease(
+    List<dynamic> releases,
+    bool wantPrerelease,
+  ) {
+    Map<String, dynamic>? best;
+    DateTime? bestStamp;
+    for (final release in releases) {
+      if (release is! Map<String, dynamic>) continue;
+
+      final tagLower = (release['tag_name'] as String? ?? '')
+          .replaceFirst(RegExp(r'^[vV]'), '')
+          .toLowerCase();
+      final isPrerelease = release['prerelease'] as bool? ?? false;
+      // Manual string check catches pre-releases whose `prerelease` flag was
+      // never set. contains('rawhide') (no leading -) matches both
+      // "nightly-rawhide..." tags and raw "rawhide.YYYY..." versions.
+      final hasBetaString =
+          tagLower.contains('beta') ||
+          tagLower.contains('alpha') ||
+          tagLower.contains('-rc') ||
+          tagLower.contains('-dev') ||
+          tagLower.contains('nightly') ||
+          tagLower.contains('rawhide');
+      final effectivelyBeta = isPrerelease || hasBetaString;
+      if (wantPrerelease != effectivelyBeta) continue;
+
+      // published_at is the real publication time; created_at (the tag's
+      // commit date) is the fallback for the rare release with a null
+      // published_at. An unparseable/missing pair sinks to the epoch so a
+      // dated release always outranks it.
+      final stamp =
+          DateTime.tryParse(
+            (release['published_at'] ?? release['created_at'] ?? '') as String,
+          ) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+      if (best == null || stamp.isAfter(bestStamp!)) {
+        best = release;
+        bestStamp = stamp;
+      }
+    }
+    return best;
+  }
+
+  /// Normalizes a version/tag string for comparison and display:
+  /// strips leading v/V, and the "nightly-" wrapper used on GitHub tags for Rawhide
+  /// so that "nightly-rawhide.20250519.abc" becomes "rawhide.20250519.abc" (matching
+  /// the appVersion string baked into the binary by the nightly CI).
+  String _normalizeForCompare(String v) {
+    v = v.toLowerCase().replaceFirst(RegExp(r'^[vV]'), '');
+    if (v.startsWith('nightly-')) {
+      v = v.substring(8);
+    }
+    return v;
+  }
+
+  /// Compare version strings (e.g. "0.9.8-Beta6" vs "0.9.8-Beta5", or rawhide dates).
+  /// Returns true if remote is newer than local.
+  bool _isNewerVersion(String remote, String local) {
+    final rClean = _normalizeForCompare(remote);
+    final lClean = _normalizeForCompare(local);
+
+    if (rClean == lClean) return false;
+
+    // Special handling for Rawhide nightlies: the version format is
+    // "rawhide.YYYYMMDD.SHA". We compare the date numeric first (correctly
+    // orders 20250519 > 20250517), then fall back for same-day builds.
+    if (rClean.startsWith('rawhide.') && lClean.startsWith('rawhide.')) {
+      final rParts = rClean.split('.');
+      final lParts = lClean.split('.');
+      if (rParts.length >= 2 && lParts.length >= 2) {
+        final rDate = int.tryParse(rParts[1]) ?? 0;
+        final lDate = int.tryParse(lParts[1]) ?? 0;
+        if (rDate > lDate) return true;
+        if (rDate < lDate) return false;
+        // Same calendar day: any distinct build from the latest published
+        // release should be offered (the GH list order is authoritative).
+        return true;
+      }
+    }
+
+    // Standard semver path for stable / beta / etc.
+    // Split at the first hyphen (e.g. "0.9.8-beta6" -> ["0.9.8", "beta6"])
+    final rSplit = rClean.split('-');
+    final lSplit = lClean.split('-');
+
+    final rBase = rSplit[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
+    final lBase = lSplit[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
+
+    // Normalize lengths for the numeric base
+    while (rBase.length < lBase.length) {
+      rBase.add(0);
+    }
+    while (lBase.length < rBase.length) {
+      lBase.add(0);
+    }
+
+    // 1. Compare numeric base parts
+    for (int i = 0; i < rBase.length; i++) {
+      if (rBase[i] > lBase[i]) return true;
+      if (rBase[i] < lBase[i]) return false;
+    }
+
+    // 2. Base version is identical, compare suffixes (e.g. "-beta6" vs "-beta5")
+    final rSuffix = rSplit.length > 1 ? rSplit[1] : '';
+    final lSuffix = lSplit.length > 1 ? lSplit[1] : '';
+
+    if (rSuffix.isEmpty && lSuffix.isNotEmpty) {
+      return true; // Stable is newer than beta
+    }
+    if (rSuffix.isNotEmpty && lSuffix.isEmpty) {
+      return false; // Beta is older than stable
+    }
+
+    // Both have suffixes, do a natural comparison
+    return _compareAlphanumeric(rSuffix, lSuffix) > 0;
+  }
+
+  /// Helper for natural string comparison (handles "beta10" > "beta9")
+  int _compareAlphanumeric(String a, String b) {
+    final re = RegExp(r'(\d+)|(\D+)');
+    final aMatches = re.allMatches(a).toList();
+    final bMatches = re.allMatches(b).toList();
+
+    for (int i = 0; i < min(aMatches.length, bMatches.length); i++) {
+      final aVal = aMatches[i].group(0)!;
+      final bVal = bMatches[i].group(0)!;
+
+      final aNum = int.tryParse(aVal);
+      final bNum = int.tryParse(bVal);
+
+      if (aNum != null && bNum != null) {
+        if (aNum != bNum) return aNum.compareTo(bNum);
+      } else {
+        if (aVal != bVal) return aVal.compareTo(bVal);
+      }
+    }
+    return aMatches.length.compareTo(bMatches.length);
+  }
+}

@@ -1,0 +1,424 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// Living Worlds repository: UUID identity, .fpworld export/import, chat
+// attachment (chat_worlds), biome fields. Rename no longer cascades — refs
+// are ids.
+
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
+import 'package:uuid/uuid.dart';
+
+import 'package:front_porch_ai/database/database.dart';
+// `World` here means the Drift row from database.dart; the model type is
+// reached through the `model.` prefix below.
+import 'package:front_porch_ai/models/models.dart' hide World;
+import 'package:front_porch_ai/models/world.dart' as model;
+import 'package:front_porch_ai/services/character_repository.dart';
+import 'package:front_porch_ai/services/chat/chat.dart';
+import 'package:front_porch_ai/services/group_chat_repository.dart';
+import 'package:front_porch_ai/services/storage_service.dart';
+import 'package:front_porch_ai/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+part 'world_repository_attach.dart';
+part 'world_repository_purge.dart';
+
+class WorldRepository extends ChangeNotifier {
+  final StorageService _storageService;
+  AppDatabase _db;
+  final List<model.World> _worlds = [];
+  bool _isLoading = false;
+  CharacterRepository? _characterRepository;
+  GroupChatRepository? _groupRepository;
+  static const _uuid = Uuid();
+
+  List<model.World> get worlds => List.unmodifiable(_worlds);
+  bool get isLoading => _isLoading;
+
+  /// Places only — excludes legacy character-lore clones (should be empty after purge).
+  List<model.World> get placeWorlds =>
+      List.unmodifiable(_worlds.where((w) => !isCharacterLinkedWorld(w)));
+
+  WorldRepository(this._storageService, this._db) {
+    _firstLoad = loadWorlds();
+  }
+
+  /// Completes when the initial DB load has filled the in-memory cache.
+  /// Await before resolving refs at times that can race app startup (e.g.
+  /// seeding a brand-new chat's worlds moments after a cold launch) — the
+  /// cache-only resolvers silently drop every ref while the list is empty.
+  late final Future<void> _firstLoad;
+  Future<void> get ready => _firstLoad;
+
+  void setCharacterRepository(CharacterRepository repo) {
+    _characterRepository = repo;
+    loadWorlds();
+  }
+
+  void setGroupChatRepository(GroupChatRepository repo) {
+    _groupRepository = repo;
+  }
+
+  void updateDatabase(AppDatabase db) {
+    _db = db;
+  }
+
+  model.World? worldById(String id) {
+    for (final w in _worlds) {
+      if (w.id == id) return w;
+    }
+    return null;
+  }
+
+  model.World? worldByName(String name) {
+    for (final w in _worlds) {
+      if (w.name == name) return w;
+    }
+    return null;
+  }
+
+  /// Resolve by UUID first, then by name (character.worldNames still use names).
+  model.World? resolveWorld(String idOrName) {
+    return worldById(idOrName) ?? worldByName(idOrName);
+  }
+
+  void _resolveAvatarPaths(List<model.World> worlds) {
+    if (_characterRepository == null) return;
+    for (final world in worlds) {
+      CharacterCard? character;
+      final charId = world.linkedCharacterId;
+      if (charId != null && charId.isNotEmpty) {
+        character = _characterRepository!.characters
+            .where((c) => c.dbId == charId)
+            .firstOrNull;
+      }
+      if (character == null && world.linkedCharacterName != null) {
+        character = _characterRepository!.characters
+            .where((c) => c.name == world.linkedCharacterName)
+            .firstOrNull;
+      }
+      if (character != null && character.imagePath != null) {
+        world.avatarPath = character.imagePath;
+      }
+    }
+  }
+
+  model.World _fromRow(World row) {
+    Lorebook lorebook;
+    if (row.lorebook != null) {
+      try {
+        lorebook = Lorebook.fromJson(jsonDecode(row.lorebook!));
+      } catch (_) {
+        lorebook = Lorebook(entries: []);
+      }
+    } else {
+      lorebook = Lorebook(entries: []);
+    }
+    return model.World(
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      lorebook: lorebook,
+      linkedCharacterName: row.linkedCharacterName,
+      linkedCharacterId: row.linkedCharacterId,
+      coverImage: row.coverImage,
+      sourceId: row.sourceId,
+      formatVersion: row.formatVersion,
+      biomeId: row.biomeId,
+      biomeJson: row.biomeJson,
+      injectDescription: row.injectDescription,
+      climateEnabled: row.climateEnabled,
+      placeTraits: _tryDecodeMap(row.placeTraits),
+    );
+  }
+
+  /// Defensive JSON-map decode for the place_traits column (null/garbage →
+  /// null → all-default traits).
+  static Map<String, dynamic>? _tryDecodeMap(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (_) {}
+    return null;
+  }
+
+  WorldsCompanion _toCompanion(model.World world) {
+    return WorldsCompanion(
+      id: Value(world.id),
+      name: Value(world.name),
+      description: Value(world.description),
+      lorebook: Value(jsonEncode(world.lorebook.toJson())),
+      linkedCharacterName: Value(world.linkedCharacterName),
+      linkedCharacterId: Value(world.linkedCharacterId),
+      coverImage: Value(world.coverImage),
+      sourceId: Value(world.sourceId),
+      formatVersion: Value(world.formatVersion),
+      biomeId: Value(world.biomeId),
+      biomeJson: Value(world.biomeJson),
+      injectDescription: Value(world.injectDescription),
+      climateEnabled: Value(world.climateEnabled),
+      placeTraits: Value(
+        world.placeTraits.isEmpty ? null : jsonEncode(world.placeTraits),
+      ),
+    );
+  }
+
+  Future<void> loadWorlds() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _storageService.initialized;
+      final dbWorlds = await _db.getAllWorlds();
+      _worlds
+        ..clear()
+        ..addAll(dbWorlds.map(_fromRow));
+      _resolveAvatarPaths(_worlds);
+      // One-time: drop legacy "Aerin's Lorebook" clones so Worlds = places.
+      await _maybePurgeCharacterLinkedWorlds();
+    } catch (e) {
+      debugPrint('Error loading worlds: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<({int deleted, int skipped})> purgeCharacterLinkedWorlds() =>
+      _purgeCharacterLinkedWorldsImpl();
+
+  /// Rename display name only — attachments use UUID and need no cascade.
+  Future<void> renameWorld(model.World world, String newName) async {
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty || trimmed == world.name) return;
+    if (await _db.getWorldByName(trimmed) != null) {
+      throw StateError('A world named "$trimmed" already exists.');
+    }
+    world.name = trimmed;
+    await _db.updateWorld(_toCompanion(world));
+    notifyListeners();
+  }
+
+  Future<void> saveWorld(model.World world) async {
+    if (world.id.isEmpty) {
+      world.id = _uuid.v4();
+    }
+    // Places only — never re-create character-linked clones via save.
+    world.linkedCharacterName = null;
+    world.linkedCharacterId = null;
+    if (world.description.trim().toLowerCase().startsWith(
+      'auto-imported from character card',
+    )) {
+      world.description = '';
+    }
+    final existing = await _db.getWorldById(world.id);
+    if (existing != null) {
+      await _db.updateWorld(_toCompanion(world));
+    } else {
+      // Name collision on create → auto-rename (Keep both).
+      final taken = await _db.getWorldByName(world.name);
+      if (taken != null && taken.id != world.id) {
+        world.name = uniqueWorldName(
+          world.name,
+          (n) => _worlds.any((w) => w.name == n && w.id != world.id),
+        );
+      }
+      await _db.insertWorld(_toCompanion(world));
+    }
+
+    final index = _worlds.indexWhere((w) => w.id == world.id);
+    if (index != -1) {
+      _worlds[index] = world;
+    } else {
+      _worlds.add(world);
+    }
+    if (world.linkedCharacterName != null || world.linkedCharacterId != null) {
+      _resolveAvatarPaths([world]);
+    }
+    notifyListeners();
+  }
+
+  Future<void> deleteWorld(model.World world) async {
+    await _db.deleteWorldById(world.id);
+    await _db.deleteChatWorldLinksForWorld(world.id);
+    _worlds.removeWhere((w) => w.id == world.id);
+    notifyListeners();
+  }
+
+  /// Import .fpworld or bare lorebook from a file. See [importWorldJson].
+  Future<model.World> importWorld(File file) async {
+    final decoded = jsonDecode(await file.readAsString());
+    if (decoded is! Map) {
+      throw const FormatException('World file must be a JSON object');
+    }
+    return importWorldJson(Map<String, dynamic>.from(decoded));
+  }
+
+  /// The ONE full-package import path (desktop file picker AND the web
+  /// facade): keeps climate, place traits, and lore. Always creates a new
+  /// row (Keep both on name collision); preserves the package id as
+  /// [model.World.sourceId] and assigns a fresh local id.
+  Future<model.World> importWorldJson(Map<String, dynamic> json) async {
+    final package = decodeFpWorld(json);
+    final world = package.world;
+
+    // Fresh local identity; remember provenance.
+    world.sourceId ??= world.id.isNotEmpty ? world.id : null;
+    world.id = _uuid.v4();
+    world.name = uniqueWorldName(
+      world.name,
+      (n) => _worlds.any((w) => w.name == n),
+    );
+
+    if (package.biome != null) {
+      final biome = Biome.fromJson(package.biome!);
+      if (Biome.builtInById(biome.id) != null) {
+        world.biomeId = biome.id;
+        world.biomeJson = null;
+      } else {
+        world.biomeId = biome.id;
+        world.biomeJson = biome.toJsonString();
+      }
+    }
+
+    await saveWorld(world);
+    return world;
+  }
+
+  /// The ONE .fpworld envelope builder (used by every export path): embeds
+  /// the resolved biome so importers get climate without built-ins, plus place
+  /// traits, lore, and the cover image already carried by [model.World].
+  Map<String, dynamic> fpWorldJson(model.World world) {
+    final biome = world.climateEnabled
+        ? Biome.resolve(
+            biomeId: world.biomeId,
+            biomeJson: world.biomeJson,
+          ).toJson()
+        : null;
+    return encodeFpWorld(world: world, biome: biome);
+  }
+
+  /// Export as .fpworld (full place package). Prefer this over ST-only.
+  Future<void> exportFpWorld(model.World world, String outputPath) async {
+    final file = File(outputPath);
+    await file.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(fpWorldJson(world)),
+    );
+  }
+
+  /// Legacy ST world-info export (lore only).
+  Future<void> exportWorld(model.World world, String outputPath) async {
+    final file = File(outputPath);
+    await file.writeAsString(
+      jsonEncode(
+        encodeStWorldInfo(
+          world.lorebook,
+          name: world.name,
+          description: world.description,
+        ),
+      ),
+    );
+  }
+
+  void notify() => notifyListeners();
+
+  Future<List<String>> getChatWorldIds(String chatId) =>
+      _getChatWorldIdsImpl(chatId);
+
+  Future<ChatPlaceSlots> getChatWorldAttachments(String chatId) =>
+      _getChatWorldAttachmentsImpl(chatId);
+
+  Future<List<model.World>> getChatWorlds(String chatId) =>
+      _getChatWorldsImpl(chatId);
+
+  /// Canonical writer: Setting (0..1) + Lore (0..N). Empty both = decided empty.
+  Future<void> setChatWorldAttachments(
+    String chatId, {
+    String? primaryId,
+    List<String> loreIds = const [],
+  }) => _setChatWorldAttachmentsImpl(
+    chatId,
+    primaryId: primaryId,
+    loreIds: loreIds,
+  );
+
+  Future<void> setChatWorlds(String chatId, List<String> worldIds) =>
+      _setChatWorldsImpl(chatId, worldIds);
+
+  /// Record that a chat's world attachments are settled without changing them.
+  Future<void> markChatWorldsDecided(String chatId) =>
+      _markChatWorldsDecidedImpl(chatId);
+
+  /// Give a chat the worlds its character carries, but ONLY if the chat has
+  /// never had that decision made. Returns true when it seeded.
+  /// This is what rescues chats created before their character had a world:
+  /// they predate any attachment, so their empty list is "undecided", not
+  /// "the user removed them".
+  Future<bool> backfillChatWorldsFromCharacter({
+    required String chatId,
+    required List<String> characterWorldRefs,
+  }) => _backfillChatWorldsFromCharacterImpl(
+    chatId: chatId,
+    characterWorldRefs: characterWorldRefs,
+  );
+
+  Future<void> attachWorldToChat(
+    String chatId,
+    String worldId, {
+    bool? asPrimary,
+  }) => _attachWorldToChatImpl(chatId, worldId, asPrimary: asPrimary);
+
+  Future<void> detachWorldFromChat(String chatId, String worldId) =>
+      _detachWorldFromChatImpl(chatId, worldId);
+
+  /// Attach worlds newly added to a CHARACTER onto that character's existing
+  /// chats that don't have any yet.
+  ///
+  /// Creation-time seeding only covers chats made *after* the character had a
+  /// world, so a chat opened first and given a world later kept its temperate
+  /// default forever — the climate, the Setting prose and the Places panel all
+  /// read chat attachments, not the character's list.
+  ///
+  /// Only [addedRefs] (the diff from this edit) propagate, and only onto chats
+  /// with an EMPTY attachment list. That keeps two things true: editing a
+  /// character for unrelated reasons never re-attaches anything, and a chat the
+  /// user deliberately sent somewhere else is never dragged back.
+  /// Returns the ids of the chats that changed, so a live session can refresh.
+  Future<List<String>> applyAddedCharacterWorldsToChats({
+    required String characterId,
+    required List<String> addedRefs,
+  }) => _applyAddedCharacterWorldsToChatsImpl(
+    characterId: characterId,
+    addedRefs: addedRefs,
+  );
+
+  /// Copy template world refs (group template ids or character world names)
+  /// onto a new chat (session). Refs may be UUIDs or names; unresolved refs
+  /// are dropped with a debug note.
+  Future<void> applyTemplateWorldsToChat(
+    String chatId,
+    List<String> templateWorldIds,
+  ) => _applyTemplateWorldsToChatImpl(chatId, templateWorldIds);
+
+  Future<void> setChatBiome({
+    required String chatId,
+    required int dayCount,
+    required Biome biome,
+  }) => _setChatBiomeImpl(chatId: chatId, dayCount: dayCount, biome: biome);
+
+  /// Raw span rows for [BiomeSchedule] hydrate (ordered by day ASC).
+  Future<List<({int effectiveFromDay, String biomeJson})>> getChatBiomeSpanRows(
+    String chatId,
+  ) => _getChatBiomeSpanRowsImpl(chatId);
+
+  Future<Biome> biomeAt({
+    required String chatId,
+    required int day,
+    Biome? worldDefault,
+  }) => _biomeAtImpl(chatId: chatId, day: day, worldDefault: worldDefault);
+}

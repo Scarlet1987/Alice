@@ -1,0 +1,32 @@
+/* Copyright (C) 2026 Front Porch AI — SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+   The stylesheet is split by surface, and the import order below IS the
+   cascade: each file is a contiguous slice of the single stylesheet this
+   used to be, in its original order. Reordering these lines changes which
+   rule wins. Add a new surface as its own file and import it in the place
+   its rules should take effect.
+*/
+
+@import './styles/base.css';
+@import './styles/shell.css';
+@import './styles/chat.css';
+@import './styles/insight.css';
+@import './styles/composer.css';
+@import './styles/messages.css';
+@import './styles/places.css';
+@import './styles/tools.css';
+@import './styles/wizard.css';
+@import './styles/library-cards.css';
+@import './styles/stories.css';
+@import './styles/settings.css';
+@import './styles/overlays.css';
+@import './styles/forms.css';
+@import './styles/crop.css';
+@import './styles/stoop.css';
+@import './styles/engine.css';
+@import './styles/kobold.css';
+@import './styles/calendar.css';
+@import './styles/living-time.css';
+@import './styles/greetings.css';
+@import './styles/glossary.css';
+@import './styles/oled.css';

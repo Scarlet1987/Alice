@@ -1,0 +1,500 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// The scrolling chat transcript: per-message bubbles (with speaker labels in a
+// multi-character scene, collapsible thinking blocks, Realism/Needs chips, and
+// the per-message action toolbar) plus the live streaming bubble. Message edit
+// is a fullscreen modal owned by ChatPage (MessageEditModal).
+
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import {
+  classifyTranscriptGrowth,
+  followTranscriptWhileStreaming,
+  holdTranscriptAfterPrepend,
+  pinTranscriptToLatest,
+  transcriptTipKey,
+} from '../pages/chat/transcriptAutoScroll';
+import { applyTranscriptSpan, revealOlderSpan, type TranscriptSpan } from '../pages/chat/transcriptWindow';
+import { MessageContent } from './MessageContent';
+import { ChipsRow } from './ChipsRow';
+import { MessageActions } from './MessageActions';
+import { type CastMember } from './CastBar';
+import { type Message } from './chatTypes';
+import { canonicalizeReasoning } from '../utils/reasoningMarkers';
+
+/// Truthful generation status (desktop status-bar parity): live prompt-reading
+/// counts from the managed local backend + which background pass holds the
+/// single local slot. Null fields = no live data (remote backend). The server
+/// interpolates estFraction between the backend's per-batch console lines and
+/// flags promptDone only when the console confirmed completion.
+export type GenStatus = {
+  phase: string;
+  elapsed?: number;
+  busyWith: string | null;
+  queued: number;
+  promptCur: number | null;
+  promptTotal: number | null;
+  promptDone: boolean;
+  estFraction: number | null;
+  genCur: number | null;
+  genTotal: number | null;
+};
+
+/// Exact count with thousands separators ("8,347") — a live ticker, not just
+/// a percent (maintainer request).
+function fmtExact(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+/// Mirror of the desktop status-bar wording so both surfaces tell the same
+/// truth about the wait.
+function genStatusLabel(s: GenStatus): { label: string; fraction: number | null } {
+  // Backend queue depth is a neutral fact — never attributed (may be
+  // someone waiting on us).
+  const queueNote =
+    s.queued > 0 ? ` — ${s.queued} request${s.queued === 1 ? '' : 's'} queued` : '';
+  const hasLive = s.promptTotal != null && s.promptTotal > 0;
+  const fraction = hasLive
+    ? (s.estFraction ?? Math.min(1, (s.promptCur ?? 0) / (s.promptTotal as number)))
+    : null;
+  const estTokens = hasLive
+    ? (s.promptDone
+        ? (s.promptTotal as number)
+        : Math.round((s.promptTotal as number) * (fraction ?? 0)))
+    : 0;
+  const counts = hasLive
+    ? `${fmtExact(estTokens)} / ${fmtExact(s.promptTotal as number)} tokens`
+    : '';
+  if (s.busyWith) {
+    // The chat's own passes come as names; what has the engine (the speed
+    // test in the preset editor) comes already in words.
+    const pass =
+      s.busyWith === 'journal'
+        ? 'journal pass'
+        : s.busyWith === 'growth'
+          ? 'growth pass'
+          : s.busyWith;
+    if (hasLive) {
+      const stage =
+        (s.genTotal ?? 0) > 0
+          ? `writing (${s.genCur} tokens)`
+          : s.promptDone
+            ? 'finishing up'
+            : `reading ${counts} (${Math.round((fraction ?? 0) * 100)}%)`;
+      return { label: `Waiting — ${pass} is using the model: ${stage}`, fraction };
+    }
+    return { label: `Waiting — ${pass} is using the model…`, fraction: null };
+  }
+  if (hasLive && !s.promptDone) {
+    return {
+      label: `Reading prompt — ${counts} (${Math.round((fraction ?? 0) * 100)}%)${queueNote}`,
+      fraction,
+    };
+  }
+  if (hasLive) {
+    // Prompt fully read. A running decode with no streamed token yet IS our
+    // reply warming up — only busyWith marks someone else's work.
+    return {
+      label:
+        (s.genTotal ?? 0) > 0
+          ? `Starting the reply — ${s.genCur} tokens written${queueNote}`
+          : `Prompt read — starting the reply…${queueNote}`,
+      fraction: 1,
+    };
+  }
+  if (s.phase === 'thinking') return { label: 'Model is thinking…', fraction: null };
+  const secs =
+    s.elapsed != null && s.elapsed >= 1 ? ` (${Math.floor(s.elapsed)}s)` : '';
+  return { label: `Processing prompt…${secs}`, fraction: null };
+}
+
+type TranscriptProps = {
+  messages: Message[];
+  castById: Map<string, CastMember>;
+  multiCast: boolean;
+  lastIndex: number;
+  busy: boolean;
+  canSpeak: boolean;
+  onBeginEdit: (m: Message) => void;
+  onSwipe: (index: number, direction: number, critique?: string) => void;
+  onRegenerate: (
+    critique?: string,
+    lookup?: { source: 'web' | 'wiki'; query: string },
+  ) => void;
+  lookupWeb?: boolean;
+  lookupWiki?: boolean;
+  onContinue: () => void;
+  onFork: (index: number) => void;
+  onDelete: (index: number) => void;
+  onReprocess: (index: number) => void;
+  onRevert: (index: number) => void;
+  greetCount?: number;
+  greetingIndex?: number;
+  onVariantPicked?: () => void;
+  onActionFailed?: (what: string, e: unknown) => void;
+  /** Fired when a generated chat image finishes loading (late height). */
+  onChatImageLoad?: () => void;
+};
+
+// Memoized separately from the live streaming tail: token/processing WS
+// frames re-render ChatPage many times a second during a turn, and
+// reconciling every transcript row each frame is what froze iPad Safari on
+// long chats. The handlers are useCallback-stable in ChatPage, so these
+// props only change identity when the transcript genuinely changes.
+const TranscriptRows = memo(function TranscriptRows({
+  messages,
+  castById,
+  multiCast,
+  lastIndex,
+  busy,
+  canSpeak,
+  onBeginEdit,
+  onSwipe,
+  onRegenerate,
+  lookupWeb,
+  lookupWiki,
+  onContinue,
+  onFork,
+  onDelete,
+  onReprocess,
+  onRevert,
+  greetCount,
+  greetingIndex,
+  onVariantPicked,
+  onActionFailed,
+  onChatImageLoad,
+}: TranscriptProps) {
+  const userHasReplied = messages.some((m) => m.isUser);
+  return (
+    <>
+      {messages.map((m) => {
+        const speaker = !m.isUser && m.characterId ? castById.get(m.characterId) : undefined;
+        // Living Time §1: dreams render as a centered narration banner
+        // (desktop parity — same treatment as Chance Time).
+        if (m.isDream) {
+          return (
+            <div key={m.rowKey ?? m.index} className="msg-row">
+              <div className="dream-banner">
+                🌙 <em>{m.sender} dreamt: {m.text}</em>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div key={m.rowKey ?? m.index} className="msg-row">
+            {multiCast && speaker && <span className="msg-speaker">{speaker.name}</span>}
+            <span className={m.isUser ? 'msg-number user' : 'msg-number'}>
+              #{(m.position ?? m.index) + 1}
+            </span>
+            {m.hasThinking && m.thinkingContent && (
+              <details className="thinking">
+                <summary>💭 Thoughts</summary>
+                <div className="thinking-body">{m.thinkingContent}</div>
+              </details>
+            )}
+            <div className={m.isUser ? 'bubble user' : 'bubble ai'}>
+              {m.image && (
+                // Generated image (from /image or the Image Studio) —
+                // native right-click gives "Save image as…" in a browser.
+                <img
+                  className="chat-image"
+                  src={`/api/image/saved/${encodeURIComponent(m.image)}`}
+                  alt={m.imagePrompt || 'generated image'}
+                  title={m.imagePrompt}
+                  loading="lazy"
+                  onLoad={onChatImageLoad}
+                />
+              )}
+              {m.text ? (
+                <MessageContent text={m.text} />
+              ) : !m.isUser && m.thinkingContent && !(busy && m.index === lastIndex) ? (
+                // Thought-only reply (the model spent its whole turn inside a
+                // <think> block): say so instead of a bare empty bubble.
+                <span className="muted small">
+                  💭 Only thoughts this turn — Continue or Regenerate for a
+                  spoken reply.
+                </span>
+              ) : null}
+            </div>
+            {!m.isUser && m.chips && (
+              <ChipsRow
+                chips={m.chips}
+                isLast={m.index === lastIndex}
+                busy={busy}
+                onReprocess={() => onReprocess(m.index)}
+                onRevert={() => onRevert(m.index)}
+              />
+            )}
+            <MessageActions
+              m={m}
+              isLast={m.index === lastIndex}
+              busy={busy}
+              canSpeak={canSpeak}
+              greetCount={greetCount}
+              greetingIndex={greetingIndex}
+              userHasReplied={userHasReplied}
+              onSwipe={onSwipe}
+              onRegenerate={onRegenerate}
+              lookupWeb={lookupWeb}
+              lookupWiki={lookupWiki}
+              onContinue={onContinue}
+              onFork={() => onFork(m.index)}
+              onEdit={() => onBeginEdit(m)}
+              onDelete={() => onDelete(m.index)}
+              onVariantPicked={onVariantPicked}
+              onActionFailed={onActionFailed}
+            />
+          </div>
+        );
+      })}
+    </>
+  );
+});
+
+export function ChatMessageList({
+  sessionId,
+  streaming,
+  genStatus,
+  scrollRef,
+  onScroll,
+  followStreamingReplies = true,
+  ...transcript
+}: TranscriptProps & {
+  sessionId?: string | null;
+  streaming: string;
+  genStatus: GenStatus | null;
+  scrollRef: RefObject<HTMLDivElement>;
+  onScroll?: () => void;
+  followStreamingReplies?: boolean;
+}) {
+  const pinnedOpen = useRef<string | null>(null);
+  const stickToLatest = useRef(false);
+  const selfScroll = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const prevTip = useRef('');
+  const prevLen = useRef(0);
+  const prevHeight = useRef(0);
+  const spanRef = useRef<TranscriptSpan>({ start: 0, end: 0 });
+  const trackedFull = useRef(0);
+  const spanSession = useRef<string | null | undefined>(undefined);
+  const spanTip = useRef('');
+  const nearTop = useRef(false);
+  const wasNearTop = useRef(false);
+  const settled = useRef(false);
+  const [, bump] = useState(0);
+  const full = transcript.messages;
+  const fullTip = transcriptTipKey(full);
+  const opened = spanSession.current !== sessionId || trackedFull.current === 0;
+  const prepended =
+    !opened && full.length > trackedFull.current && fullTip === spanTip.current;
+  applyTranscriptSpan(spanRef.current, {
+    previousLength: trackedFull.current,
+    nextLength: full.length,
+    opened,
+    prepended,
+    nearTop: settled.current && nearTop.current,
+  });
+  if (opened) settled.current = false;
+  trackedFull.current = full.length;
+  spanTip.current = fullTip;
+  spanSession.current = sessionId ?? null;
+  // Memoized so token frames (which re-render this list) hand TranscriptRows
+  // the same array — a fresh slice each frame defeated its memo.
+  const { start: spanStart, end: spanEnd } = spanRef.current;
+  const visible = useMemo(() => full.slice(spanStart, spanEnd), [full, spanStart, spanEnd]);
+  const pinSelf = useCallback((el: HTMLDivElement) => {
+    selfScroll.current = true;
+    try {
+      pinTranscriptToLatest(el);
+    } finally {
+      selfScroll.current = false;
+    }
+  }, []);
+  const repinIfStuck = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || !stickToLatest.current) return;
+    if (streaming && !followStreamingReplies) {
+      stickToLatest.current = false;
+      return;
+    }
+    const max = Math.max(0, el.scrollHeight - el.clientHeight);
+    if (el.scrollTop < max - 1) pinSelf(el);
+  }, [followStreamingReplies, pinSelf, scrollRef, streaming]);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const nextTip = transcriptTipKey(visible);
+    const kind = classifyTranscriptGrowth({
+      sessionId,
+      prevSession: pinnedOpen.current,
+      prevLen: prevLen.current,
+      prevTip: prevTip.current,
+      nextLen: visible.length,
+      nextTip,
+    });
+    if (kind === 'open' && el) {
+      stickToLatest.current = true;
+      pinSelf(el);
+      pinnedOpen.current = sessionId ?? null;
+    } else if (kind === 'prepend' && el) {
+      stickToLatest.current = false;
+      selfScroll.current = true;
+      try {
+        holdTranscriptAfterPrepend(el, prevHeight.current);
+      } finally {
+        selfScroll.current = false;
+      }
+    } else if (el) {
+      selfScroll.current = true;
+      try {
+        followTranscriptWhileStreaming(el, {
+          followEnabled: followStreamingReplies,
+          generating: !!streaming,
+          previousHeight: prevHeight.current,
+        });
+      } finally {
+        selfScroll.current = false;
+      }
+    }
+    prevLen.current = visible.length;
+    prevTip.current = nextTip;
+    prevHeight.current = el?.scrollHeight ?? 0;
+    settled.current = true;
+  }, [sessionId, visible, scrollRef, streaming, followStreamingReplies, pinSelf]);
+  // The streaming bubble sits outside contentRef, so a follow-off reply
+  // never resizes that node and nothing else drops the open stick. Clear
+  // it before the observer can pin the landed message to the bottom.
+  useLayoutEffect(() => {
+    if (streaming && !followStreamingReplies) stickToLatest.current = false;
+  }, [streaming, followStreamingReplies]);
+  // Stable for TranscriptRows: repinIfStuck changes with `streaming`.
+  const repinRef = useRef(repinIfStuck);
+  repinRef.current = repinIfStuck;
+  const onChatImageLoad = useCallback(() => repinRef.current(), []);
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!content || typeof ResizeObserver === 'undefined') return;
+    const obs = new ResizeObserver(() => {
+      repinIfStuck();
+    });
+    obs.observe(content);
+    return () => obs.disconnect();
+  }, [repinIfStuck]);
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el || !settled.current) return;
+    if (!selfScroll.current && stickToLatest.current) {
+      const max = Math.max(0, el.scrollHeight - el.clientHeight);
+      if (el.scrollTop < max - 1) stickToLatest.current = false;
+    }
+    const atTop = el.scrollTop <= 64;
+    const enteredTop = atTop && !wasNearTop.current;
+    nearTop.current = atTop;
+    wasNearTop.current = atTop;
+    if (!enteredTop) return;
+    // The prepend hold is new height minus this. A Thought opened or an
+    // image decoded since the last render would otherwise count too.
+    prevHeight.current = el.scrollHeight;
+    if (revealOlderSpan(spanRef.current, trackedFull.current)) {
+      bump((n) => n + 1);
+      return;
+    }
+    onScroll?.();
+  };
+  // A tap that opens a Thought, or a wheel inside its own box, never
+  // scrolls the list, so it would otherwise leave the open stick armed.
+  const readerTookOver = () => {
+    stickToLatest.current = false;
+  };
+  return (
+    <div
+      className="chat-messages"
+      ref={scrollRef}
+      onScroll={handleScroll}
+      onPointerDown={readerTookOver}
+      onWheel={readerTookOver}
+      onTouchStart={readerTookOver}
+    >
+      <div ref={contentRef}>
+        <TranscriptRows
+          {...transcript}
+          messages={visible}
+          onChatImageLoad={onChatImageLoad}
+        />
+      </div>
+      {streaming && (() => {
+        // Separate a (possibly still-open) <think> block so reasoning streams
+        // into a muted "thinking…" area and the reply shows below — mirrors how
+        // the finished message renders its collapsible thinking block.
+        // Case-INSENSITIVE like the Dart strip (<THINK> is valid there too);
+        // the old case-sensitive match streamed an uppercase think block as
+        // normal reply text that then vanished into an empty bubble at done.
+        const canonical = canonicalizeReasoning(streaming)
+        const lower = canonical.toLowerCase();
+        const open = lower.indexOf('<think>');
+        let thinking = '';
+        let rest = canonical;
+        if (open !== -1) {
+          const after = canonical.slice(open + 7);
+          const close = after.toLowerCase().indexOf('</think>');
+          thinking = close === -1 ? after : after.slice(0, close);
+          rest = canonical.slice(0, open) + (close === -1 ? '' : after.slice(close + 8));
+        }
+        return (
+          <div className="bubble ai streaming">
+            {thinking.trim() && (
+              <LiveThinkBody text={thinking} followLatest={followStreamingReplies} />
+            )}
+            {rest && <MessageContent text={rest} />}
+          </div>
+        );
+      })()}
+      {!streaming && genStatus && (() => {
+        // Before the first token arrives, name the wait truthfully instead of
+        // showing nothing: real prompt-reading progress from the local
+        // backend, or which background pass is holding the slot.
+        const { label, fraction } = genStatusLabel(genStatus);
+        return (
+          <div className="bubble ai streaming gen-status" aria-live="polite">
+            <span className="muted small">{label}</span>
+            {fraction != null && (
+              <div className="gen-status-track">
+                <div
+                  className="gen-status-fill"
+                  style={{ width: `${Math.round(fraction * 100)}%` }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+function LiveThinkBody({
+  text,
+  followLatest,
+}: {
+  text: string;
+  followLatest: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const prevHeight = useRef(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    followTranscriptWhileStreaming(el, {
+      followEnabled: followLatest,
+      generating: true,
+      previousHeight: prevHeight.current,
+      slop: 24,
+    });
+    prevHeight.current = el.scrollHeight;
+  }, [text, followLatest]);
+  return (
+    <details className="thinking" open>
+      <summary>💭 thinking…</summary>
+      <div className="thinking-body" ref={ref}>{text}</div>
+    </details>
+  );
+}

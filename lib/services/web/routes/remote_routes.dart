@@ -1,0 +1,100 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf_router/shelf_router.dart';
+
+import 'package:front_porch_ai/services/web/tunnels/tunnels.dart';
+import 'package:front_porch_ai/services/web/util/util.dart';
+import 'package:front_porch_ai/services/web/web_server_deps.dart';
+
+/// Remote-access (Tailscale / port-forward) status + control endpoints.
+///
+/// Enabling a tunnel publishes the full web surface (chat, library, settings)
+/// beyond the host. That is a credential-grade action: session cookie alone
+/// is not enough — same password step-up as 2FA disable (audit P0.6).
+class WebRemoteRoutes {
+  WebRemoteRoutes(this._deps, this._tunnels, Router router) {
+    router.get('/api/remote/status', _status);
+    router.post('/api/remote/tailscale', _tailscale);
+    router.post('/api/remote/tailscale/login', _tailscaleLogin);
+  }
+
+  final WebServerDeps _deps;
+  final TunnelManager _tunnels;
+
+  Future<shelf.Response> _status(shelf.Request request) async =>
+      JsonResponse.ok(await _statusMap());
+
+  /// Tunnel status for the UI.
+  Future<Map<String, dynamic>> _statusMap() async {
+    return _tunnels.status();
+  }
+
+  Future<shelf.Response> _tailscaleLogin(shelf.Request request) async {
+    // Same step-up as enable-serve: a stolen session must not bind this
+    // machine to an attacker's tailnet (audit P1.6).
+    final body = await _json(request);
+    final denied = await denyUnlessSteppedUp(
+      auth: _deps.auth,
+      body: body,
+      request: request,
+    );
+    if (denied != null) return denied;
+    final url = await _tunnels.tailscaleLogin();
+    if (url == null) {
+      return JsonResponse.error(
+        502,
+        'Could not start Tailscale login. If Tailscale is already logged in, '
+        'just enable HTTPS below; otherwise open the Tailscale app and sign in.',
+      );
+    }
+    return JsonResponse.ok({'url': url});
+  }
+
+  Future<shelf.Response> _tailscale(shelf.Request request) async {
+    final body = await _json(request);
+    if (body['enable'] == true) {
+      final denied = await denyUnlessSteppedUp(
+        auth: _deps.auth,
+        body: body,
+        request: request,
+      );
+      if (denied != null) return denied;
+      final result = await _tunnels.enableTailscale();
+      if (result.outcome != TailscaleServeOutcome.ok) {
+        final message = result.outcome == TailscaleServeOutcome.httpsDisabled
+            ? 'HTTPS certificates aren\'t enabled for your tailnet yet. Turn them '
+                  'on once at ${TailscaleProvider.enableHttpsUrl}, then try again.'
+            : 'Could not start Tailscale serve (is Tailscale running and signed in?).';
+        return JsonResponse.error(502, message);
+      }
+    } else {
+      await _tunnels.disableTailscale();
+    }
+    return JsonResponse.ok(await _statusMap());
+  }
+
+  Future<Map<String, dynamic>> _json(shelf.Request request) async {
+    try {
+      return await RequestBody.readJsonMap(request);
+    } catch (_) {
+      return const {};
+    }
+  }
+}

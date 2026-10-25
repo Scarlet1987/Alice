@@ -1,0 +1,153 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:front_porch_ai/services/lore_extraction_service.dart';
+import 'package:front_porch_ai/utils/picker_prefs.dart';
+
+void main() {
+  test('pubspec pins file_picker ^13.1.0', () {
+    final yaml = File('pubspec.yaml').readAsStringSync();
+    expect(yaml, contains('file_picker: ^13.1.0'));
+    expect(yaml.contains('file_picker: ^12.'), isFalse);
+  });
+
+  test('lock resolves file_picker at least 13.1.0', () {
+    final lock = File('pubspec.lock').readAsStringSync();
+    final idx = lock.indexOf('\n  file_picker:\n');
+    expect(
+      idx,
+      greaterThanOrEqualTo(0),
+      reason: 'file_picker missing from lock',
+    );
+    final block = lock.substring(idx, idx + 500);
+    final version = RegExp(r'version: "([^"]+)"').firstMatch(block)!.group(1)!;
+    final parts = version.split('.').map(int.parse).toList();
+    expect(parts[0], 13);
+    expect(parts[1], greaterThanOrEqualTo(1));
+  });
+
+  test('package_info_plus is constraint-only (no Dart import)', () {
+    final needle = 'package:package_info_plus/';
+    final dartFiles = Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart'));
+    for (final f in dartFiles) {
+      for (final line in f.readAsLinesSync()) {
+        final trimmed = line.trimLeft();
+        if (trimmed.startsWith('import ') && trimmed.contains(needle)) {
+          fail('${f.path} must not import package_info_plus');
+        }
+      }
+    }
+  });
+
+  test('FilePickerResult shim exposes files and firstBytes', () async {
+    final file = MemoryPlatformFile(
+      name: 'note.txt',
+      bytes: Uint8List.fromList(utf8.encode('hello porch')),
+    );
+    final result = FilePickerResult([file]);
+    expect(result.files, hasLength(1));
+    expect(result.files.first.name, 'note.txt');
+    expect(await result.firstBytes(), utf8.encode('hello porch'));
+    expect(await FilePickerResult([]).firstBytes(), isNull);
+  });
+
+  test('MemoryPlatformFile readAsBytes, extension, and lengthSync', () async {
+    final file = MemoryPlatformFile(
+      name: 'lore.md',
+      bytes: Uint8List.fromList(utf8.encode('# Tide')),
+    );
+    expect(file.extension, 'md');
+    expect(await file.readAsBytes(), utf8.encode('# Tide'));
+    expect(await file.length(), 6);
+    expect(file.lengthSync(), 6);
+  });
+
+  test('testPickFilesOverride short-circuits pickFiles', () async {
+    PickerPrefs.testPickFilesOverride =
+        ({required String category, List<String>? allowedExtensions}) async {
+          expect(category, PickerPrefs.catImport);
+          expect(allowedExtensions, ['json']);
+          return FilePickerResult([
+            MemoryPlatformFile(
+              name: 'card.json',
+              bytes: Uint8List.fromList(utf8.encode('{"ok":true}')),
+            ),
+          ]);
+        };
+    addTearDown(() => PickerPrefs.testPickFilesOverride = null);
+
+    final result = await PickerPrefs.pickFiles(
+      category: PickerPrefs.catImport,
+      allowedExtensions: ['json'],
+    );
+    expect(result, isNotNull);
+    expect(result!.files.single.name, 'card.json');
+    expect(await result.firstBytes(), utf8.encode('{"ok":true}'));
+  });
+
+  test('uriToSavePath converts file Uri to a filesystem path', () {
+    expect(PickerPrefs.uriToSavePath(null), isNull);
+    final path = PickerPrefs.uriToSavePath(Uri.file('/tmp/out.txt'));
+    expect(path, '/tmp/out.txt');
+    expect(
+      PickerPrefs.uriToSavePath(Uri.parse('content://media/123')),
+      'content://media/123',
+    );
+  });
+
+  test('lore extraction reads MemoryPlatformFile via readAsBytes', () async {
+    const body =
+        'The Saltmarrow Compact binds the seven tide-houses of Brelth.';
+    final text = await LoreExtractionService.extractAll(
+      urls: const [],
+      files: [
+        MemoryPlatformFile(
+          name: 'compact.txt',
+          bytes: Uint8List.fromList(utf8.encode(body)),
+        ),
+      ],
+    );
+    expect(text, contains('Saltmarrow Compact'));
+    expect(text, contains('compact.txt'));
+  });
+
+  test('saveFile rejects empty bytes so it cannot wipe the chosen file', () {
+    expect(
+      PickerPrefs.saveFile(
+        category: PickerPrefs.catExport,
+        bytes: Uint8List(0),
+        fileName: 'wipe-me.txt',
+      ),
+      throwsA(isA<ArgumentError>()),
+    );
+  });
+
+  test('localPathOrTemp materializes a path-null pick', () async {
+    final file = MemoryPlatformFile(
+      name: 'card.json',
+      bytes: Uint8List.fromList(utf8.encode('{"ok":true}')),
+    );
+    expect(file.path, isNull);
+    final path = await PickerPrefs.localPathOrTemp(file);
+    expect(path, isNotNull);
+    expect(File(path!).readAsStringSync(), '{"ok":true}');
+  });
+
+  test('lock resolves win32 6 with file_picker 13', () {
+    final lock = File('pubspec.lock').readAsStringSync();
+    final idx = lock.indexOf('\n  win32:\n');
+    expect(idx, greaterThanOrEqualTo(0), reason: 'win32 missing from lock');
+    final block = lock.substring(idx, idx + 400);
+    final version = RegExp(r'version: "([^"]+)"').firstMatch(block)!.group(1)!;
+    expect(int.parse(version.split('.').first), 6);
+  });
+}

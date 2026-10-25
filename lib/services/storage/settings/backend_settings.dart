@@ -1,0 +1,489 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:io';
+
+// A leaf, not kobold.dart: the barrel loops back through storage_service.dart.
+import 'package:front_porch_ai/services/kobold/kcpps_codec.dart';
+
+import 'chat_context_fields.dart';
+import 'kobold_launch_fields.dart';
+import 'settings_base.dart';
+import 'preset_settings.dart'; // for parseKcppsFile (static)
+import 'remote_api_key_vault.dart';
+import 'worker_backend_settings.dart';
+
+/// Backend, remote API, reasoning, Kobold launch flags, model/kcpps paths,
+/// GPU/context etc.
+///
+/// Lifted Stage 7. kcppsHasModel + context override from active preset logic
+/// preserved exactly.
+class BackendSettings
+    with
+        SettingsBase,
+        WorkerBackendFields,
+        KoboldLaunchFields,
+        ChatContextFields {
+  String _backendType = 'kobold'; // 'kobold' or 'openRouter'
+  bool _backendChoiceDone = false; // first-launch engine choice answered
+  String _remoteApiKey = '';
+  String _remoteApiUrl = 'https://openrouter.ai/api/v1';
+  String _remoteModelName = '';
+  RemoteApiKeyVault _remoteApiKeys = RemoteApiKeyVault();
+
+  /// Last model id per host (same slot rule as keys). Reuses the vault
+  /// map type — url → string — not a second key store.
+  RemoteApiKeyVault _remoteApiModels = RemoteApiKeyVault();
+
+  bool _reasoningEnabled = false;
+  String _reasoningEffort = 'medium';
+  bool _koboldThinkingModel = false;
+
+  bool _autostartBackend = false;
+  bool _autostartOnChatOpen = true;
+  String? _lastUsedModelPath;
+  String? _activeKcppsPath;
+  bool _kcppsHasModel = false;
+
+  bool? _useCublas;
+  bool? _useVulkan;
+  bool? _useMetal;
+  bool? _useRocm;
+  bool _flashAttentionEnabled = true;
+  bool _mlockEnabled = false; // was on everywhere; pins the model in RAM
+  int _blasBatchSize = 512;
+  int _gpuId = 0;
+  int _gpuLayers = 0;
+
+  @override
+  String get backendType => _backendType;
+
+  /// Key for the *active* URL's vault slot. Image Studio, chat, and Check
+  /// Connection must all read this — never a leftover parked on another host.
+  String get remoteApiKey => remoteApiKeyFor(_remoteApiUrl);
+  String get remoteApiUrl => _remoteApiUrl;
+  String get remoteModelName => _remoteModelName;
+
+  /// Signed-in bearer for [url] (SuperGrok on api.x.ai). Wins over the
+  /// saved key and is never written into the vault.
+  String? Function(String url)? bearerOverlay;
+
+  /// Key for [url], independent of the currently selected host.
+  String remoteApiKeyFor(String url) =>
+      bearerOverlay?.call(url) ?? _remoteApiKeys.keyFor(url);
+
+  /// Normalized URLs that have a non-empty saved key (web placeholder).
+  List<String> get remoteApiUrlsWithKeys => _remoteApiKeys.urlsWithKeys;
+
+  /// Last model id stored for [url], independent of the live selection.
+  String remoteApiModelFor(String url) => _remoteApiModels.keyFor(url);
+  bool get reasoningEnabled => _reasoningEnabled;
+  String get reasoningEffort => _reasoningEffort;
+  bool get koboldThinkingModel => _koboldThinkingModel;
+  bool get autostartBackend => _autostartBackend;
+  bool get autostartOnChatOpen => _autostartOnChatOpen;
+  String? get lastUsedModelPath => _lastUsedModelPath;
+  @override
+  String? get activeKcppsPath => _activeKcppsPath;
+  bool get kcppsHasModel => _kcppsHasModel;
+
+  /// Model path referenced by parsed .kcpps JSON, or null when it names
+  /// none. The rule is [kcppsModelOf], the one a launch uses, so what
+  /// Settings shows is what loads.
+  static String? _kcppsModelPathOf(
+    Map<String, dynamic>? parsed, [
+    String? dir,
+  ]) {
+    final model = parsed == null ? '' : kcppsModelOf(parsed, engineDir: dir);
+    return model.isEmpty ? null : model;
+  }
+
+  /// The folder KoboldCpp runs in: a preset's relative model path is
+  /// relative to it. Set by the storage service.
+  String Function()? engineFolder;
+
+  /// Model path referenced by the ACTIVE .kcpps preset, or null when no
+  /// preset is active / the preset carries no model key. Lets callers (e.g.
+  /// the vision-capability resolver) interrogate the GGUF a preset owns even
+  /// though lastUsedModelPath stays empty in preset mode.
+  String? get kcppsModelPath => _kcppsModelPathOf(
+    PresetSettings.parseKcppsFile(_activeKcppsPath),
+    engineFolder?.call(),
+  );
+
+  /// Vision projector (mmproj) path referenced by the ACTIVE .kcpps preset,
+  /// or null. KoboldCpp loads this itself from --config, so the app never
+  /// passes it on the command line — but capability detection must honor it.
+  String? get kcppsMmprojPath {
+    final v = PresetSettings.parseKcppsFile(_activeKcppsPath)?['mmproj'];
+    return v is String && v.trim().isNotEmpty
+        ? kcppsPathIn(v.trim(), engineFolder?.call())
+        : null;
+  }
+
+  /// Returns whether the model file referenced in the active .kcpps preset exists on disk.
+  /// When false the Flutter model picker should allow selection even if kcppsHasModel.
+  bool get kcppsModelFileExists {
+    final modelPath = kcppsModelPath;
+    return modelPath != null && File(modelPath).existsSync();
+  }
+
+  bool? get useCublas => _useCublas;
+  bool? get useVulkan => _useVulkan;
+  bool? get useMetal => _useMetal;
+  bool? get useRocm => _useRocm;
+  bool get flashAttentionEnabled => _flashAttentionEnabled;
+  bool get mlockEnabled => _mlockEnabled;
+  int get blasBatchSize => _blasBatchSize;
+  int get gpuId => _gpuId;
+  int get gpuLayers => _gpuLayers;
+
+  void load() {
+    _backendType = prefs?.getString(k('backend_type')) ?? 'kobold';
+    _remoteApiKey = prefs?.getString(k('remote_api_key')) ?? '';
+    _remoteApiUrl =
+        prefs?.getString(k('remote_api_url')) ?? 'https://openrouter.ai/api/v1';
+    _remoteModelName = prefs?.getString(k('remote_model_name')) ?? '';
+    _remoteApiKeys = RemoteApiKeyVault.decode(
+      prefs?.getString(k('remote_api_keys')),
+    );
+    _remoteApiModels = RemoteApiKeyVault.decode(
+      prefs?.getString(k('remote_api_models')),
+    );
+    // Pre-fix installs had one shared key. Never put a leftover `sk-or-`
+    // into the Nano slot (or the inverse) — that is the community stuck
+    // state. Attribute by key shape; persist when migration changes either.
+    final beforeKey = _remoteApiKey;
+    final beforeVault = _remoteApiKeys.encode();
+    _remoteApiKey = applyLegacySharedRemoteApiKey(
+      vault: _remoteApiKeys,
+      activeUrl: _remoteApiUrl,
+      sharedKey: _remoteApiKey,
+    );
+    if (_remoteApiKey != beforeKey || _remoteApiKeys.encode() != beforeVault) {
+      prefs?.setString(k('remote_api_key'), _remoteApiKey);
+      prefs?.setString(k('remote_api_keys'), _remoteApiKeys.encode());
+    }
+    // Seed the live model into this host's slot so a later visit can
+    // still read remoteApiModelFor. The live picker is cleared on
+    // host/type change — it must not restore into the new host.
+    final modelSlot = _modelSlot();
+    if (modelSlot.isNotEmpty &&
+        _remoteModelName.isNotEmpty &&
+        _remoteApiModels.keyFor(modelSlot).isEmpty) {
+      _remoteApiModels.put(modelSlot, _remoteModelName);
+      prefs?.setString(k('remote_api_models'), _remoteApiModels.encode());
+    }
+    _reasoningEnabled = prefs?.getBool(k('reasoning_enabled')) ?? false;
+    _reasoningEffort = prefs?.getString(k('reasoning_effort')) ?? 'medium';
+    _koboldThinkingModel = prefs?.getBool(k('kobold_thinking_model')) ?? false;
+
+    _autostartBackend =
+        prefs?.getBool(k('autostart_backend')) ?? _autostartBackend;
+    _autostartOnChatOpen =
+        prefs?.getBool(k('autostart_on_chat_open')) ?? _autostartOnChatOpen;
+
+    // ── Migration: the removed 'pseudoRemote' backend is now the local Kobold
+    // backend launching a .kcpps preset. Rewrite the persisted value so nothing
+    // downstream ever sees the dead string, and carry the old
+    // autostart-pseudo-remote intent into the single autostart_backend flag,
+    // then drop the orphaned key.
+    if (_backendType == 'pseudoRemote') {
+      _backendType = 'kobold';
+      prefs?.setString(k('backend_type'), 'kobold');
+      if (prefs?.getBool(k('autostart_pseudo_remote')) ?? false) {
+        _autostartBackend = true;
+        prefs?.setBool(k('autostart_backend'), true);
+      }
+    }
+    prefs?.remove(k('autostart_pseudo_remote'));
+
+    _lastUsedModelPath = prefs?.getString(k('last_used_model_path'));
+    _activeKcppsPath = prefs?.getString(k('active_kcpps_path'));
+
+    // Restore the kcppsHasModel flag and context size from the persisted preset path
+    final parsed = PresetSettings.parseKcppsFile(_activeKcppsPath);
+    _kcppsHasModel = _kcppsModelPathOf(parsed) != null;
+
+    _backendChoiceDone = prefs?.getBool(k('backend_choice_done')) ?? false;
+
+    _useCublas = prefs?.getBool(k('use_cublas'));
+    _useVulkan = prefs?.getBool(k('use_vulkan'));
+    _useMetal = prefs?.getBool(k('use_metal'));
+    _useRocm = prefs?.getBool(k('use_rocm'));
+    _flashAttentionEnabled =
+        prefs?.getBool(k('flash_attention_enabled')) ?? _flashAttentionEnabled;
+    _mlockEnabled = prefs?.getBool(k('mlock_enabled')) ?? _mlockEnabled;
+    // Cleanup orphaned prefs (original migration)
+    prefs?.remove(k('context_shift_enabled'));
+    _blasBatchSize = prefs?.getInt(k('blas_batch_size')) ?? _blasBatchSize;
+    _gpuId = prefs?.getInt(k('gpu_id')) ?? _gpuId;
+    _gpuLayers = prefs?.getInt(k('gpu_layers')) ?? _gpuLayers;
+    loadChatContext(_contextOf(parsed));
+    loadWorkerBackend();
+    loadKoboldLaunch();
+  }
+
+  /// Write a key into [url]'s vault slot without changing the live mouth
+  /// host. Worker settings reuse the same per-host keys.
+  Future<void> setRemoteApiKeyFor(String url, String value) async {
+    if (value == bearerOverlay?.call(url)) return;
+    _remoteApiKeys.put(url, value);
+    if (normalizeRemoteApiUrl(url) == normalizeRemoteApiUrl(_remoteApiUrl)) {
+      _remoteApiKey = value;
+      await prefs?.setString(k('remote_api_key'), value);
+    }
+    await _persistRemoteApiKeys();
+    notify();
+  }
+
+  /// Vault slot for the live model: oMLX has a fixed URL so it does not
+  /// steal the OpenRouter/Nano slot when that backend is selected.
+  String _modelSlot({String? backend, String? url}) {
+    final b = backend ?? _backendType;
+    if (b == 'omlx') return normalizeRemoteApiUrl(kOmlxApiV1);
+    return normalizeRemoteApiUrl(url ?? _remoteApiUrl);
+  }
+
+  Future<void> _persistRemoteApiModels() async {
+    await prefs?.setString(k('remote_api_models'), _remoteApiModels.encode());
+  }
+
+  void _stashLiveModel() {
+    final slot = _modelSlot();
+    if (slot.isEmpty) return;
+    // An already-blank picker is not a new last-used id. Putting '' would
+    // wipe a parked vault entry when the user leaves a host they never
+    // picked a model on (or just cleared).
+    if (_remoteModelName.isEmpty) return;
+    _remoteApiModels.put(slot, _remoteModelName);
+  }
+
+  Future<void> _clearLiveRemoteModel() async {
+    _remoteModelName = '';
+    await prefs?.setString(k('remote_model_name'), '');
+  }
+
+  Future<void> setBackendType(String value) async {
+    if (value != _backendType) {
+      _stashLiveModel();
+      _backendType = value;
+      // Kobold and OpenRouter share the URL slot — restoring would keep
+      // the previous host's id in the picker. Always blank the live
+      // selection so the user picks a model that belongs here.
+      await _clearLiveRemoteModel();
+      await _persistRemoteApiModels();
+    } else {
+      _backendType = value;
+    }
+    await prefs?.setString(k('backend_type'), value);
+    notify();
+  }
+
+  /// Whether the one-time first-launch "how will you run your AI?" choice has
+  /// been answered (or implicitly resolved — an already-installed engine or a
+  /// configured remote backend counts). Until true, SetupService shows the
+  /// choice instead of touching the network.
+  bool get backendChoiceDone => _backendChoiceDone;
+
+  Future<void> setBackendChoiceDone(bool value) async {
+    _backendChoiceDone = value;
+    await prefs?.setBool(k('backend_choice_done'), value);
+    notify();
+  }
+
+  Future<void> setRemoteApiKey(String value) async {
+    if (value == bearerOverlay?.call(_remoteApiUrl)) return;
+    _remoteApiKey = value;
+    _remoteApiKeys.put(_remoteApiUrl, value);
+    await prefs?.setString(k('remote_api_key'), value);
+    await _persistRemoteApiKeys();
+    notify();
+  }
+
+  Future<void> setRemoteApiUrl(String value) async {
+    if (_remoteApiKey.isNotEmpty &&
+        remoteApiKeyBelongsToUrl(_remoteApiKey, _remoteApiUrl)) {
+      _remoteApiKeys.put(_remoteApiUrl, _remoteApiKey);
+    }
+    final previousSlot = _modelSlot();
+    _stashLiveModel();
+    _remoteApiUrl = value;
+    _remoteApiKey = _remoteApiKeys.keyFor(value);
+    await prefs?.setString(k('remote_api_url'), value);
+    await prefs?.setString(k('remote_api_key'), _remoteApiKey);
+    await _persistRemoteApiKeys();
+    if (previousSlot != _modelSlot()) {
+      await _clearLiveRemoteModel();
+    }
+    await _persistRemoteApiModels();
+    notify();
+  }
+
+  Future<void> _persistRemoteApiKeys() async {
+    await prefs?.setString(k('remote_api_keys'), _remoteApiKeys.encode());
+  }
+
+  Future<void> setRemoteModelName(String value) async {
+    _remoteModelName = value;
+    final slot = _modelSlot();
+    if (slot.isNotEmpty) _remoteApiModels.put(slot, value);
+    await prefs?.setString(k('remote_model_name'), value);
+    await _persistRemoteApiModels();
+    notify();
+  }
+
+  Future<void> setReasoningEnabled(bool value) async {
+    _reasoningEnabled = value;
+    await prefs?.setBool(k('reasoning_enabled'), value);
+    notify();
+  }
+
+  Future<void> setReasoningEffort(String value) async {
+    _reasoningEffort = value;
+    await prefs?.setString(k('reasoning_effort'), value);
+    notify();
+  }
+
+  Future<void> setKoboldThinkingModel(bool value) async {
+    _koboldThinkingModel = value;
+    await prefs?.setBool(k('kobold_thinking_model'), value);
+    notify();
+  }
+
+  Future<void> setAutostartBackend(bool value) async {
+    _autostartBackend = value;
+    await prefs?.setBool(k('autostart_backend'), value);
+    notify();
+  }
+
+  Future<void> setAutostartOnChatOpen(bool value) async {
+    _autostartOnChatOpen = value;
+    await prefs?.setBool(k('autostart_on_chat_open'), value);
+    notify();
+  }
+
+  Future<void> setLastUsedModelPath(String? value) async {
+    _lastUsedModelPath = value;
+    if (value != null) {
+      await prefs?.setString(k('last_used_model_path'), value);
+    } else {
+      await prefs?.remove(k('last_used_model_path'));
+    }
+    notify();
+  }
+
+  /// The one way chat's preset changes, on the desktop and on the phone; the
+  /// context follows it ([followPresetContext]).
+  Future<void> setActiveKcppsPath(String? value) async {
+    final hadPreset = _activeKcppsPath?.trim().isNotEmpty ?? false;
+    _activeKcppsPath = value;
+    // Parse synchronously so _kcppsHasModel and the context are accurate in the same notifyListeners call.
+    final parsed = PresetSettings.parseKcppsFile(value);
+    _kcppsHasModel = _kcppsModelPathOf(parsed) != null;
+    await followPresetContext(
+      hadPreset: hadPreset,
+      hasPreset: value?.trim().isNotEmpty ?? false,
+      presetContext: _contextOf(parsed),
+    );
+    if (value != null) {
+      await prefs?.setString(k('active_kcpps_path'), value);
+    } else {
+      await prefs?.remove(k('active_kcpps_path'));
+    }
+    notify();
+  }
+
+  Future<void> setUseCublas(bool? value) async {
+    _useCublas = value;
+    if (value != null) {
+      await prefs?.setBool(k('use_cublas'), value);
+    } else {
+      await prefs?.remove(k('use_cublas'));
+    }
+    notify();
+  }
+
+  Future<void> setUseVulkan(bool? value) async {
+    _useVulkan = value;
+    if (value != null) {
+      await prefs?.setBool(k('use_vulkan'), value);
+    } else {
+      await prefs?.remove(k('use_vulkan'));
+    }
+    notify();
+  }
+
+  Future<void> setUseMetal(bool? value) async {
+    _useMetal = value;
+    if (value != null) {
+      await prefs?.setBool(k('use_metal'), value);
+    } else {
+      await prefs?.remove(k('use_metal'));
+    }
+    notify();
+  }
+
+  Future<void> setUseRocm(bool? value) async {
+    _useRocm = value;
+    if (value != null) {
+      await prefs?.setBool(k('use_rocm'), value);
+    } else {
+      await prefs?.remove(k('use_rocm'));
+    }
+    notify();
+  }
+
+  Future<void> setFlashAttentionEnabled(bool value) async {
+    _flashAttentionEnabled = value;
+    await prefs?.setBool(k('flash_attention_enabled'), value);
+    // Switching it back on is asking ROCm to try it again.
+    if (value) await retryRocmFlashAttention();
+    notify();
+  }
+
+  Future<void> setMlockEnabled(bool value) async {
+    _mlockEnabled = value;
+    await prefs?.setBool(k('mlock_enabled'), value);
+    notify();
+  }
+
+  Future<void> setBlasBatchSize(int value) async {
+    _blasBatchSize = value;
+    await prefs?.setInt(k('blas_batch_size'), value);
+    notify();
+  }
+
+  Future<void> setGpuId(int value) async {
+    _gpuId = value;
+    await prefs?.setInt(k('gpu_id'), value);
+    notify();
+  }
+
+  Future<void> setGpuLayers(int value) async {
+    _gpuLayers = value;
+    await prefs?.setInt(k('gpu_layers'), value);
+    notify();
+  }
+
+  /// The context a parsed preset sets, or null when it sets none.
+  static int? _contextOf(Map<String, dynamic>? preset) {
+    final context = preset?['contextsize'];
+    return context is int ? context : null;
+  }
+}

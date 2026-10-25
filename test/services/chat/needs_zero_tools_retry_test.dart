@@ -1,0 +1,202 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// Tools fill required ints with 0; retry text once. A quiet all-zero after
+// that is a valid read. Individual 0s were always fine.
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:front_porch_ai/models/character_card.dart';
+import 'package:front_porch_ai/services/chat/llm_eval_engine.dart';
+import 'package:front_porch_ai/services/chat/needs_impact_zero.dart';
+import 'package:front_porch_ai/services/chat/pass_support.dart';
+import 'package:front_porch_ai/services/chat/realism_tools.dart';
+import 'package:front_porch_ai/services/llm_service.dart';
+
+import 'llm_eval_engine_test.dart' show createTestLlmEvalEngine;
+
+const _zeroArgs = {
+  'hunger_delta': 0,
+  'energy_delta': 0,
+  'hygiene_delta': 0,
+  'fun_delta': 0,
+  'social_delta': 0,
+  'bladder_delta': 0,
+  'comfort_delta': 0,
+  'reason': 'none',
+};
+
+void main() {
+  group('needsImpactHasNonZeroDelta', () {
+    test('false for all zeros and for no delta keys', () {
+      expect(
+        needsImpactHasNonZeroDelta(
+          '{"hunger_delta":0,"energy_delta":0,"hygiene_delta":0,'
+          '"fun_delta":0,"social_delta":0,"bladder_delta":0,'
+          '"comfort_delta":0,"reason":"none"}',
+        ),
+        isFalse,
+      );
+      expect(needsImpactHasNonZeroDelta('{"reason":"none"}'), isFalse);
+    });
+
+    test('true when any need moved', () {
+      expect(
+        needsImpactHasNonZeroDelta(
+          '{"hunger_delta":0,"bladder_delta":60,"reason":"peed"}',
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  // Needs v2 (2026-10-06): the clock charges the span in code, so a quiet
+  // beat is a legitimate all-zero and common. The text retry after tools
+  // zeros would fire on most quiet turns and double the eval cost on local
+  // models; it is kept only for the away prompt, which expects restorations.
+  group('tools all-zero is a quiet beat', () {
+    test('keeps the tools zeros instead of retrying as text', () async {
+      var textCalls = 0;
+      final e = _engine(
+        toolArgs: _zeroArgs,
+        onText: (p) {
+          textCalls++;
+          return '{"hunger_delta":0,"energy_delta":-6,"hygiene_delta":-8,'
+              '"fun_delta":7,"social_delta":13,"bladder_delta":60,'
+              '"comfort_delta":10,"reason":"relieved herself in the scene"}';
+        },
+      );
+      final raw = await e.evaluateNeedsImpactCall(
+        'she pees on him, riding hard',
+      );
+      expect(textCalls, 0);
+      expect(needsImpactHasNonZeroDelta(raw!), isFalse);
+    });
+
+    test('the away prompt still retries tools zeros as text once', () async {
+      var textCalls = 0;
+      final e = _engine(
+        toolArgs: _zeroArgs,
+        onText: (p) {
+          textCalls++;
+          return '{"hunger_delta":40,"energy_delta":60,"hygiene_delta":0,'
+              '"fun_delta":0,"social_delta":0,"bladder_delta":70,'
+              '"comfort_delta":10,"reason":"ate, slept, went"}';
+        },
+      );
+      final raw = await e.evaluateNeedsImpactCall(
+        'she ate, slept and freshened up while you were away',
+        awayScene: true,
+      );
+      expect(textCalls, 1);
+      expect(raw, contains('"bladder_delta":70'));
+    });
+
+    test(
+      'quiet all-zero after tools+text is kept — no inventing a swing',
+      () async {
+        var textCalls = 0;
+        final e = _engine(
+          toolArgs: _zeroArgs,
+          onText: (p) {
+            textCalls++;
+            if (p.prompt.contains('failed read') ||
+                p.prompt.contains('always moves at least one need')) {
+              return '{"hunger_delta":0,"energy_delta":-5,"hygiene_delta":0,'
+                  '"fun_delta":8,"social_delta":12,"bladder_delta":60,'
+                  '"comfort_delta":4,"reason":"invented"}';
+            }
+            return '{"hunger_delta":0,"energy_delta":0,"hygiene_delta":0,'
+                '"fun_delta":0,"social_delta":0,"bladder_delta":0,'
+                '"comfort_delta":0,"reason":"no notable need impact"}';
+          },
+        );
+        final raw = await e.evaluateNeedsImpactCall(
+          'they sit together a while',
+        );
+        expect(textCalls, 0);
+        expect(needsImpactHasNonZeroDelta(raw!), isFalse);
+      },
+    );
+
+    test('does not retry when tools already reported a scene delta', () async {
+      var textCalls = 0;
+      final e = _engine(
+        toolArgs: {..._zeroArgs, 'bladder_delta': 70, 'reason': 'bathroom'},
+        onText: (p) {
+          textCalls++;
+          return '{"hunger_delta":99}';
+        },
+      );
+      final raw = await e.evaluateNeedsImpactCall('she uses the bathroom');
+      expect(textCalls, 0);
+      expect(raw, contains('"bladder_delta":70'));
+    });
+  });
+}
+
+LlmEvalEngine _engine({
+  required Map<String, dynamic> toolArgs,
+  required String Function(GenerationParams) onText,
+}) {
+  final base = createTestLlmEvalEngine(
+    activeChar: CharacterCard(name: 'Jennifer'),
+  );
+  return LlmEvalEngine(
+    getActiveCharacter: () => CharacterCard(name: 'Jennifer'),
+    getActiveGroup: () => null,
+    getIsObserverMode: () => false,
+    getUserName: () => 'User',
+    getRealismEnabled: () => true,
+    getMessages: () => const [],
+    fireToolEval: (spec) async => LlmToolResponse(
+      calls: [LlmToolCall(name: kNeedsImpactTool, arguments: toolArgs)],
+      text: '',
+    ),
+    probe: ToolTransportProbe(),
+    getBackendIdentity: () => 'test',
+    getLlmService: () => _TextLlm(onText),
+    getIsLocal: () => false,
+    getKoboldService: () => null,
+    reconnectIfAlive: () async {},
+    ensureServerIdle: () async {},
+    getIsCancellingRealismEval: () => false,
+    getRealismEvalCancelled: () => false,
+    getPendingRealismMetadata: () => null,
+    setPendingRealismMetadata: (_) {},
+    captureRealismState: ({preTurn}) => {},
+    getCharacterEmotion: () => '',
+    setCharacterEmotion: (_) {},
+    getEmotionIntensity: () => '',
+    setEmotionIntensity: (_) {},
+    relationshipService: base.relationshipService,
+  );
+}
+
+class _TextLlm extends LLMService {
+  _TextLlm(this._onText);
+  final String Function(GenerationParams) _onText;
+
+  @override
+  bool get isReady => true;
+
+  @override
+  String get backendName => 'fake';
+
+  @override
+  Stream<String> generateStream(GenerationParams params) =>
+      Stream.value(_onText(params));
+
+  @override
+  void addListener(VoidCallback listener) {}
+
+  @override
+  void removeListener(VoidCallback listener) {}
+
+  @override
+  bool get hasListeners => false;
+
+  @override
+  void notifyListeners() {}
+}

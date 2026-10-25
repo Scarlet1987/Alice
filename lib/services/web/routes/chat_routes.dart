@@ -1,0 +1,469 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf_router/shelf_router.dart';
+
+import 'package:front_porch_ai/services/web/facade/chat_facade.dart';
+import 'package:front_porch_ai/services/web/util/util.dart';
+
+/// Chat state + action endpoints for the rewritten server. Live tokens stream
+/// over the WebSocket hub (/api/ws); these endpoints drive and read state.
+class WebChatRoutes {
+  WebChatRoutes(this._facade, Router router) {
+    router.get('/api/chat/state', _state);
+    router.get('/api/chat/context-budget', _contextBudget);
+    router.post('/api/chat/context-budget/refresh', _refreshContextBudget);
+    router.get('/api/chat/participant/<id>/realism', _participantRealism);
+    router.get('/api/chat/sessions', _sessions);
+    router.get('/api/personas', _personas);
+    router.post('/api/personas/select', _selectPersona);
+    router.post('/api/chat/persona', _selectChatPersona);
+    router.post('/api/personas/create', _createPersona);
+    router.get('/api/personas/<id>/detail', _personaDetail);
+    router.post('/api/personas/<id>/delete', _deletePersona);
+    router.post('/api/personas/<id>', _updatePersona);
+    router.post('/api/chat/select', _select);
+    router.post('/api/chat/select-group', _selectGroup);
+    router.post('/api/chat/start-fresh', _startFresh);
+    router.post('/api/chat/send', _send);
+    router.post('/api/chat/guest-picker/dismiss', _dismissGuestPicker);
+    router.post('/api/chat/chance-time/accept', _acceptChanceTime);
+    router.post('/api/chat/chance-time/spin', _spinChanceTime);
+    router.post('/api/chat/stop', _stop);
+    router.post('/api/chat/regenerate', _regenerate);
+    router.post('/api/chat/cancel-realism', _cancelRealism);
+    router.post('/api/chat/continue', _continue);
+    router.post('/api/chat/fork', _fork);
+    router.post('/api/chat/impersonate', _impersonate);
+    router.post('/api/chat/swipe', _swipe);
+    router.get('/api/chat/variants', _variants);
+    router.post('/api/chat/select-variant', _selectVariant);
+    router.post('/api/chat/edit', _edit);
+    router.post('/api/chat/delete', _delete);
+    router.post('/api/chat/insert-image', _insertImage);
+    router.post('/api/chat/image-review', _imageReview);
+    router.post('/api/chat/tool-test', _toolTest);
+    router.post('/api/chat/reprocess-needs', _reprocessNeeds);
+    router.post('/api/chat/revert-needs-reprocess', _revertNeedsReprocess);
+    router.post('/api/chat/author-note', _authorNote);
+    router.post('/api/chat/theme-overrides', _setThemeOverrides);
+    router.get('/api/chat/lorebook', _chatLorebook);
+    router.post('/api/chat/lorebook', _setChatLorebook);
+    router.post('/api/chat/lore-preview', _lorePreview);
+    router.post('/api/chat/session', _session);
+    router.post('/api/chat/history-older', _historyOlder);
+  }
+
+  final ChatFacade _facade;
+
+  shelf.Response _state(shelf.Request request) =>
+      JsonResponse.ok(_facade.state());
+
+  shelf.Response _contextBudget(shelf.Request request) =>
+      JsonResponse.ok(_facade.contextBudget());
+
+  Future<shelf.Response> _refreshContextBudget(shelf.Request request) async =>
+      JsonResponse.ok(await _facade.refreshContextBudget());
+
+  shelf.Response _dismissGuestPicker(shelf.Request request) {
+    _facade.dismissGuestPicker();
+    return JsonResponse.ok({'ok': true});
+  }
+
+  /// Re-probe the current model's tool-calling support (web pill retest).
+  Future<shelf.Response> _toolTest(shelf.Request request) async =>
+      JsonResponse.ok(await _facade.testToolCalling());
+
+  /// The chat-scoped lorebook (full-fidelity rows) — desktop "This Chat"
+  /// sidebar section parity.
+  shelf.Response _chatLorebook(shelf.Request request) =>
+      JsonResponse.ok(_facade.chatLorebookRows());
+
+  Future<shelf.Response> _setChatLorebook(shelf.Request request) async {
+    final body = await _json(request);
+    final ok = await _facade.setChatLorebook(body['entries']);
+    if (!ok) return JsonResponse.error(409, 'No active chat session');
+    return JsonResponse.ok({'ok': true});
+  }
+
+  /// Mutation-free "would trigger next" dry-run against a composer draft.
+  Future<shelf.Response> _lorePreview(shelf.Request request) async {
+    final body = await _json(request);
+    return JsonResponse.ok({
+      'matches': _facade.lorePreview(body['draft']?.toString() ?? ''),
+    });
+  }
+
+  /// Realism for one cast participant (focus-scoped sidebar in the unified UI).
+  shelf.Response _participantRealism(shelf.Request request, String id) {
+    final realism = _facade.participantRealism(id);
+    if (realism == null) {
+      return JsonResponse.error(404, 'Participant not found');
+    }
+    return JsonResponse.ok(realism);
+  }
+
+  /// List the active character's saved conversations (newest first) so the web
+  /// UI can show the Conversations drawer and resume any of them.
+  Future<shelf.Response> _sessions(shelf.Request request) async =>
+      JsonResponse.ok({
+        'sessions': await _facade.sessions(
+          characterId: request.url.queryParameters['characterId'],
+          groupId: request.url.queryParameters['groupId'],
+        ),
+      });
+
+  shelf.Response _personas(shelf.Request request) =>
+      JsonResponse.ok({'personas': _facade.personas()});
+
+  Future<shelf.Response> _selectPersona(shelf.Request request) async {
+    final body = await _json(request);
+    final id = body['id']?.toString();
+    if (id == null) return JsonResponse.badRequest('id is required');
+    final ok = await _facade.setPersona(id);
+    if (!ok) return JsonResponse.error(404, 'Persona not found');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  /// Speak as a different persona in the CURRENT chat. Separate endpoint from
+  /// /api/personas/select on purpose: that one moves the default for new chats
+  /// and must not touch the chat you are in.
+  Future<shelf.Response> _selectChatPersona(shelf.Request request) async {
+    final body = await _json(request);
+    final id = body['id']?.toString();
+    if (id == null) return JsonResponse.badRequest('id is required');
+    final ok = await _facade.setChatPersona(id);
+    if (!ok) return JsonResponse.error(404, 'Persona not found');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _createPersona(shelf.Request request) async {
+    final body = await _json(request);
+    if ((body['name']?.toString().trim() ?? '').isEmpty) {
+      return JsonResponse.badRequest('name is required');
+    }
+    final ok = await _facade.createPersona(body);
+    if (!ok) return JsonResponse.error(503, 'Personas unavailable');
+    return JsonResponse.ok({'personas': _facade.personas()});
+  }
+
+  shelf.Response _personaDetail(shelf.Request request, String id) {
+    final detail = _facade.personaDetail(id);
+    if (detail == null) return JsonResponse.error(404, 'Persona not found');
+    return JsonResponse.ok(detail);
+  }
+
+  Future<shelf.Response> _updatePersona(
+    shelf.Request request,
+    String id,
+  ) async {
+    final ok = await _facade.updatePersona(id, await _json(request));
+    if (!ok) return JsonResponse.error(404, 'Persona not found');
+    return JsonResponse.ok({'personas': _facade.personas()});
+  }
+
+  Future<shelf.Response> _deletePersona(
+    shelf.Request request,
+    String id,
+  ) async {
+    final ok = await _facade.deletePersona(id);
+    if (!ok) {
+      return JsonResponse.error(409, 'Cannot delete (last persona or unknown)');
+    }
+    return JsonResponse.ok({'personas': _facade.personas()});
+  }
+
+  Future<shelf.Response> _select(shelf.Request request) async {
+    final body = await _json(request);
+    final id = body['characterId']?.toString();
+    if (id == null) return JsonResponse.badRequest('characterId is required');
+    final ok = await _facade.select(id);
+    if (!ok) return JsonResponse.error(404, 'Character not found');
+    return JsonResponse.ok({
+      'status': 'ok',
+      'sessionId': _facade.currentSessionId,
+    });
+  }
+
+  Future<shelf.Response> _selectGroup(shelf.Request request) async {
+    final body = await _json(request);
+    final id = body['groupId']?.toString();
+    if (id == null) return JsonResponse.badRequest('groupId is required');
+    final ok = await _facade.selectGroup(id);
+    if (!ok) return JsonResponse.error(404, 'Group not found');
+    return JsonResponse.ok({
+      'status': 'ok',
+      'sessionId': _facade.currentSessionId,
+    });
+  }
+
+  /// Start a fresh chat with a character OR group under a chosen persona
+  /// (the library's "Start new chat"). Body: {characterId|groupId, personaId}.
+  Future<shelf.Response> _startFresh(shelf.Request request) async {
+    final body = await _json(request);
+    final characterId = body['characterId']?.toString();
+    final groupId = body['groupId']?.toString();
+    if ((characterId == null || characterId.isEmpty) &&
+        (groupId == null || groupId.isEmpty)) {
+      return JsonResponse.badRequest('characterId or groupId is required');
+    }
+    final ok = await _facade.startFreshChat(
+      characterId: characterId,
+      groupId: groupId,
+      personaId: body['personaId']?.toString() ?? '',
+    );
+    if (!ok) return JsonResponse.error(404, 'Character or group not found');
+    return JsonResponse.ok({
+      'status': 'ok',
+      'sessionId': _facade.currentSessionId,
+    });
+  }
+
+  Future<shelf.Response> _historyOlder(shelf.Request request) async {
+    final loaded = await _facade.loadOlderHistory();
+    return JsonResponse.ok({
+      'ok': true,
+      'loaded': loaded,
+      'hasOlderHistory': _facade.state()['hasOlderHistory'] == true,
+    });
+  }
+
+  Future<shelf.Response> _send(shelf.Request request) async {
+    final body = await _json(request);
+    final text = body['text']?.toString() ?? '';
+    final image = decodeChatSendImage(body['imageBase64']);
+    if (text.trim().isEmpty && image == null) {
+      return JsonResponse.badRequest('text is required');
+    }
+    final testing = _facade.sendRefusal(text, withImage: image != null);
+    if (testing != null) return JsonResponse.badRequest(testing);
+    final lookupBlock = _facade.lookupCommandBlock(text);
+    if (lookupBlock != null) return JsonResponse.badRequest(lookupBlock);
+    _facade.send(text, imageBytes: image);
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  /// Resolve a parked Chance Time (chaos) event — the web counterpart of the
+  /// desktop wheel's "Accept Your Fate". Bodyless: the server already holds the
+  /// pre-picked pending event, so the client just says "go".
+  Future<shelf.Response> _acceptChanceTime(shelf.Request request) async {
+    await _facade.acceptChanceTime();
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  shelf.Response _spinChanceTime(shelf.Request request) {
+    if (!_facade.requestChanceTimeSpin()) {
+      return JsonResponse.badRequest(
+        'Chaos is off or an event is already pending',
+      );
+    }
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  shelf.Response _stop(shelf.Request request) {
+    _facade.stop();
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _regenerate(shelf.Request request) async {
+    final body = await _json(request);
+    _facade.regenerate(
+      critique: body['critique']?.toString(),
+      webQuery: body['webQuery']?.toString(),
+      wikiQuery: body['wikiQuery']?.toString(),
+    );
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  shelf.Response _cancelRealism(shelf.Request request) {
+    _facade.cancelRealismEval();
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  shelf.Response _continue(shelf.Request request) {
+    _facade.continueGeneration();
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _fork(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['index'];
+    if (index is! int) return JsonResponse.badRequest('index is required');
+    final sessionId = await _facade.fork(index);
+    if (sessionId == null) {
+      return JsonResponse.error(409, 'Cannot fork at that message');
+    }
+    return JsonResponse.ok({'status': 'ok', 'sessionId': sessionId});
+  }
+
+  Future<shelf.Response> _impersonate(shelf.Request request) async {
+    final body = await _json(request);
+    _facade.impersonate(body['prefix']?.toString() ?? '');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _swipe(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['messageIndex'];
+    final direction = body['direction'];
+    if (index is! int || direction is! int) {
+      return JsonResponse.badRequest('messageIndex and direction are required');
+    }
+    _facade.swipe(index, direction, critique: body['critique']?.toString());
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  shelf.Response _variants(shelf.Request request) {
+    final raw = request.url.queryParameters['messageIndex'];
+    final index = int.tryParse(raw ?? '');
+    if (index == null) {
+      return JsonResponse.badRequest('messageIndex is required');
+    }
+    return JsonResponse.ok(_facade.variants(index));
+  }
+
+  Future<shelf.Response> _selectVariant(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['messageIndex'];
+    final variantIndex = body['variantIndex'];
+    if (index is! int || variantIndex is! int) {
+      return JsonResponse.badRequest(
+        'messageIndex and variantIndex are required',
+      );
+    }
+    await _facade.selectVariant(index, variantIndex);
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _edit(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['index'];
+    final text = body['text']?.toString();
+    if (index is! int || text == null) {
+      return JsonResponse.badRequest('index and text are required');
+    }
+    _facade.edit(index, text);
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _delete(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['index'];
+    if (index is! int) return JsonResponse.badRequest('index is required');
+    _facade.delete(index);
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  /// Resolve a parked /image prompt review: {prompt: '...'} generates with
+  /// the (possibly edited) prompt; an absent/empty prompt cancels.
+  Future<shelf.Response> _imageReview(shelf.Request request) async {
+    final body = await _json(request);
+    final prompt = body['prompt']?.toString().trim();
+    _facade.resolveImageReview(
+      (prompt == null || prompt.isEmpty) ? null : prompt,
+    );
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _insertImage(shelf.Request request) async {
+    final body = await _json(request);
+    final filename = body['filename']?.toString();
+    if (filename == null || filename.trim().isEmpty) {
+      return JsonResponse.badRequest('filename is required');
+    }
+    // Optional prompt (newer clients send it so the image message carries the
+    // same hover/copyable prompt the desktop attaches).
+    final prompt = body['prompt']?.toString() ?? '';
+    final ok = await _facade.insertImage(filename, prompt: prompt);
+    if (!ok) return JsonResponse.error(404, 'Saved image not found');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _reprocessNeeds(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['index'];
+    final critique = body['critique']?.toString().trim() ?? '';
+    if (index is! int) return JsonResponse.badRequest('index is required');
+    if (critique.isEmpty) {
+      return JsonResponse.badRequest('critique is required');
+    }
+    // Optional, and parsed defensively: an app built before scoped reprocess
+    // sends no 'needs' key at all and must keep working unchanged.
+    final rawNeeds = body['needs'];
+    final onlyNeeds = rawNeeds is List
+        ? rawNeeds
+              .map((n) => n.toString().trim().toLowerCase())
+              .where((n) => n.isNotEmpty)
+              .toSet()
+        : const <String>{};
+    final ok = await _facade.reprocessNeeds(
+      index,
+      critique,
+      onlyNeeds: onlyNeeds,
+    );
+    if (!ok) return JsonResponse.error(409, 'Message cannot be reprocessed');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _revertNeedsReprocess(shelf.Request request) async {
+    final body = await _json(request);
+    final index = body['index'];
+    if (index is! int) return JsonResponse.badRequest('index is required');
+    final ok = await _facade.revertNeedsReprocess(index);
+    if (!ok) return JsonResponse.error(409, 'Nothing to revert');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _authorNote(shelf.Request request) async {
+    final body = await _json(request);
+    final note = body['authorNote']?.toString() ?? '';
+    final strength = body['strength'] is int ? body['strength'] as int : null;
+    _facade.setAuthorNote(note, strength: strength);
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _setThemeOverrides(shelf.Request request) async {
+    final body = await _json(request);
+    final ok = await _facade.setThemeOverrides(body);
+    if (!ok) return JsonResponse.error(400, 'No active session');
+    return JsonResponse.ok({'status': 'ok'});
+  }
+
+  Future<shelf.Response> _session(shelf.Request request) async {
+    final body = await _json(request);
+    final action = body['action']?.toString();
+    final sessionId = await _facade.session(
+      action: action,
+      sessionId: body['sessionId']?.toString(),
+      startReplacement: body['startReplacement'] != false,
+    );
+    if (sessionId == null && action != 'new' && action != 'delete') {
+      return JsonResponse.badRequest('sessionId or action is required');
+    }
+    return JsonResponse.ok({'status': 'ok', 'sessionId': sessionId});
+  }
+
+  Future<Map<String, dynamic>> _json(shelf.Request request) async {
+    try {
+      return await RequestBody.readJsonMap(request);
+    } catch (_) {
+      return const {};
+    }
+  }
+}

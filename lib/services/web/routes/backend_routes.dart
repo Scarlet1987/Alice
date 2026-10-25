@@ -1,0 +1,464 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf_router/shelf_router.dart';
+
+import 'package:front_porch_ai/services/image/studio_model_roots.dart';
+import 'package:front_porch_ai/services/kobold/kobold.dart';
+import 'package:front_porch_ai/services/web/facade/facades.dart';
+import 'package:front_porch_ai/services/web/routes/civitai_routes.dart';
+import 'package:front_porch_ai/services/web/routes/expression_pack_routes.dart';
+import 'package:front_porch_ai/services/web/routes/image_desk_routes.dart';
+import 'package:front_porch_ai/services/web/util/util.dart';
+import 'package:front_porch_ai/services/web/web_server_deps.dart';
+
+/// Backend lifecycle + local-model switching + HuggingFace downloader, plus
+/// image-generation config/generate. Progress is polled (GET /downloads), not
+/// streamed — simpler and robust for mobile sleep/wake.
+class WebBackendRoutes {
+  WebBackendRoutes(
+    this._deps,
+    Router router, {
+    BackendFacade? backend,
+    ImageFacade? image,
+  }) : _backend = backend,
+       _image = image {
+    if (backend != null) {
+      router.get('/api/backend/status', _status);
+      router.post('/api/backend/restart', _restart);
+      router.post('/api/backend/stop', _stop);
+      router.post('/api/backend/engine/install', _installEngine);
+      router.get('/api/backend/models', _models);
+      router.post('/api/backend/models/switch', _switchModel);
+      router.get('/api/backend/local-model', _localModel);
+      router.post('/api/backend/local-model/preset', _setChatPreset);
+      router.post('/api/backend/local-model/context', _setLocalContext);
+      router.post('/api/backend/models/delete', _deleteModel);
+      router.get('/api/backend/models-folder', _modelsFolder);
+      router.get('/api/backend/hf/search', _hfSearch);
+      router.get('/api/backend/hf/files', _hfFiles);
+      router.get('/api/backend/downloads', _downloads);
+      router.post('/api/backend/downloads', _queueDownload);
+      // Bulk controls registered before the <taskId> route — single-segment
+      // paths won't collide with the two-segment per-task pattern, but keep them
+      // grouped for clarity.
+      router.post('/api/backend/downloads/pause-all', _pauseAll);
+      router.post('/api/backend/downloads/resume-all', _resumeAll);
+      router.post('/api/backend/downloads/clear-completed', _clearCompleted);
+      router.post('/api/backend/downloads/<taskId>/cancel', _cancelDownload);
+      router.post('/api/backend/downloads/<taskId>/pause', _pauseDownload);
+      router.post('/api/backend/downloads/<taskId>/resume', _resumeDownload);
+      router.get('/api/backend/hardware', _hardware);
+      router.post('/api/backend/hardware/redetect', _redetectHardware);
+      router.get('/api/backend/recommendations', _recommendations);
+      router.post('/api/backend/remote-models', _remoteModels);
+      router.post('/api/backend/reasoning-menu', _reasoningMenu);
+      router.post('/api/backend/test-connection', _testConnection);
+    }
+    if (image != null) {
+      router.get('/api/image/config', _imageConfig);
+      router.post('/api/image/config', _imageUpdateConfig);
+      router.post('/api/image/generate', _imageGenerate);
+      router.get('/api/image/saved/<name>', _imageSaved);
+      router.get('/api/image/comfy-catalog', _imageComfyCatalog);
+      router.get('/api/image/studio/ready', _imageStudioReady);
+      router.get('/api/image/local-catalog', _imageLocalCatalog);
+      router.post('/api/image/studio/installed', _imageInstalled);
+      router.get('/api/image/comfy-workflow-slots', _imageComfyWorkflowSlots);
+      router.get('/api/image/models', _imageRemoteModels);
+      ImageDeskRoutes(router, deps: _deps, image: image);
+      ExpressionPackRoutes(router, image: image);
+      CivitaiRoutes(
+        router,
+        auth: _deps.auth,
+        adultAllowed: () => _deps.storage.realismSettings.adultThemesEnabled,
+        rootForAsync: savedStudioModelRoot,
+        typeFoldersFor: studioModelTypeFolders,
+        trustedRootsFor: studioSavedModelRoots,
+      );
+    }
+  }
+
+  final WebServerDeps _deps;
+  final BackendFacade? _backend;
+  final ImageFacade? _image;
+
+  shelf.Response _status(shelf.Request r) =>
+      JsonResponse.ok(_backend!.status());
+
+  Future<shelf.Response> _restart(shelf.Request r) async {
+    final refused = await _backend!.restart();
+    // Additive: why it was not started, or null.
+    return JsonResponse.ok({..._backend.status(), 'refused': refused});
+  }
+
+  Future<shelf.Response> _stop(shelf.Request r) async {
+    await _backend!.stop();
+    return JsonResponse.ok(_backend.status());
+  }
+
+  /// Kick the managed-engine background download (guarded no-op when
+  /// installed / already downloading / remote backend selected).
+  Future<shelf.Response> _installEngine(shelf.Request r) async =>
+      JsonResponse.ok(await _backend!.installEngine());
+
+  Future<shelf.Response> _models(shelf.Request r) async =>
+      JsonResponse.ok({'models': await _backend!.localModels()});
+
+  /// The "Local model" card and the chat-preset picker.
+  Future<shelf.Response> _localModel(shelf.Request r) async =>
+      JsonResponse.ok(await _backend!.localModel());
+
+  /// `{path}`: a preset in the engine folder, or null for the app's own
+  /// settings. Anything else is refused, and so is a preset the app will not
+  /// start KoboldCpp from (422, with the reason in `error`).
+  Future<shelf.Response> _setChatPreset(shelf.Request r) async {
+    final body = await _json(r);
+    final raw = body['path'];
+    if (raw != null && raw is! String) {
+      return JsonResponse.badRequest('path must be text or null');
+    }
+    final path = raw is String && raw.isNotEmpty ? raw : null;
+    try {
+      if (!await _backend!.setChatPreset(path)) {
+        return JsonResponse.error(404, 'Preset not found');
+      }
+    } on KoboldPresetProblem catch (e) {
+      return JsonResponse.error(422, e.message);
+    }
+    return JsonResponse.ok(await _backend.localModel());
+  }
+
+  /// `{context}`: tokens, [kKoboldContextMin] to [kKoboldContextMax].
+  Future<shelf.Response> _setLocalContext(shelf.Request r) async {
+    final body = await _json(r);
+    final context = body['context'];
+    if (context is! int || !await _backend!.setLocalContext(context)) {
+      return JsonResponse.badRequest(
+        'context must be a whole number of tokens from '
+        '${koboldTokens(kKoboldContextMin)} to '
+        '${koboldTokens(kKoboldContextMax)}, '
+        'and is set by the KoboldCpp preset while one is in use',
+      );
+    }
+    return JsonResponse.ok(await _backend.localModel());
+  }
+
+  Future<shelf.Response> _switchModel(shelf.Request r) async {
+    final body = await _json(r);
+    final path = body['path']?.toString();
+    if (path == null || path.isEmpty) {
+      return JsonResponse.badRequest('path is required');
+    }
+    String? refused;
+    final ok = await _backend!.switchModel(
+      path,
+      onRefused: (words) => refused = words,
+    );
+    if (!ok) return JsonResponse.error(404, 'Model not found');
+    // Additive: why the running KoboldCpp could not load it, or null.
+    return JsonResponse.ok({..._backend.status(), 'refused': refused});
+  }
+
+  Future<shelf.Response> _hfSearch(shelf.Request r) async {
+    final q = r.url.queryParameters['q']?.trim() ?? '';
+    if (q.isEmpty) return JsonResponse.ok({'models': []});
+    return JsonResponse.ok({'models': await _backend!.searchHf(q)});
+  }
+
+  Future<shelf.Response> _hfFiles(shelf.Request r) async {
+    final repoId = r.url.queryParameters['repoId'] ?? '';
+    if (repoId.isEmpty) return JsonResponse.badRequest('repoId is required');
+    return JsonResponse.ok({'files': await _backend!.modelFiles(repoId)});
+  }
+
+  Future<shelf.Response> _deleteModel(shelf.Request r) async {
+    final body = await _json(r);
+    final path = body['path']?.toString();
+    if (path == null || path.isEmpty) {
+      return JsonResponse.badRequest('path is required');
+    }
+    final ok = await _backend!.deleteModel(path);
+    if (!ok) return JsonResponse.error(404, 'Model not found');
+    return JsonResponse.ok({'models': await _backend.localModels()});
+  }
+
+  shelf.Response _modelsFolder(shelf.Request r) =>
+      JsonResponse.ok(_backend!.modelsFolder());
+
+  shelf.Response _downloads(shelf.Request r) =>
+      JsonResponse.ok(_backend!.downloadsState());
+
+  Future<shelf.Response> _queueDownload(shelf.Request r) async {
+    final body = await _json(r);
+    final repoId = body['repoId']?.toString();
+    final filename = body['filename']?.toString();
+    if (repoId == null || filename == null) {
+      return JsonResponse.badRequest('repoId and filename are required');
+    }
+    final taskId = await _backend!.queueDownload(repoId, filename);
+    if (taskId == null) {
+      return JsonResponse.error(404, 'File not found in repo');
+    }
+    return JsonResponse.ok({'taskId': taskId, ..._backend.downloadsState()});
+  }
+
+  shelf.Response _cancelDownload(shelf.Request r, String taskId) {
+    final ok = _backend!.cancelDownload(taskId);
+    if (!ok) return JsonResponse.error(404, 'Download not found');
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _pauseDownload(shelf.Request r, String taskId) {
+    final ok = _backend!.pauseDownload(taskId);
+    if (!ok) return JsonResponse.error(404, 'Download not found or not active');
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _resumeDownload(shelf.Request r, String taskId) {
+    final ok = _backend!.resumeDownload(taskId);
+    if (!ok) return JsonResponse.error(404, 'Download not found or not paused');
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _pauseAll(shelf.Request r) {
+    _backend!.pauseAllDownloads();
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _resumeAll(shelf.Request r) {
+    _backend!.resumeAllDownloads();
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _clearCompleted(shelf.Request r) {
+    _backend!.clearCompletedDownloads();
+    return JsonResponse.ok(_backend.downloadsState());
+  }
+
+  shelf.Response _hardware(shelf.Request r) {
+    final hw = _backend!.hardware();
+    if (hw == null) return JsonResponse.error(404, 'Hardware info unavailable');
+    return JsonResponse.ok(hw);
+  }
+
+  Future<shelf.Response> _redetectHardware(shelf.Request r) async {
+    final hw = await _backend!.redetectHardware();
+    if (hw == null) return JsonResponse.error(404, 'Hardware info unavailable');
+    return JsonResponse.ok(hw);
+  }
+
+  shelf.Response _recommendations(shelf.Request r) =>
+      JsonResponse.ok({'queries': _backend!.recommendations()});
+
+  // ── Remote (OpenAI-compatible) model picker ──────────────────────────────
+  // Optional apiUrl/apiKey let Settings preview a provider before saving.
+  // A non-stored host/key is credential-grade (it would fire a live request
+  // with the stored key) — same password step-up as settings persist.
+  Future<shelf.Response> _remoteModels(shelf.Request r) async {
+    final body = await _json(r);
+    final denied = await _denyUnstoredPreview(body, r);
+    if (denied != null) return denied;
+    final models = await _backend!.remoteModels(
+      apiUrl: body['apiUrl']?.toString(),
+      apiKey: body['apiKey']?.toString(),
+    );
+    return JsonResponse.ok({'models': models});
+  }
+
+  Future<shelf.Response> _reasoningMenu(shelf.Request r) async {
+    final body = await _json(r);
+    final model = body['model']?.toString() ?? '';
+    if (model.isEmpty) {
+      return JsonResponse.badRequest('model is required');
+    }
+    final denied = await _denyUnstoredPreview(body, r);
+    if (denied != null) return denied;
+    final menu = await _backend!.reasoningMenu(
+      model: model,
+      apiUrl: body['apiUrl']?.toString(),
+      apiKey: body['apiKey']?.toString(),
+    );
+    return JsonResponse.ok(menu);
+  }
+
+  Future<shelf.Response> _testConnection(shelf.Request r) async {
+    final body = await _json(r);
+    final denied = await _denyUnstoredPreview(body, r);
+    if (denied != null) return denied;
+    final message = await _backend!.testRemoteConnection(
+      apiUrl: body['apiUrl']?.toString(),
+      apiKey: body['apiKey']?.toString(),
+    );
+    return JsonResponse.ok({
+      'ok': message.toLowerCase().contains('success'),
+      'message': message,
+    });
+  }
+
+  /// Null when the preview uses the saved URL/key (or re-auth passed).
+  Future<shelf.Response?> _denyUnstoredPreview(
+    Map<String, dynamic> body,
+    shelf.Request request,
+  ) {
+    final stored = _deps.storage.backendSettings;
+    if (!remoteCredentialPreviewNeedsStepUp(
+      body,
+      currentRemoteApiUrl: stored.remoteApiUrl,
+      currentRemoteApiKey: stored.remoteApiKey,
+    )) {
+      return Future<shelf.Response?>.value(null);
+    }
+    return denyUnlessSteppedUp(auth: _deps.auth, body: body, request: request);
+  }
+
+  // ── Image generation ─────────────────────────────────────────────────────
+  shelf.Response _imageConfig(shelf.Request r) =>
+      JsonResponse.ok(_image!.config());
+
+  Future<shelf.Response> _imageUpdateConfig(shelf.Request r) async {
+    final body = await _json(r);
+    // Same stored remote URL/key as POST /api/settings — a session cookie
+    // must not redirect image generation either. Local A1111 / Comfy /
+    // Draw Things hosts are the same class of SSRF.
+    final cfg = _image!.config();
+    // A graph the caller supplies is what Comfy runs on this computer, so it
+    // needs the password too.
+    if (imageConfigUploadsGraph(body) ||
+        imageConfigWriteNeedsStepUp(
+          body,
+          currentRemoteApiUrl: '${cfg['remoteApiUrl'] ?? ''}',
+          currentLocalUrl: '${cfg['localUrl'] ?? ''}',
+          currentComfyUrl: '${cfg['comfyUrl'] ?? ''}',
+          currentDrawThingsHost: '${cfg['drawThingsHost'] ?? ''}',
+          currentDrawThingsPort: cfg['drawThingsPort'] as int?,
+        )) {
+      final denied = await denyUnlessSteppedUp(
+        auth: _deps.auth,
+        body: body,
+        request: r,
+      );
+      if (denied != null) return denied;
+    }
+    try {
+      await _image.updateConfig(body);
+    } on DeskRefused catch (e) {
+      return ImageDeskRoutes.refused(e);
+    }
+    return JsonResponse.ok(_image.config());
+  }
+
+  Future<shelf.Response> _imageGenerate(shelf.Request r) async {
+    // An Edit carries its picture in the body, which can be larger than the
+    // usual JSON limit.
+    final Map<String, dynamic> body;
+    try {
+      body = await RequestBody.readJsonMap(
+        r,
+        maxBytes: RequestBody.uploadMaxBytes,
+      );
+    } on BodyTooLarge {
+      return JsonResponse.error(413, 'That picture is too large.');
+    } on FormatException {
+      return JsonResponse.badRequest('That request was not JSON.');
+    }
+    if ((body['prompt']?.toString().trim() ?? '').isEmpty) {
+      return JsonResponse.badRequest('prompt is required');
+    }
+    final Map<String, dynamic>? result;
+    try {
+      result = await _image!.generate(body);
+    } on DeskRefused catch (e) {
+      return ImageDeskRoutes.refused(e);
+    }
+    if (result == null) {
+      return JsonResponse.error(
+        502,
+        _image.config()['statusMessage']?.toString() ?? 'Generation failed',
+      );
+    }
+    return JsonResponse.ok(result);
+  }
+
+  Future<shelf.Response> _imageComfyCatalog(shelf.Request r) async {
+    final q = r.url.queryParameters;
+    return JsonResponse.ok(
+      await _image!.comfyCatalog(
+        edit: q['mode'] == 'edit',
+        token: q['token'] ?? '',
+        loraFacts: q['lora'] == '1',
+      ),
+    );
+  }
+
+  Future<shelf.Response> _imageLocalCatalog(shelf.Request r) async =>
+      JsonResponse.ok(
+        await _image!.localCatalog(model: r.url.queryParameters['model'] ?? ''),
+      );
+
+  Future<shelf.Response> _imageStudioReady(shelf.Request r) async {
+    final edit = r.url.queryParameters['mode'] == 'edit';
+    return JsonResponse.ok(await _image!.studioReady(edit: edit));
+  }
+
+  Future<shelf.Response> _imageInstalled(shelf.Request r) async {
+    final body = await _json(r);
+    return JsonResponse.ok(
+      await _image!.installedChoice(
+        workflowId: body['workflowId']?.toString() ?? '',
+        file: body['filename']?.toString() ?? '',
+        lora: body['lora'] == true,
+      ),
+    );
+  }
+
+  Future<shelf.Response> _imageComfyWorkflowSlots(shelf.Request r) async {
+    final id = r.url.queryParameters['workflowId'] ?? '';
+    if (id.isEmpty) return JsonResponse.badRequest('workflowId is required');
+    return JsonResponse.ok(
+      await _image!.comfyWorkflowSlots(
+        id,
+        edit: r.url.queryParameters['kind'] == 'edit',
+      ),
+    );
+  }
+
+  Future<shelf.Response> _imageRemoteModels(shelf.Request r) async =>
+      JsonResponse.ok(await _image!.remoteModels());
+
+  Future<shelf.Response> _imageSaved(shelf.Request r, String name) async {
+    final file = _image!.savedImageFile(name);
+    if (file == null) return JsonResponse.error(404, 'Image not found');
+    return shelf.Response.ok(
+      file.openRead(),
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'private, max-age=86400',
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> _json(shelf.Request request) async {
+    try {
+      return await RequestBody.readJsonMap(request);
+    } catch (_) {
+      return const {};
+    }
+  }
+}

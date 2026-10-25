@@ -1,0 +1,623 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import { useEffect, useState } from 'react';
+import { api, ApiError } from '../api/client';
+import { PersonaManager } from '../components/PersonaManager';
+import { ModelPicker } from '../components/ModelPicker';
+import { ChatColorsSettings } from '../components/ChatColorsSettings';
+import { ReadingSizeSettings } from '../components/ReadingSizeSettings';
+import { FollowStreamingSettings } from '../components/FollowStreamingSettings';
+import { DetailLevelSettings } from '../components/DetailLevelSettings';
+import { OledSettings } from '../components/OledSettings';
+import { GlossaryLink } from '../components/Glossary';
+import { MessageSideSettings } from '../components/MessageSideSettings';
+import { PorchLifeSettings } from '../components/PorchLifeSettings';
+import { ModelTransportCard } from '../components/ModelTransportCard';
+import { IdleUnloadSettings } from '../components/IdleUnloadSettings';
+import { KeepRecentChatsSettings } from '../components/KeepRecentChatsSettings';
+import { applySpellCheckLang } from '../spellCheckLang';
+import {
+  StepUpFields,
+  attachStepUp,
+  remotePreviewNeedsStepUp,
+  settingsPersistNeedsStepUp,
+} from '../components/StepUpFields';
+import {
+  GenerationSettingsFields,
+  type GenSettings,
+} from '../components/GenerationSettingsFields';
+import { VoiceMediaSettings } from '../components/VoiceMediaSettings';
+import { WorkerBackendCard } from '../components/WorkerBackendCard';
+import { SuperGrokCard } from '../components/SuperGrokCard';
+import { urlHasStoredApiKey } from '../remoteApiKeys';
+import { BACKEND_OPTIONS, INTEL_MAC_LOCAL_UNSUPPORTED, backendOptionId } from '../backendOptions';
+import { presetOwnsContext } from '../presetOwnsContext';
+import { useLocalUnsupported } from '../hooks/useLocalUnsupported';
+
+
+type Gen = GenSettings;
+interface Settings {
+  backend: string;
+  backends: string[];
+  isLocal: boolean;
+  loadedModel: string;
+  remoteApiUrl: string;
+  remoteModelName: string;
+  hasApiKey: boolean;
+  remoteApiUrlsWithKeys?: string[];
+  /** Host is macOS — oMLX is Apple Silicon only. Absent = hide (old hosts). */
+  omlxAvailable?: boolean;
+  remoteConfigured?: boolean;
+  remoteReachability?: 'unknown' | 'checking' | 'reachable' | 'unreachable';
+  contextSize: number;
+  reasoningEnabled: boolean;
+  reasoningEffort: string;
+  reasoningMandatory?: boolean;
+  reasoningEfforts?: string[];
+  // KoboldCpp / oMLX / LM Studio template verdict: what this model actually
+  // supports — 'graded' | 'toggle' | 'always' | 'none'. Absent on remote
+  // hosted backends and until the template has been read, which is the
+  // signal to fall back to the generic chips instead of claiming knowledge
+  // we do not have.
+  reasoningLocalSupport?: string;
+  generation: Gen;
+  /** Dictionary tag ('en_US') or 'off'. Optional for the same reason. */
+  spellCheckLanguage?: string;
+  /** General follow-while-generating. Absent on older hosts = ON default. */
+  followStreamingReplies?: boolean;
+  /** Dictionary tags the host can check. Optional for the same reason. */
+  spellCheckLanguages?: string[];
+  systemPrompt?: string;
+  bannedPhrases?: string[];
+  workerBackend?: string;
+  workerRemoteApiUrl?: string;
+  workerRemoteModelName?: string;
+  workerKoboldModelPath?: string;
+  workerKoboldKcppsPath?: string;
+  lastUsedModelPath?: string;
+  activeKcppsPath?: string;
+  localKcpps?: { name: string; path: string }[];
+  workerEnabled?: boolean;
+  workerRefusedDualLocal?: boolean;
+  workerDualLocalMessage?: string;
+  workerUnreadyMessage?: string;
+  workerGpuSwapAvailable?: boolean;
+}
+
+// Legacy-engine model files still on the host (desktop parity: the Reclaim
+// Disk Space card in Settings → Voice & Media). Absent/empty → no section.
+interface LegacyModels {
+  groups: { label: string; bytes: number }[];
+  totalBytes: number;
+}
+
+const fmtBytes = (b: number) =>
+  b >= 1024 ** 3 ? `${(b / 1024 ** 3).toFixed(1)} GB` : `${Math.round(b / 1024 ** 2)} MB`;
+
+function remoteReachabilityLabel(
+  configured: boolean,
+  reachability?: string,
+): { text: string; tone: 'ok' | 'busy' | 'down' | 'configured' } {
+  if (!configured) return { text: 'Not configured', tone: 'down' };
+  switch (reachability) {
+    case 'checking':
+      return { text: 'Checking…', tone: 'busy' };
+    case 'reachable':
+      return { text: 'Ready', tone: 'ok' };
+    case 'unreachable':
+      return { text: 'Configured but unreachable', tone: 'down' };
+    default:
+      return { text: 'Configured', tone: 'configured' };
+  }
+}
+
+function RemoteReachabilityBadge({
+  configured,
+  reachability,
+}: {
+  configured: boolean;
+  reachability?: string;
+}) {
+  const { text, tone } = remoteReachabilityLabel(configured, reachability);
+  return (
+    <span className={`remote-ready-badge remote-ready-badge-${tone}`}>
+      <span className="engine-dot" />
+      {text}
+    </span>
+  );
+}
+
+export function SettingsPage() {
+  const [s, setS] = useState<Settings | null>(null);
+  const [apiKey, setApiKey] = useState('');
+  const [workerApiKey, setWorkerApiKey] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState('');
+  const [superGrokSignedIn, setSuperGrokSignedIn] = useState(false);
+  const [xaiKeyOpen, setXaiKeyOpen] = useState(false);
+
+  const [legacy, setLegacy] = useState<LegacyModels | null>(null);
+  const [reclaiming, setReclaiming] = useState(false);
+  const [savedRemoteApiUrl, setSavedRemoteApiUrl] = useState('');
+  const [savedWorkerRemoteApiUrl, setSavedWorkerRemoteApiUrl] = useState('');
+  const [password, setPassword] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [totpEnabled, setTotpEnabled] = useState(false);
+
+  const load = () =>
+    api
+      .get<Settings>('/api/settings')
+      .then((next) => {
+        setS(next);
+        setSavedRemoteApiUrl(next.remoteApiUrl);
+        setSavedWorkerRemoteApiUrl(next.workerRemoteApiUrl ?? '');
+      })
+      .catch(() => {});
+  const loadLegacy = () =>
+    api.get<LegacyModels>('/api/legacy-models').then(setLegacy).catch(() => {});
+  useEffect(() => {
+    void load();
+    void loadLegacy();
+    void api
+      .get<{ totpEnabled?: boolean }>('/api/auth/state')
+      .then((st) => setTotpEnabled(!!st.totpEnabled))
+      .catch(() => {});
+  }, []);
+  // An Intel Mac host cannot run KoboldCpp: greyed out in the Backend
+  // picker, with the desktop's sentence beside it.
+  const localUnsupported = useLocalUnsupported();
+
+  const reclaim = async () => {
+    if (
+      !window.confirm(
+        'Permanently delete the old speech engines’ model files? ' +
+          'Your voices and settings are unaffected — the new engines ' +
+          'have their own models.',
+      )
+    )
+      return;
+    setReclaiming(true);
+    try {
+      await api.post('/api/legacy-models/reclaim');
+      await loadLegacy();
+    } catch {
+      /* surfaced by the section simply not shrinking */
+    } finally {
+      setReclaiming(false);
+    }
+  };
+
+  if (!s) return <div className="centered"><div className="spinner" /></div>;
+
+  const patch = (p: Partial<Settings>) =>
+    setS((prev) => (prev ? { ...prev, ...p } : prev));
+  const patchGen = (p: Partial<Gen>) =>
+    setS((prev) =>
+      prev ? { ...prev, generation: { ...prev.generation, ...p } } : prev,
+    );
+
+  const save = async () => {
+    setSaving(true);
+    setError('');
+    setSaved(false);
+    try {
+      const body: Record<string, unknown> = {
+        backend: s.backend,
+        remoteApiUrl: s.remoteApiUrl,
+        remoteModelName: s.remoteModelName,
+        contextSize: s.contextSize,
+        reasoningEnabled: s.reasoningEnabled,
+        reasoningEffort: s.reasoningEffort,
+        generation: s.generation,
+        systemPrompt: s.systemPrompt,
+        bannedPhrases: s.bannedPhrases,
+        workerBackend: s.workerBackend ?? '',
+        workerRemoteApiUrl: s.workerRemoteApiUrl ?? '',
+        workerRemoteModelName: s.workerRemoteModelName ?? '',
+        workerKoboldModelPath: s.workerKoboldModelPath ?? '',
+        workerKoboldKcppsPath: s.workerKoboldKcppsPath ?? '',
+      };
+      if (s.spellCheckLanguage !== undefined) {
+        body.spellCheckLanguage = s.spellCheckLanguage;
+      }
+      if (apiKey.trim()) body.apiKey = apiKey.trim();
+      if (workerApiKey.trim()) body.workerApiKey = workerApiKey.trim();
+      const needsStepUp = settingsPersistNeedsStepUp({
+        remoteApiUrl: s.remoteApiUrl,
+        savedRemoteApiUrl,
+        apiKey,
+        workerRemoteApiUrl: s.workerRemoteApiUrl ?? '',
+        savedWorkerRemoteApiUrl,
+        workerApiKey,
+      });
+      if (needsStepUp) {
+        attachStepUp(body, password, totpEnabled, totpCode);
+      }
+      const next = await api.post<Settings>('/api/settings', body);
+      setS(next);
+      setSavedRemoteApiUrl(next.remoteApiUrl);
+      setSavedWorkerRemoteApiUrl(next.workerRemoteApiUrl ?? '');
+      // Take effect on this device immediately rather than at next reload.
+      applySpellCheckLang(next.spellCheckLanguage);
+      setApiKey('');
+      setWorkerApiKey('');
+      setPassword('');
+      setTotpCode('');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1800);
+    } catch (e) {
+      if (e instanceof ApiError && e.payload.totpRequired === true) {
+        setTotpEnabled(true);
+      }
+      setError(e instanceof ApiError ? e.message : 'Could not save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const currentBackendId = (): string => backendOptionId(s.backend, s.remoteApiUrl);
+
+  // Switching backend sets the BackendType and, for fixed-URL providers, the API
+  // URL; Custom clears the URL so it doesn't masquerade as a named provider and
+  // the model dropdown refetches off the new endpoint. The live model id is
+  // blanked — a leftover from the previous host is not valid here.
+  const onBackendChange = (id: string) => {
+    const opt = BACKEND_OPTIONS.find((o) => o.id === id);
+    if (!opt) return;
+    const next: Partial<Settings> = { backend: opt.backend, remoteModelName: '' };
+    if (id === 'custom') next.remoteApiUrl = '';
+    else if (opt.url) next.remoteApiUrl = opt.url;
+    setApiKey('');
+    patch(next);
+  };
+
+  const previewNeedsStepUp = remotePreviewNeedsStepUp(
+    s.remoteApiUrl,
+    apiKey,
+    savedRemoteApiUrl,
+  );
+
+  const testConnection = async () => {
+    setTesting(true);
+    setTestMsg('');
+    try {
+      const body: Record<string, unknown> = { apiUrl: s.remoteApiUrl };
+      if (apiKey.trim()) body.apiKey = apiKey.trim();
+      if (previewNeedsStepUp) {
+        attachStepUp(body, password, totpEnabled, totpCode);
+      }
+      const r = await api.post<{ ok: boolean; message: string }>('/api/backend/test-connection', body);
+      setTestMsg(r.message);
+    } catch (e) {
+      if (e instanceof ApiError && e.payload.totpRequired === true) {
+        setTotpEnabled(true);
+      }
+      setTestMsg(e instanceof ApiError ? e.message : 'Connection test failed');
+    } finally {
+      setTesting(false);
+      void load();
+    }
+  };
+
+  // Control visibility keys off the *selected* backend so it updates the instant
+  // the dropdown changes (before saving). Local backends are host subprocesses;
+  // the API ones connect to an OpenAI-compatible server.
+  const selectedId = currentBackendId();
+  const visibleBackends = BACKEND_OPTIONS.filter(
+    (o) => o.id !== 'omlx' || s.omlxAvailable === true,
+  );
+  const isApi = s.backend === 'openRouter' || s.backend === 'omlx';
+  // Not on an Intel Mac, as the Models page's KoboldCpp cards.
+  const isManagedLocal = s.backend === 'kobold' && !localUnsupported;
+  const showUrlField = selectedId === 'custom';
+  const showKeyField =
+    selectedId === 'openrouter' ||
+    selectedId === 'nanogpt' ||
+    // xAI: sign-in first; the key box only once asked for or already saved.
+    (selectedId === 'xai' &&
+      !superGrokSignedIn &&
+      (xaiKeyOpen || urlHasStoredApiKey(s.remoteApiUrl, s.remoteApiUrlsWithKeys))) ||
+    selectedId === 'custom';
+
+  return (
+    <div className="page">
+      <h2>Settings</h2>
+
+      <PersonaManager />
+
+      <MessageSideSettings />
+
+      <FollowStreamingSettings />
+
+      <DetailLevelSettings />
+
+      <OledSettings />
+
+      <section className="card" data-testid="glossary-card">
+        <h3>Words we use</h3>
+        <p className="muted">
+          What MC, NPC, User and the other terms mean, in plain English.
+        </p>
+        <GlossaryLink />
+      </section>
+
+      <ReadingSizeSettings />
+
+      <ChatColorsSettings />
+
+      <PorchLifeSettings />
+
+      <section className="card" data-testid="chat-speech-card">
+        <h3>Chat speech</h3>
+        <label>
+          Backend
+          <select value={selectedId} onChange={(e) => onBackendChange(e.target.value)}>
+            {visibleBackends.map((o) => (
+              <option key={o.id} value={o.id} disabled={o.id === 'kobold' && localUnsupported}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        {localUnsupported && (
+          <div className="cpu-warn" data-testid="chat-local-unsupported">
+            {INTEL_MAC_LOCAL_UNSUPPORTED}
+          </div>
+        )}
+        <p className="muted small">Loaded model: <strong>{s.loadedModel}</strong> · context {s.contextSize}</p>
+
+        {isManagedLocal && (
+          <p className="muted small">
+            This backend runs on the host machine. Pick or download its model on the Models tab;
+            GPU and launch options are configured in the desktop app.
+          </p>
+        )}
+
+        {isApi && (
+          <>
+            {showUrlField && (
+              <label>
+                API URL
+                <input
+                  data-testid="chat-api-url"
+                  value={s.remoteApiUrl}
+                  onChange={(e) =>
+                    patch({ remoteApiUrl: e.target.value, remoteModelName: '' })
+                  }
+                  placeholder="https://your-server.example/v1"
+                />
+              </label>
+            )}
+            {selectedId === 'xai' && (
+              <SuperGrokCard
+                onUseApiKey={showKeyField ? undefined : () => setXaiKeyOpen(true)}
+                onChange={(st) => {
+                  if (st.signedIn !== superGrokSignedIn) void load();
+                  setSuperGrokSignedIn(st.signedIn);
+                }}
+              />
+            )}
+            {showKeyField && (
+              <label>
+                {selectedId === 'xai' ? 'xAI API key' : 'API key'}
+                <input
+                  data-testid="chat-api-key"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder={
+                    urlHasStoredApiKey(s.remoteApiUrl, s.remoteApiUrlsWithKeys)
+                      ? '•••••• (leave blank to keep)'
+                      : 'paste your API key'
+                  }
+                />
+              </label>
+            )}
+            <div className="test-conn-row">
+              <RemoteReachabilityBadge
+                configured={s.remoteConfigured ?? s.hasApiKey}
+                reachability={s.remoteReachability}
+              />
+              <button
+                className="ghost"
+                onClick={testConnection}
+                disabled={testing || (previewNeedsStepUp && !password)}
+              >
+                {testing ? 'Testing…' : 'Test connection'}
+              </button>
+              {testMsg && (
+                <span className={`test-conn-msg${testMsg.toLowerCase().includes('success') ? ' ok' : ' bad'}`}>
+                  {testMsg}
+                </span>
+              )}
+            </div>
+            <label>
+              Model
+              <ModelPicker
+                apiUrl={s.remoteApiUrl}
+                apiKey={apiKey}
+                savedApiUrl={savedRemoteApiUrl}
+                currentPassword={password}
+                totpCode={totpCode}
+                totpEnabled={totpEnabled}
+                onTotpRequired={() => setTotpEnabled(true)}
+                value={s.remoteModelName}
+                onChange={(id) => {
+                  patch({ remoteModelName: id })
+                  void (async () => {
+                    if (previewNeedsStepUp && !password) return
+                    try {
+                      const body: Record<string, unknown> = {
+                        model: id,
+                        apiUrl: s.remoteApiUrl,
+                      }
+                      if (apiKey.trim()) body.apiKey = apiKey.trim()
+                      if (previewNeedsStepUp) {
+                        attachStepUp(body, password, totpEnabled, totpCode)
+                      }
+                      const menu = await api.post<{
+                        efforts?: string[]
+                        mandatory?: boolean
+                        localSupport?: string
+                      }>('/api/backend/reasoning-menu', body)
+                      setS((prev) =>
+                        prev && prev.remoteModelName === id
+                          ? {
+                              ...prev,
+                              reasoningEfforts: menu.efforts ?? [],
+                              reasoningMandatory: Boolean(menu.mandatory),
+                              reasoningLocalSupport: menu.localSupport,
+                            }
+                          : prev,
+                      )
+                    } catch (e) {
+                      if (e instanceof ApiError && e.payload.totpRequired === true) {
+                        setTotpEnabled(true)
+                      }
+                      /* family-hint chips stay until Save */
+                    }
+                  })()
+                }}
+              />
+            </label>
+          </>
+        )}
+
+        <WorkerBackendCard
+          s={s}
+          workerApiKey={workerApiKey}
+          onWorkerApiKey={setWorkerApiKey}
+          onPatch={patch}
+          savedRemoteApiUrl={savedRemoteApiUrl}
+          chatApiKey={apiKey}
+          currentPassword={password}
+          totpCode={totpCode}
+          totpEnabled={totpEnabled}
+          onTotpRequired={() => setTotpEnabled(true)}
+        />
+      </section>
+
+      {/* The desktop has these two in Advanced Launch Options. */}
+      {isManagedLocal && <IdleUnloadSettings />}
+      {isManagedLocal && <KeepRecentChatsSettings />}
+
+      <GenerationSettingsFields
+        backend={s.backend}
+        isLocal={s.isLocal}
+        remoteModelName={s.remoteModelName}
+        contextSize={s.contextSize}
+        contextLocked={presetOwnsContext(s.backend, s.activeKcppsPath)}
+        generation={s.generation}
+        systemPrompt={s.systemPrompt}
+        bannedPhrases={s.bannedPhrases}
+        spellCheckLanguage={s.spellCheckLanguage}
+        spellCheckLanguages={s.spellCheckLanguages}
+        reasoningEnabled={s.reasoningEnabled}
+        reasoningEffort={s.reasoningEffort}
+        reasoningMandatory={s.reasoningMandatory}
+        reasoningEfforts={s.reasoningEfforts}
+        reasoningLocalSupport={s.reasoningLocalSupport}
+        patch={(p) => patch(p as Partial<Settings>)}
+        patchGen={patchGen}
+      />
+
+      {/* Moved out of the Porch Life card so the switch sits under
+          Generation on both surfaces (desktop parity). */}
+      <ModelTransportCard />
+
+      <VoiceMediaSettings />
+
+      {legacy && legacy.totalBytes > 0 && (
+        <section className="card">
+          <h3>Reclaim disk space</h3>
+          <p className="muted small">
+            The new built-in speech engines use their own models. These files
+            from the old engines are no longer used:
+          </p>
+          {legacy.groups.map((g) => (
+            <p key={g.label} className="muted small" style={{ margin: '4px 0' }}>
+              • {g.label} — {fmtBytes(g.bytes)}
+            </p>
+          ))}
+          <button className="ghost" onClick={() => void reclaim()} disabled={reclaiming}>
+            {reclaiming ? 'Reclaiming…' : `Reclaim ${fmtBytes(legacy.totalBytes)}`}
+          </button>
+        </section>
+      )}
+
+      {error && <p className="error">{error}</p>}
+      {settingsPersistNeedsStepUp({
+        remoteApiUrl: s.remoteApiUrl,
+        savedRemoteApiUrl,
+        apiKey,
+        workerRemoteApiUrl: s.workerRemoteApiUrl ?? '',
+        savedWorkerRemoteApiUrl,
+        workerApiKey,
+      }) && (
+        <StepUpFields
+          password={password}
+          onPassword={setPassword}
+          totpEnabled={totpEnabled}
+          totpCode={totpCode}
+          onTotp={setTotpCode}
+          reason={
+            totpEnabled
+              ? 'Changing a remote API URL or key — or testing a new host — needs your web login password and a 2FA code.'
+              : 'Changing a remote API URL or key — or testing a new host — needs your web login password.'
+          }
+        />
+      )}
+      <button
+        className="primary"
+        onClick={save}
+        disabled={
+          saving ||
+          (settingsPersistNeedsStepUp({
+            remoteApiUrl: s.remoteApiUrl,
+            savedRemoteApiUrl,
+            apiKey,
+            workerRemoteApiUrl: s.workerRemoteApiUrl ?? '',
+            savedWorkerRemoteApiUrl,
+            workerApiKey,
+          }) && !password)
+        }
+      >
+        {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save settings'}
+      </button>
+
+      <section className="card">
+        <h2>About &amp; License</h2>
+        <p className="muted small" style={{ lineHeight: 1.5 }}>
+          Front Porch AI is free, open-source software © 2026 Front Porch AI,
+          licensed under the GNU Affero General Public License v3.0. You are
+          free to use, study, modify, and redistribute it under the AGPL. The
+          complete source code is available below; if you received this app
+          without that source, or as part of a closed-source product, that is a
+          license violation.
+        </p>
+        <div className="about-links">
+          <a
+            className="btn-link"
+            href="https://github.com/linux4life1/front-porch-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Source code
+          </a>
+          <a
+            className="btn-link"
+            href="https://github.com/linux4life1/front-porch-ai/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Report a license violation
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+}

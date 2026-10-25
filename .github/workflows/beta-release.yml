@@ -1,0 +1,364 @@
+name: Pre-Release (Installer + Standalone)
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    tags:
+      - '*alpha*'
+      - '*Alpha*'
+      - '*beta*'
+      - '*Beta*'
+      - '*rc*'
+      - '*RC*'
+      - '*dev*'
+      - '*Dev*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Pre-Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            build_path: build/windows/x64/runner/Release
+          - os: macos-latest
+            platform: macos
+            build_path: build/macos/Build/Products/Release
+          - os: ubuntu-22.04
+            platform: linux
+            asset_name: Front_Porch_AI_Linux.tar.gz
+            build_path: build/linux/x64/release/bundle
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libblkid-dev liblzma-dev libsecret-1-dev libwebkit2gtk-4.1-dev ninja-build pkg-config cmake libunwind-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - name: Sync Version from Tag
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION=$(echo "$TAG" | sed 's/^[vV]//')
+          # Convert 4-part (0.0.4.1) to Flutter format (0.0.4+1)
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$ ]]; then
+            FLUTTER_VERSION="$(echo $VERSION | sed 's/\.\([^.]*\)$/+\1/')"
+          else
+            FLUTTER_VERSION="${VERSION}+0"
+          fi
+          echo "Setting version to: $FLUTTER_VERSION"
+          # Use the full version (including 4th part if present) for the Dart display constant
+          DISPLAY_VERSION="$VERSION"
+          # Use Python for cross-platform reliability (sed can fail silently with Windows \r\n line endings)
+          python3 -c "
+          import re
+          # Update pubspec.yaml
+          with open('pubspec.yaml', 'r') as f: content = f.read()
+          content = re.sub(r'^version: .*$', 'version: $FLUTTER_VERSION', content, flags=re.MULTILINE)
+          with open('pubspec.yaml', 'w') as f: f.write(content)
+          # Patch only the appVersion constant (preserve all committed getters and comments).
+          # This eliminates duplication and prevents compile breaks when app_version.dart evolves.
+          with open('lib/app_version.dart', 'r') as f: content = f.read()
+          content = re.sub(r\"^const String appVersion = '.*';\$\", "const String appVersion = '$DISPLAY_VERSION';", content, flags=re.MULTILINE)
+          with open('lib/app_version.dart', 'w') as f: f.write(content)
+          "
+          # Verify both were updated (visible in CI logs)
+          echo "Verifying pubspec version:"
+          grep '^version:' pubspec.yaml
+          echo "Verifying Dart version constant:"
+          cat lib/app_version.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Node (for the WebUI bundle)
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: web_ui/package-lock.json
+
+      # Regenerate assets/web_app from web_ui/src so the Flutter build bundles a
+      # fresh WebUI (never a stale committed bundle). Must run before flutter build.
+      - name: Build WebUI bundle
+          # --ignore-scripts: no package in this tree runs an install-time
+          # script today (verified 2026-08-05), so this changes nothing now
+          # and blocks the ChainDrop vector if one ever arrives.
+        run: npm ci --ignore-scripts && npm run build
+        working-directory: web_ui
+
+      - name: Build Application
+        if: matrix.platform != 'linux'
+        run: flutter build ${{ matrix.platform }} --release
+
+      - name: Build Application (Linux)
+        if: matrix.platform == 'linux'
+        env:
+          CXXFLAGS: "-Wno-unknown-warning-option"
+        run: flutter build linux --release
+
+      # ── Guard: the Linux bundle MUST be able to reach SQLite ──
+      # v1.1.0 shipped with no SQLite in the bundle and bricked every Linux
+      # install ("libsqlite3.so is missing" -> "database is corrupted"). The
+      # build succeeded and tests passed; only real users saw it. Checks
+      # REACHABILITY, not a filename: sqlite3 3.x emits a standalone
+      # lib/libsqlite3.so, sqlite3_flutter_libs 0.5.x compiles sqlite3.c into
+      # the plugin .so. Either is fine; zero exporters is a broken release.
+      # Full rationale in .github/workflows/release.yml and pubspec.yaml.
+      - name: Verify SQLite is bundled (Linux)
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          BUNDLE=build/linux/x64/release/bundle
+          FOUND=""
+          while IFS= read -r so; do
+            if nm -D --defined-only "$so" 2>/dev/null | grep -qE ' sqlite3_open_v2$'; then
+              echo "  ✓ $(basename "$so") exports sqlite3_open_v2"
+              FOUND="yes"
+            fi
+          done < <(find "$BUNDLE" -name '*.so*' -type f)
+          if [ -z "$FOUND" ]; then
+            echo "::error::No library in the Linux bundle exports the SQLite C API."
+            echo "::error::The app cannot open its database. See pubspec.yaml note."
+            find "$BUNDLE" -name '*.so*' -type f -printf '  %f\n' || true
+            exit 1
+          fi
+          echo "SQLite is reachable from the bundle."
+
+      - name: Bundle libfpzip for the native Draw Things client (macOS)
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          # The pure-Dart Draw Things client decodes generated images through
+          # a tiny fpzip FFI dylib (dt_fpzip.dart looks in Contents/Frameworks/).
+          # Without it, Draw Things generation fails with a clear
+          # libfpzip-missing error (no fallback exists — the sidecars are
+          # gone). Built fresh (LLNL fpzip 1.3.0, universal arm64+x86_64)
+          # and signed by the codesign pass below like every other
+          # Frameworks dylib. Draw Things is macOS-only software, so no
+          # Windows/Linux counterpart exists.
+          ./scripts/build-fpzip-macos.sh
+          APP_PATH=$(find build/macos/Build/Products/Release -maxdepth 1 -name "*.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found for libfpzip bundling" >&2
+            exit 1
+          fi
+          mkdir -p "$APP_PATH/Contents/Frameworks"
+          cp tools/fpzip/libfpzip.dylib "$APP_PATH/Contents/Frameworks/"
+          echo "Bundled libfpzip into $APP_PATH/Contents/Frameworks/"
+
+      - name: Re-sign macOS App (ad-hoc with entitlements)
+        if: matrix.platform == 'macos'
+        run: |
+          APP_NAME=$(ls -d ${{ matrix.build_path }}/*.app | head -1)
+          ENTITLEMENTS="${{ github.workspace }}/macos/Runner/Release.entitlements"
+          echo "Re-signing $APP_NAME after libfpzip bundling..."
+          echo "Using entitlements: $ENTITLEMENTS"
+          # Sign inner frameworks/dylibs first (inside-out signing; covers the
+          # freshly bundled libfpzip.dylib)
+          find "$APP_NAME/Contents/Frameworks" -name "*.framework" -o -name "*.dylib" | while read f; do
+            codesign --force --sign - "$f" 2>/dev/null || true
+          done
+          # Sign the main app with entitlements (preserves file picker, network, etc.)
+          codesign --force --sign - --entitlements "$ENTITLEMENTS" "$APP_NAME"
+          echo "✓ Ad-hoc signature applied with entitlements"
+
+      - name: Download VC++ Redistributable
+        if: matrix.platform == 'windows'
+        run: |
+          $DestDir = "${{ github.workspace }}\${{ matrix.build_path }}\.."
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" `
+            -OutFile "$DestDir\vc_redist.x64.exe"
+          Write-Host "VC++ Redistributable downloaded to $DestDir"
+        shell: pwsh
+
+      - name: Build Windows Installer (Inno Setup)
+        if: matrix.platform == 'windows'
+        run: |
+          $VERSION = "${env:GITHUB_REF_NAME}" -replace '^[vV]', ''
+          choco install innosetup -y --no-progress
+          $ISCC = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $ISCC /DPRE_RELEASE=1 /DMyAppVersion="$VERSION" /DMyAppBuildDir="${{ github.workspace }}\${{ matrix.build_path }}" /DMyAppLicenseFile="${{ github.workspace }}\LICENSE" /DMyAppIconFile="${{ github.workspace }}\windows\runner\resources\app_icon.ico" "installers\windows\setup.iss"
+          Copy-Item "installers\windows\Front_Porch_AI_Beta_Setup.exe" -Destination "."
+        shell: pwsh
+
+
+
+      - name: Clean xattrs from app bundle (required before packaging)
+        if: matrix.platform == 'macos'
+        run: |
+          APP_PATH="build/macos/Build/Products/Release/FrontPorchAI.app"
+          xattr -cr "$APP_PATH" || true
+          find "$APP_PATH" -exec xattr -d com.apple.FinderInfo {} + 2>/dev/null || true
+
+      # Primary artifact for beta channel is now .pkg (to match the updater consts
+      # and the overall .pkg direction). Beta flow currently does ad-hoc app re-sign
+      # (no full Developer ID + notary secrets in this workflow), so we do a bare
+      # pkgbuild here. The important thing for the auto-updater is the
+      # fixed canonical .pkg name (the shim DMG was retired 2026-07-27).
+      - name: Build macOS PKG (primary for beta channel)
+        if: matrix.platform == 'macos'
+        run: |
+          cd build/macos/Build/Products/Release
+          APP_NAME=$(ls -d *.app | head -1)
+          PKG_NAME="Front_Porch_AI_MacOS.pkg"
+          UNSIGNED_PKG="unsigned_${PKG_NAME}"
+          echo "Building (bare) .pkg for beta channel: $PKG_NAME from $APP_NAME"
+          pkgbuild \
+            --component "$APP_NAME" \
+            --install-location /Applications \
+            "$UNSIGNED_PKG" || { echo "ERROR: pkgbuild failed"; exit 1; }
+          # No productsign here (beta flow lacks the full installer cert import/notary path
+          # that nightly/release have). The .pkg is still the canonical name the updater
+          # will look for; real signed+stapled .pkgs come from the other channels.
+          mv "$UNSIGNED_PKG" "$PKG_NAME"
+          echo "✓ PKG created: $PKG_NAME (beta channel)"
+          # Promote the *canonical* PKG name (what _platformAsset + fallback will
+          # request for the beta/pre-release channel) to workspace root so that
+          # upload-artifact + gh-release publish it under the exact name the
+          # in-app updater expects. Use ${GITHUB_WORKSPACE} (absolute) to avoid
+          # brittle relative ../../ counts (addresses review issues 1 and 9).
+          mv "$PKG_NAME" "${GITHUB_WORKSPACE}/Front_Porch_AI_MacOS.pkg" 2>/dev/null || true
+
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=$(echo ${GITHUB_REF_NAME} | sed 's/^[vV]//')" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Package Linux (AppImage + tar.gz only)
+        if: matrix.platform == 'linux'
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          echo "Building beta packages for version $VERSION"
+          
+          # 1. Prepare AppImage
+          mkdir -p AppDir/usr/bin
+          cp -r ${{ matrix.build_path }}/* AppDir/usr/bin/
+          
+          # Create Desktop file
+          cat <<EOF > AppDir/front_porch_ai.desktop
+          [Desktop Entry]
+          Name=Front Porch AI
+          Exec=front_porch_ai
+          Icon=front_porch_ai
+          Type=Application
+          Categories=Utility;
+          Comment=A chilled out frontend for KoboldCPP
+          EOF
+          
+          # Icon management
+          if [ -f "assets/images/front_porch_ai_icon.png" ]; then
+            cp assets/images/front_porch_ai_icon.png AppDir/front_porch_ai.png
+            cp assets/images/front_porch_ai_icon.png AppDir/.DirIcon
+          else
+            touch AppDir/front_porch_ai.png
+            touch AppDir/.DirIcon
+          fi
+          
+          # AppRun - symlink to the binary in usr/bin
+          ln -s usr/bin/front_porch_ai AppDir/AppRun
+          
+          # AppImageKit `continuous` now 404s as HTML. Pin maintained appimagetool.
+          curl -fL https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage -o appimagetool
+          if ! file appimagetool | grep -qi ELF; then
+            echo "appimagetool download is not an ELF binary:" >&2
+            file appimagetool
+            ls -l appimagetool
+            exit 1
+          fi
+          chmod +x appimagetool
+          ./appimagetool AppDir Front_Porch_AI-Linux.AppImage
+          
+          # 2. Standard tar.gz (no deb, no rpm)
+          cd ${{ matrix.build_path }}
+          tar -czvf ../../../../../${{ matrix.asset_name }} .
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-${{ matrix.platform }}
+          path: |
+            Front_Porch_AI_Beta_Setup.exe
+            Front_Porch_AI_MacOS.pkg
+            Front_Porch_AI-Linux.AppImage
+          if-no-files-found: ignore
+
+      - name: Prepare Friendly Release Notes
+        id: release_notes
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+
+          # Try to find a matching per-branch notes file
+          if [[ "$TAG" == *"Beta"* ]] || [[ "$TAG" == *"beta"* ]]; then
+            NOTES_FILE="docs/0.9.8-Beta.md"
+          elif [[ "$TAG" == *"Rawhide"* ]] || [[ "$TAG" == *"nightly"* ]]; then
+            NOTES_FILE="docs/Rawhide.md"
+          else
+            NOTES_FILE="docs/main.md"
+          fi
+
+          if [ -f "$NOTES_FILE" ]; then
+            BODY=$(awk '
+              /^## / { if (in_content) { exit }; in_content=1; next }
+              in_content { print }
+            ' "$NOTES_FILE" || true)
+
+            if [ -n "$BODY" ]; then
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "$BODY" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+              echo "Using notes from $NOTES_FILE for tag $TAG"
+            else
+              echo "body=" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No notes file found at $NOTES_FILE — release body will be empty"
+            echo "body=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create or Update Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            Front_Porch_AI_Beta_Setup.exe
+            Front_Porch_AI_MacOS.pkg
+            Front_Porch_AI-Linux.AppImage
+          prerelease: true
+          name: "${{ github.ref_name }} (Pre-Release)"
+          body: ${{ steps.release_notes.outputs.body }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── AUR publishing removed 2026-08-03 (maintainer-directed) ─────────────
+  # The AUR disabled package adoption on 2026-07-30 and froze ALL pushes on
+  # 2026-08-01 (third malware wave since June — 'Atomic Arch' et al.; Robin
+  # Candau's aur-general announcement gives no restoration ETA, only "we will
+  # send a follow-up once we're able to"). Our job could not even clone over
+  # SSH, so every run ended in a red X and a failure email. The complete job
+  # text lives in git history — `git log -S publish-aur-beta` finds it — and the
+  # AUR_SSH_KEY secret is intentionally left in place for reinstatement.
+  # Until then front-porch-ai-beta-bin on the AUR goes stale; Arch users can install from the
+  # GitHub release artifacts.

@@ -1,0 +1,346 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
+
+import 'package:front_porch_ai/models/models.dart';
+import 'package:front_porch_ai/services/avatar_gallery.dart';
+import 'package:front_porch_ai/services/chat/llm_eval_engine.dart'
+    show kScalarEvalRepeatPenalty;
+import 'package:front_porch_ai/services/chat/pass_support.dart';
+import 'package:front_porch_ai/services/chat/realism_tools.dart';
+import 'package:front_porch_ai/services/services.dart';
+import 'package:front_porch_ai/utils/utils.dart';
+
+part 'expression_classifier.eval.dart';
+
+/// Chat-scoped expression labels: manual override, avatar pick (random +
+/// lastId reroll avoidance), LLM reclass, ONNX cache/debounce.
+/// Label/avatar is not per-speaker — it follows the active `_characterEmotion`
+/// scalar the owner swaps during group impersonation. Manual override and
+/// ONNX caches stay chat-scoped.
+class ExpressionService {
+  final VoidCallback onNotify;
+  final Future<void> Function() onSaveChat;
+
+  // Callbacks for parent-owned cross-domain state (realism guard for reclass,
+  // LLM for async reclass stream + thinking mode, storage for onnx mode,
+  // generating for onnx keep-prior, emotion for onnx ensure/classify fallback,
+  // messages for onnx last-AI text + count + label messageCount check).
+  // These remain in ChatService until their owning domains are extracted later.
+  final bool Function() getIsEvaluatingRealism;
+  final StorageService Function() getStorageService;
+  final LLMService Function() getLlmServiceForReclass;
+  final bool Function() getIsGenerating;
+  final String Function() getCharacterEmotion;
+  final List<ChatMessage> Function() getMessages;
+  final bool Function() getIsThinkingModelForReclass;
+
+  // Special cbs for the cancel-during-onnx block that was inside the original
+  // _classifyWithOnnxAsync (uses messages + save + flags + notify). Kept
+  // granular so leaf can own the classify without owning god realism flags.
+  final bool Function() getRealismEvalCancelled;
+  final void Function(bool) setRealismEvalCancelled;
+  final void Function(bool) setIsEvaluatingRealism;
+  final Future<void> Function() onHandleRealismEvalCancelledDuringOnnx;
+
+  // Owned simulation state (moved verbatim from ChatService).
+  // Remembered avatar pick per "characterKey:label" — keeps the expression
+  // sprite stable across per-token rebuilds (see resolveExpressionAvatar).
+  final Map<String, String> _stableExpressionPicks = {};
+  String? _manualExpressionLabel;
+  final Random _expressionRandom = Random();
+  String? _cachedExpressionLabel;
+  String? _cachedForEmotion;
+
+  // ONNX expression classification
+  ExpressionClassifierService? _expressionClassifierService;
+  String? _onnxExpressionLabel;
+  String? _onnxCachedForEmotion;
+  int _lastOnnxMessageCount = 0;
+  String? _lastOnnxMessageText;
+  bool _onnxClassifying = false;
+  Timer? _onnxDebounce;
+
+  // Tools transport for the LLM reclassify (nullable — tests and tool-less
+  // hosts stay on the text path; the god wires the shared probe/door the
+  // other structured evals use).
+  final Object? fireToolEval;
+  final ToolTransportProbe? probe;
+  final String Function()? getBackendIdentity;
+
+  ExpressionService({
+    required this.onNotify,
+    required this.onSaveChat,
+    required this.getIsEvaluatingRealism,
+    required this.getStorageService,
+    required this.getLlmServiceForReclass,
+    required this.getIsGenerating,
+    required this.getCharacterEmotion,
+    required this.getMessages,
+    required this.getIsThinkingModelForReclass,
+    required this.getRealismEvalCancelled,
+    required this.setRealismEvalCancelled,
+    required this.setIsEvaluatingRealism,
+    required this.onHandleRealismEvalCancelledDuringOnnx,
+    this.fireToolEval,
+    this.probe,
+    this.getBackendIdentity,
+  });
+
+  // ── Public surface (for @Deprecated shims in ChatService + direct test/UI callers) ──────
+
+  String? get manualExpressionLabel => _manualExpressionLabel;
+
+  /// Returns the standard expression label for the current emotion.
+  ///
+  /// If a manual expression is set via [setManualExpression], returns that.
+  /// When classification mode is 'onnx', uses the ONNX classifier result.
+  /// Otherwise maps the nuanced emotion to a standard label
+  /// using [EmotionLabels.nuancedToStandard].
+  String? get currentExpressionLabel {
+    // Manual override takes priority
+    if (_manualExpressionLabel != null && _manualExpressionLabel!.isNotEmpty) {
+      return _manualExpressionLabel!.toLowerCase();
+    }
+
+    final lower = getCharacterEmotion().toLowerCase();
+    final messageCount = getMessages().length;
+
+    final lastAiMsgText = getMessages().isNotEmpty && !getMessages().last.isUser
+        ? getMessages().last.text
+        : '';
+
+    // ONNX mode: trigger classification if needed and return cached result
+    if (getStorageService().expressionSettings.expressionClassificationMode ==
+        'onnx') {
+      // ── STABILITY: Keep previous expression while generating ───────────────
+      // As requested, we don't want "live" updates. We keep the current
+      // face until the message is complete.
+      if (getIsGenerating()) {
+        return _onnxExpressionLabel ??
+            EmotionLabels.nuancedToStandard[lower] ??
+            'neutral';
+      }
+
+      // Trigger async ONNX classification if a new message arrived, text changed, or emotion changed
+      if ((_onnxCachedForEmotion != lower ||
+              messageCount != _lastOnnxMessageCount ||
+              lastAiMsgText != _lastOnnxMessageText) &&
+          !_onnxClassifying &&
+          _onnxDebounce == null) {
+        // Use a small debounce to avoid rapid re-triggering during UI transitions
+        _onnxDebounce = Timer(const Duration(milliseconds: 500), () {
+          _onnxDebounce = null;
+          _classifyWithOnnxAsync(lower);
+        });
+      }
+
+      if (_onnxCachedForEmotion == lower && _onnxExpressionLabel != null) {
+        return _onnxExpressionLabel;
+      }
+      return _onnxExpressionLabel ??
+          EmotionLabels.nuancedToStandard[lower] ??
+          'neutral';
+    }
+
+    if (getCharacterEmotion().isEmpty) return 'neutral';
+
+    // Return cached label if emotion hasn't changed
+    if (_cachedForEmotion == lower && _cachedExpressionLabel != null) {
+      return _cachedExpressionLabel;
+    }
+
+    // Direct match
+    if (EmotionLabels.all.contains(lower)) {
+      debugPrint('[Expression] emotion=$lower -> label=$lower (direct match)');
+      _cachedForEmotion = lower;
+      _cachedExpressionLabel = lower;
+      return lower;
+    }
+
+    // Nuanced mapping
+    final mapped = EmotionLabels.nuancedToStandard[lower];
+    if (mapped != null) {
+      debugPrint(
+        '[Expression] emotion=$lower -> label=$mapped (nuanced mapping)',
+      );
+      _cachedForEmotion = lower;
+      _cachedExpressionLabel = mapped;
+      return mapped;
+    }
+
+    // Unmapped — trigger LLM re-classification
+    debugPrint(
+      '[Expression] emotion=$lower -> UNMAPPED, triggering LLM re-classification',
+    );
+    _reclassifyEmotionAsync(lower);
+    _cachedForEmotion = lower;
+    _cachedExpressionLabel = 'neutral';
+    return 'neutral';
+  }
+
+  /// Resolves the best matching expression avatar for the given character.
+  ///
+  /// Returns the [AvatarImage] to display, or null if no expression images
+  /// are available. Uses [currentExpressionLabel] for matching.
+  ///
+  /// If [rerollIfSame] is true and multiple avatars share the same label,
+  /// a random one is picked (avoiding the previously shown avatar).
+  AvatarImage? resolveExpressionAvatar(
+    CharacterCard character, {
+    bool rerollIfSame = false,
+  }) {
+    // Gallery "looks" are stored as avatar rows too — filter them out so a look
+    // can never be chosen (or counted) as an emotion face.
+    final avatars = expressionsFrom(character.avatarImages);
+    if (avatars.isEmpty) {
+      return null;
+    }
+
+    final label = currentExpressionLabel;
+    if (label == null) {
+      return avatars
+              .where((a) => a.displayOrder + 1 == character.primeAvatarIndex)
+              .isEmpty
+          ? avatars.first
+          : avatars.firstWhere(
+              (a) => a.displayOrder + 1 == character.primeAvatarIndex,
+            );
+    }
+
+    // Find all avatars matching the current emotion label
+    final matches = avatars
+        .where((a) => a.label?.toLowerCase() == label)
+        .toList();
+
+    if (matches.isEmpty) {
+      // Fallback: try neutral, then prime avatar
+      final neutral = avatars
+          .where((a) => a.label?.toLowerCase() == 'neutral')
+          .toList();
+      if (neutral.isNotEmpty) {
+        return neutral.first;
+      }
+      return avatars
+              .where((a) => a.displayOrder + 1 == character.primeAvatarIndex)
+              .isEmpty
+          ? avatars.first
+          : avatars.firstWhere(
+              (a) => a.displayOrder + 1 == character.primeAvatarIndex,
+            );
+    }
+
+    if (matches.length == 1) {
+      return matches.first;
+    }
+
+    // Multiple matches — the pick must be STABLE across rebuilds. This
+    // resolver runs inside build() (chat background + sidebar portrait),
+    // which rebuilds per streamed token batch; re-randomizing on every call
+    // changed the AnimatedSwitcher's child key each rebuild and kept a
+    // full-screen cross-fade thrashing for the whole generation. Re-pick
+    // only on an explicit reroll or when the remembered pick no longer fits
+    // this character's current label. Stability is per character+label so
+    // group chats (which resolve several characters in one build cycle)
+    // can't evict each other's picks.
+    final stableKey = '${character.dbId ?? character.name}:$label';
+    final msgs = getMessages();
+    // List length + sender is stable for the whole stream of one reply
+    // (text grows; the list does not). A new reply increments length.
+    final tipStamp = msgs.isEmpty ? '0' : '${msgs.length}:${msgs.last.sender}';
+    final turnKey = '$stableKey@$tipStamp';
+    final thisTurn = _stableExpressionPicks[turnKey];
+    if (thisTurn != null) {
+      final match = matches.where((a) => a.id == thisTurn).firstOrNull;
+      if (match != null) return match;
+    }
+    final lastForLabel = _stableExpressionPicks[stableKey];
+    // "Re-roll if same" = different variant than the previous REPLY,
+    // not a new roll every rebuild.
+    if (rerollIfSame && lastForLabel != null) {
+      final different = matches.where((a) => a.id != lastForLabel).toList();
+      if (different.isNotEmpty) {
+        final picked = different[_expressionRandom.nextInt(different.length)];
+        _stableExpressionPicks[turnKey] = picked.id;
+        _stableExpressionPicks[stableKey] = picked.id;
+        return picked;
+      }
+    }
+    final picked = lastForLabel != null
+        ? (matches.where((a) => a.id == lastForLabel).firstOrNull ??
+              matches[_expressionRandom.nextInt(matches.length)])
+        : matches[_expressionRandom.nextInt(matches.length)];
+    _stableExpressionPicks[turnKey] = picked.id;
+    _stableExpressionPicks[stableKey] = picked.id;
+    return picked;
+  }
+
+  /// Manually set an expression label (e.g., from /expression-set command).
+  /// Pass null to clear the manual override and resume auto-detection.
+  void setManualExpression(String? label) {
+    _manualExpressionLabel = label;
+    _stableExpressionPicks.clear();
+    onNotify();
+  }
+
+  Future<String> reclassifyEmotion(String unknownEmotion) async {
+    _reclassifyEmotionAsync(unknownEmotion);
+    // Fire-and-forget (side effects + notify happen inside _reclassify... async); return value is the pre-extraction shim contract (always neutral immediate)
+    return 'neutral';
+  }
+
+  /// Initialize the ONNX expression classifier service.
+  void initExpressionClassifier() {
+    _expressionClassifierService ??= ExpressionClassifierService(
+      getStorageService(),
+    );
+  }
+
+  /// Set the ExpressionClassifierService (for ONNX).
+  void setExpressionClassifierService(ExpressionClassifierService service) {
+    _expressionClassifierService = service;
+  }
+
+  // ── Reset / seed / load helpers (support "keep reset blocks in sync" in parent) ──
+
+  void resetForFreshChat() {
+    _manualExpressionLabel = null;
+    _stableExpressionPicks.clear();
+    _cachedExpressionLabel = null;
+    _cachedForEmotion = null;
+    _onnxExpressionLabel = null;
+    _onnxCachedForEmotion = null;
+    _lastOnnxMessageCount = 0;
+    _lastOnnxMessageText = null;
+    _onnxClassifying = false;
+    _onnxDebounce?.cancel();
+    _onnxDebounce = null;
+  }
+
+  void invalidateOnnxCacheForNewResponse() {
+    _onnxCachedForEmotion = null;
+    _onnxExpressionLabel = null;
+    _lastOnnxMessageText = null;
+  }
+}

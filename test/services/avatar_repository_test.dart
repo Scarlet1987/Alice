@@ -1,0 +1,252 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import 'dart:io';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
+import 'package:front_porch_ai/database/database.dart';
+import 'package:front_porch_ai/models/character_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  const channel = MethodChannel('plugins.flutter.io/path_provider');
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        if (methodCall.method == 'getApplicationDocumentsDirectory') {
+          return Directory.systemTemp.path;
+        }
+        return null;
+      });
+
+  SharedPreferences.setMockInitialValues({});
+
+  group('Database — avatar schema', () {
+    late AppDatabase db;
+
+    setUp(() async {
+      db = AppDatabase.forTesting();
+      // Warm up: trigger database initialization
+      await db.select(db.characters).get();
+      // Ensure avatar_images table exists (may not be created by in-memory DB migrations)
+      try {
+        await db.customStatement(
+          'CREATE TABLE IF NOT EXISTS avatar_images ('
+          'id TEXT NOT NULL, '
+          'character_id TEXT NOT NULL, '
+          'filename TEXT NOT NULL, '
+          'label TEXT, '
+          'display_order INTEGER NOT NULL DEFAULT 0, '
+          'created_at INTEGER NOT NULL DEFAULT 0, '
+          'PRIMARY KEY (id))',
+        );
+      } catch (_) {}
+    });
+
+    tearDown(() async {
+      await db.close();
+    });
+
+    test('schema version is 42', () {
+      // v40: Living Worlds (worlds columns + chat_worlds + chat_biome_spans).
+      // v41: worlds.place_traits (atmosphere/gravity JSON).
+      // v42: groups.folder_id (groups movable through folders).
+      // v45: sessions.objectives_enabled (the Objectives switch). Bumped with
+      //      the maintainer's explicit sign-off on the schema change
+      //      (2026-08-07); this assertion tracks schemaVersion by definition,
+      //      so it is provably wrong at 44 rather than merely inconvenient.
+      // v46: objectives.served_ambition (which ambition a quest is a step
+      //      toward — docs/design/pockets-and-preferences.md Part 3). Same
+      //      reasoning as v45: this assertion exists to track schemaVersion,
+      //      so once the version really is 46 the old value is false, not
+      //      merely failing. The column itself is guarded by
+      //      test/database/served_ambition_migration_test.dart, which checks
+      //      the Table, the ladder and the repair path agree — that is the
+      //      test that would catch a BAD schema change; this one only notices
+      //      that a change happened at all.
+      // v47: sessions.pockets — the 1:1 Pockets record. Same reasoning again:
+      //      this assertion tracks schemaVersion by definition, so once the
+      //      version really is 47 the old value is false rather than merely
+      //      failing. The column itself is guarded by
+      //      test/database/pockets_persist_migration_test.dart, which checks
+      //      the Table/ladder/repair trio AND that the save and load wires
+      //      exist — the wires being the part that was actually missing and
+      //      that made 1:1 chats forget her pockets on every reload.
+      // v48: sessions.today_objective_id — the live Today side-quest row.
+      //      Same pin: uniqueness-by-shape cannot rebind once a user-typed
+      //      secondary exists, so the session holds the id. The column itself
+      //      is guarded by the Table/ladder/repair trio plus
+      //      test/services/chat/today_side_quest_test.dart.
+      // v49: sessions.with_user — 1:1 With you / Away judge. NULL means
+      //      never judged; the glance keeps the keyword fallback. The
+      //      column itself is guarded by
+      //      test/database/with_user_persist_migration_test.dart.
+      // v50: personas.birthday — calendar birthday YYYY-MM-DD. NULL means
+      //      unset. The column itself is guarded by
+      //      test/database/birthday_persona_migration_test.dart.
+      // v51: worlds.climate_enabled — per-world climate/weather plug.
+      //      DEFAULT 1 so existing worlds keep climate. Guarded by
+      //      test/database/climate_enabled_migration_test.dart.
+      // v52: chat_worlds.is_primary — Places Primary (Setting) slot.
+      //      Guarded by test/database/chat_worlds_primary_migration_test.dart.
+      // v53: sessions.passage_of_time_gate_migrated — one-shot leftover
+      //      per-chat Passage of Time re-derive. Ladder in
+      //      lib/database/database.migrations.late.dart.
+      // v55: sessions.refractory_minutes_remaining / _total and
+      //      refractory_opened — the refractory in story minutes (2026-10-06).
+      //      The ladder step and the once-only turns × 15 read are guarded by
+      //      test/services/chat/refractory_legacy_load_test.dart.
+      expect(db.schemaVersion, 55);
+    });
+
+    test('journal_memories table exists and round-trips (v35)', () async {
+      await db.insertJournalCard(
+        const JournalMemoriesCompanion(
+          sessionId: Value('s-test'),
+          characterId: Value('c-test'),
+          content: Value('a memory'),
+        ),
+      );
+      final cards = await db.getJournalCards('s-test', 'c-test');
+      expect(cards, hasLength(1));
+      expect(cards.single.content, 'a memory');
+      expect(cards.single.heat, 1.0);
+      expect(cards.single.pinned, isFalse);
+      expect(await db.deleteJournalCardsForSession('s-test'), 1);
+    });
+
+    test(
+      'groups table has stable_id column (v34) — nullable, round-trips',
+      () async {
+        final base = DateTime.now().millisecondsSinceEpoch;
+        // Nullable: a group inserted without a stable id keeps it null.
+        final gid1 = 'grp-a-$base';
+        await db.insertGroup(GroupsCompanion.insert(id: gid1, name: 'G1'));
+        expect((await db.getGroupById(gid1))!.stableId, null);
+
+        // Round-trips when provided.
+        final gid2 = 'grp-b-$base';
+        await db.insertGroup(
+          GroupsCompanion.insert(
+            id: gid2,
+            name: 'G2',
+            stableId: const Value('sid-xyz'),
+          ),
+        );
+        expect((await db.getGroupById(gid2))!.stableId, 'sid-xyz');
+      },
+    );
+
+    test('characters table has prime_avatar_index column', () async {
+      final charId = 'prime-test-${DateTime.now().millisecondsSinceEpoch}';
+      await db.insertCharacter(
+        CharactersCompanion(
+          id: Value(charId),
+          name: Value('Prime Test'),
+          imagePath: Value('test.png'),
+        ),
+      );
+
+      final character = await db.getCharacterById(charId);
+      expect(character.primeAvatarIndex, 1);
+
+      await db.updatePrimeAvatarIndex(charId, 3);
+      final updated = await db.getCharacterById(charId);
+      expect(updated.primeAvatarIndex, 3);
+    });
+
+    test('CRUD operations on avatars', () async {
+      final charId = 'crud-test-${DateTime.now().millisecondsSinceEpoch}';
+      await db.insertCharacter(
+        CharactersCompanion(
+          id: Value(charId),
+          name: Value('CRUD Test'),
+          imagePath: Value('test.png'),
+        ),
+      );
+
+      final avatarId = 'crud-aid-${DateTime.now().millisecondsSinceEpoch}';
+
+      await db.insertAvatar(
+        AvatarImagesCompanion(
+          id: Value(avatarId),
+          characterId: Value(charId),
+          filename: Value('avatar_1.png'),
+          label: Value('casual'),
+          displayOrder: Value(0),
+        ),
+      );
+
+      var avatars = await db.getAvatarImagesByCharacterId(charId);
+      expect(avatars.length, 1);
+      expect(avatars[0].id, avatarId);
+      expect(avatars[0].label, 'casual');
+
+      await db.updateAvatarLabel(avatarId, 'formal');
+      avatars = await db.getAvatarImagesByCharacterId(charId);
+      expect(avatars[0].label, 'formal');
+
+      await db.deleteAvatar(avatarId);
+      avatars = await db.getAvatarImagesByCharacterId(charId);
+      expect(avatars, isEmpty);
+    });
+
+    test('avatars ordered by displayOrder', () async {
+      final charId = 'order-test-${DateTime.now().millisecondsSinceEpoch}';
+      await db.insertCharacter(
+        CharactersCompanion(
+          id: Value(charId),
+          name: Value('Order Test'),
+          imagePath: Value('test.png'),
+        ),
+      );
+
+      final base = 'ord-${DateTime.now().millisecondsSinceEpoch}';
+      await db.insertAvatar(
+        AvatarImagesCompanion(
+          id: Value('$base-a'),
+          characterId: Value(charId),
+          filename: Value('avatar_z.png'),
+          displayOrder: Value(2),
+        ),
+      );
+      await db.insertAvatar(
+        AvatarImagesCompanion(
+          id: Value('$base-b'),
+          characterId: Value(charId),
+          filename: Value('avatar_a.png'),
+          displayOrder: Value(0),
+        ),
+      );
+      await db.insertAvatar(
+        AvatarImagesCompanion(
+          id: Value('$base-c'),
+          characterId: Value(charId),
+          filename: Value('avatar_m.png'),
+          displayOrder: Value(1),
+        ),
+      );
+
+      final avatars = await db.getAvatarImagesByCharacterId(charId);
+      expect(avatars.length, 3);
+      expect(avatars[0].filename, 'avatar_a.png');
+      expect(avatars[1].filename, 'avatar_m.png');
+      expect(avatars[2].filename, 'avatar_z.png');
+    });
+  });
+
+  group('CharacterCard — avatar fields', () {
+    test('primeAvatarIndex defaults to 1', () {
+      final card = CharacterCard(name: 'Test');
+      expect(card.primeAvatarIndex, 1);
+    });
+
+    test('avatarImages defaults to null', () {
+      final card = CharacterCard(name: 'Test');
+      expect(card.avatarImages, equals(null));
+    });
+  });
+}

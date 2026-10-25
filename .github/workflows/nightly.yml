@@ -1,0 +1,837 @@
+name: Nightly Build (Rawhide)
+
+# IMPORTANT: GitHub ONLY evaluates `schedule:` (cron) triggers from workflow files
+# that exist on the repository's DEFAULT branch (main). The schedule here will NOT
+# fire from changes made only on Rawhide.
+#
+# When editing this file (especially the "Compute Rawhide Nightly Version" step that
+# patches lib/app_version.dart), you MUST also ensure an up-to-date copy lands on
+# `main`. Otherwise the 07:00 UTC Rawhide builds will use a stale writer and fail
+# with "Undefined name" compile errors for any new getters/symbols (e.g. isNightlyBuild).
+#
+# The job itself checks out `ref: Rawhide` for the actual source, but the workflow
+# definition (including the sed version-patch logic) always comes from main's copy.
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force a nightly even if Rawhide has no new commits since the last one'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Required GitHub Secrets for macOS Notarization (set in repo Settings → Secrets and variables → Actions)
+#
+#   MACOS_CERTIFICATE         → Base64-encoded .p12 of your "Developer ID Application" certificate + private key
+#   MACOS_CERTIFICATE_PWD     → Password for the .p12 file
+#   MACOS_CERTIFICATE_NAME    → Exact certificate name, e.g. "Developer ID Application: Your Name (TEAMID)"
+#   MACOS_INSTALLER_CERT_NAME → Exact "Developer ID Installer: ..." name
+#   APPLE_TEAM_ID             → 10-character Team ID (from developer.apple.com)
+#   APPLE_API_KEY             → Entire AuthKey_XXXXXXXXXX.p8 PEM (or base64 of that file)
+#   APPLE_API_KEY_ID          → Key ID from App Store Connect → Users and Access → Integrations → App Store Connect API
+#   APPLE_API_ISSUER          → Issuer ID UUID from that same page
+#
+# Notarization uses an App Store Connect API key (notarytool --key / --key-id / --issuer).
+# App-specific passwords (APPLE_ID / APPLE_ID_PASSWORD) are retired: they die every
+# time the Apple ID password changes. API keys do not.
+#
+# Security notes:
+# - We use `::add-mask::` to proactively mask MACOS_CERTIFICATE_NAME, APPLE_TEAM_ID,
+#   APPLE_API_KEY_ID, and APPLE_API_ISSUER in all logs for the macOS job.
+# - Never manually `echo` these secrets in steps.
+#
+# Without these secrets the macOS job will skip real signing + notarization and fall back to ad-hoc (for PR testing).
+# ─────────────────────────────────────────────────────────────────────────────
+
+jobs:
+  # Resolve the Rawhide commit + nightly version ONCE, up front, and hand it to
+  # every downstream job. Previously each job (build matrix, publish, AUR) did its
+  # own `checkout ref: Rawhide` + `git rev-parse --short HEAD` at its own start
+  # time. On a moving branch (rapid pushes / manual re-triggers) those SHAs could
+  # differ, so the binary got stamped with one SHA while the release was TAGGED
+  # with a later one — the .pkg's baked appVersion != its release tag, producing a
+  # permanent "Update Available" loop that reinstalling never fixed. Pinning one
+  # commit (full_sha) + one version string for the whole run makes build == tag by
+  # construction. Also fixes a midnight date-straddle (DATE resolved once here).
+  resolve:
+    name: Resolve Rawhide commit + version
+    runs-on: ubuntu-latest
+    outputs:
+      full_sha: ${{ steps.r.outputs.full_sha }}
+      version: ${{ steps.r.outputs.version }}
+      should_build: ${{ steps.gate.outputs.should_build }}
+    steps:
+      - name: Checkout Rawhide
+        uses: actions/checkout@v7
+        with:
+          ref: Rawhide
+      - name: Compute pinned version
+        id: r
+        shell: bash
+        run: |
+          DATE=$(date +%Y%m%d)
+          FULL_SHA=$(git rev-parse HEAD)
+          SHA=$(git rev-parse --short HEAD)
+          VERSION="rawhide.${DATE}.${SHA}"
+          echo "full_sha=$FULL_SHA" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Resolved nightly version $VERSION at $FULL_SHA"
+
+      # Skip the whole nightly if Rawhide hasn't moved since the last one.
+      # We don't diff git history — we just compare the commit we're about to
+      # build (Rawhide's current HEAD) against the commit the LAST nightly was
+      # built from. That last commit is baked into the previous release's tag
+      # (nightly-rawhide.<date>.<sha>), so the trailing "<sha>" IS the last
+      # build's commit. We prefix-match it against the FULL current SHA (not a
+      # short==short compare) so a later, longer git abbreviation can't cause a
+      # spurious rebuild. Same commit → no new commits → nothing to build.
+      # The Force checkbox on a manual run rebuilds even the same commit.
+      - name: Decide whether to build (skip if no new commits since last nightly)
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          CURRENT_FULL=$(git rev-parse HEAD)
+          CURRENT_SHORT=$(git rev-parse --short HEAD)
+          DECISION=""
+
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "Force requested — building $CURRENT_SHORT regardless of commit changes."
+            DECISION=true
+          else
+            LAST_TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 40 \
+              --json tagName,createdAt \
+              --jq '[.[] | select(.tagName | startswith("nightly-rawhide."))] | sort_by(.createdAt) | last | .tagName' 2>/dev/null || echo "")
+
+            if [ -z "$LAST_TAG" ]; then
+              echo "No previous nightly release found — building."
+              DECISION=true
+            else
+              LAST_SHA="${LAST_TAG##*.}"
+              echo "Current Rawhide HEAD : $CURRENT_SHORT ($CURRENT_FULL)"
+              echo "Last nightly's commit: $LAST_SHA (from tag $LAST_TAG)"
+              if [ -z "$LAST_SHA" ]; then
+                # Couldn't parse a sha — never skip on ambiguity; build to be safe.
+                echo "Could not parse a sha from '$LAST_TAG' — building to be safe."
+                DECISION=true
+              else
+                # Prefix-match the last build's short sha against the current full sha.
+                case "$CURRENT_FULL" in
+                  "$LAST_SHA"*)
+                    echo "::notice::No new commits on Rawhide since the last nightly ($LAST_SHA) — skipping build."
+                    DECISION=false
+                    ;;
+                  *)
+                    echo "New commits since $LAST_SHA — building $CURRENT_SHORT."
+                    DECISION=true
+                    ;;
+                esac
+              fi
+            fi
+          fi
+
+          # Single, guaranteed write of the output (never leave it empty).
+          echo "should_build=$DECISION" >> "$GITHUB_OUTPUT"
+
+  nightly:
+    name: Build Nightly
+    needs: resolve
+    if: needs.resolve.outputs.should_build == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            build_path: build/windows/x64/runner/Release
+          - os: macos-latest
+            platform: macos
+            build_path: build/macos/Build/Products/Release
+          - os: ubuntu-22.04
+            platform: linux
+            asset_name: Front_Porch_AI_Nightly-Linux.tar.gz
+            build_path: build/linux/x64/release/bundle
+
+    steps:
+      - name: Checkout Rawhide (pinned to the resolved commit)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.resolve.outputs.full_sha }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libblkid-dev liblzma-dev libsecret-1-dev libwebkit2gtk-4.1-dev ninja-build pkg-config cmake libunwind-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - name: Stamp Rawhide Nightly Version (pinned)
+        id: version
+        shell: bash
+        run: |
+          # Use the version resolved ONCE for the whole run, so the binary's
+          # baked appVersion always equals the release tag (no SHA race).
+          VERSION="${{ needs.resolve.outputs.version }}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Setting nightly version to: $VERSION"
+
+          # Patch only the version string in the existing app_version.dart.
+          # This leaves isPreRelease, isNightlyBuild, stableVersionBase, and all comments
+          # exactly as they are committed on the Rawhide branch — no duplication.
+          # Prevents "undefined name" compile failures when new getters are added.
+          sed -i.bak "s/^const String appVersion = '.*';$/const String appVersion = '$VERSION';/" lib/app_version.dart
+          rm -f lib/app_version.dart.bak
+
+          echo "Version written: $VERSION"
+          echo "Current lib/app_version.dart (after patch):"
+          cat lib/app_version.dart
+
+      - name: Prepare Friendly Release Notes (for in-app update dialog)
+        id: release_notes
+        shell: bash
+        run: |
+          NOTES_FILE="docs/Rawhide.md"
+
+          if [ -f "$NOTES_FILE" ]; then
+            # Extract the main content after the title and first intro section.
+            # This keeps the notes friendly and focused for the update dialog.
+            BODY=$(awk '
+              /^## / { 
+                if (in_content) { exit } 
+                in_content=1; 
+                next 
+              }
+              in_content { print }
+            ' "$NOTES_FILE")
+
+            if [ -n "$BODY" ]; then
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "$BODY" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+              echo "Using notes from $NOTES_FILE"
+            else
+              echo 'body=**Rawhide Nightly** — Latest development from the Rawhide branch.' >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No $NOTES_FILE found — using fallback notes"
+            echo 'body=**Rawhide Nightly** — Bleeding-edge development. See the README for current focus areas.' >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Node (for the WebUI bundle)
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: web_ui/package-lock.json
+
+      # Regenerate assets/web_app from web_ui/src so the Flutter build bundles a
+      # fresh WebUI (never a stale committed bundle). Must run before flutter build.
+      - name: Build WebUI bundle
+          # --ignore-scripts: no package in this tree runs an install-time
+          # script today (verified 2026-08-05), so this changes nothing now
+          # and blocks the ChainDrop vector if one ever arrives.
+        run: npm ci --ignore-scripts && npm run build
+        working-directory: web_ui
+
+      - name: Build Application
+        if: matrix.platform != 'linux'
+        run: flutter build ${{ matrix.platform }} --release
+
+      - name: Build Application (Linux)
+        if: matrix.platform == 'linux'
+        env:
+          CXXFLAGS: "-Wno-unknown-warning-option"
+        run: flutter build linux --release
+
+      # ── Guard: the Linux bundle MUST be able to reach SQLite ──
+      # v1.1.0 shipped with no SQLite in the bundle and bricked every Linux
+      # install ("libsqlite3.so is missing" -> "database is corrupted"). The
+      # build succeeded and tests passed; only real users saw it. Checks
+      # REACHABILITY, not a filename: sqlite3 3.x emits a standalone
+      # lib/libsqlite3.so, sqlite3_flutter_libs 0.5.x compiles sqlite3.c into
+      # the plugin .so. Either is fine; zero exporters is a broken release.
+      # Full rationale in .github/workflows/release.yml and pubspec.yaml.
+      - name: Verify SQLite is bundled (Linux)
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          BUNDLE=build/linux/x64/release/bundle
+          FOUND=""
+          while IFS= read -r so; do
+            if nm -D --defined-only "$so" 2>/dev/null | grep -qE ' sqlite3_open_v2$'; then
+              echo "  ✓ $(basename "$so") exports sqlite3_open_v2"
+              FOUND="yes"
+            fi
+          done < <(find "$BUNDLE" -name '*.so*' -type f)
+          if [ -z "$FOUND" ]; then
+            echo "::error::No library in the Linux bundle exports the SQLite C API."
+            echo "::error::The app cannot open its database. See pubspec.yaml note."
+            find "$BUNDLE" -name '*.so*' -type f -printf '  %f\n' || true
+            exit 1
+          fi
+          echo "SQLite is reachable from the bundle."
+
+      - name: Rename macOS app bundle for Rawhide Nightly (collision avoidance)
+        if: matrix.platform == 'macos'
+        run: |
+          cd build/macos/Build/Products/Release
+          if [ -d FrontPorchAI.app ]; then
+            mv FrontPorchAI.app FrontPorchAI-Rawhide.app
+            /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Front Porch AI Nightly" FrontPorchAI-Rawhide.app/Contents/Info.plist 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Set :CFBundleName Front Porch AI Nightly" FrontPorchAI-Rawhide.app/Contents/Info.plist 2>/dev/null || true
+            # Give Nightly its OWN bundle identifier — this is the macOS twin of the
+            # Windows per-channel-AppId fix. Stable ships com.linux4life1.frontPorchAi.
+            # Nightly previously ALSO shipped that same id, so /Applications had two
+            # different .app bundles claiming one identity (stable front_porch_ai.app +
+            # FrontPorchAI-Rawhide.app). When the in-app updater ran `open <pkg>`, the
+            # macOS Installer's bundle-relocation looked up that shared id, found two
+            # candidates, and the .pkg payload never reliably overwrote the running
+            # Nightly bundle — so the app stayed on the old build and kept re-prompting
+            # "Update Available" forever (the macOS Nightly update loop).
+            #
+            # A distinct id makes relocation unambiguous: exactly one bundle on disk
+            # claims com.linux4life1.frontPorchAi.nightly, so the Installer overwrites
+            # the Nightly bundle in place (wherever the user keeps it) and the loop ends.
+            # IMPORTANT: this must happen BEFORE code signing below — signing seals
+            # Info.plist, so the id has to be final here.
+            #
+            # Data safety: the app is NOT sandboxed (see macos/Runner/Release.entitlements),
+            # so chats/characters live in ~/Documents/FrontPorchAI-Beta and are keyed by
+            # the FrontPorchAI-Beta dir + isPreRelease, NOT by the bundle id — they are
+            # untouched. Only macOS NSUserDefaults (which IS bundle-id-keyed) moves to a
+            # new domain, i.e. a one-time reset of Nightly's app settings on changeover.
+            /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.linux4life1.frontPorchAi.nightly" FrontPorchAI-Rawhide.app/Contents/Info.plist 2>/dev/null || true
+          fi
+
+      - name: Bundle libfpzip for the native Draw Things client (macOS)
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          # The pure-Dart Draw Things client decodes generated images through
+          # a tiny fpzip FFI dylib (dt_fpzip.dart looks in Contents/Frameworks/).
+          # Without it, Draw Things generation fails with a clear
+          # libfpzip-missing error (no fallback exists — the sidecars are
+          # gone). Built fresh (LLNL fpzip 1.3.0, universal arm64+x86_64)
+          # and signed by the codesign pass below like every other
+          # Frameworks dylib. Draw Things is macOS-only software, so no
+          # Windows/Linux counterpart exists.
+          ./scripts/build-fpzip-macos.sh
+          APP_PATH=$(find build/macos/Build/Products/Release -maxdepth 1 -name "*.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found for libfpzip bundling" >&2
+            exit 1
+          fi
+          mkdir -p "$APP_PATH/Contents/Frameworks"
+          cp tools/fpzip/libfpzip.dylib "$APP_PATH/Contents/Frameworks/"
+          echo "Bundled libfpzip into $APP_PATH/Contents/Frameworks/"
+
+      - name: Download VC++ Redistributable (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          $DestDir = "${{ github.workspace }}\${{ matrix.build_path }}\.."
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$DestDir\vc_redist.x64.exe"
+        shell: pwsh
+
+      - name: Build Windows Installer (Inno Setup)
+        if: matrix.platform == 'windows'
+        run: |
+          choco install innosetup -y --no-progress
+          $ISCC = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $ISCC /DPRE_RELEASE=1 /DNIGHTLY=1 /DMyAppVersion="${{ steps.version.outputs.VERSION }}" /DMyAppBuildDir="${{ github.workspace }}\${{ matrix.build_path }}" /DMyAppLicenseFile="${{ github.workspace }}\LICENSE" /DMyAppIconFile="${{ github.workspace }}\windows\runner\resources\app_icon.ico" "installers\windows\setup.iss"
+          # The .iss produces Front_Porch_AI_Beta_Setup.exe when PRE_RELEASE=1 — rename it for Nightly
+          Copy-Item "installers\windows\Front_Porch_AI_Beta_Setup.exe" -Destination "Front_Porch_AI_Nightly_Setup.exe" -Force
+        shell: pwsh
+
+      - name: Ensure correct Nightly artifact names
+        shell: bash
+        run: |
+          echo "Artifact naming normalized for Nightly"
+      # ── Real Developer ID Code Signing + Notarization (macOS only) ──
+      - name: Mask sensitive certificate values (prevent accidental log leakage)
+        if: matrix.platform == 'macos'
+        run: |
+          # These values will be masked in all logs for this job, even if they
+          # accidentally appear in command output, error messages, or env dumps.
+          echo "::add-mask::${{ secrets.MACOS_CERTIFICATE_NAME }}"
+          echo "::add-mask::${{ secrets.APPLE_TEAM_ID }}"
+          echo "::add-mask::${{ secrets.APPLE_API_KEY_ID }}"
+          echo "::add-mask::${{ secrets.APPLE_API_ISSUER }}"
+
+      - name: Import Apple Developer Certificate
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Create a temporary keychain
+          security create-keychain -p "" "$KEYCHAIN_PATH" 2>/dev/null || true
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+
+          # Decode and import the .p12 certificate
+          echo -n "$MACOS_CERTIFICATE" | base64 --decode -o $RUNNER_TEMP/certificate.p12
+          security import $RUNNER_TEMP/certificate.p12 -k "$KEYCHAIN_PATH" -P "$MACOS_CERTIFICATE_PWD" \
+            -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productsign
+
+          # Allow codesign to use the key without prompting
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" "$KEYCHAIN_PATH"
+
+          # Make the temporary keychain the default for this job
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+
+          echo "Certificate imported successfully"
+
+      - name: Verify certificate is available
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_CERTIFICATE_NAME: ${{ secrets.MACOS_CERTIFICATE_NAME }}
+        run: |
+          echo "Looking for certificate identity..."
+          security find-identity -v -p codesigning
+
+          if ! security find-identity -v -p codesigning | grep -q "$MACOS_CERTIFICATE_NAME"; then
+            echo "ERROR: Certificate '$MACOS_CERTIFICATE_NAME' was not found in the keychain after import."
+            echo "This usually means the certificate name/hash in the secret does not exactly match."
+            exit 1
+          fi
+
+          echo "✓ Certificate identity found in keychain"
+
+      # macOS signing + PKG notarization flow (PKG is the ONLY macOS asset):
+      #
+      # 1. Clean xattrs from the built .app (must be before codesigning).
+      # 2. Sign the .app bundle (inside-out: frameworks → Resources Mach-O → app).
+      # 3. pkgbuild + productsign the .pkg (using Installer cert).
+      # 4. Notarize + staple the .pkg.
+      #
+      # The unsigned shim .dmg was retired 2026-07-27 (maintainer decision).
+      # Its 2026-07-08 removal-revert was a red herring — the re-prompt bug was
+      # the nightly SHA race (see changelog), fixed since. All macOS users are
+      # on the .pkg; pre-.pkg binaries must manually download once.
+      - name: Clean xattrs from app bundle (before code signing)
+        if: matrix.platform == 'macos'
+        run: |
+          APP_PATH=$(ls -d build/macos/Build/Products/Release/*.app 2>/dev/null | head -1)
+          echo "Cleaning xattrs on $APP_PATH (must be before codesigning and notarization)"
+          xattr -cr "$APP_PATH" || true
+          find "$APP_PATH" -exec xattr -d com.apple.FinderInfo {} + 2>/dev/null || true
+
+      - name: Code Sign macOS App (Developer ID)
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_CERTIFICATE_NAME: ${{ secrets.MACOS_CERTIFICATE_NAME }}
+        run: |
+          APP_NAME=$(ls -d ${{ matrix.build_path }}/*.app | head -1)
+          ENTITLEMENTS="${{ github.workspace }}/macos/Runner/Release.entitlements"
+          # Sign inside-out (the main .app is signed LAST); distinct files
+          # WITHIN a pass run in parallel. BSD xargs on macOS, so no GNU-only
+          # flags and we guard against empty input. Each `codesign --timestamp`
+          # is a network round-trip to Apple's timestamp server, which
+          # throttles under a parallel burst — every codesign RETRIES with
+          # backoff. (The helper-signing passes that used to follow left with
+          # the sidecar retirement — since phase 5 the app spawns no helper
+          # processes, so Resources holds only data files.) If Apple rejects
+          # anything, the notarize step below fetches `notarytool log` so the
+          # precise reason is in the CI log.
+          export MACOS_CERTIFICATE_NAME ENTITLEMENTS
+          JOBS=8
+
+          echo "Code signing $APP_NAME with hardened runtime using Developer ID certificate (parallel x$JOBS, with retries)..."
+
+          # Pass 1 — frameworks and dylibs first (inside-out).
+          { find "$APP_NAME/Contents/Frameworks" \( -name "*.framework" -o -name "*.dylib" \) -print0 2>/dev/null || true; } \
+            | xargs -0 -P "$JOBS" -I {} bash -c '
+                f="$1"; [ -n "$f" ] || exit 0
+                i=0
+                until codesign --force --sign "$MACOS_CERTIFICATE_NAME" --timestamp --options runtime "$f" >"/tmp/cs.$$.log" 2>&1; do
+                  i=$((i + 1))
+                  if [ "$i" -ge 4 ]; then echo "  ⚠ codesign skipped after 4 tries (continuing — Apple still notarizes; matches the long-standing pipeline): $f" >&2; break; fi
+                  sleep $((i * 2))
+                done
+                rm -f "/tmp/cs.$$.log"
+              ' _ {}
+
+          # Sign the main app bundle last (outermost)
+          i=0
+          until codesign --force --sign "$MACOS_CERTIFICATE_NAME" --timestamp --options runtime --entitlements "$ENTITLEMENTS" "$APP_NAME" >/tmp/cs_app.log 2>&1; do
+            i=$((i + 1))
+            if [ "$i" -ge 4 ]; then echo "::error::codesign failed after 4 tries for the app bundle"; cat /tmp/cs_app.log; exit 1; fi
+            sleep $((i * 2))
+          done
+
+          echo "✓ App signed with Developer ID (best-effort; the notarize step fetches Apple's log if anything is actually rejected)"
+
+      - name: Build macOS PKG
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_INSTALLER_CERT_NAME: ${{ secrets.MACOS_INSTALLER_CERT_NAME }}
+        run: |
+          cd build/macos/Build/Products/Release
+          APP_NAME=$(ls -d *.app | head -1)
+          PKG_NAME="Front_Porch_AI_Nightly.pkg"
+          if [[ "${{ github.workflow }}" == *"Release"* ]]; then
+            VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+            PKG_NAME="Front_Porch_AI_${VERSION}.pkg"
+          fi
+          UNSIGNED_PKG="unsigned_${PKG_NAME}"
+
+          # Build a NON-RELOCATABLE component pkg. `pkgbuild --component` is relocatable
+          # by default — on a channel-id transition (old shared id com.linux4life1.frontPorchAi
+          # -> new com.linux4life1.frontPorchAi.nightly) macOS bundle relocation can't find
+          # the new id, refuses to overwrite the different-id app already sitting at
+          # /Applications/FrontPorchAI-Rawhide.app, and FORKS the install into
+          # /Applications/FrontPorchAI-Rawhide.localized/ — so the user keeps launching the
+          # OLD build and the update appears to do nothing. Disabling relocation makes the
+          # install path deterministic (overwrites in place). This requires --root +
+          # --component-plist (the --component shorthand can't set it), so stage just the
+          # already-signed .app with ditto (preserves the Developer ID signature + the
+          # framework Versions/Current symlinks), flip BundleIsRelocatable to false, build.
+          # Verified locally: --component emits <relocate><bundle/></relocate> (forks);
+          # this emits an empty <relocate/> in PackageInfo (deterministic overwrite).
+          PKG_STAGE="$(mktemp -d)"
+          ditto "$APP_NAME" "$PKG_STAGE/$APP_NAME"
+          COMP_PLIST="${RUNNER_TEMP:-/tmp}/fp_component.plist"
+          pkgbuild --analyze --root "$PKG_STAGE" "$COMP_PLIST"
+          plutil -replace 0.BundleIsRelocatable -bool NO "$COMP_PLIST"
+          echo "Building non-relocatable .pkg..."
+          pkgbuild \
+            --root "$PKG_STAGE" \
+            --component-plist "$COMP_PLIST" \
+            --install-location /Applications \
+            "$UNSIGNED_PKG" || { echo "ERROR: pkgbuild failed"; exit 1; }
+          rm -rf "$PKG_STAGE" "$COMP_PLIST"
+
+          echo "Signing .pkg with Installer cert..."
+          productsign --sign "$MACOS_INSTALLER_CERT_NAME" "$UNSIGNED_PKG" "$PKG_NAME" || { echo "ERROR: productsign failed"; exit 1; }
+          rm -f "$UNSIGNED_PKG"
+          echo "✓ PKG created successfully: $PKG_NAME"
+
+      - name: Clean quarantine/FinderInfo from PKG file only (before notarization)
+        if: matrix.platform == 'macos'
+        run: |
+          cd build/macos/Build/Products/Release
+          PKG_NAME="Front_Porch_AI_Nightly.pkg"
+          if [[ "${{ github.workflow }}" == *"Release"* ]]; then
+            VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+            PKG_NAME="Front_Porch_AI_${VERSION}.pkg"
+          fi
+          if [ -f "$PKG_NAME" ]; then
+            echo "Light xattr cleanup on PKG file only (not recursive)"
+            xattr -d com.apple.quarantine "$PKG_NAME" 2>/dev/null || true
+            xattr -d com.apple.FinderInfo "$PKG_NAME" 2>/dev/null || true
+          fi
+
+      - name: Submit final PKG to notarization and Staple
+        if: matrix.platform == 'macos'
+        env:
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          cd build/macos/Build/Products/Release
+          PKG_NAME="Front_Porch_AI_Nightly.pkg"
+          if [[ "${{ github.workflow }}" == *"Release"* ]]; then
+            VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+            PKG_NAME="Front_Porch_AI_${VERSION}.pkg"
+          fi
+
+          if [ -z "$APPLE_API_KEY" ] || [ -z "$APPLE_API_KEY_ID" ] || [ -z "$APPLE_API_ISSUER" ]; then
+            echo "::error::Missing APPLE_API_KEY / APPLE_API_KEY_ID / APPLE_API_ISSUER (App Store Connect API key). App-specific passwords are no longer used."
+            exit 1
+          fi
+
+          KEY_FILE="$RUNNER_TEMP/AuthKey.p8"
+          umask 077
+          if printf '%s' "$APPLE_API_KEY" | grep -q 'BEGIN PRIVATE KEY'; then
+            printf '%s\n' "$APPLE_API_KEY" | tr -d '\r' > "$KEY_FILE"
+          else
+            printf '%s' "$APPLE_API_KEY" | tr -d '\r\n ' | base64 --decode > "$KEY_FILE"
+          fi
+          chmod 600 "$KEY_FILE"
+
+          echo "Submitting PKG for notarization (App Store Connect API key)..."
+          SUBMIT_OUT=$(xcrun notarytool submit "$PKG_NAME" \
+            --key "$KEY_FILE" \
+            --key-id "$APPLE_API_KEY_ID" \
+            --issuer "$APPLE_API_ISSUER" \
+            --wait 2>&1) || true
+          printf '%s\n' "$SUBMIT_OUT"
+
+          # `notarytool submit --wait` exits 0 even when the status is Invalid, so
+          # check the status explicitly. On anything other than Accepted, pull
+          # Apple's notarization log (the specific per-file reasons) so a failure
+          # is self-diagnosing in CI instead of a mystery "Invalid" + Error 65.
+          SUBMISSION_ID=$(printf '%s\n' "$SUBMIT_OUT" | grep -Eo 'id: [0-9a-f-]{36}' | head -1 | awk '{print $2}')
+          NOTARY_STATUS=$(printf '%s\n' "$SUBMIT_OUT" | grep -E '^[[:space:]]*status:' | tail -1 | awk '{print $2}')
+          if [ "$NOTARY_STATUS" != "Accepted" ]; then
+            echo "::error::Notarization status='${NOTARY_STATUS:-unknown}' for $PKG_NAME (submission ${SUBMISSION_ID:-unknown})"
+            if [ -n "$SUBMISSION_ID" ]; then
+              echo "── Apple notarization log ──"
+              xcrun notarytool log "$SUBMISSION_ID" \
+                --key "$KEY_FILE" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER" 2>&1 || true
+            fi
+            exit 1
+          fi
+          
+          echo "Stapling notarization ticket to PKG..."
+          xcrun stapler staple "$PKG_NAME"
+          xcrun stapler validate "$PKG_NAME" \
+            && echo "✓ PKG staple verified" \
+            || { echo "⚠ PKG staple validation failed"; exit 1; }
+          
+          # Move PKG to workspace root for upload-artifact step
+          mv "$PKG_NAME" ../../../../../
+          
+          echo "✓ Build complete: PKG and inner .app are fully notarized and stapled!"
+
+      - name: Package Linux Nightly (AppImage + tar.gz)
+        if: matrix.platform == 'linux'
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          echo "Building Linux Nightly packages for $VERSION"
+
+          # 1. Prepare AppDir for AppImage
+          mkdir -p AppDir/usr/bin
+          cp -r ${{ matrix.build_path }}/* AppDir/usr/bin/
+
+          # Create Desktop file (Nightly branding)
+          cat <<EOF > AppDir/front_porch_ai_nightly.desktop
+          [Desktop Entry]
+          Name=Front Porch AI Nightly
+          Exec=front_porch_ai
+          Icon=front_porch_ai
+          Type=Application
+          Categories=Utility;
+          Comment=Rawhide Nightly - Bleeding edge build from rawhide branch
+          EOF
+
+          # Icon management
+          if [ -f "assets/images/front_porch_ai_icon.png" ]; then
+            cp assets/images/front_porch_ai_icon.png AppDir/front_porch_ai.png
+            cp assets/images/front_porch_ai_icon.png AppDir/.DirIcon
+          else
+            touch AppDir/front_porch_ai.png
+            touch AppDir/.DirIcon
+          fi
+
+          # AppRun - symlink to the binary in usr/bin
+          ln -s usr/bin/front_porch_ai AppDir/AppRun
+
+          # AppImageKit `continuous` now 404s as HTML. Pin maintained appimagetool.
+          curl -fL https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage -o appimagetool
+          if ! file appimagetool | grep -qi ELF; then
+            echo "appimagetool download is not an ELF binary:" >&2
+            file appimagetool
+            ls -l appimagetool
+            exit 1
+          fi
+          chmod +x appimagetool
+          ./appimagetool AppDir Front_Porch_AI_Nightly-Linux.AppImage
+
+          # 2. Standard tar.gz (for users who prefer it)
+          cd ${{ matrix.build_path }}
+          tar -czvf ../../../../../Front_Porch_AI_Nightly-Linux.tar.gz .
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-${{ matrix.platform }}
+          path: |
+            Front_Porch_AI_Nightly_Setup.exe
+            Front_Porch_AI_Nightly.pkg
+            Front_Porch_AI_Nightly-Linux.AppImage
+            Front_Porch_AI_Nightly-Linux.tar.gz
+          if-no-files-found: ignore
+
+  publish-nightly:
+    name: Publish Nightly Release
+    needs: [resolve, nightly]
+    if: needs.resolve.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Rawhide (pinned to the resolved commit, for release notes)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.resolve.outputs.full_sha }}
+
+      - name: Resolve Rawhide Nightly Version (pinned)
+        id: version
+        shell: bash
+        run: |
+          # Same pinned version the binary was stamped with — guarantees the
+          # release tag matches the .pkg's baked appVersion (no SHA/date race).
+          VERSION="${{ needs.resolve.outputs.version }}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing nightly version: $VERSION"
+
+      - name: Prepare Friendly Release Notes (for in-app update dialog)
+        id: release_notes
+        shell: bash
+        run: |
+          NOTES_FILE="docs/Rawhide.md"
+
+          if [ -f "$NOTES_FILE" ]; then
+            BODY=$(awk '
+              /^## / { 
+                if (in_content) { exit } 
+                in_content=1; 
+                next 
+              }
+              in_content { print }
+            ' "$NOTES_FILE")
+
+            if [ -n "$BODY" ]; then
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "$BODY" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+              echo "Using notes from $NOTES_FILE"
+            else
+              echo 'body=**Rawhide Nightly** — Latest development from the Rawhide branch.' >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No $NOTES_FILE found — using fallback notes"
+            echo 'body=**Rawhide Nightly** — Bleeding-edge development. See the README for current focus areas.' >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: nightly-*
+          merge-multiple: true
+
+      - name: Upload Nightly Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "nightly-${{ steps.version.outputs.VERSION }}"
+          name: "Nightly ${{ steps.version.outputs.VERSION }}"
+          prerelease: true
+          generate_release_notes: false
+          files: |
+            Front_Porch_AI_Nightly_Setup.exe
+            Front_Porch_AI_Nightly.pkg
+            Front_Porch_AI_Nightly-Linux.AppImage
+            Front_Porch_AI_Nightly-Linux.tar.gz
+          body: |
+            ${{ steps.release_notes.outputs.body }}
+
+            ---
+            **Rawhide Nightly Build** — `${{ steps.version.outputs.VERSION }}`
+
+            Built from the `Rawhide` branch.
+            This is the bleeding-edge version. Use at your own risk.
+
+            Data directory: `FrontPorchAI-Beta`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Update AUR nightly package (front-porch-ai-beta-bin — leftover name) ──
+  # Restored 2026-08-16: AUR write freeze lifted (aurweb v6.5.0). This job
+  # still publishes to the existing front-porch-ai-beta-bin page because that
+  # is the AUR package Arch users already have; we are not opening a third
+  # package. Secret AUR_SSH_KEY is still the deploy key.
+  #
+  # Cron evaluates this file from main. A Rawhide-only edit does not fire.
+  publish-aur-beta:
+    name: Update AUR Nightly Package (from Rawhide)
+    needs: [resolve, nightly, publish-nightly]
+    if: needs.resolve.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Rawhide (pinned to the resolved commit)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.resolve.outputs.full_sha }}
+
+      - name: Update AUR Nightly Package
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: |
+          # Same pinned version as the build + release (no SHA/date race).
+          VERSION="${{ needs.resolve.outputs.version }}"
+          TAG="nightly-${VERSION}"
+
+          # AUR pkgver can contain dots
+          AUR_VERSION="${VERSION}"
+
+          # Set up SSH for AUR
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_KEY" > ~/.ssh/aur_key
+          chmod 600 ~/.ssh/aur_key
+          ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur_key -o StrictHostKeyChecking=accept-new"
+
+          # Existing AUR package — leftover "beta" name, nightly contents.
+          git clone ssh://aur@aur.archlinux.org/front-porch-ai-beta-bin.git /tmp/aur
+          cd /tmp/aur
+
+          git config user.email "age3dude@gmail.com"
+          git config user.name "Sosukeaizen"
+
+          # Update PKGBUILD
+          sed -i "s/^pkgver=.*/pkgver=${AUR_VERSION}/" PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" PKGBUILD
+          sed -i "s/^_tag=.*/_tag=\"${TAG}\"/" PKGBUILD
+
+          cat > .SRCINFO <<SRCINFO
+          pkgbase = front-porch-ai-beta-bin
+          pkgdesc = A chilled out frontend for KoboldCPP (Rawhide nightlies)
+          pkgver = ${AUR_VERSION}
+          pkgrel = 1
+          url = https://github.com/linux4life1/front-porch-AI
+          arch = x86_64
+          license = GPL-3.0-or-later
+          depends = gtk3
+          depends = glib2
+          depends = libsecret
+          depends = fuse2
+          provides = front-porch-ai
+          conflicts = front-porch-ai
+          conflicts = front-porch-ai-bin
+          options = !strip
+          options = !debug
+          source = Front_Porch_AI_Nightly-Linux.AppImage::https://github.com/linux4life1/front-porch-AI/releases/download/${TAG}/Front_Porch_AI_Nightly-Linux.AppImage
+          source = front-porch-ai.desktop
+          source = front-porch-ai.png
+          sha256sums = SKIP
+          sha256sums = SKIP
+          sha256sums = SKIP
+
+          pkgname = front-porch-ai-beta-bin
+          SRCINFO
+
+          # Remove leading whitespace from .SRCINFO (heredoc indentation)
+          sed -i 's/^          //' .SRCINFO
+
+          git add -A
+          git diff --cached --quiet && echo "No changes to push" && exit 0
+          git commit -m "Update to ${TAG} (Rawhide nightly)"
+          git push
+
+          # Clean up
+          rm -f ~/.ssh/aur_key
+          echo "✓ AUR nightly package updated to ${TAG} (Rawhide)"
+

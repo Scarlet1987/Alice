@@ -1,0 +1,79 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+// Barrel file for the most commonly reused UI widgets.
+//
+// Keep reusable widgets exported here so callers use one stable import rather
+// than accumulating single-file paths. Files inside this directory retain the
+// direct-import exemption because importing their own barrel would self-cycle.
+//
+// Preferred usage:
+//
+// ```dart
+// import 'package:front_porch_ai/ui/widgets/widgets.dart';
+// ```
+
+export 'chip_list_editor.dart';
+export 'gpu_layers_field.dart';
+export 'identity_chip_lists.dart';
+export 'kv_quant_picker.dart';
+export 'wardrobe_chip_section.dart';
+export 'work_row.dart';
+export 'birthday_row.dart';
+export 'ai_error_snack_bar.dart';
+export 'app_text_field.dart';
+export 'engine_status_chip.dart';
+export 'kobold_status_bar.dart';
+export 'folder_character_picker.dart';
+export 'realism_form_section.dart';
+export 'styled_dropdown.dart';
+export 'styled_text_controller.dart';
+export 'sidebar.dart';
+export 'model_selector.dart';
+export 'kcpps_selector.dart';
+export 'preset_context_lock.dart';
+export 'low_perf_cpu_warning.dart';
+export 'log_view.dart';
+export 'slider_with_input.dart';
+export 'stop_sequence_list.dart';
+export 'character_card_grid.dart';
+export 'library_view.dart';
+export 'call_overlay.dart';
+export 'chance_time_overlay.dart';
+export 'warm_card.dart';
+export 'warm_dialog.dart';
+export 'guarded_picker.dart';
+export 'onnx_download_overlay.dart';
+export 'remote_lock_overlay.dart';
+export 'setup_overlay.dart';
+
+export 'expanded_editor_dialog.dart';
+export 'realism_progress_row.dart';
+export 'needs_bar.dart';
+export 'needs_clock_off_note.dart';
+export 'fixation_chip.dart';
+export 'group_avatar_montage.dart';
+export 'group_member_card.dart';
+export 'group_member_chips.dart';
+export 'banned_phrases_editor.dart';
+export 'output_sanitizer_rule_editor.dart';
+export 'planner_feature_row.dart';
+export 'vision_projector_field.dart';
+export 'character_voice_picker.dart';
+export 'detail_level_control.dart';
+export 'glossary.dart';

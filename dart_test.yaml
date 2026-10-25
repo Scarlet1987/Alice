@@ -1,0 +1,37 @@
+# Test tags for Front Porch AI.
+#
+# The `golden` tag marks Flutter widget pixel goldens (matchesGoldenFile). These
+# are render-sensitive and are authored against the Linux CI image. The widget
+# golden files also carry `@TestOn('linux')`, so they auto-skip on macOS/Windows
+# (where anti-aliasing differs) and run on Linux / CI. Text and JSON snapshot
+# goldens are untagged and always run on every platform.
+#
+#   Run everything except pixel goldens (e.g. main CI step):
+#     flutter test --exclude-tags golden
+#   Run only the pixel goldens (Linux / CI):
+#     flutter test --tags golden
+#   Refresh pixel goldens after an intentional UI change (Linux / CI):
+#     flutter test --tags golden --update-goldens
+#
+# The `perf` tag marks startup/throughput benchmarks. They PRINT numbers rather
+# than assert them (a wall-clock threshold would flake on shared CI runners), and
+# they self-skip unless FP_BENCH_DIR points at a seeded library — so leaving them
+# in the default run is harmless. Run them deliberately:
+#     FP_BENCH_DIR=~/Documents/FrontPorchAI flutter test --tags perf
+#
+# The `live` / `stoop_live` tags mark pins that talk to a real Stoop/backporch
+# server. They skip when STOOP_TEST_EMAIL / STOOP_TEST_PASSWORD are absent —
+# never replace them with a stub. See CLAUDE.md ## Testing.
+#     STOOP_TEST_EMAIL=… STOOP_TEST_PASSWORD=… flutter test --tags stoop_live
+#
+# The `kobold_live` tag marks checks against a real KoboldCpp: a real engine is
+# started from a temp folder, asked what it has loaded, and stopped. They skip
+# unless both variables are set, so the default run and CI are unaffected.
+#     KOBOLD_LIVE_BIN=/path/to/koboldcpp KOBOLD_LIVE_MODEL=/path/to/small.gguf \
+#       flutter test --tags kobold_live
+tags:
+  golden:
+  perf:
+  live:
+  stoop_live:
+  kobold_live:

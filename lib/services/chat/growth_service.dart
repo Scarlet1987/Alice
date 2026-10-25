@@ -1,0 +1,437 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'package:flutter/foundation.dart';
+
+import 'package:front_porch_ai/models/models.dart';
+import 'package:front_porch_ai/database/database.dart';
+import 'package:front_porch_ai/services/services.dart';
+
+import 'growth_ops.dart';
+import 'growth_physics.dart';
+import 'salience_kick_gate.dart';
+import 'growth_prompt.dart';
+import 'growth_review.dart';
+import 'growth_store.dart';
+import 'journal_ops.dart';
+import 'journal_physics.dart';
+import 'pass_support.dart';
+import 'tool_eval_spec.dart';
+
+part 'growth_service.exchange.dart';
+
+/// Pass-window start index: clamp [cursor] into [messageCount], then cap the
+/// open window at [JournalPhysics.kFirstPassCap] (audit P1.9 — Journal twin).
+/// Pure so the unit test calls the same function the pass uses.
+int growthPassWindowStart(int cursor, int messageCount) {
+  var start = cursor.clamp(0, messageCount);
+  if (messageCount - start > JournalPhysics.kFirstPassCap) {
+    start = messageCount - JournalPhysics.kFirstPassCap;
+  }
+  return start;
+}
+
+/// Whether an automatic Growth pass should fire.
+///
+/// Interval (user messages since the cursor) OR a gated [kickPending]
+/// from onSalienceKick / quest complete. Do **not** also OR
+/// [JournalPhysics.hasSalientEvent] on the same window — that metadata
+/// is what requested the kick, and reading it here bypasses the
+/// cooldown so a hot scene runs growth every turn on two messages.
+/// The model then only reinforces the same rings; new growth starves.
+bool growthPassIsDue({
+  required int userMessagesSincePass,
+  required int interval,
+  required bool kickPending,
+}) {
+  if (userMessagesSincePass <= 0) return false;
+  return kickPending || userMessagesSincePass >= interval;
+}
+
+/// [MemorySettings.growthInterval] when a caller does not pass the slider.
+int _defaultGrowthInterval() => 5;
+
+/// Growth Rings — the growth pass + effective-personality layering
+/// (docs/design/growth-rings.md). Replaces EvolutionService's monolithic
+/// personality/scenario rewrites with small receipt-backed ring operations.
+///
+/// Plain leaf, callback-wired (JournalMaintenance's sibling). Its own small
+/// background job with its own cursor (growth_state) — deliberately NOT a
+/// rider on the Journal pass, whose per-pass cooling is tuned to
+/// journalInterval (§4.2).
+///
+/// Key invariants:
+/// - Strictly per-chat: rings are read and written for the CURRENT session
+///   only and die with the chat.
+/// - The original card is immutable; rings only ever layer on top.
+/// - LLM proposes, code disposes: caps, fade, tiers, and receipts are
+///   deterministic (GrowthPhysics) — never model judgment.
+/// - 1:1 ↔ group parity by construction: the same owner loop runs in both
+///   modes (resolvePassOwners). Scene Guests grow too (1:1) — rings are
+///   keyed by their stable charId exactly like members'.
+/// - Two transports, one applier: tool calls when the backend accepts them,
+///   XML tags everywhere else — both normalize to the same [GrowthOp] list,
+///   resolved here into id-addressed proposals and applied through
+///   [GrowthReview.applyOwnerProposals] immediately or after user review
+///   (review-first, default OFF — autonomous growth by default).
+/// - Scenario evolution is retired (§3.2): the Journal recap owns "where we
+///   are", so there is no effectiveScenario here — callers use the card's
+///   original scenario.
+class GrowthService {
+  final GrowthStore store;
+  final GrowthReview review;
+
+  /// Shared with the Journal pass — one tools probe per backend identity
+  /// per run, no matter which pass asks first.
+  final ToolTransportProbe probe;
+
+  final Future<String?> Function(String prompt) fireLLMEval;
+  final Object fireToolEval;
+  final bool Function() getPreferTextEvals;
+  final int Function() getPassEpoch;
+  final String Function(String) stripThinkBlocks;
+  final String Function() getBackendIdentity;
+
+  final String? Function() getSessionId;
+  final CharacterCard? Function() getActiveCharacter;
+  final GroupChat? Function() getActiveGroup;
+  final List<CharacterCard> Function() getGroupCharacters;
+  final List<CharacterCard> Function() getSceneGuestCards;
+  final String Function(CharacterCard) getCharacterIdFromCard;
+  final List<ChatMessage> Function() getMessages;
+  final String Function() getUserName;
+
+  /// The Journal recap + hot cards ground the pass in distilled state
+  /// instead of raw RAG chunks (§4.2).
+  final String Function() getRecap;
+  final Future<List<JournalMemoryData>> Function(
+    String sessionId,
+    String characterId,
+  )
+  getJournalCards;
+
+  final bool Function() getGrowthEnabled;
+  final bool Function() getReviewFirst;
+
+  /// User messages between automatic passes. The reinforce brake allows
+  /// about one strength step per ring per this many messages.
+  final int Function() getGrowthInterval;
+  final bool Function() getIsPassRunning;
+  final void Function(bool) setIsPassRunning;
+
+  /// Reloads the store's injection cache with the current roster (god
+  /// helper — it knows the session, members, and guests).
+  final Future<void> Function() refreshCache;
+  final VoidCallback onNotify;
+
+  GrowthService({
+    required this.store,
+    required this.review,
+    required this.probe,
+    required this.fireLLMEval,
+    required this.fireToolEval,
+    this.getPreferTextEvals = preferTextEvalsOff,
+    this.getPassEpoch = passEpochNeverStale,
+    required this.stripThinkBlocks,
+    required this.getBackendIdentity,
+    required this.getSessionId,
+    required this.getActiveCharacter,
+    required this.getActiveGroup,
+    required this.getGroupCharacters,
+    required this.getSceneGuestCards,
+    required this.getCharacterIdFromCard,
+    required this.getMessages,
+    required this.getUserName,
+    required this.getRecap,
+    required this.getJournalCards,
+    required this.getGrowthEnabled,
+    required this.getReviewFirst,
+    this.getGrowthInterval = _defaultGrowthInterval,
+    required this.getIsPassRunning,
+    required this.setIsPassRunning,
+    required this.refreshCache,
+    required this.onNotify,
+  });
+
+  /// How many trailing messages a force pass re-reads when nothing is new
+  /// since the cursor (manual "Check now" with an empty window).
+  static const int kForceWindowFallback = 10;
+
+  /// Set when a significant event fires outside message metadata (objective
+  /// completion). Consumed by ChatService's post-generation trigger.
+  bool eventKickPending = false;
+
+  /// The shared salient-kick rate limiter (salience_kick_gate.dart),
+  /// consulted by BOTH kick origins in the god wiring before either this
+  /// service's or the Journal's [eventKickPending] is set. HOSTED here for
+  /// storage only — the ChatService shell sits at the god-file ratchet's
+  /// edge and cannot take a field, and this leaf had the headroom. The
+  /// throttle is upstream of both features and gates neither on the other.
+  final salienceKickGate = SalienceKickGate();
+
+  // ── Layering (the injection payoff, §4.5) ────────────────────────────
+
+  /// The effective personality for [card]: original description +
+  /// personality, plus the compact tier-prefixed ring block (or the legacy
+  /// evolved blob while it awaits distillation — no behavior cliff).
+  /// Description + personality, without the growth block. The chat prompt
+  /// keeps this in the stable head and puts [growthBlockFor] after the
+  /// transcript. [effectivePersonality] still appends growth for callers
+  /// that want the combined string.
+  String cardPersonality(CharacterCard card) {
+    return [
+      if (card.description.isNotEmpty) card.description,
+      if (card.personality.isNotEmpty) card.personality,
+    ].join('\n');
+  }
+
+  String effectivePersonality(CharacterCard card) {
+    final base = cardPersonality(card);
+    if (!getGrowthEnabled()) return base;
+    return '$base${growthBlockFor(card)}';
+  }
+
+  /// The standalone [Character Growth] block for [card] ('' when there is
+  /// nothing to inject). Synchronous — reads the store cache.
+  String growthBlockFor(CharacterCard card) {
+    final charId = getCharacterIdFromCard(card);
+    final session = getSessionId();
+    final legacy = store.legacyBlobFor(session, charId);
+    return buildGrowthInjection(
+      charName: card.name,
+      activeRings: store.activeRingsFor(session, charId),
+      legacyBlob: legacy == null ? '' : legacy.$1,
+    );
+  }
+
+  /// Raw growth lines for prompt-budgeted consumers (the realism dossier):
+  /// tier-prefixed ring lines, or the legacy personality blob pre-distill.
+  String growthLinesFor(CharacterCard card) {
+    if (!getGrowthEnabled()) return '';
+    final charId = getCharacterIdFromCard(card);
+    final session = getSessionId();
+    final legacy = store.legacyBlobFor(session, charId);
+    if (legacy != null && legacy.$1.isNotEmpty) return legacy.$1;
+    return GrowthPhysics.injectionSelection(
+          store.activeRingsFor(session, charId),
+        )
+        .map((r) => GrowthPhysics.injectionLine(r, charName: card.name))
+        .join('\n');
+  }
+
+  // ── The growth pass (§4.2) ───────────────────────────────────────────
+
+  Future<void> runGrowthPass({bool force = false}) async {
+    final sessionToken = getSessionId();
+    if (sessionToken == null) return;
+    if (getIsPassRunning()) return;
+    if (!force && review.hasPendingFor(sessionToken)) return;
+    // Consume the event kick only once a pass actually starts — the caller
+    // used to clear it BEFORE calling, so a pass blocked by a parked review
+    // (or an already-running pass) silently ate the kick.
+    eventKickPending = false;
+    final epoch = getPassEpoch();
+    setIsPassRunning(true);
+    onNotify();
+
+    try {
+      // Fresh cache first: the legacy blobs decide distill mode, and a
+      // stale cache would skip the migration.
+      await refreshCache();
+
+      final messages = getMessages();
+      // THE WINDOW IS CAPPED ON EVERY PASS (audit P1.9) — Journal twin.
+      // Gating on `start == 0` only protected a virgin growth record; a
+      // stuck non-zero cursor on a long chat reopened an unbounded window
+      // after one failed pass. Same trap Journal fixed in journal_maintenance.
+      final freshFrom = growthPassWindowStart(
+        await store.cursorFor(sessionToken),
+        messages.length,
+      );
+      // A forced "Check" on a caught-up cursor re-reads already-reviewed
+      // messages for context. It may still ADD, but it must not re-score
+      // them: no reinforce and no fade, or each press bumps the same ring
+      // +0.20 and fades the rest.
+      final rewound = freshFrom >= messages.length;
+      var start = freshFrom;
+      if (rewound) {
+        if (!force) return;
+        start = (messages.length - kForceWindowFallback).clamp(
+          0,
+          messages.length,
+        );
+      }
+      final window = messages.sublist(start);
+      if (window.isEmpty) return;
+      // Snapshot-derived cursor target — Journal twin (journal_maintenance).
+      // `messages` is the god's live `_messages`; a turn taken while this pass
+      // awaits its LLM call would otherwise land BEHIND the advanced cursor
+      // and never be read for a ring, with no path that rewinds it.
+      final cursorTarget = start + window.length;
+
+      final owners = resolvePassOwners(
+        window: window,
+        group: getActiveGroup(),
+        members: getGroupCharacters(),
+        active: getActiveCharacter(),
+        idOf: getCharacterIdFromCard,
+        guests: getSceneGuestCards(),
+      );
+      if (owners.isEmpty) return;
+
+      final reviewMode = getReviewFirst();
+      final parked = <GrowthOwnerProposals>[];
+      var anySucceeded = false;
+
+      for (final owner in owners) {
+        final ownerId = getCharacterIdFromCard(owner);
+        if (ownerId.isEmpty) continue;
+
+        final allRings = await store.ringsFor(sessionToken, ownerId);
+        final active = allRings.where((r) => !r.retired).toList();
+        final legacy = store.legacyBlobFor(sessionToken, ownerId);
+        final legacyText = legacy == null
+            ? ''
+            : [
+                if (legacy.$1.isNotEmpty) legacy.$1,
+                if (legacy.$2.isNotEmpty) legacy.$2,
+              ].join('\n\n');
+
+        final journalCards = (await getJournalCards(
+          sessionToken,
+          ownerId,
+        )).where(JournalPhysics.isHot).toList();
+
+        final ops = await _runExchange(
+          owner: owner,
+          activeRings: active,
+          journalCards: journalCards,
+          window: window,
+          windowStart: start,
+          legacyBlob: legacyText,
+          startedEpoch: epoch,
+        );
+        if (ops == null || getPassEpoch() != epoch) {
+          debugPrint('[Growth] ✗ ${owner.name}: empty eval response');
+          continue;
+        }
+
+        final distillMode = legacyText.isNotEmpty;
+        final intervalHeld = <String>{};
+        final resolved = _resolveOps(
+          ops,
+          active,
+          distillMode: distillMode,
+          ownerName: owner.name,
+          windowStart: start,
+          windowLength: window.length,
+          rewound: rewound,
+          intervalHeld: intervalHeld,
+        );
+        final proposals = GrowthOwnerProposals(
+          ownerId: ownerId,
+          ownerName: owner.name,
+          ops: resolved,
+          // Only count the distill done when it actually produced starter
+          // rings — a whiffed distill retries on the next pass (the blob
+          // keeps injecting meanwhile, so nothing is lost).
+          distilled:
+              distillMode &&
+              resolved.any((op) => op.action == GrowthOpAction.add),
+        );
+
+        // Ring physics: rings this pass actively engaged (reinforced or
+        // revised) don't fade; everything else non-established steps down.
+        // Applied at pass time in both modes (JournalStore.coolCards
+        // precedent — a later discarded review doesn't undo physics).
+        final engagedIds = proposals.ops
+            .where(
+              (op) =>
+                  op.action == GrowthOpAction.reinforce ||
+                  op.action == GrowthOpAction.revise,
+            )
+            .map((op) => op.ringId)
+            .whereType<String>()
+            .toSet();
+        // A too-soon reinforce is not applied, but the ring did show up:
+        // do not also fade it on the passes that refuse the extra step.
+        engagedIds.addAll(intervalHeld);
+        if (!rewound) {
+          await store.fadeUnreinforced(sessionToken, ownerId, engagedIds);
+        }
+
+        final proposed = proposals.ops.length;
+        final ({int added, int reinforced, int revised, int retired}) wrote;
+        if (reviewMode) {
+          if (proposals.ops.isNotEmpty) parked.add(proposals);
+          int count(GrowthOpAction action) =>
+              proposals.ops.where((op) => op.action == action).length;
+          wrote = (
+            added: count(GrowthOpAction.add),
+            reinforced: count(GrowthOpAction.reinforce),
+            revised: count(GrowthOpAction.revise),
+            retired: count(GrowthOpAction.retire),
+          );
+        } else {
+          wrote = await review.applyOwnerProposals(sessionToken, proposals);
+        }
+        anySucceeded = true;
+        final addN = wrote.added;
+        final reinN = wrote.reinforced;
+        final revN = wrote.revised;
+        final retN = wrote.retired;
+        final applied = addN + reinN + revN + retN;
+        final gap = !reviewMode && proposed != applied
+            ? ' ($proposed proposed)'
+            : '';
+        debugPrint(
+          '[Growth] ✓ ${owner.name}: $applied op(s) '
+          '(+$addN add, $reinN reinforce, $revN revise, $retN retire)'
+          '${rewound ? ' (re-check)' : ''}'
+          '$gap'
+          '${proposals.distilled ? ' (distilled legacy growth)' : ''}'
+          '${reviewMode ? ' (for review)' : ''}',
+        );
+      }
+
+      // Cursor advances only when at least one owner call succeeded — an
+      // all-failed pass auto-retries next interval. In review mode a
+      // non-empty batch parks and carries the cursor target; an empty
+      // "no growth" result settles immediately.
+      if (anySucceeded && getSessionId() == sessionToken) {
+        if (reviewMode && parked.isNotEmpty) {
+          review.park(
+            GrowthReviewBatch(
+              sessionId: sessionToken,
+              cursorTarget: cursorTarget,
+              owners: parked,
+            ),
+          );
+        } else {
+          await store.setCursor(sessionToken, cursorTarget);
+        }
+        await refreshCache();
+      }
+    } catch (e) {
+      debugPrint('[Growth] Pass failed: $e');
+    } finally {
+      setIsPassRunning(false);
+      onNotify();
+    }
+  }
+}

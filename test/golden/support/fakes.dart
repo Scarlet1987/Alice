@@ -1,0 +1,749 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+// Shared, timer-free service doubles for provider-backed widget goldens.
+//
+// The real services are unsuitable for static pixel goldens: a real LLMProvider
+// builds a KoboldService whose readiness probe schedules a recurring timer, so
+// `pumpAndSettle` never returns. These doubles construct nothing and implement
+// only the surface the widgets actually read (everything else throws via
+// noSuchMethod), following the established `_Fake*` pattern in `test/ui/`.
+
+import 'package:flutter/foundation.dart';
+
+import 'package:front_porch_ai/database/database.dart' show Objective;
+import 'package:front_porch_ai/services/chat/pockets.dart';
+import 'package:front_porch_ai/models/character_card.dart';
+import 'package:front_porch_ai/models/chat_generation_settings.dart';
+import 'package:front_porch_ai/models/chat_message.dart';
+import 'package:front_porch_ai/models/chat_theme_overrides.dart';
+import 'package:front_porch_ai/models/chat_participant.dart';
+import 'package:front_porch_ai/services/chat/context_viewer_snapshot.dart';
+import 'package:front_porch_ai/services/chat/weather_biomes.dart';
+import 'package:front_porch_ai/services/chat/weather_engine.dart';
+import 'package:front_porch_ai/services/chat/weather_segments.dart';
+import 'package:front_porch_ai/services/live_gen_progress.dart';
+import 'package:front_porch_ai/utils/character_linked_world.dart';
+import 'package:front_porch_ai/models/group_chat.dart';
+import 'package:front_porch_ai/providers/app_state.dart';
+import 'package:front_porch_ai/services/character_repository.dart';
+import 'package:front_porch_ai/services/chat_service.dart';
+import 'package:front_porch_ai/services/chat/chaos_mode_service.dart';
+import 'package:front_porch_ai/services/chat/web_search_service.dart';
+import 'package:front_porch_ai/services/chat/wiki_search_service.dart';
+import 'package:front_porch_ai/services/chat/needs_simulation.dart';
+import 'package:front_porch_ai/services/chat/nsfw_service.dart';
+import 'package:front_porch_ai/services/chat/relationship_service.dart';
+import 'package:front_porch_ai/services/chat/time_service.dart';
+import 'package:front_porch_ai/services/folder_service.dart';
+import 'package:front_porch_ai/services/group_chat_repository.dart';
+import 'package:front_porch_ai/models/world.dart' as world_model;
+import 'package:front_porch_ai/services/llm_provider.dart';
+import 'package:front_porch_ai/services/llm_service.dart';
+import 'package:front_porch_ai/services/memory_service.dart';
+import 'package:front_porch_ai/services/stt_service.dart';
+import 'package:front_porch_ai/services/tts_service.dart';
+import 'package:front_porch_ai/services/tts_voice_info.dart';
+import 'package:front_porch_ai/services/update_service.dart';
+import 'package:front_porch_ai/services/user_persona_service.dart';
+import 'package:front_porch_ai/services/world_repository.dart';
+
+/// A timer-free, IO-free [LLMProvider] double. Exposes the backend-type surface
+/// screens read (e.g. the shared AvatarGenerationPanel's vision peek checks
+/// `activeBackend`) without
+/// constructing any backend service.
+class FakeLLMProvider extends ChangeNotifier implements LLMProvider {
+  FakeLLMProvider({this.activeBackend = BackendType.kobold});
+
+  @override
+  final BackendType activeBackend;
+
+  @override
+  bool get isLocal => activeBackend == BackendType.kobold;
+
+  @override
+  bool get hasManagedProcess => activeBackend == BackendType.kobold;
+
+  @override
+  bool get hasAnyManagedProcessRunning => false;
+
+  /// Worker lane defaults to off. Instance members (not the library
+  /// extension) so abort/settings never read `_storageService` on a double.
+  @override
+  BackendType? get workerBackend => null;
+
+  @override
+  bool get workerConfigured => false;
+
+  @override
+  bool get workerRefusedDualLocal => false;
+
+  @override
+  LLMService? get workerService => null;
+
+  @override
+  LLMService get sideLaneService => activeService;
+
+  @override
+  bool get sideLaneIsKobold => false;
+
+  @override
+  String? get workerUnreadyMessage => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// A `ChatService` double for sidebar/chat/overlay goldens. `ChatService` is a
+/// large god class, so this implements only the surface a rendered widget reads
+/// and grows as new surfaces are covered; everything else throws via
+/// noSuchMethod. Sub-services (e.g. [timeService]) are seeded deterministically.
+class FakeChatService extends ChangeNotifier implements ChatService {
+  FakeChatService({
+    this.realismEnabled = true,
+    this.isGenerating = false,
+    this.authorNote = '',
+    this.authorNoteStrength = 3,
+    this.summary = '',
+    this.summaryLastIndex = 0,
+    this.summaryPaused = false,
+    this.isSummaryGenerating = false,
+    this.needsSimEnabled = true,
+    this.characterEmotion = 'neutral',
+    this.emotionIntensity = 'moderate',
+    this.isGrowthPassRunning = false,
+    this.todaySentence,
+    this.activeCharacter,
+    List<ChatMessage> messages = const [],
+    // Generation status bar surface.
+    this.generationPhase = GenerationPhase.idle,
+    this.generationProgress = 0.0,
+    this.tokensGenerated = 0,
+    this.maxTokens = 0,
+    this.tokensPerSecond = 0.0,
+    this.prefillElapsedSeconds = 0.0,
+    this.prefillPromptTokens = 0,
+    this.prefillMetricsAreMeasured = true,
+    this.lastPerfData,
+    // Realism-processing overlay surface.
+    this.isVerifyingRealism = false,
+    this.verificationPass = 0,
+    this.verificationMaxPasses = 1,
+    this.isEvaluatingRealism = false,
+    this.isProcessingGreeting = false,
+    String timeOfDay = 'evening',
+    int dayCount = 3,
+    int shortTermBond = 120,
+    int longTermBond = 60,
+    int trustLevel = 40,
+    Map<String, int> needs = const {
+      'hunger': 70,
+      'bladder': 55,
+      'energy': 80,
+      'social': 45,
+      'fun': 65,
+      'hygiene': 75,
+      'comfort': 60,
+    },
+  }) : _messages = messages {
+    // Goldens must be date-stable: pin the canonical clock to a fixed anchor
+    // (Tue 2026-06-30) instead of the legacy today-anchored synthesis, which
+    // would repaint the TimeStrip's date every real-world day.
+    _time =
+        TimeService(
+          onNotify: () {},
+          onSaveChat: () async {},
+          onSetPendingRealismMetadata: (_, _) {},
+          onPatchLastMessageRealismState: (_, _, _) {},
+        )..seedFromV2OrExt(
+          timeOfDay: timeOfDay,
+          dayCount: dayCount,
+          storyStartDate: '2026-06-30',
+        );
+    _nsfw = NsfwService(
+      getGroupInt: (_, _) => 0,
+      getGroupValue: (_, _) => null,
+      setGroupValue: (_, _, _) {},
+    );
+    _chaos = ChaosModeService(
+      onNotify: () {},
+      onSaveChat: () async {},
+      onSetPendingRealismMetadata: (_, _) {},
+    );
+    _webSearch = WebSearchService(getApiKey: () => '');
+    _wikiSearch = WikiSearchService(getBaseUrl: () => '');
+    _needs = NeedsSimulation(
+      onNotify: () {},
+      onSaveChat: () async {},
+      getTimeOfDay: () => timeOfDay,
+      getRealismEnabled: () => realismEnabled,
+      getObserverMode: () => false,
+      getCurrentSpeakerIdForRealism: () => '',
+      getIsGroupNonObserverMode: () => false,
+      getGroupNeeds: (_) => {},
+      setGroupNeeds: (_, _) {},
+      getEnjoysLowHygiene: () => false,
+      getNeedsSimEnabled: () => needsSimEnabled,
+    )..restoreFromSnapshot(needs);
+    _relationship =
+        RelationshipService(
+          onNotify: () {},
+          onSaveChat: () async {},
+          getIsGroupActive: () => false,
+          getObserverMode: () => false,
+          getGroupCharacterCount: () => 0,
+          getShouldTrackInterCharacterRelationships: () => false,
+          getCurrentSpeakerIdForRealism: () => '',
+          getCurrentGroupMemberIds: () => <String>{},
+          getOtherGroupMemberIds: (_) => const [],
+          getOtherGroupMemberIdToLowerName: (_) => const {},
+          getRecentExchangeLowerText: () => '',
+          getMessageCount: () => 0,
+          getIsGroupRealismActive: () => false,
+          getGroupAffectionScore: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupAffectionScore: (_, _) {},
+          getGroupLongTermScore: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupLongTermScore: (_, _) {},
+          getGroupTrustLevel: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupTrustLevel: (_, _) {},
+          getGroupFixation: (_, {String defaultValue = ''}) => defaultValue,
+          setGroupFixation: (_, _) {},
+          getGroupFixationLifespan: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupFixationLifespan: (_, _) {},
+          getGroupRelationshipTier: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupRelationshipTier: (_, _) {},
+          getGroupLongTermTier: (_, {int defaultValue = 0}) => defaultValue,
+          setGroupLongTermTier: (_, _) {},
+          getGroupSpatialStance: (_, {String defaultValue = ''}) =>
+              defaultValue,
+          setGroupSpatialStance: (_, _) {},
+          getGroupInterCharacterRelationships: (_) => <String, int>{},
+          setGroupInterCharacterRelationships: (_, _) {},
+        )..loadScalars(
+          affectionScore: shortTermBond,
+          longTermScore: longTermBond,
+          trustLevel: trustLevel,
+        );
+  }
+
+  final List<ChatMessage> _messages;
+  late final TimeService _time;
+  late final NsfwService _nsfw;
+  late final ChaosModeService _chaos;
+  late final WebSearchService _webSearch;
+  late final WikiSearchService _wikiSearch;
+  late final NeedsSimulation _needs;
+  late final RelationshipService _relationship;
+
+  @override
+  final bool realismEnabled;
+
+  /// Objectives running for this chat (v45). CharacterStateGroup reads this in
+  /// build() to decide whether the Ambitions row renders, so the fake must
+  /// answer it or the whole sidebar panel throws mid-build — which is exactly
+  /// how it failed: an 87% pixel diff on character_state.{dark,light}, because
+  /// the widget rendered an error box instead of the panel. Defaults true,
+  /// matching production.
+  @override
+  bool get objectivesActive => true;
+
+  /// Same fake-pinned reason as objectivesActive directly above: the sidebar
+  /// reads this, its body is an extension member, and an unoverridden
+  /// extension call from a fake reaches ChatService privates and throws
+  /// mid-build. Empty = "unremarkable day", which keeps the goldens showing
+  /// the panel exactly as they did before Standing Mood existed.
+  @override
+  String get standingMoodSummary => '';
+
+  @override
+  final bool isGenerating;
+  @override
+  final String authorNote;
+  @override
+  final int authorNoteStrength;
+  @override
+  final String summary;
+  @override
+  final int summaryLastIndex;
+  @override
+  int get historyBasePosition => 0;
+  @override
+  final bool summaryPaused;
+  @override
+  final bool isSummaryGenerating;
+  @override
+  final bool needsSimEnabled;
+  @override
+  final String characterEmotion;
+  @override
+  final String emotionIntensity;
+  @override
+  final bool isGrowthPassRunning;
+  @override
+  String? todaySentence;
+  @override
+  String? get todayLine => todaySentence;
+  @override
+  void setTodaySentence(String? value) {
+    final next = value?.trim();
+    todaySentence = (next == null || next.isEmpty) ? null : next;
+    notifyListeners();
+  }
+
+  @override
+  void abandonToday() {
+    setTodaySentence(null);
+  }
+
+  @override
+  final CharacterCard? activeCharacter;
+
+  // Generation status bar surface.
+  @override
+  final GenerationPhase generationPhase;
+  @override
+  final double generationProgress;
+  @override
+  final int tokensGenerated;
+  @override
+  final int maxTokens;
+  @override
+  final double tokensPerSecond;
+  @override
+  final double prefillElapsedSeconds;
+  @override
+  final int prefillPromptTokens;
+  @override
+  final bool prefillMetricsAreMeasured;
+  @override
+  final Map<String, dynamic>? lastPerfData;
+
+  /// No live backend source in goldens → the status bar renders its
+  /// estimate-based fallback labels (pixel-stable regardless of backend).
+  @override
+  LiveGenProgress? get activeLiveProgress => null;
+
+  // Realism-processing overlay surface.
+  @override
+  final bool isVerifyingRealism;
+  @override
+  final int verificationPass;
+  @override
+  final int verificationMaxPasses;
+  @override
+  final bool isEvaluatingRealism;
+  @override
+  final bool isProcessingGreeting;
+
+  // RealismProcessingOverlay reads this at build time; empty = "initializing" branch.
+  @override
+  String get realismEvalStreamTextClean => '';
+
+  @override
+  TimeService get timeService => _time;
+
+  @override
+  Future<void> setPassageOfTimeEnabled(bool enabled) async {
+    _time.setPassageOfTimeEnabled(enabled);
+    notifyListeners();
+  }
+
+  @override
+  NsfwService get nsfwService => _nsfw;
+  @override
+  ChaosModeService get chaosModeService => _chaos;
+  @override
+  WebSearchService get webSearchService => _webSearch;
+  @override
+  bool get webSearchEnabled => _webSearch.isActive;
+  @override
+  WikiSearchService get wikiSearchService => _wikiSearch;
+  @override
+  String get wikiBaseUrl => '';
+  @override
+  Future<void> setWikiBaseUrl(String url) async {}
+  @override
+  NeedsSimulation get needsSimulation => _needs;
+  @override
+  RelationshipService get relationshipService => _relationship;
+
+  /// RAG / Memory sidebar: public getters live on ChatServiceAccessors and
+  /// read library-private fields. Fakes that only `implements ChatService`
+  /// must pin them or ChatToolsFacade.state() throws mid-call (CI red since
+  /// the embedding statusSnapshot was added to the facade).
+  @override
+  MemoryService? get memoryService => null;
+
+  @override
+  Map<String, dynamic>? get lastRagReceipt => null;
+
+  // 1:1 mode by default (no active group) for the simple sidebar sections.
+  @override
+  GroupChat? get activeGroup => null;
+  @override
+  bool get chaosNsfwEnabled => _chaos.chaosNsfwEnabled;
+
+  // Unified-cast surface (empty / 1:1 defaults for the simple test doubles).
+  @override
+  List<ChatParticipant> get cast => const [];
+  @override
+  bool get observerMode => false;
+  @override
+  List<Objective> getObjectivesForGroupCharacter(CharacterCard character) =>
+      const [];
+  // getArousalForGroupCharacter is an extension on ChatService (resolves on the
+  // static type), so it needs no fake override.
+
+  // Pockets & Wardrobe surface. The 1:1 Character State panel calls both of
+  // these in build(), and they are CLASS members on ChatService rather than
+  // extension members, so noSuchMethod cannot dispatch them and the panel
+  // throws mid-render without these — the same maintenance this file already
+  // does for every other class member the real service grew. Null pockets
+  // means the row renders nothing, so existing goldens are unmoved.
+  @override
+  String characterIdFor(CharacterCard c) => c.name;
+  @override
+  Pockets? pocketsFor(String characterId) => null;
+  // Feature off in every golden scene, so the panel (which since the
+  // add-by-hand change renders even for an EMPTY record when the switch is
+  // on) stays absent and existing goldens are unmoved — same contract as
+  // the null pocketsFor above.
+  @override
+  bool get pocketsFeatureEnabled => false;
+
+  // Objective surface — empty by default (renders the "propose an objective" UI).
+  @override
+  Objective? get primaryObjective => null;
+  @override
+  List<Objective> get secondaryObjectives => const [];
+  @override
+  bool get isCheckingCompletion => false;
+
+  // Context viewer surface.
+  @override
+  Map<String, int> get lastPromptBudget => const {};
+  @override
+  Map<String, String> get lastPromptSections => const {};
+  @override
+  ContextBudgetSource get promptBudgetSource => ContextBudgetSource.none;
+  @override
+  DateTime? get promptBudgetAssembledAt => null;
+  @override
+  Future<void> estimateContextBudgetNow() async {}
+  @override
+  int get contextSize => 8192;
+
+  @override
+  Future<List<Objective>> getActiveObjectivesFor(CharacterCard _) async =>
+      const [];
+
+  // ChatSettingsDialog reads sessionGenSettings in didChangeDependencies then
+  // calls resolveBannedPhrases(storage). Pre-populate bannedPhrases so the
+  // resolve short-circuits before touching StorageService.realismSettings.
+  @override
+  ChatGenerationSettings get sessionGenSettings =>
+      ChatGenerationSettings(bannedPhrases: const <String>[]);
+  @override
+  set sessionGenSettings(ChatGenerationSettings _) {}
+
+  // Chat theme overrides — MessageBubble and ChatSettingsDialog read this
+  // at build time via widget.chatService?.sessionThemeOverrides and
+  // didChangeDependencies respectively. Default (empty) is fine for goldens.
+  @override
+  ChatThemeOverrides get sessionThemeOverrides => ChatThemeOverrides();
+  @override
+  set sessionThemeOverrides(ChatThemeOverrides _) {}
+
+  // Message bubble surface.
+  @override
+  List<ChatMessage> get messages => List.unmodifiable(_messages);
+  // Mutates the seeded message in place so facade edit paths (e.g. inserting a
+  // generated image into the last message) are observable in unit tests.
+  @override
+  void editMessage(int index, String newText) {
+    if (index >= 0 && index < _messages.length) _messages[index].text = newText;
+  }
+
+  @override
+  bool get isGroupMode => false;
+  @override
+  List<CharacterCard> get groupCharacters => const [];
+  @override
+  int get greetingIndex => 0;
+  @override
+  bool get isGeneratingActions => false;
+  @override
+  List<String> get suggestedActions => const [];
+
+  // Scene-guest "regenerate the buried host" affordance. These unit goldens never
+  // set up a host buried under Lite-NPC replies, so null = MessageBubble shows no
+  // buried-host regen button (matching the pre-scene-guest render). Without this
+  // stub the real getter call hits noSuchMethod and throws at build time, which
+  // is what was making the MessageBubble goldens fail on CI.
+  @override
+  int? get regenerableHostBelowGuestsIndex => null;
+
+  // Living Time weather. Null (off) by default so every pre-weather sidebar
+  // baseline renders byte-identical — TimeStrip omits the chip entirely on
+  // null. The dedicated weather-chip golden sets this non-null (the VALUE only
+  // gates rendering; the chip's pixels come from WeatherEngine recomputing
+  // over currentSessionId/dayCount/clock, which are seeded deterministically).
+  DailyWeather? currentWeatherValue;
+
+  @override
+  DailyWeather? get currentWeather => currentWeatherValue;
+
+  // Same shape as the real getter: gated on currentWeather, recomputed by the
+  // engine over the deterministic seed/day/clock — so facade and chip tests
+  // see the exact forecast the shipped code would produce.
+  @override
+  DailyWeather? get upcomingWeather => currentWeatherValue == null
+      ? null
+      : WeatherEngine.weatherFor(
+          sessionSeed: currentSessionId!,
+          dayCount: _time.dayCount + 1,
+          date: _time.clock.add(const Duration(days: 1)),
+        );
+
+  // Intra-day chip surface (Living Time §3 / Living Worlds): same shape as
+  // the real getter — gated on currentWeather, recomputed by WeatherSegments
+  // over the deterministic seed/day/clock. Span-less temperate climate, so
+  // pre-biome chip pixels stay byte-identical.
+  @override
+  SegmentWeather? get currentSegmentWeather => currentWeatherValue == null
+      ? null
+      : WeatherSegments.segmentWeatherFor(
+          sessionSeed: currentSessionId!,
+          dayCount: _time.dayCount,
+          date: _time.clock,
+          hour: _time.clock.hour,
+        );
+
+  @override
+  Biome get activeChatBiome => Biome.temperate;
+
+  @override
+  String? get currentSessionId => 'golden-session';
+
+  /// Ambitions shown by the Character State accordion / group member card.
+  /// Empty by default so pre-ambition goldens render unchanged; a fixture
+  /// can seed values to golden the row itself.
+  List<({String text, int progress})> ambitionsValue = const [];
+
+  @override
+  List<({String text, int progress})> ambitionsFor(CharacterCard card) =>
+      ambitionsValue;
+
+  @override
+  String spatialStanceForGroupCharacter(CharacterCard character) => '';
+
+  @override
+  bool? withUserForGroupCharacter(CharacterCard character) => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Timer-free [TtsService] double. Exposes the getters that widget build trees
+/// read at build time (MessageBubble, TTS settings dialogs, voice browsing).
+class FakeTtsService extends ChangeNotifier implements TtsService {
+  @override
+  bool get isSpeaking => false;
+  @override
+  bool get isGenerating => false;
+  @override
+  String? get currentMessageId => null;
+  @override
+  double get generationProgress => 0.0;
+  @override
+  List<TtsVoiceInfo> get activeVoices => const [];
+  @override
+  double get modelDownloadProgress => 0.0;
+  @override
+  bool get isDownloadingModel => false;
+  @override
+  String? get lastError => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// [SttService] double that avoids the real constructor's platform-channel
+/// [AudioRecorder] (which throws MissingPluginException in headless tests).
+/// Defaults to unavailable; [transcribeAudioFile] returns a canned value so
+/// VoiceFacade's transcribe path is exercisable without Whisper.
+class FakeSttService extends ChangeNotifier implements SttService {
+  FakeSttService({this.available = false, this.transcript});
+
+  final bool available;
+  final String? transcript;
+
+  @override
+  bool get isAvailable => available;
+  @override
+  Future<String?> transcribeAudioFile(String audioPath) async => transcript;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Empty [UserPersonaService] double. [MessageBubble] uses a
+/// `Consumer<UserPersonaService>` to filter personas by sender name; an empty
+/// list renders the section as a no-op. [UserPersonaPage] reads [persona] when
+/// `personas` is non-empty — returning a default here so seeded variants work.
+class FakeUserPersonaService extends ChangeNotifier
+    implements UserPersonaService {
+  @override
+  List<UserPersona> get personas => const [];
+  @override
+  UserPersona get persona => UserPersona(id: 'default');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Seeded [CharacterRepository] double. Holds a fixed in-memory character
+/// list; `loadCharacters` is a no-op. Used by home-page component goldens.
+class FakeCharacterRepository extends ChangeNotifier
+    implements CharacterRepository {
+  FakeCharacterRepository([List<CharacterCard> characters = const []])
+    : _characters = List.unmodifiable(characters);
+
+  final List<CharacterCard> _characters;
+
+  @override
+  List<CharacterCard> get characters => _characters;
+  @override
+  bool get isLoading => false;
+  @override
+  List<String> get allTags => const [];
+  @override
+  Future<void> loadCharacters() async {}
+
+  /// Home grid keys cover images with this; static goldens stay at 0.
+  @override
+  int get coverEpoch => 0;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Empty [FolderService] double. All folder-related lookups return empty
+/// collections so [CharacterCardGrid] renders the unfolderd character list.
+class FakeFolderService extends ChangeNotifier implements FolderService {
+  @override
+  List<CharacterFolder> get folders => const [];
+  @override
+  List<String> getCharactersInFolder(String folderId) => const [];
+  @override
+  List<String> getCharactersInFolderRecursive(String folderId) => const [];
+  @override
+  List<CharacterFolder> getSubfolders(String? parentId) => const [];
+  @override
+  Set<String> getUnfolderedCharacterPaths() => const {};
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Empty [GroupChatRepository] double. Returns no groups so the grid renders
+/// only character cards (no group tiles).
+class FakeGroupChatRepository extends ChangeNotifier
+    implements GroupChatRepository {
+  @override
+  List<GroupChat> get groups => const [];
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Minimal [AppState] double. [Sidebar] reads only [selectedIndex] at build
+/// time; [setIndex] is a no-op (navigation callbacks are never invoked in a
+/// static golden).
+class FakeAppState extends ChangeNotifier implements AppState {
+  FakeAppState({this.selectedIndex = 0});
+
+  @override
+  final int selectedIndex;
+
+  @override
+  void setIndex(int index) {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Empty [WorldRepository] double. Returns no worlds; [WorldManagementPage]
+/// renders the empty-state message ("No worlds yet").
+class FakeWorldRepository extends ChangeNotifier implements WorldRepository {
+  FakeWorldRepository([List<world_model.World> worlds = const []])
+    : _worlds = worlds;
+
+  final List<world_model.World> _worlds;
+
+  @override
+  List<world_model.World> get worlds => List.unmodifiable(_worlds);
+  @override
+  bool get isLoading => false;
+
+  // Living Worlds: mirrors the real filter (places = not character-linked).
+  @override
+  List<world_model.World> get placeWorlds =>
+      List.unmodifiable(_worlds.where((w) => !isCharacterLinkedWorld(w)));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Minimal [UpdateService] double. [Sidebar]'s `Consumer<UpdateService>`
+/// reads [currentVersion], [displayCurrentVersion], and [updateAvailable]
+/// at build time. [UpdateDialog]'s Consumer additionally reads
+/// [downloadComplete], [downloading], [displayLatestVersion],
+/// [releaseNotes], and [downloadProgress]. No HTTP, timers, or file-system.
+class FakeUpdateService extends ChangeNotifier implements UpdateService {
+  FakeUpdateService({
+    this.updateAvailable = false,
+    this.downloadComplete = false,
+    this.downloading = false,
+    this.latestVersion = '0.9.1',
+    this.releaseNotes = '',
+    this.downloadProgress = 0.0,
+  });
+
+  @override
+  String get currentVersion => '0.9.0';
+  @override
+  String get displayCurrentVersion => 'v0.9.0';
+  @override
+  final bool updateAvailable;
+  @override
+  final bool downloadComplete;
+  @override
+  final bool downloading;
+  @override
+  final String latestVersion;
+  @override
+  String get displayLatestVersion => 'v$latestVersion';
+  @override
+  final String releaseNotes;
+  @override
+  final double downloadProgress;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}

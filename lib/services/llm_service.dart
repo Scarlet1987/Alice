@@ -1,0 +1,419 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+
+/// Generation parameters shared across all LLM backends.
+class GenerationParams {
+  final String prompt;
+  final int maxLength;
+  final int minLength;
+  final double temperature;
+  final double repeatPenalty;
+  final double topP;
+  final double minP;
+  final int repPenTokens;
+  final double? dynatempRange;
+  final double xtcThreshold;
+  final double xtcProbability;
+  final List<String>? stopSequences;
+  final bool reasoningEnabled;
+  final String reasoningEffort;
+
+  /// Optional maximum tokens the model may spend on its internal reasoning/thinking trace.
+  /// Used by OpenRouter and compatible providers (e.g. Nano-GPT) via the `reasoning.max_tokens` field.
+  /// Setting to 0 on Continue generations helps force non-thinking / direct output on models that support budget control (Kimi K2, DeepSeek hybrids, Qwen3 thinking variants, etc.).
+  final int? reasoningMaxTokens;
+
+  /// Evals only: keep reasoning-channel tokens so we can parse JSON out of
+  /// them. Mandatory-reasoning models (Kimi :thinking) put the answer there
+  /// and `reasoning.exclude` leaves `content` empty — a 90s think then a
+  /// newline. Chat / Continue leave this false so thoughts stay hidden.
+  final bool salvageReasoning;
+
+  /// Chargen (and similar small-budget callers): if a silent mandatory
+  /// reasoner 200s `enabled:false` then thinks until `finish_reason:length`
+  /// with no content, retry once with the shared think-headroom budget.
+  /// Unlike [salvageReasoning], this keeps `reasoning.exclude` so think
+  /// tokens never pollute the visible reply. Chat / Continue stay false —
+  /// their reply-length cap is the user's setting.
+  final bool mandatoryReasoningHeadroom;
+
+  final List<String>? bannedPhrases;
+
+  /// Top-K cutoff; 0 disables it (KoboldCpp and remote APIs both treat 0 as
+  /// off, so it's only serialized when > 0).
+  final int topK;
+
+  /// DRY anti-repetition strength (KoboldCpp only; 0 = off).
+  final double dryMultiplier;
+
+  /// Optional system prompt for chat APIs. When provided, OpenRouter/LM Studio
+  /// will send this as a proper 'system' role message instead of lumping
+  /// everything into a single 'user' message. KoboldCPP ignores this field.
+  final String? systemPrompt;
+
+  /// Optional GBNF grammar string for constrained JSON output (KoboldCPP local only).
+  /// Never set this when reasoning/thinking mode is active — the `<think>` block
+  /// tokens would be illegal under the grammar and break generation.
+  final String? grammar;
+
+  /// When true, instructs KoboldCPP to never emit EOS mid-generation.
+  /// Required for thinking models so the model can complete its `<think>` block
+  /// without KoboldCPP treating the template's built-in stop tokens as EOS.
+  final bool banEosToken;
+
+  /// Controls KoboldCPP's trim_stop behaviour. Set to false for thinking models
+  /// so template stop tokens (`<|im_end|>` etc.) don't silently eat the output.
+  final bool trimStop;
+
+  /// Optional base64-encoded PNG images attached to the user chat message
+  /// (Vision QC, portrait describe, Waifu Coder drop). When non-empty, the
+  /// OpenAI-compatible chat transports render the last user content as a
+  /// multimodal array via [openAiUserContent] / [attachOpenAiImagesToLastUser];
+  /// when null/empty the payload keeps the plain string content,
+  /// byte-identical to the pre-vision text-only path.
+  final List<String>? images;
+
+  /// Named OpenAI `tool_choice` function, or null → `'auto'`. The sentinel
+  /// `'required'` (`kToolChoiceRequired`) forces any advertised tool (Waifu
+  /// first mutation step). Rides the params object so [generateWithTools]
+  /// overrides keep their two-arg signature (existing test fakes must not
+  /// be edited).
+  final String? toolChoice;
+
+  /// Live token callback (Waifu Coder think tokens, realism overlay).
+  /// Null stays on the buffered POST.
+  final void Function(String chunk)? onChunk;
+
+  /// After Kobold FIFO `waitForIdle`: skip/pause/xml-only, never live
+  /// prefer-text (the ping shares this door).
+  final bool Function()? stillWantTools;
+
+  /// Asked when a request's turn comes at KoboldCpp and again just before it
+  /// is sent: false means the caller no longer wants the reply (Stop was
+  /// pressed while it waited), and the request is not sent. Null always
+  /// wants. Set on chat replies; the Stop button cancels the turn, not the
+  /// reader's subscription, so a reply that waits has to ask.
+  final bool Function()? stillWant;
+
+  /// Probe identity (`backend|endpoint|model|path`). Style retry and skip/pause
+  /// key on the same string [ChatService] uses.
+  final String backendIdentity;
+
+  /// When set, chat-completions `messages` is this list (after optional
+  /// system). Null keeps the single user blob chat uses.
+  final List<Map<String, Object>>? chatMessages;
+
+  /// The chat this reply belongs to, so KoboldCpp's cache for it can be kept
+  /// while helper prompts run in between. Set on a chat reply and nowhere
+  /// else; only [KoboldService.generateStream] reads it. A helper that
+  /// carries it by mistake only costs speed.
+  final String? kvChat;
+
+  const GenerationParams({
+    required this.prompt,
+    this.maxLength = 200,
+    this.minLength = 0,
+    this.temperature = 0.7,
+    this.repeatPenalty = 1.1,
+    this.topP = 0.9,
+    this.minP = 0.0,
+    this.topK = 0,
+    this.dryMultiplier = 0.0,
+    this.repPenTokens = 64,
+    this.dynatempRange,
+    this.xtcThreshold = 0.1,
+    this.xtcProbability = 0.0, // 0 = off (samplers are delivered now)
+    this.stopSequences,
+    this.reasoningEnabled = false,
+    this.reasoningEffort = 'medium',
+    this.reasoningMaxTokens,
+    this.salvageReasoning = false,
+    this.mandatoryReasoningHeadroom = false,
+    this.bannedPhrases,
+    this.systemPrompt,
+    this.grammar,
+    this.banEosToken = false,
+    this.trimStop = true,
+    this.images,
+    this.toolChoice,
+    this.onChunk,
+    this.stillWantTools,
+    this.stillWant,
+    this.backendIdentity = '',
+    this.chatMessages,
+    this.kvChat,
+  });
+
+  /// Chat-completions `messages`. Null [chatMessages] is the historical
+  /// system + one user blob. Waifu passes user/assistant/tool turns here;
+  /// [systemPrompt] still prefixes as `system` when set.
+  List<Map<String, Object>> get openAiMessages {
+    final custom = chatMessages;
+    final messages = <Map<String, Object>>[];
+    final system = systemPrompt;
+    if (system != null && system.isNotEmpty) {
+      messages.add({'role': 'system', 'content': system});
+    }
+    if (custom != null && custom.isNotEmpty) {
+      messages.addAll(custom);
+      return attachOpenAiImagesToLastUser(messages, images);
+    }
+    messages.add({'role': 'user', 'content': openAiUserContent});
+    return messages;
+  }
+
+  /// The `content` value for the OpenAI chat user message: the plain [prompt]
+  /// string when no [images] ride along, or a multimodal content array of one
+  /// text part followed by one `image_url` part per image.
+  Object get openAiUserContent {
+    final imgs = images;
+    if (imgs == null || imgs.isEmpty) return prompt;
+    return openAiContentWithImages(prompt, imgs);
+  }
+}
+
+/// Headroom-opted [OpenRouterService.generateStream] learned a silent
+/// mandatory-reasoner and the single retry still returned no content.
+class SilentMandatoryReasoningStarveException implements Exception {
+  const SilentMandatoryReasoningStarveException(this.model);
+  final String model;
+  @override
+  String toString() =>
+      'API error: $model used hidden reasoning until max_tokens with no '
+      'content. Retried once with think headroom; still empty.';
+}
+
+/// Puts [images] on the last `role: user` row as OpenAI `image_url` parts.
+/// No images, or no user row, returns [messages] unchanged. Does not mutate
+/// the input list or its maps.
+List<Map<String, Object>> attachOpenAiImagesToLastUser(
+  List<Map<String, Object>> messages,
+  List<String>? images,
+) {
+  if (images == null || images.isEmpty) return messages;
+  for (var i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]['role'] != 'user') continue;
+    final next = List<Map<String, Object>>.of(messages);
+    next[i] = {
+      ...messages[i],
+      'content': openAiContentWithImages(messages[i]['content'], images),
+    };
+    return next;
+  }
+  return messages;
+}
+
+/// Text (or existing parts) plus one `image_url` PNG part per image.
+/// Empty [images] leaves [content] unchanged (string stays a string).
+Object openAiContentWithImages(Object? content, List<String> images) {
+  if (images.isEmpty) return content ?? '';
+  final imageParts = [
+    for (final img in images)
+      {
+        'type': 'image_url',
+        'image_url': {'url': 'data:image/png;base64,$img'},
+      },
+  ];
+  if (content is List) {
+    return [...content, ...imageParts];
+  }
+  return [
+    {'type': 'text', 'text': content is String ? content : '${content ?? ''}'},
+    ...imageParts,
+  ];
+}
+
+/// One tool invocation from a tool-calling response (OpenAI `tool_calls`
+/// entry, arguments already JSON-decoded; malformed arguments decode to {}).
+class LlmToolCall {
+  final String name;
+  final Map<String, dynamic> arguments;
+
+  /// Provider `tool_calls[].id` when the host sent one. Empty means synthesize.
+  final String id;
+
+  const LlmToolCall({
+    required this.name,
+    required this.arguments,
+    this.id = '',
+  });
+}
+
+/// OpenAI-style `usage` block. Null fields mean the server omitted them.
+class LlmTokenUsage {
+  const LlmTokenUsage({
+    this.promptTokens,
+    this.completionTokens,
+    this.totalTokens,
+  });
+
+  final int? promptTokens;
+  final int? completionTokens;
+  final int? totalTokens;
+
+  int? get usedTokens {
+    if (totalTokens != null && totalTokens! > 0) return totalTokens;
+    if (promptTokens == null && completionTokens == null) return null;
+    return (promptTokens ?? 0) + (completionTokens ?? 0);
+  }
+}
+
+/// Result of a tool-enabled, non-streaming generation: the tool calls the
+/// model made (possibly none) plus any plain assistant text it also wrote.
+class LlmToolResponse {
+  final List<LlmToolCall> calls;
+  final String text;
+
+  /// Hidden chain-of-thought when the backend splits it out of [text]
+  /// (`reasoning_content`). Empty on text-only backends.
+  final String reasoning;
+
+  /// Server-reported tokens when the backend sent `usage`. Null = guess.
+  final int? promptTokens;
+  final int? completionTokens;
+  final int? totalTokens;
+
+  /// OpenAI `choices[0].finish_reason` when the body carried one.
+  final String? finishReason;
+
+  const LlmToolResponse({
+    required this.calls,
+    required this.text,
+    this.reasoning = '',
+    this.promptTokens,
+    this.completionTokens,
+    this.totalTokens,
+    this.finishReason,
+  });
+
+  /// Empty parse after the model committed to `tool_calls`. Callers must
+  /// not fire a second text/XML generate for this turn.
+  bool get isUnusableNativeToolCall =>
+      calls.isEmpty && finishReason == 'tool_calls';
+
+  int? get usedTokens => LlmTokenUsage(
+    promptTokens: promptTokens,
+    completionTokens: completionTokens,
+    totalTokens: totalTokens,
+  ).usedTokens;
+}
+
+/// Opt-in identity surface for OpenAI-compatible services with a live URL.
+abstract interface class LlmApiEndpoint {
+  String get apiUrl;
+}
+
+/// Abstract interface for all LLM backends (local KoboldCPP, OpenRouter, etc).
+abstract class LLMService extends ChangeNotifier {
+  /// Stream tokens one at a time for real-time display.
+  Stream<String> generateStream(GenerationParams params);
+
+  /// Non-streaming generation with OpenAI-style tool calling. Returns null
+  /// when this backend can't speak the tools protocol — callers fall back to
+  /// their text transport (the Journal falls back to its XML tags). Every
+  /// real backend implements it (remote APIs and local KoboldCpp alike —
+  /// Qwen3-class local models call tools well); a model that can't simply
+  /// produces no calls and the caller's negotiation handles the rest.
+  ///
+  /// Contract: null is a CAPABILITY signal (the backend answered and the
+  /// call yielded nothing usable). Transport failures — host unreachable,
+  /// the client torn down mid-call by [abortGeneration], a whole-call
+  /// timeout, or a busy/5xx server — THROW instead, so verdict-recording
+  /// callers (the shared ToolTransportProbe consumers) can classify them as
+  /// network events via [isToolTransportFailure] rather than branding the
+  /// backend XML-only for the whole run.
+  Future<LlmToolResponse?> generateWithTools(
+    GenerationParams params,
+    List<Map<String, dynamic>> tools,
+  ) async => null;
+
+  /// Abort the current in-flight generation request (closes the HTTP client).
+  void abortGeneration() {}
+
+  /// The caller's turn was cancelled: replies of it that still wait for this
+  /// backend's line leave it, and whatever is on the wire is left alone.
+  /// True when one left. Only a backend with a line has any.
+  bool dropStoppedReplies() => false;
+
+  /// Whether the backend is ready to accept requests.
+  bool get isReady;
+
+  /// Human-readable name for this backend (e.g. "KoboldCPP", "OpenRouter").
+  String get backendName;
+}
+
+/// True when [error] reads like a failure to reach the backend at all —
+/// nothing listening on the port, host down, or the HTTP client torn down
+/// mid-request. The OS words the same failure differently per platform:
+/// Windows says "The remote computer refused the network connection"
+/// (errno 1225), macOS "Connection refused" (errno 61), Linux errno 111 —
+/// so match the broad shapes rather than one platform's phrasing.
+bool looksLikeBackendUnreachable(Object error) {
+  final s = error.toString();
+  return s.contains('SocketException') ||
+      s.contains('Connection refused') ||
+      s.contains('refused the network connection') ||
+      s.contains('errno = 61') ||
+      s.contains('Connection closed before full header') ||
+      (s.contains('ClientException') && s.contains('closed'));
+}
+
+/// Thrown by [LLMService.generateWithTools] implementations when the server
+/// answered "busy / unavailable" (HTTP 429 or 5xx) — the transient sibling
+/// of a thrown socket error. Says nothing about the model's tool-calling
+/// capability; callers classify it via [isToolTransportFailure].
+class LlmToolTransportException implements Exception {
+  final String message;
+
+  LlmToolTransportException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+/// True when a tools-transport attempt failed at the TRANSPORT level — an
+/// unreachable backend, a client torn down mid-call (an app-side
+/// abortGeneration), a whole-call timeout, or a busy/5xx server. These say
+/// nothing about the MODEL's tool-calling capability, so verdict-recording
+/// callers (the shared ToolTransportProbe consumers) must not brand a
+/// backend XML-only on them.
+bool isToolTransportFailure(Object error) =>
+    error is TimeoutException ||
+    error is LlmToolTransportException ||
+    looksLikeBackendUnreachable(error) ||
+    // package:http race: abortGeneration closed the client between its
+    // creation and the post() — surfaces as a StateError, not a
+    // ClientException.
+    error.toString().contains('Client is already closed');
+
+/// Thrown when a feature needs the AI backend but it isn't ready or can't be
+/// reached. [message] is user-facing — surfaces like the story pages and the
+/// web client show pipeline errors verbatim, so [toString] returns the plain
+/// message with no "Exception:" prefix.
+class LlmUnavailableException implements Exception {
+  final String message;
+
+  LlmUnavailableException(this.message);
+
+  @override
+  String toString() => message;
+}

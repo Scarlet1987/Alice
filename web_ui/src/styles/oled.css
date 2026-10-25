@@ -1,0 +1,13 @@
+/* Copyright (C) 2026 Front Porch AI — SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+   OLED true-black variant. Applied via the `oled` class on <body> (see oled.ts).
+   Pure-black grounds let OLED screens switch pixels fully off. Imported last so
+   it wins over every surface token.
+*/
+body.oled {
+  --bg: #000000;
+  --surface: #101013;
+  --surface-2: #0a0a0c;
+  --card: #0a0a0c;
+  --border: #1e1e26;
+}

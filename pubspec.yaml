@@ -1,0 +1,257 @@
+name: front_porch_ai
+description: "Front Porch AI - A chilled out frontend for KoboldCPP."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 0.9.8+1
+
+environment:
+  sdk: ^3.10.8
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^2.0.0
+  provider: ^6.1.5+1
+  file_picker: ^13.1.0
+  # Native file-drop onto the chat / Waifu Coder composer (Win/Linux/macOS).
+  desktop_drop: ^0.8.4
+  cross_file: ^0.3.5
+  path_provider: ^2.1.5
+  archive: ^4.3.0
+  image: ^4.10.1
+  # Pure-Dart Draw Things gRPC client (replaces the Python dt_grpc_client
+  # sidecar; the sidecar remains as automatic fallback for one release cycle).
+  grpc: ^5.0.0
+  flat_buffers: ^25.0.0
+  ffi: ^2.1.3
+  crypto: ^3.0.6
+  http: ^1.6.0
+  shared_preferences: ^2.5.4
+  window_manager: ^0.5.1
+  url_launcher: ^6.2.5
+  qr_flutter: ^4.1.0
+  package_info_plus: ^10.2.2
+  audioplayers: ^6.5.1
+  drift: ^2.35.1
+  # PAIRS WITH `sqlite3` 3.x, which bundles SQLite itself via native assets.
+  # 0.6.0+eol is the correct marker pin here: it contains no code, and exists
+  # to guarantee the old 0.5.x Flutter build scripts are NOT also used.
+  # NEVER pair 0.6.x with `sqlite3` 2.x — that combination builds no libsqlite3
+  # at all. It shipped as v1.1.0 and bricked every Linux install
+  # ("libsqlite3.so is missing" → "database is corrupted"); macOS and Windows
+  # survived only via their /usr/lib/libsqlite3.dylib and winsqlite3.dll
+  # fallbacks. Enforced by test/deps/dependency_floor_test.dart and the bundle
+  # check in release.yml.
+  sqlite3_flutter_libs: ^0.6.0
+  path: ^1.9.1
+  uuid: ^4.5.3
+  record: ^7.0.0
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  shelf_web_socket: ^3.0.0
+  web_socket_channel: ^3.0.1 # WS channel abstraction (server + client/tests)
+  hashlib: ^1.21.0
+  otp: ^3.2.1 # RFC 6238 TOTP for optional web-login 2FA
+  page_flip: ^0.2.5+1
+  html: ^0.15.7
+  pdfrx: ^2.10.1
+  flex_color_picker: ^3.8.0
+  intl: ^0.20.2
+  onnxruntime_v2: ^1.23.2 # in-process ONNX (offline photo captioner — maintainer-approved dep)
+  unorm_dart: ^0.3.0 # Unicode NFD for BERT accent-strip parity (maintainer-approved dep 2026-07-18)
+  # In-process Whisper STT (replaces the Python whisper_stt sidecar; the
+  # sidecar remains as automatic fallback for one release cycle —
+  # docs/design/sidecar-retirement.md phase 3).
+  sherpa_onnx: ^1.13.8
+  flutter_riverpod: ^3.4.3
+  riverpod_annotation: ^4.0.6
+  flutter_markdown_plus: ^1.0.12
+  flutter_secure_storage: ^11.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Dev-only: test/flutter_test_config.dart uses GoogleFonts.config to forbid
+  # runtime font fetching in tests. The app bundles its fonts natively
+  # (assets/fonts/, declared below) and never depends on this package.
+  google_fonts: ^8.2.1
+  drift_dev: ^2.35.1
+  build_runner: ^2.16.1
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+  # Flutter 3.47.0 / Dart 3.13: riverpod_generator 4.0.8 + drift_dev 2.34.5
+  # + analyzer 13 resolve together. file_picker ^13.1.0 (FilePickerResult
+  # shimmed in picker_prefs.dart; 13 dropped top-level lockParentWindow /
+  # allowMultiple / withData).
+  riverpod_generator: ^4.0.8
+  integration_test:
+    sdk: flutter
+  path_provider_platform_interface: ^2.1.3
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/backgrounds/
+    - assets/audio/
+    # React PWA (built from web_ui/ by `npm run build`). Served by the web
+    # server (lib/services/web) from assets/web_app. Directory entries are
+    # non-recursive, so the Vite assets/ subdir is listed explicitly.
+    - assets/web_app/
+    - assets/web_app/assets/
+    - assets/web_app/audio/
+    - assets/web_app/fonts/
+
+  # All app fonts are bundled natively (no runtime fetching). These are the
+  # exact font files the app renders with, one entry per family/weight the
+  # code uses. Lato has no 500 weight upstream: its Medium slot deliberately
+  # points at the Regular file, which is the face Lato medium-weight text
+  # has always rendered with.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+    - family: Figtree
+      fonts:
+        - asset: assets/fonts/Figtree-Regular.ttf
+        - asset: assets/fonts/Figtree-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Figtree-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Figtree-Bold.ttf
+          weight: 700
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-Regular.ttf
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/OpenSans-Regular.ttf
+        - asset: assets/fonts/OpenSans-Medium.ttf
+          weight: 500
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Regular.ttf
+        - asset: assets/fonts/Lato-Regular.ttf
+          weight: 500
+    - family: SourceSans3
+      fonts:
+        - asset: assets/fonts/SourceSans3-Regular.ttf
+        - asset: assets/fonts/SourceSans3-Medium.ttf
+          weight: 500
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-Medium.ttf
+          weight: 500
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-Medium.ttf
+          weight: 500
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Regular.ttf
+        - asset: assets/fonts/Raleway-Medium.ttf
+          weight: 500
+    - family: WorkSans
+      fonts:
+        - asset: assets/fonts/WorkSans-Regular.ttf
+        - asset: assets/fonts/WorkSans-Medium.ttf
+          weight: 500
+    - family: DMSans
+      fonts:
+        - asset: assets/fonts/DMSans-Regular.ttf
+        - asset: assets/fonts/DMSans-Medium.ttf
+          weight: 500
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-Regular.ttf
+        - asset: assets/fonts/Quicksand-Medium.ttf
+          weight: 500
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/Rubik-Regular.ttf
+        - asset: assets/fonts/Rubik-Medium.ttf
+          weight: 500
+    - family: Karla
+      fonts:
+        - asset: assets/fonts/Karla-Regular.ttf
+        - asset: assets/fonts/Karla-Medium.ttf
+          weight: 500
+    - family: Merriweather
+      fonts:
+        - asset: assets/fonts/Merriweather-Regular.ttf
+        - asset: assets/fonts/Merriweather-Medium.ttf
+          weight: 500
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-Regular.ttf
+        - asset: assets/fonts/PlayfairDisplay-Medium.ttf
+          weight: 500
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf
+        - asset: assets/fonts/RobotoMono-Medium.ttf
+          weight: 500
+    - family: FiraCode
+      fonts:
+        - asset: assets/fonts/FiraCode-Regular.ttf
+        - asset: assets/fonts/FiraCode-Medium.ttf
+          weight: 500
+    - family: SourceCodePro
+      fonts:
+        - asset: assets/fonts/SourceCodePro-Regular.ttf
+        - asset: assets/fonts/SourceCodePro-Medium.ttf
+          weight: 500

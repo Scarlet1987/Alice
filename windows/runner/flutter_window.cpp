@@ -1,0 +1,100 @@
+#include "flutter_window.h"
+
+#include <optional>
+
+#include "flutter/generated_plugin_registrant.h"
+#include "spell_check_plugin.h"
+#include <flutter/plugin_registrar_windows.h>
+
+namespace {
+
+// Dart shows the window itself once it has painted at its final size
+// (lib/main.startup.dart, _showMainWindow). Resizing the window before the
+// engine has produced a frame can leave Flutter's resize handshake stuck,
+// with the window white until a real resize (flutter/flutter#192537), so
+// the restore of the saved bounds happens after the first frame, hidden.
+// This timer is the safety net: if Dart has not shown the window a few
+// seconds after the first frame, show it anyway.
+constexpr UINT_PTR kShowWatchdogTimerId = 1;
+constexpr UINT kShowWatchdogMs = 3000;
+
+}  // namespace
+
+FlutterWindow::FlutterWindow(const flutter::DartProject& project)
+    : project_(project) {}
+
+FlutterWindow::~FlutterWindow() {}
+
+bool FlutterWindow::OnCreate() {
+  if (!Win32Window::OnCreate()) {
+    return false;
+  }
+
+  RECT frame = GetClientArea();
+
+  // The size here must match the window dimensions to avoid unnecessary surface
+  // creation / destruction in the startup path.
+  flutter_controller_ = std::make_unique<flutter::FlutterViewController>(
+      frame.right - frame.left, frame.bottom - frame.top, project_);
+  // Ensure that basic setup of the controller was successful.
+  if (!flutter_controller_->engine() || !flutter_controller_->view()) {
+    return false;
+  }
+  RegisterPlugins(flutter_controller_->engine());
+  SpellCheckPlugin::RegisterWithMessenger(flutter_controller_->engine()->messenger());
+  SetChildContent(flutter_controller_->view()->GetNativeWindow());
+
+  flutter_controller_->engine()->SetNextFrameCallback([&]() {
+    SetTimer(GetHandle(), kShowWatchdogTimerId, kShowWatchdogMs, nullptr);
+  });
+
+  // Flutter can complete the first frame before the callback above is
+  // registered. The following call ensures a frame is pending so the
+  // watchdog is always armed. It is a no-op if the first frame hasn't
+  // completed yet.
+  flutter_controller_->ForceRedraw();
+
+  return true;
+}
+
+void FlutterWindow::OnDestroy() {
+  if (flutter_controller_) {
+    flutter_controller_ = nullptr;
+  }
+
+  Win32Window::OnDestroy();
+}
+
+LRESULT
+FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
+                              WPARAM const wparam,
+                              LPARAM const lparam) noexcept {
+  // Give Flutter, including plugins, an opportunity to handle window messages.
+  if (flutter_controller_) {
+    std::optional<LRESULT> result =
+        flutter_controller_->HandleTopLevelWindowProc(hwnd, message, wparam,
+                                                      lparam);
+    if (result) {
+      return *result;
+    }
+  }
+
+  switch (message) {
+    case WM_FONTCHANGE:
+      flutter_controller_->engine()->ReloadSystemFonts();
+      break;
+    case WM_TIMER:
+      if (wparam == kShowWatchdogTimerId) {
+        KillTimer(hwnd, kShowWatchdogTimerId);
+        if (!IsWindowVisible(hwnd)) {
+          // SW_SHOW, not Show()'s SW_SHOWNORMAL: Dart may already have
+          // maximized the hidden window, and SW_SHOWNORMAL would restore it.
+          ShowWindow(hwnd, SW_SHOW);
+        }
+        return 0;
+      }
+      break;
+  }
+
+  return Win32Window::MessageHandler(hwnd, message, wparam, lparam);
+}

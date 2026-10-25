@@ -1,0 +1,417 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'package:flutter/foundation.dart';
+
+import 'package:front_porch_ai/models/models.dart';
+import 'package:front_porch_ai/services/chat/needs_wear.dart';
+
+part 'needs_simulation.tables.dart';
+
+/// Plain (non-ChangeNotifier) domain service owning the Needs simulation.
+///
+/// After buffer/afterglow/post-climax-crash/arousal-suppression removal:
+/// - Straight per-turn decay ticks (needDecay + time mods + remaining cross-boost modifiers).
+/// - Scene deltas from model (reviewed by optional Director) applied via applySceneImpact.
+/// - Catastrophe text when needs cross critical thresholds.
+/// - No erotic buffers, no afterglow damp in decay, no crash multipliers, no suppression state.
+///
+/// 1:1 vs group per-speaker parity preserved via cbs + god impersonation.
+/// Reset hygiene: initializeFresh/clearVector/resetBuffers (now just vector + pending catas + reason) called from god at all sites + both startNew.
+///
+/// Stateless w.r.t. card config; owner (god) owns resets.
+class NeedsSimulation {
+  final VoidCallback onNotify;
+  final Future<void> Function() onSaveChat;
+
+  final String Function() getTimeOfDay;
+  final bool Function() getRealismEnabled;
+  final bool Function() getObserverMode;
+  final String Function() getCurrentSpeakerIdForRealism;
+  final bool Function() getIsGroupNonObserverMode;
+  final Map<String, int> Function(String charId) getGroupNeeds;
+  final void Function(String charId, Map<String, int> needs) setGroupNeeds;
+  final bool Function() getEnjoysLowHygiene;
+  final bool Function() getNeedsSimEnabled;
+
+  Map<String, int> _vector = {};
+
+  /// Fractions of a point the clock has charged but not yet taken, per need
+  /// (see needsWearForSpan). Rewound with the vector.
+  Map<String, double> _wearCarry = {};
+  String? _pendingCatastrophe;
+  String?
+  _lastSceneReason; // from model/Director for better chip reasons on scene deltas
+  /// Speakers who already got the "I reek" beat at hygiene 0. Cleared
+  /// when hygiene rises (they washed). Stops a no-rebound meter from
+  /// re-firing the canon scene event every turn.
+  final Set<String> _hygieneCrisisAcked = {};
+
+  NeedsSimulation({
+    required this.onNotify,
+    required this.onSaveChat,
+    required this.getTimeOfDay,
+    required this.getRealismEnabled,
+    required this.getObserverMode,
+    required this.getCurrentSpeakerIdForRealism,
+    required this.getIsGroupNonObserverMode,
+    required this.getGroupNeeds,
+    required this.setGroupNeeds,
+    required this.getEnjoysLowHygiene,
+    required this.getNeedsSimEnabled,
+  });
+
+  Map<String, int> get vector => Map<String, int>.unmodifiable(_vector);
+  Map<String, double> get wearCarry =>
+      Map<String, double>.unmodifiable(_wearCarry);
+  String? get pendingCatastrophe => _pendingCatastrophe;
+  Set<String> get hygieneCrisisAcked =>
+      Set<String>.unmodifiable(_hygieneCrisisAcked);
+
+  // Buffer state and getters completely removed.
+
+  static const List<String> needKeys = _needKeys;
+  static const Map<String, int> needDefaults = _needDefaults;
+
+  /// Stored group-member needs, or empty when the slot has never carried a
+  /// vector. Missing keys in a partial map are filled from [needDefaults];
+  /// a null/empty map is NOT invented — callers seed from the card instead.
+  static Map<String, int> storedNeedsOrEmpty(Map<String, int>? raw) {
+    if (raw == null || raw.isEmpty) return const {};
+    return {for (final k in needKeys) k: raw[k] ?? (needDefaults[k] ?? 80)};
+  }
+
+  /// Card baselines used to seed a fresh 1:1 chat and a group member who
+  /// has never had a stored vector. Falls back to [needDefaults] when the
+  /// card has no extensions.
+  static Map<String, int> baselinesFromExtensions(FrontPorchExtensions? ext) {
+    if (ext == null) return Map<String, int>.from(needDefaults);
+    return {
+      'hunger': ext.needsBaselineHunger,
+      'bladder': ext.needsBaselineBladder,
+      'energy': ext.needsBaselineEnergy,
+      'social': ext.needsBaselineSocial,
+      'fun': ext.needsBaselineFun,
+      'hygiene': ext.needsBaselineHygiene,
+      'comfort': ext.needsBaselineComfort,
+    };
+  }
+
+  /// Bar colours follow the bands: amber from the moderate band down, red
+  /// from the strong band down.
+  static const int needUrgentThreshold = 40;
+  static const int needCriticalThreshold = 25;
+
+  /// Upper bound of each band, worst first: 0 empty, 10 crisis, 25 strong,
+  /// 40 moderate, 55 mild. Above 55 a need says nothing.
+  static const List<int> needStepUpperBounds = [0, 10, 25, 40, 55];
+
+  static const Map<String, List<String>> needSteppedText = _needSteppedText;
+  static const List<String> hygieneSteppedTextWhenEnjoysLow =
+      _hygieneSteppedTextWhenEnjoysLow;
+  static const Map<String, String> needCatastropheText = _needCatastropheText;
+  static const Map<String, int> needPostCatastropheFloor =
+      _needPostCatastropheFloor;
+  static const List<String> catastropheNeeds = _catastropheNeeds;
+
+  void initializeFresh() {
+    _vector = Map<String, int>.from(needDefaults);
+    _wearCarry = {};
+    _pendingCatastrophe = null;
+    _lastSceneReason = null;
+    _hygieneCrisisAcked.clear();
+    // No buffer state to zero.
+  }
+
+  /// Initialize the needs vector from card-specific baseline values.
+  ///
+  /// Used when starting a new chat so that the character's
+  /// [FrontPorchExtensions] baseline needs (needsBaselineHunger, etc.)
+  /// are respected instead of the hardcoded [needDefaults].
+  void initializeFreshWithDefaults(Map<String, int> defaults) {
+    _vector = Map<String, int>.from(defaults);
+    _wearCarry = {};
+    _pendingCatastrophe = null;
+    _lastSceneReason = null;
+    _hygieneCrisisAcked.clear();
+    // No buffer state to zero.
+  }
+
+  void clearVector() {
+    _vector.clear();
+    _wearCarry = {};
+    _pendingCatastrophe = null;
+    _lastSceneReason = null;
+    _hygieneCrisisAcked.clear();
+  }
+
+  /// The clock's wear for one beat, applied to the live vector. [points] is
+  /// what needsWearForSpan charged; [carry] is its leftover fraction, kept
+  /// so the next beat continues from it. [offScreen] picks the skip floors
+  /// over the on-screen stop (see wornBar). Returns the drop each bar took.
+  Map<String, int> applyTimeWear({
+    required Map<String, int> points,
+    required Map<String, double> carry,
+    required bool offScreen,
+  }) {
+    final taken = <String, int>{};
+    for (final entry in points.entries) {
+      final current = _vector[entry.key];
+      if (current == null) continue;
+      final next = wornBar(
+        need: entry.key,
+        current: current,
+        drop: entry.value,
+        offScreen: offScreen,
+      );
+      if (next != current) {
+        _vector[entry.key] = next;
+        taken[entry.key] = current - next;
+      }
+    }
+    _wearCarry = Map<String, double>.from(carry);
+    return taken;
+  }
+
+  void resetBuffers() {
+    // Buffer reset is now a no-op (buffers expunged). Kept for god reset hygiene calls.
+    _pendingCatastrophe = null;
+    _lastSceneReason = null;
+    _hygieneCrisisAcked.clear();
+  }
+
+  /// Apply a scene's deltas. A PURE MUTATOR — it does not judge magnitude.
+  ///
+  /// The depletion policy deliberately does NOT live here, and that was worth
+  /// getting wrong once to learn. Putting it on this method bounded the whole
+  /// vector, which broke two tests that use it merely to ARRANGE a state (a
+  /// composer test making a character hungry, and the raw-clamp golden) — the
+  /// bound was reaching past the bug. What needs limiting is what a MODEL
+  /// proposes about a scene, not what the simulation is allowed to hold.
+  /// Scene drops are limited in the needs evaluator, after pace.
+  void applySceneImpact(NeedsImpact impact) {
+    if (impact.deltas.isNotEmpty) {
+      for (final entry in impact.deltas.entries) {
+        final k = entry.key;
+        if (_vector.containsKey(k)) {
+          _vector[k] = (_vector[k]! + entry.value).clamp(0, 100);
+        }
+      }
+    }
+    if (impact.reason != null && impact.reason!.isNotEmpty) {
+      _lastSceneReason = impact.reason;
+    }
+    onSaveChat();
+    onNotify();
+  }
+
+  void applyNeedsDeltas(
+    Map<String, int> deltas, {
+    bool fromSexualActivity = false,
+  }) {
+    // Kept for any legacy direct callers; delegates to impact path (no buffer side effects).
+    applySceneImpact(NeedsImpact(deltas: deltas));
+  }
+
+  Map<String, dynamic> computeNeedsDeltasWithReasons(Map<String, int> pre) {
+    final out = <String, dynamic>{};
+    for (final k in needKeys) {
+      // No baseline → no delta. A missing pre-turn value used to read as 0,
+      // fabricating "delta = the full current value" chips (a 67 hunger
+      // showed delta 67) whenever capture ran without a pre-turn vector —
+      // e.g. a time-chevron patch outside any turn (2026-07-28 snapshot).
+      final before = pre[k];
+      if (before == null) continue;
+      final after = _vector[k] ?? before;
+      final delta = after - before;
+      String reason = 'Stable';
+      if (delta > 0) reason = 'Scene action';
+      if (delta < 0) reason = 'Natural decay';
+      if (_lastSceneReason != null && _lastSceneReason!.isNotEmpty) {
+        reason = _lastSceneReason!;
+      }
+      if (delta != 0) {
+        out[k] = {'delta': delta, 'reason': reason};
+      }
+    }
+    return out;
+  }
+
+  /// When a hard-event need has bottomed out (≤0) this turn, arm ONE mandatory
+  /// catastrophe (the worst such need) for the prompt builder. Needs with a
+  /// [needPostCatastropheFloor] lift so they can't instantly re-fire; hygiene
+  /// has none — they stay filthy until a scene actually washes them. Operates
+  /// on the live [_vector] — the 1:1 host, or a group speaker after their
+  /// scalars are loaded — so 1:1 and group behave identically. Enjoys-low-hygiene skips
+  /// the hygiene beat (0 is comfort for them).
+  void applyCatastropheIfNeeded({Iterable<String> ignore = const []}) {
+    if (!getNeedsSimEnabled() || !getRealismEnabled()) return;
+    if (_pendingCatastrophe != null) return; // one pending event at a time
+    final speaker = getCurrentSpeakerIdForRealism();
+    if ((_vector['hygiene'] ?? 80) > 0) {
+      _hygieneCrisisAcked.remove(speaker);
+    }
+    final enjoysLow = getEnjoysLowHygiene();
+    String? worst;
+    int worstVal = 1; // only needs at 0 or below qualify
+    for (final key in catastropheNeeds) {
+      if (ignore.contains(key)) continue;
+      if (key == 'hygiene' && enjoysLow) continue;
+      if (key == 'hygiene' && _hygieneCrisisAcked.contains(speaker)) continue;
+      final v = _vector[key];
+      if (v == null) continue;
+      if (v <= 0 && v < worstVal) {
+        worstVal = v;
+        worst = key;
+      }
+    }
+    if (worst == null) return;
+    _pendingCatastrophe = needCatastropheText[worst];
+    if (worst == 'hygiene') {
+      _hygieneCrisisAcked.add(speaker);
+    }
+    final floor = needPostCatastropheFloor[worst];
+    if (floor != null) {
+      _vector[worst] = floor;
+    }
+    debugPrint(
+      '[Realism:Needs] ⚠️ CATASTROPHE armed for $worst'
+      '${floor == null ? ' (no floor)' : ' → floor $floor'}',
+    );
+  }
+
+  // applyLongGenerationNeedsDecay, getInjectionEffectiveStep, and other buffer-aware helpers simplified or removed.
+  // For injection, owner falls back to basic step from current vector.
+
+  void restoreFromSnapshot(Map<dynamic, dynamic> needsData) {
+    if (needsData['vector'] is Map) {
+      // Tolerant restore for snapshots that may come from JSON (numbers as num)
+      // or mixed dynamic maps (e.g. persisted realism_state['needs'] or pre_state).
+      // Also tolerates the 'deltas' sibling key that capture now includes.
+      final raw = needsData['vector'] as Map;
+      _vector = {
+        for (final e in raw.entries)
+          if (e.value is num) e.key.toString(): (e.value as num).toInt(),
+      };
+    }
+    final ack = needsData['hygiene_crisis_acked'];
+    if (ack is List) {
+      _hygieneCrisisAcked
+        ..clear()
+        ..addAll(ack.map((e) => e.toString()));
+    }
+    // A snapshot without a carry (older rows, a bare vector) starts the
+    // fractions over; a vector restore without one is a rewind to a turn
+    // whose carry the stamp did not keep, and sub-point drift is accepted.
+    final carry = needsData[kNeedsWearCarryKey];
+    _wearCarry = carry is Map ? wearCarryFrom(carry) : {};
+    // No buffer restore.
+    _lastSceneReason = null;
+  }
+
+  /// Clears the scene-level reason so the delta chip falls back to
+  /// per-need reasons ("Scene action", "Natural decay", "Stable").
+  void clearLastSceneReason() {
+    _lastSceneReason = null;
+  }
+
+  void consumePendingCatastrophe() {
+    _pendingCatastrophe = null;
+  }
+
+  int getNeedStep(String need, int value) {
+    for (int s = 0; s < needStepUpperBounds.length; s++) {
+      if (value <= needStepUpperBounds[s]) return s;
+    }
+    return 5;
+  }
+
+  /// Effective stepped urgency for prompt injection.
+  ///
+  /// [enjoysLowHygieneOverride] lets the caller supply the flag for the SPECIFIC
+  /// character whose need is being rendered. This is required in group chats:
+  /// the shared [getEnjoysLowHygiene] callback reads the chat's *active*
+  /// character, which — after the per-speaker realism dance restores the pointer
+  /// — is the PREVIOUS speaker, not the one this line belongs to. Passing the
+  /// speaker's own flag stops one filthy-loving member from inverting every
+  /// other member's hygiene (the "hygiene 88 shows CATASTROPHIC" bleed). The 1:1
+  /// path passes null and keeps using the global (active == host there).
+  int getInjectionEffectiveStep(
+    String need,
+    int value, {
+    bool? enjoysLowHygieneOverride,
+  }) {
+    final enjoysLow = enjoysLowHygieneOverride ?? getEnjoysLowHygiene();
+    if (enjoysLow && need == 'hygiene') {
+      // VALUE inversion, not index inversion. The step bands are asymmetric
+      // (widths 1/15/15/15/20/35 over [0,15,30,45,65]), so the old `5 - step`
+      // mapped the wide sated band onto "catastrophic" and the 1-point band
+      // onto "sated": a filthy character (value 10) read as mildly
+      // freshly-washed and NEVER reached the silent sated state, while a
+      // merely clean one (value 90) was described as scrubbed-raw
+      // catastrophic. Walking the same bands from the other end
+      // (100 - value) is what the hygieneSteppedTextWhenEnjoysLow doc has
+      // always described. Golden regenerated with maintainer approval
+      // 2026-08-15.
+      return getNeedStep(need, 100 - value);
+    }
+    return getNeedStep(need, value);
+  }
+
+  /// Returns the lowest (worst) needs that should receive background state
+  /// this turn, worst-first, capped at 3. Every need injects from the mild
+  /// band (step 4); the mild lines carry their own "not pressing", which is
+  /// what used to keep hunger and bladder a band quieter. Sated needs never
+  /// surface.
+  ///
+  /// [enjoysLowHygieneOverride] MUST carry the specific speaker's flag in
+  /// group chats (same reason as [getInjectionEffectiveStep]) — without it the
+  /// hygiene inversion reads the shared active-character flag and one
+  /// filthy-loving member corrupts every other member's need SELECTION, not
+  /// just its wording.
+  List<({String key, int value, int effectiveStep})> getLowNeedsForInjection(
+    Map<String, int> vector, {
+    bool? enjoysLowHygieneOverride,
+  }) {
+    if (vector.isEmpty) return const [];
+    // Rank by EFFECTIVE step, not raw value: for an enjoys-low-hygiene
+    // character the distressed hygiene value is a HIGH number, so a raw-value
+    // sort would rank their most urgent need last and let milder needs crowd
+    // it out of the cap.
+    final ranked =
+        [
+          for (final e in vector.entries)
+            (
+              key: e.key,
+              value: e.value,
+              effectiveStep: getInjectionEffectiveStep(
+                e.key,
+                e.value,
+                enjoysLowHygieneOverride: enjoysLowHygieneOverride,
+              ),
+            ),
+        ]..sort((a, b) {
+          final byStep = a.effectiveStep.compareTo(b.effectiveStep);
+          return byStep != 0 ? byStep : a.value.compareTo(b.value);
+        });
+    return ranked
+        .where((e) => e.effectiveStep <= needStepUpperBounds.length - 1)
+        .take(3)
+        .toList();
+  }
+}

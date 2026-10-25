@@ -1,0 +1,42 @@
+# Code owners — review gate for the files that exist to catch regressions.
+#
+# Companion to .github/workflows/test-integrity.yml. That workflow makes a
+# protected-path change FAIL; this makes it require the maintainer's review
+# before it can merge at all. Two independent mechanisms, because PR #172
+# showed that a single guard whose evidence lives in the repo is not enough:
+# the dependency-floor test was working correctly and was simply out-voted by
+# an edit to the baseline JSON it reads.
+#
+# CODEOWNERS only has teeth when branch protection has
+# "Require review from Code Owners" enabled on main and Rawhide.
+
+# Default: everything else can be reviewed normally.
+*                                   @Scarlet1987
+
+# ── The regression net itself ────────────────────────────────────────────
+# Editing any of these is editing the evidence, not the code.
+/test/                              @Scarlet1987
+/integration_test/                  @Scarlet1987
+/test/deps/dependency_floors.json   @Scarlet1987
+
+# The WebUI suite is evidence too, and it does NOT live under /test/ — vitest
+# files sit beside the code they test, which is how they stayed off both this
+# list and test-integrity.yml's until 2026-08-07. The catch-all `*` above
+# already routes them here; these lines exist so the omission is not repeated
+# by someone reading this file to learn what the net covers.
+/web_ui/**/*.test.ts                @Scarlet1987
+/web_ui/**/*.test.tsx               @Scarlet1987
+/web_ui/vitest.config.ts            @Scarlet1987
+
+# ── CI, and the config that decides what CI even checks ──────────────────
+# A PR that can rewrite the workflows can grant itself a pass.
+/.github/                           @Scarlet1987
+/analysis_options.yaml              @Scarlet1987
+
+# ── Release + packaging: a bad edit here ships to every user at once ─────
+/scripts/                           @Scarlet1987
+/pubspec.yaml                       @Scarlet1987
+/pubspec.lock                       @Scarlet1987
+
+# ── Schema: the Drift onUpgrade ladder is load-bearing for user libraries.
+/lib/database/                      @Scarlet1987

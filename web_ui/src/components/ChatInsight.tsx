@@ -1,0 +1,280 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// Realism + lorebook + author-note insight panel (drawer on phone, sidebar on
+// desktop). Extracted verbatim from ChatPage to keep that page under the
+// file-size cap. Section order mirrors the desktop sidebar.
+
+import { useEffect, useState } from 'react';
+import { api } from '../api/client';
+import { ToolCallingPill, type ToolSupport } from './ToolCallingPill';
+import { ChatLorebookModal } from './ChatLorebookModal';
+import { ImportLorebookWizard } from './ImportLorebookWizard';
+import { ChatPlacesSection } from './ChatPlacesSection';
+import { ChatTools } from './ChatTools';
+import { type CastMember } from './CastBar';
+import { LookSwiper } from './ChatAvatar';
+import { type Realism, type LoreEntry, NEED_LABELS } from './chatTypes';
+import { NeedBar, StatBar } from './StatBar';
+
+export function ChatInsight({
+  realism,
+  lorebook,
+  authorNote,
+  authorNoteDepth,
+  onSaveAuthorNote,
+  characterId,
+  expressionLabel,
+  isGroup,
+  focusedIsHost,
+  focusedIsLiteGuest,
+  focusedAvatarUrl,
+  toolsKey,
+  focusedId,
+  groupId,
+  onCommand,
+  cast,
+  onFocus,
+  loreTokens,
+  loreBudget,
+  loreOverflow,
+  draft,
+  toolSupport,
+}: {
+  realism: Realism;
+  /** Focused cast member is a lightweight scene guest with no realism state. */
+  focusedIsLiteGuest?: boolean;
+  lorebook?: LoreEntry[];
+  authorNote: string;
+  authorNoteDepth: number;
+  onSaveAuthorNote: (note: string, strength: number) => void;
+  characterId: string;
+  expressionLabel?: string;
+  isGroup: boolean;
+  focusedIsHost: boolean;
+  focusedAvatarUrl?: string;
+  toolsKey: number;
+  focusedId: string | null;
+  groupId: string | null;
+  onCommand: (cmd: string) => void;
+  cast?: CastMember[];
+  onFocus?: (id: string) => void;
+  loreTokens?: number;
+  loreBudget?: number;
+  loreOverflow?: string[];
+  /** Live composer draft — powers the "would trigger next" preview. */
+  draft?: string;
+  /** Current model's tool-calling verdict (POST /api/chat/tool-test retests). */
+  toolSupport?: ToolSupport;
+}) {
+  const [note, setNote] = useState(authorNote);
+  // "Would trigger next": mutation-free dry-run against the draft, debounced.
+  const [wouldTrigger, setWouldTrigger] = useState<string[]>([]);
+  useEffect(() => {
+    const text = (draft ?? '').trim();
+    if (!text) {
+      setWouldTrigger([]);
+      return;
+    }
+    const t = setTimeout(() => {
+      api
+        .post<{ matches: string[] }>('/api/chat/lore-preview', { draft: text })
+        .then((r) => setWouldTrigger(r.matches ?? []))
+        .catch(() => setWouldTrigger([]));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [draft]);
+  const [showChatBook, setShowChatBook] = useState(false);
+  // Import Lorebook wizard entry (desktop "This Chat" sidebar download icon
+  // parity — the Worlds tab no longer hosts this).
+  const [showImportBook, setShowImportBook] = useState(false);
+  const [importMsg, setImportMsg] = useState('');
+  useEffect(() => setNote(authorNote), [authorNote]);
+  // Author's Note strength (injection depth/weight, 1–10) — desktop parity.
+  const [strength, setStrength] = useState(authorNoteDepth);
+  useEffect(() => setStrength(authorNoteDepth), [authorNoteDepth]);
+  return (
+    <div className="realism-panel">
+      <ToolCallingPill support={toolSupport} />
+      {/* Group: switch which member's stats you're viewing (the cast bar is
+          covered by this panel on phone, so the switcher lives here too). */}
+      {isGroup && cast && cast.length > 1 && onFocus && (
+        <div className="insight-cast">
+          {cast.map((c) => (
+            <button
+              key={c.id}
+              className={`insight-cast-chip${c.id === focusedId ? ' active' : ''}`}
+              onClick={() => onFocus(c.id)}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {/* Mood-expression portrait for the 1:1 host (and 1:1 scene guests). NOT
+          shown in groups — member avatars don't resolve, so we'd only get a
+          broken image. Hidden on phones too via CSS ([data-layout="phone"]
+          .portrait-wrap). Self-hides if its image fails. */}
+      {isGroup ? null : focusedIsHost ? (
+        <LookSwiper
+          characterId={characterId}
+          basePrimary={`/api/chat/expression-avatar?v=${encodeURIComponent(expressionLabel ?? '')}`}
+          baseFallback={`/api/characters/${characterId}/avatar`}
+          mood={realism.mood || realism.emotion}
+        />
+      ) : focusedAvatarUrl ? (
+        <LookSwiper
+          characterId={characterId}
+          basePrimary={focusedAvatarUrl}
+          mood={realism.mood || realism.emotion}
+        />
+      ) : null}
+
+      {/* Author's note sits near the top (matches the desktop sidebar order). */}
+      <h4 className="section-label">Author's note</h4>
+      <textarea
+        className="note-input"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="Steer the narrative (injected near the end of context)…"
+        rows={3}
+      />
+      <label className="row-label note-strength">
+        <span>Strength: {strength}</span>
+        <input
+          type="range"
+          min={1}
+          max={10}
+          step={1}
+          value={strength}
+          onChange={(e) => setStrength(Number(e.target.value))}
+        />
+      </label>
+      <button className="primary note-save" onClick={() => onSaveAuthorNote(note, strength)}>
+        Save note
+      </button>
+
+      {/* Realism off: desktop replaces this whole block with one honest line.
+          Disabling realism PRESERVES the last numbers rather than zeroing them,
+          so rendering the bars anyway showed a live-looking dashboard that had
+          silently stopped moving. `!== false` keeps older desktop builds, which
+          do not send the flag, on their existing behaviour. */}
+      {focusedIsLiteGuest ? (
+        <p className="muted realism-off">
+          Lite NPC — no realism or needs tracking for this guest.
+        </p>
+      ) : (
+      <>
+      {realism.realismEnabled === false ? (
+        <p className="muted realism-off">
+          Realism Mode is off — flip the switch to track bond, trust, mood,
+          and scene time for this character.
+        </p>
+      ) : (
+      <>
+      {/* Current fixation, highlighted, just above the realism stats (desktop order). */}
+      {realism.fixation && (
+        <div className="stat-fixation">
+          <span className="fixation-label">Current fixation</span> {realism.fixation}
+        </div>
+      )}
+      <StatBar label="Bond" value={`${realism.bond.tier} · ${realism.bond.score}`} percent={realism.bond.percent} />
+      <StatBar label="Long-term" value={`${realism.longTerm.tier} · ${realism.longTerm.score}`} percent={realism.longTerm.percent} />
+      <StatBar
+        label="Trust"
+        value={`${realism.trust.tier} · ${realism.trust.level}`}
+        percent={realism.trust.percent}
+        tone={realism.trust.level < 0 ? 'danger' : ''}
+      />
+      <div className="stat-line"><span>Mood</span><span className="muted">{realism.mood || realism.emotion || '—'}</span></div>
+      <div className="stat-line"><span>Arousal</span><span className="muted">{realism.arousal.tier} · {realism.arousal.level}</span></div>
+      </>
+      )}
+      {realism.needsEnabled && Object.keys(realism.needs).length > 0 && (
+        <>
+          <h4 className="section-label">Needs</h4>
+          {Object.entries(realism.needs).map(([k, v]) => (
+            <NeedBar
+              key={k}
+              label={NEED_LABELS[k] ?? k}
+              value={v}
+              urgentAt={realism.needsUrgentAt}
+              criticalAt={realism.needsCriticalAt}
+            />
+          ))}
+        </>
+      )}
+      </>
+      )}
+
+      <ChatTools reloadKey={toolsKey} focusedId={focusedId} groupId={groupId} onCommand={onCommand} />
+
+      <ChatPlacesSection reloadKey={toolsKey} />
+
+      <h4 className="section-label">Lorebook</h4>
+      {typeof loreBudget === 'number' && loreBudget > 0 && (
+        <div className={`lore-meter${(loreOverflow?.length ?? 0) > 0 ? ' over' : ''}`}>
+          <div className="lore-meter-bar">
+            <div
+              style={{
+                width: `${Math.min(100, Math.round(((loreTokens ?? 0) / loreBudget) * 100))}%`,
+              }}
+            />
+          </div>
+          <span>
+            lore in prompt: {loreTokens ?? 0} / {loreBudget} tokens
+            {(loreOverflow?.length ?? 0) > 0 ? ` — ${loreOverflow!.length} dropped` : ''}
+          </span>
+        </div>
+      )}
+      {lorebook && lorebook.length > 0 ? (
+        <ul className="lore-list">
+          {lorebook.map((e, i) => (
+            <li
+              key={i}
+              className={`lore${e.isTriggered ? ' on' : ''}${e.constant ? ' const' : ''}`}
+            >
+              <span className="lore-dot" />
+              <span>{e.name}{e.constant ? ' · always' : ''}</span>
+              {(e.stickyLeft ?? 0) > 0 && (
+                <span className="lore-pill ok">sticky {e.stickyLeft}</span>
+              )}
+              {(e.stickyLeft ?? 0) === 0 && (e.cooldownLeft ?? 0) > 0 && (
+                <span className="lore-pill honey">cooldown {e.cooldownLeft}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted small">No lorebook entries.</p>
+      )}
+      {wouldTrigger.length > 0 && (
+        <div className="lore-preview">
+          <span className="lore-preview-title">Would trigger next</span>
+          <div className="lore-preview-chips">
+            {wouldTrigger.slice(0, 6).map((n) => (
+              <span key={n} className="lore-pill honey">{n}</span>
+            ))}
+            {wouldTrigger.length > 6 && (
+              <span className="lore-pill honey">+{wouldTrigger.length - 6} more</span>
+            )}
+          </div>
+        </div>
+      )}
+      <button className="ghost lore-chat-btn" onClick={() => setShowChatBook(true)}>
+        Manage this chat's lore…
+      </button>
+      <button className="ghost lore-chat-btn" onClick={() => setShowImportBook(true)}>
+        Import a lorebook…
+      </button>
+      {importMsg && <p className="muted small">{importMsg}</p>}
+      {showChatBook && <ChatLorebookModal onClose={() => setShowChatBook(false)} />}
+      {showImportBook && (
+        <ImportLorebookWizard
+          onClose={() => setShowImportBook(false)}
+          onImported={setImportMsg}
+        />
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,411 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This file is part of Front Porch AI.
+//
+// Front Porch AI is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Front Porch AI is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:front_porch_ai/services/kobold/kobold.dart';
+import 'package:front_porch_ai/services/storage_service.dart';
+import 'package:front_porch_ai/services/hardware_service.dart';
+import 'package:front_porch_ai/services/update_service.dart';
+import 'package:front_porch_ai/services/security/verify_sha256.dart';
+import 'package:front_porch_ai/utils/utils.dart';
+
+part 'backend_manager.download.dart';
+part 'backend_manager.gate.dart';
+
+/// Said wherever the app would offer KoboldCpp on an Intel Mac, which cannot
+/// run it: the desktop's Backend tab and the phone's Models page (its own
+/// copy in web_ui/src/backendOptions.ts says the same).
+const String kIntelMacLocalUnsupported =
+    'Local inference is not supported on Intel Macs. Only Remote API mode is '
+    'available.';
+
+class BackendManager extends ChangeNotifier {
+  final StorageService _storageService;
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  String? _backendPath;
+  String? _error;
+
+  String _statusMessage = '';
+  String? _localVersion;
+  int? _localSize;
+  String? _remoteVersion;
+  int? _remoteAssetSize;
+  bool _isCheckingVersion = false;
+  String? _versionError;
+
+  /// The processor as `uname -m` names it (`arm64` on Apple Silicon), null
+  /// until it has answered: unknown is never taken for an Intel Mac.
+  String? _arch;
+  final Completer<void> _archRead = Completer<void>();
+
+  /// Done once the first look for the engine file and its record is over;
+  /// the start-up gate reads [backendPath] only after this.
+  final Completer<void> _engineChecked = Completer<void>();
+  bool _useRocm = false;
+
+  /// CUDA availability, sourced from HardwareService when wired (it already
+  /// probes nvidia-smi once during its own detection). Falls back to false
+  /// when HardwareService isn't available — the download logic then picks
+  /// the universal nocuda binary, which runs everywhere.
+  bool get _hasCuda => _hardwareService?.hasCuda ?? false;
+  // Detected once. When the CPU lacks AVX2 (older/low-end PCs), KoboldCpp's
+  // standard + nocuda builds crash on launch, so we fetch its `oldpc` build
+  // instead (per KoboldCpp: "Cuda11 + AVX1" — it keeps CUDA 11 GPU offload for
+  // older NVIDIA cards but has NO ROCm; an AMD box on a non-AVX2 CPU therefore
+  // runs CPU-side, since the ROCm binary is a standard AVX2 build that would
+  // simply crash there). Defaults to true so detection failure never downgrades
+  // a capable machine. (Irrelevant on Apple Silicon; the mac build is arm64.)
+  final bool _hasAvx2 = cpuHasAvx2();
+
+  bool get useRocm => _useRocm;
+
+  bool get isDownloading => _isDownloading;
+  double get downloadProgress => _downloadProgress;
+  String? get backendPath => _backendPath;
+  String? get error => _error;
+
+  /// Where this machine's engine is downloaded from. A test serves its own.
+  @visibleForTesting
+  String get engineDownloadUrl => _getDownloadUrl();
+  String get statusMessage => _statusMessage;
+  String? get localVersion => _localVersion;
+  int? get localSize => _localSize;
+  String? get remoteVersion => _remoteVersion;
+  int? get remoteAssetSize => _remoteAssetSize;
+  bool get isCheckingVersion => _isCheckingVersion;
+  String? get versionError => _versionError;
+
+  bool get isUpdateAvailable {
+    if (_localVersion == null) return true;
+    if (_remoteVersion == null) return false;
+    if (_localVersion != _remoteVersion) return true;
+    if (_remoteAssetSize != null &&
+        _localSize != null &&
+        _localSize != _remoteAssetSize) {
+      return true;
+    }
+    return false;
+  }
+
+  String get localVersionDisplay {
+    if (_localVersion == null) return '';
+    if (_localSize == null) return 'v$_localVersion';
+    return 'v$_localVersion, ${_formatFileSize(_localSize!)}';
+  }
+
+  /// KoboldCpp cannot run here: the app says [kIntelMacLocalUnsupported].
+  /// False until the processor is known; listeners hear when it is.
+  bool get isIntelMac => _onMac && _intelCpu;
+
+  bool get _intelCpu => _arch != null && _arch != 'arm64';
+
+  /// Done once the processor is known, or could not be read. What depends
+  /// on it (which engine to download, whether it can run) waits for this.
+  Future<void> get architectureKnown => _archRead.future;
+
+  final bool _onMac;
+  final Future<String?> Function() _readArch;
+
+  /// HardwareService, when provided (production wiring in main.providers.dart).
+  /// Used for CUDA/ROCm status instead of spawning duplicate nvidia-smi /
+  /// rocminfo probes — HardwareService already does that detection once.
+  /// Null in tests that don't wire it; [_hasCuda] then stays false (safe:
+  /// download logic picks the universal nocuda binary).
+  final HardwareService? _hardwareService;
+
+  /// [onMac] and [readArch] stand in for the machine in tests.
+  /// [hardwareService] supplies CUDA/ROCm status in production (wired in
+  /// main.providers.dart) so BackendManager doesn't spawn duplicate probes.
+  BackendManager(
+    this._storageService, {
+    @visibleForTesting bool? onMac,
+    @visibleForTesting Future<String?> Function()? readArch,
+    HardwareService? hardwareService,
+  }) : _onMac = onMac ?? Platform.isMacOS,
+       _readArch = readArch ?? _uname,
+       _hardwareService = hardwareService {
+    // Don't _init() here: _storageService.backendSettings reads null until
+    // StorageService finishes loading, so the first init saw useRocm=null
+    // (logged false) and the storage-ready notify re-ran it (logged true) —
+    // the ROCm flip-flop. Defer until storage is ready; the
+    // _onStorageChanged listener below still catches later mutations.
+    unawaited(
+      _storageService.initialized.then((_) {
+        if (!_disposed) _init();
+      }),
+    );
+    _storageService.addListener(_onStorageChanged); // React to path changes
+  }
+
+  // StorageService notifies on EVERY settings mutation (any slider, any
+  // toggle) — but _init spawns processes (uname / nvidia-smi) and re-reads
+  // the binary version from disk, so re-running it per notify made flipping
+  // an unrelated switch spawn a process. Only the inputs _init actually
+  // reads matter: the data root (bin dir) and the ROCm opt-in.
+  String? _lastInitRoot;
+  bool? _lastInitUseRocm;
+  void _onStorageChanged() {
+    final root = _storageService.rootPath;
+    final useRocm = _storageService.backendSettings.useRocm == true;
+    if (root == _lastInitRoot && useRocm == _lastInitUseRocm) return;
+    _lastInitRoot = root;
+    _lastInitUseRocm = useRocm;
+    _init();
+  }
+
+  @override // IMPORTANT
+  void dispose() {
+    _disposed = true;
+    _storageService.removeListener(_onStorageChanged);
+    super.dispose();
+  }
+
+  bool _disposed = false;
+
+  /// Its start-up reads (the processor, the engine file) can finish after
+  /// it is gone; nobody is left to tell then.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  Future<void> _init() async {
+    if (!_hasAvx2 && (Platform.isWindows || Platform.isLinux)) {
+      print(
+        'AG_DEBUG: CPU lacks AVX2 — using KoboldCpp oldpc build '
+        '(${_getExecutableName()})',
+      );
+    }
+    if (_onMac && !_archRead.isCompleted) {
+      final arch = await _readArch();
+      if (!_archRead.isCompleted) {
+        _arch = arch;
+        _archRead.complete();
+        // The desktop's KoboldCpp section and the phone's status follow it.
+        if (_intelCpu) notifyListeners();
+      }
+    } else if (!_archRead.isCompleted) {
+      _archRead.complete();
+    }
+    // GPU acceleration status comes from HardwareService (which probes once
+    // during its own detection) — no duplicate nvidia-smi spawn here.
+    if (Platform.isLinux) {
+      // ROCm is an explicit expert opt-in ONLY (see GpuBackendResolver's
+      // policy note) — rocminfo succeeding is not proof koboldcpp's hipblas
+      // kernels support the card, and auto-selecting it used to hand AMD
+      // users a broken binary while their launch flags said Vulkan.
+      _useRocm = _storageService.backendSettings.useRocm == true;
+      print('AG_DEBUG: ROCm binary (user opt-in): $_useRocm');
+    }
+    // Only a look that had the data root counts: the first pass can start
+    // before the storage has one and report no engine, and the root can
+    // arrive during that look, so what it had is taken before it begins.
+    final looked = _storageService.rootPath != null;
+    await checkBackendAvailability();
+    if (_storageService.rootPath != null) {
+      final v = await KoboldBinaryVersion.read(_storageService.binDir.path);
+      _localVersion = v.version;
+      _localSize = v.size;
+    }
+    if (looked && !_engineChecked.isCompleted) _engineChecked.complete();
+    if (UpdateService.isSupported) {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('update_auto_check') ?? true) {
+        checkForUpdates();
+      }
+    }
+    // Portable builds: auto-check skipped (manual button still works)
+  }
+
+  Future<void> checkBackendAvailability() async {
+    if (_storageService.rootPath == null) return;
+
+    final binDir = _storageService.binDir;
+    final executableName = _getExecutableName();
+    final file = File(path.join(binDir.path, executableName));
+
+    // Also check for other variants (user may have switched GPU acceleration)
+    final altNames = <String>[];
+    if (Platform.isLinux) {
+      for (final name in [
+        'koboldcpp-linux-x64',
+        'koboldcpp-linux-x64-rocm',
+        'koboldcpp-linux-x64-nocuda',
+        'koboldcpp-linux-x64-oldpc',
+      ]) {
+        if (name != executableName) altNames.add(name);
+      }
+    }
+
+    File? foundFile;
+    if (await file.exists()) {
+      foundFile = file;
+    } else {
+      for (final altName in altNames) {
+        final altFile = File(path.join(binDir.path, altName));
+        if (await altFile.exists()) {
+          foundFile = altFile;
+          break;
+        }
+      }
+    }
+
+    if (foundFile != null) {
+      _backendPath = foundFile.path;
+      _statusMessage = 'Ready';
+      final v = await KoboldBinaryVersion.read(_storageService.binDir.path);
+      _localVersion = v.version;
+      _localSize = v.size;
+      // On Linux/Mac, ensure executable permission
+      if (!Platform.isWindows) {
+        await Process.run('chmod', ['+x', _backendPath!]);
+      }
+      // On macOS, clear quarantine attribute that sandbox sets on downloaded binaries
+      if (Platform.isMacOS) {
+        await Process.run('xattr', ['-cr', _backendPath!]);
+        print('AG_DEBUG: Cleared quarantine on $_backendPath');
+      }
+    } else {
+      _backendPath = null;
+      _statusMessage = 'Not Installed';
+    }
+    notifyListeners();
+  }
+
+  Future<void> checkForUpdates() async {
+    if (_isCheckingVersion) return;
+    _isCheckingVersion = true;
+    _versionError = null;
+    notifyListeners();
+    try {
+      final client = http.Client();
+      try {
+        // The Linux ROCm build lives under the rolling `rocm-rolling` tag
+        // (what koboldai.org/cpplinuxrocm serves), never in releases/latest
+        // — version-checking it against latest lied about what was
+        // installed.
+        final releasePath = (Platform.isLinux && _useRocm)
+            ? 'releases/tags/rocm-rolling'
+            : 'releases/latest';
+        final response = await client
+            .get(
+              Uri.parse(
+                'https://api.github.com/repos/LostRuins/koboldcpp/$releasePath',
+              ),
+            )
+            .timeout(const Duration(seconds: 10));
+        if (response.statusCode == 200) {
+          final body = jsonDecode(response.body);
+          final tag = (body['tag_name'] as String?) ?? '';
+          _remoteVersion = tag.replaceFirst(RegExp(r'^[vV]'), '');
+          final exeName = _getExecutableName();
+          for (final a in (body['assets'] as List?) ?? []) {
+            if (a['name'] == exeName) {
+              _remoteAssetSize = a['size'] as int?;
+              // A rolling tag never changes name — the asset's rebuild
+              // date is the real version identity.
+              final updated = a['updated_at'] as String?;
+              if (releasePath != 'releases/latest' && updated != null) {
+                _remoteVersion = '$tag (${updated.split('T').first})';
+              }
+              break;
+            }
+          }
+        } else {
+          _versionError = 'GitHub API: HTTP ${response.statusCode}';
+        }
+      } finally {
+        client.close();
+      }
+    } catch (_) {
+      _versionError = 'Could not check for updates';
+    } finally {
+      _isCheckingVersion = false;
+      notifyListeners();
+    }
+  }
+
+  /// The ONE background-acquisition entry point for the managed KoboldCpp
+  /// engine (first-launch choice, engine-status chip, model-download trigger,
+  /// and every "backend not found" launch path funnel through here). A no-op
+  /// whenever downloading would be wrong: engine already installed, download
+  /// already running, a remote/own backend selected, or an Intel Mac.
+  /// Progress rides the existing [isDownloading]/[downloadProgress]/
+  /// [statusMessage] notifier fields — callers just fire and forget.
+  Future<void> ensureEngineInstalled() async {
+    await architectureKnown;
+    if (_isDownloading || _backendPath != null || isIntelMac) return;
+    await _storageService.initialized;
+    final backendType = _storageService.backendSettings.backendType;
+    if (backendType == 'openRouter' || backendType == 'omlx') return;
+    await checkBackendAvailability();
+    if (_backendPath != null) return; // found an existing binary after all
+    await downloadBackend();
+  }
+
+  void notify() => notifyListeners();
+
+  Future<void> downloadBackend() => _downloadBackendImpl();
+
+  /// Move a fully-downloaded staging file onto the live executable path. The
+  /// rename is atomic on all three desktop platforms, so [livePath] only ever
+  /// holds a whole binary — never the truncated remains of an interrupted
+  /// download. A locked target (Windows keeps a RUNNING .exe open; Linux
+  /// returns ETXTBSY) is retried once after unlinking and, failing that,
+  /// reported in words a non-technical user can act on instead of a raw
+  /// sharing-violation string. The staged file is left in place on failure so
+  /// the download is not thrown away.
+  @visibleForTesting
+  static Future<void> swapStagedBinary(File staged, String livePath) async {
+    try {
+      await staged.rename(livePath);
+      return;
+    } on FileSystemException catch (e) {
+      print('AG_DEBUG: Direct rename onto $livePath failed ($e) — retrying');
+    }
+    try {
+      final live = File(livePath);
+      if (await live.exists()) await live.delete();
+      await staged.rename(livePath);
+    } catch (e) {
+      print('AG_DEBUG: Could not replace $livePath: $e');
+      throw Exception(
+        'Could not replace the engine file — it looks like KoboldCpp is still '
+        'running. Press Stop on this page, then start the download again.',
+      );
+    }
+  }
+}
+
+/// The processor, as `uname -m` names it; null when it cannot be read.
+Future<String?> _uname() async {
+  try {
+    final result = await Process.run('uname', ['-m']);
+    if (result.exitCode == 0) return result.stdout.toString().trim();
+  } on Object catch (e) {
+    debugPrint('[Backend] the processor could not be read: $e');
+  }
+  return null;
+}

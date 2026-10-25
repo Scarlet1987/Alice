@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alice — Full UI Preview</title>
+<style>
+  :root{
+    --bg:#04231f; --card:#08302a; --surface:#0b3a33;
+    --border:#1c554b; --border-soft:#123f37;
+    --text:#f2faf8; --muted:rgba(255,255,255,.74); --faint:rgba(255,255,255,.48);
+    --accent:#2DD4BF; --accent-soft:rgba(45,212,191,.08);
+    --gold:#e8b84b; --green:#4ade80;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:14px;line-height:1.5;color:var(--text);background:var(--bg)}
+  .preview-note{background:var(--card);border-bottom:1px dashed var(--border);
+    padding:10px 20px;font-size:12px;color:var(--muted);text-align:center}
+  .preview-note strong{color:var(--accent)}
+  .app{display:flex;min-height:calc(100vh - 41px)}
+  /* Nav rail */
+  .rail{width:200px;flex:none;background:var(--card);border-right:1px solid var(--border-soft);
+    padding:20px 0;display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,.4)}
+  .rail .logo{padding:0 20px 20px;font-size:18px;font-weight:800;color:var(--accent)}
+  .rail .logo span{color:var(--text);font-weight:400;font-size:12px;display:block;color:var(--faint)}
+  .nav-item{padding:10px 20px;cursor:pointer;color:var(--muted);font-size:14px;
+    border-left:3px solid transparent;display:flex;align-items:center;gap:10px}
+  .nav-item:hover{background:var(--accent-soft);color:var(--text)}
+  .nav-item.active{border-left-color:var(--accent);color:var(--text);background:var(--accent-soft);font-weight:600}
+  .nav-item .icon{font-size:16px}
+  .rail .bottom{margin-top:auto;padding:16px 20px;font-size:11px;color:var(--faint)}
+  /* Main */
+  .main{flex:1;padding:24px;max-width:820px;overflow-y:auto}
+  .screen{display:none}
+  .screen.active{display:block;animation:fadeIn .18s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h1.st{font-size:22px;margin-bottom:4px;padding:8px 16px;margin-left:-16px;margin-right:-16px;
+    background:linear-gradient(90deg,rgba(45,212,191,.22),transparent 70%);
+    border-left:3px solid var(--accent);border-radius:0 8px 8px 0}
+  p.ssub{color:var(--muted);margin-bottom:20px;font-size:13px}
+  .card{background:var(--card);border:1px solid var(--border-soft);border-radius:12px;padding:20px;margin-bottom:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,.6), 0 1px 0 rgba(45,212,191,.12) inset;
+    border-top:1px solid rgba(45,212,191,.15)}
+  .card h2{font-size:15px;margin-bottom:4px;padding:6px 12px;margin-left:-12px;
+    background:linear-gradient(90deg,rgba(45,212,191,.16),transparent 60%);
+    border-radius:6px;display:inline-block}
+  .card .sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+  .hint{font-size:11px;color:var(--faint);line-height:1.4}
+  .label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px;letter-spacing:.3px}
+  .btn{background:var(--accent);color:#032520;border:none;border-radius:8px;
+    padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:0 2px 12px rgba(45,212,191,.4)}
+  .btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);
+    border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .btn-text{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;font-family:inherit}
+  .btn-text.danger{color:var(--red);font-weight:700;border:1px solid rgba(248,113,113,.4);
+    border-radius:6px;padding:6px 12px;background:rgba(248,113,113,.08)}
+  .btn-text.danger:hover{background:rgba(248,113,113,.15);border-color:var(--red)}
+  .path-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-soft)}
+  .path-row:last-child{border-bottom:none}
+  .path-info{flex:1;min-width:0}
+  .path-name{font-size:13px;font-weight:600;margin-bottom:2px}
+  .path-desc{font-size:11px;color:var(--faint);line-height:1.4;margin-bottom:4px}
+  .path-value{font-size:11px;color:var(--muted);font-family:ui-monospace,monospace;
+    background:var(--bg);border-radius:4px;padding:4px 8px;display:inline-block;max-width:100%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .engine-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
+  .engine-row:last-child{border-bottom:none}
+  .engine-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+  .engine-info{flex:1}
+  .engine-name{font-size:13px;font-weight:600}
+  .engine-detail{font-size:11px;color:var(--faint)}
+  .zone-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{border:1px solid var(--border);background:transparent;color:var(--muted);
+    border-radius:999px;padding:8px 16px;font-size:12px;cursor:pointer;font-family:inherit}
+  .chip.sel{border-color:var(--accent);color:var(--text);font-weight:600;background:var(--accent-soft)}
+  .golden{border-left:3px solid var(--gold);padding:12px 16px;background:var(--surface);
+    border-radius:0 8px 8px 0;margin-bottom:16px}
+  .golden .gr-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px}
+  .golden p{font-size:12px;color:var(--muted);line-height:1.5}
+  /* Chat */
+  .chat-msgs{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;max-height:400px;overflow-y:auto}
+  .msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+  .msg.ai{background:var(--surface);align-self:flex-start;border-bottom-left-radius:4px}
+  .msg.user{background:var(--accent-soft);border:1px solid var(--border);align-self:flex-end;border-bottom-right-radius:4px}
+  .msg .who{font-size:10px;color:var(--faint);margin-bottom:4px;font-weight:700}
+  .composer{display:flex;gap:8px}
+  .composer input{flex:1;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);padding:10px 14px;font-size:13px;font-family:inherit}
+  .composer input::placeholder{color:var(--faint)}
+  /* Creator */
+  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-soft)}
+  .tab{padding:10px 16px;cursor:pointer;color:var(--muted);font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .field input,.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);padding:10px 12px;font-size:13px;font-family:inherit}
+  .field textarea{min-height:80px;resize:vertical}
+  input[type=range]{accent-color:var(--accent);width:100%}
+  /* Worlds */
+  .world-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+  .world-card:hover{border-color:var(--accent)}
+  .world-card h3{font-size:14px;margin-bottom:4px}
+  .world-card p{font-size:12px;color:var(--faint)}
+  .crumb{font-size:11px;color:var(--faint);margin-bottom:8px}
+  .crumb span{color:var(--accent)}
+  /* Toast */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);
+    border:1px solid var(--accent);color:var(--text);padding:10px 20px;border-radius:8px;
+    font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
+  .toast.show{opacity:1}
+  .adv-toggle{background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;
+    padding:8px 0;font-family:inherit;width:100%;text-align:left}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="preview-note"><strong>PREVIEW ONLY</strong> — full Alice UI, freshest build. Click the nav to switch screens.</div>
+<div class="app">
+  <nav class="rail">
+    <div class="logo">🐇 Alice<span>Rabbit Hole</span></div>
+    <div class="nav-item active" onclick="go('home',this)"><span class="icon">🏠</span> Home</div>
+    <div class="nav-item" onclick="go('chat',this)"><span class="icon">💬</span> Chat</div>
+    <div class="nav-item" onclick="go('creator',this)"><span class="icon">🎨</span> Creator</div>
+    <div class="nav-item" onclick="go('worlds',this)"><span class="icon">🌍</span> Worlds</div>
+    <div class="nav-item" onclick="go('studio',this)"><span class="icon">🖼️</span> Image Studio</div>
+    <div class="nav-item" onclick="go('settings',this)"><span class="icon">⚙️</span> Settings</div>
+    <div class="bottom">v1.5.0-alice8<br>RX 580 · 8GB VRAM</div>
+  </nav>
+  <main class="main">
+
+    <!-- HOME -->
+    <div class="screen active" id="s-home">
+      <h1 class="st">On your porch</h1>
+      <p class="ssub">Your worlds and characters will live here.</p>
+
+      <div class="card">
+        <h2>🌍 Worlds</h2>
+        <div style="text-align:center;padding:32px 16px">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4">🌌</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">No worlds yet</div>
+          <div class="sub" style="margin-bottom:16px">Every story needs a stage. Build your first world —<br>pick a scale, set the physics, start creating.</div>
+          <button class="btn" onclick="go('worlds',document.querySelectorAll('.nav-item')[3])">Build your first world</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎭 Character cards</h2>
+        <div style="text-align:center;padding:32px 16px">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4">🎭</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">No characters yet</div>
+          <div class="sub" style="margin-bottom:16px">Create your main character, add NPCs,<br>and bring your world to life.</div>
+          <button class="btn" onclick="go('creator',document.querySelectorAll('.nav-item')[2])">Create your first character</button>
+        </div>
+      </div>
+
+    <!-- CHAT -->
+    <div class="screen" id="s-chat">
+      <h1 class="st">Chat</h1>
+      <p class="ssub">Pick a character to start talking.</p>
+      <div class="card">
+        <div style="text-align:center;padding:48px 16px">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4">💬</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">No conversations yet</div>
+          <div class="sub" style="margin-bottom:16px">Create a character first,<br>then come back here to talk to them.</div>
+          <button class="btn" onclick="go('creator',document.querySelectorAll('.nav-item')[2])">Create a character</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATOR -->
+    <div class="screen" id="s-creator">
+      <h1 class="st">Character Creator</h1>
+      <p class="ssub">Build someone worth talking to.</p>
+      <div class="tabs">
+        <div class="tab" onclick="ctab('mc',this)">Main Character</div>
+        <div class="tab active" onclick="ctab('npc',this)">NPC</div>
+        <div class="tab" onclick="ctab('you',this)">You</div>
+      </div>
+      <div id="ct-mc" class="hidden">
+        <div class="card">
+          <h2>Main Character</h2>
+          <div class="sub">The protagonist. You write every detail — the AI never invents your MC.</div>
+          <div class="field"><label>Name</label><input type="text" placeholder="e.g. Kael"></div>
+          <div class="field"><label>Persona name</label><input type="text" placeholder="What should other characters call you?"></div>
+          <div class="field"><label>Kardashev Scale (locks on save)</label>
+            <select id="kardSelect" onchange="kardCheck()">
+              <option value="0">Type 0 — Planetary</option>
+              <option value="1">Type I — Stellar</option>
+              <option value="2">Type II — Galactic</option>
+              <option value="3">Type III — Universal</option>
+            </select></div>
+          <div class="hint" id="kardNote" style="margin-bottom:14px;color:var(--accent)">Gear is checked against Type 0 — no tech above your scale.</div>
+          <div class="field"><label>Sarcasm</label><input type="range" min="0" max="10" value="5" oninput="document.getElementById('sarVal').textContent=this.value"><div class="hint"><span id="sarVal">5</span> / 10</div></div>
+          <div class="field"><label>Core mission (50 words)</label><textarea id="missionText" placeholder="What drives them?" oninput="document.getElementById('missionCount').textContent=this.value.trim().split(/\s+/).filter(w=>w).length"></textarea><div class="hint"><span id="missionCount">0</span> / 50 words</div></div>
+        </div>
+        <div class="card">
+          <h2>Gear loadout</h2>
+          <div class="sub">What they're carrying. The Kardashev engine checks every item — no tech above your scale.</div>
+          <div id="gearSections">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="field" style="margin-bottom:0"><label>🦾 L arm</label><input type="text" placeholder="e.g. grapple gauntlet" oninput="kardCheck()"></div>
+              <div class="field" style="margin-bottom:0"><label>🦾 R arm</label><input type="text" placeholder="e.g. plasma cutter" oninput="kardCheck()"></div>
+              <div class="field" style="margin-bottom:0"><label>🦵 L leg</label><input type="text" placeholder="e.g. mag-boot" oninput="kardCheck()"></div>
+              <div class="field" style="margin-bottom:0"><label>🦵 R leg</label><input type="text" placeholder="e.g. mag-boot" oninput="kardCheck()"></div>
+            </div>
+            <div class="field"><label>🎒 Back / torso</label><input type="text" placeholder="e.g. medkit, rope" oninput="kardCheck()"></div>
+            <div class="field"><label>⛑️ Head</label><input type="text" placeholder="e.g. comm visor" oninput="kardCheck()"></div>
+          </div>
+          <div class="hint" id="gearWarn" style="color:var(--gold)"></div>
+        </div>
+        <div class="card">
+          <h2>Clothing</h2>
+          <div class="sub">What they're wearing. Separate from gear — this is style, not function.</div>
+          <div class="label" style="margin-bottom:8px">Shell — outer clothing</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+            <div class="field" style="margin-bottom:0"><label>Top head</label><input type="text" placeholder="e.g. hood"></div>
+            <div class="field" style="margin-bottom:0"><label>Torso</label><input type="text" placeholder="e.g. leather jacket"></div>
+            <div class="field" style="margin-bottom:0"><label>Bottom ext.</label><input type="text" placeholder="e.g. cargo pants"></div>
+          </div>
+          <div class="label" style="margin-bottom:8px">Intimate</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="field" style="margin-bottom:0"><label>Torso intimate</label><input type="text" placeholder="e.g. undershirt"></div>
+            <div class="field" style="margin-bottom:0"><label>Bottom intimate</label><input type="text" placeholder="e.g. underwear"></div>
+          </div>
+          <div class="field"><label>Footwear</label><input type="text" placeholder="e.g. steel-toe boots"></div>
+          <div class="field"><label>Accessories</label><input type="text" placeholder="e.g. brass goggles, fingerless gloves"></div>
+        </div>
+      </div>
+      <div id="ct-npc">
+        <div class="card">
+          <h2>NPC</h2>
+          <div class="sub">The AI writes the full personality from these anchors. Short answers, consistent results — no more regenerating three times.</div>
+          <div class="field"><label>Name</label><input type="text" placeholder="e.g. Bramble"></div>
+          <div class="field"><label>Role — what they do</label><input type="text" placeholder="e.g. Mischievous forest guide"></div>
+          <div class="field"><label>Tone — how they speak</label><input type="text" placeholder="e.g. Talks in riddles, never direct"></div>
+          <div class="field"><label>Motivation — what they want</label><input type="text" placeholder="e.g. Protect the forest at any cost"></div>
+          <div class="field"><label>Quirk — one memorable detail</label><input type="text" placeholder="e.g. Collects shiny buttons, sews them into coat"></div>
+          <div class="field"><label>Relationship to MC</label>
+            <select>
+              <option>Ally</option><option>Rival</option><option>Mentor</option>
+              <option>Neutral</option><option>Love interest</option><option>Enemy</option>
+              <option>Family</option><option>Stranger</option>
+            </select></div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn" onclick="toast('NPC generated (simulated)')">Generate NPC</button>
+            <button class="btn-ghost" onclick="toast('Write it for me')">Write it for me</button>
+          </div>
+          <div class="hint" style="margin-top:12px">Six anchors → one consistent character. The AI fills in the rest but can't drift from what you set.</div>
+        </div>
+      </div>
+      <div id="ct-you" class="hidden">
+        <div class="card">
+          <h2>You</h2>
+          <div class="sub">This one is you. This information is how other users see you.</div>
+          <div class="field"><label>Real name</label><input type="text" placeholder="Your real name (only shared if you choose)"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field"><label>Pronouns</label><input type="text" placeholder="e.g. she/her"></div>
+            <div class="field"><label>Birthday</label><input type="date"></div>
+          </div>
+          <div class="field"><label>Bio (300 words)</label><textarea id="bioText" placeholder="How other users see you..." oninput="document.getElementById('bioCount').textContent=this.value.trim().split(/\s+/).filter(w=>w).length"></textarea><div class="hint"><span id="bioCount">0</span> / 300 words</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORLDS -->
+    <div class="screen" id="s-worlds">
+      <h1 class="st">Worlds</h1>
+      <p class="ssub">Pick a scale. The computer uses it to understand your story's limits — what's possible, how far things reach, what the stakes can be.</p>
+      <div class="card">
+        <h2>New world</h2>
+        <div class="sub">Start at the top. Pick a Stage, then drill down — each level unlocks the next.</div>
+        <div class="label" style="margin-bottom:8px">1. Pick a Stage</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center" id="stagePicker">
+          <input type="text" id="stageNameInput" placeholder="Name your Stage..." style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;min-width:200px">
+          <button class="btn" id="stageBtn" onclick="pickStage()">+ Stage</button>
+        </div>
+        <div class="label" style="margin-bottom:8px">2. Drill down <span class="hint" id="lockHint">(pick a Stage first)</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center" id="childScales" style="opacity:.4">
+          <input type="text" id="scaleNameInput" placeholder="Name it..." disabled style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;min-width:160px">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <button class="btn-ghost" id="sc-universe" disabled onclick="newWorld('Universe','multiple galaxies, intergalactic stakes')">+ Universe</button>
+          <button class="btn-ghost" id="sc-galaxy" disabled onclick="newWorld('Galaxy','thousands of star systems')">+ Galaxy</button>
+          <button class="btn-ghost" id="sc-planet" disabled onclick="newWorld('Planet','one world, its continents and cultures')">+ Planet</button>
+          <button class="btn-ghost" id="sc-continent" disabled onclick="newWorld('Continent','a landmass and its regions')">+ Continent</button>
+          <button class="btn-ghost" id="sc-city" disabled onclick="newWorld('City','streets, neighborhoods, daily life')">+ City</button>
+          <button class="btn-ghost" id="sc-village" disabled onclick="newWorld('Village','a small settlement, everyone knows everyone')">+ Village</button>
+        </div>
+        <div class="hint" id="scaleHint" style="min-height:20px">The physics engine only needs two things: <strong style="color:var(--accent)">scale</strong> + <strong style="color:var(--accent)">Kardashev level</strong>. Everything else derives from those.</div>
+      </div>
+      <div class="card">
+        <h2>Your worlds</h2>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn-ghost" onclick="toast('Would start new world flow')">+ New world</button>
+          <button class="btn-ghost" onclick="toast('Would start new story')">+ New story</button>
+        </div>
+        <div style="text-align:center;padding:32px 16px">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4">🪐</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">No worlds yet</div>
+          <div class="sub" style="margin-bottom:16px">Pick a Stage above to start building.<br>Your worlds will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGE STUDIO -->
+    <div class="screen" id="s-studio">
+      <h1 class="st">Image Studio</h1>
+      <p class="ssub">The AI drawing your pictures: <strong style="color:var(--accent)">Built-in</strong> (native, no server).</p>
+      <div class="card">
+        <h2>Generate</h2>
+        <div class="sub">Tailor measurements drive the body. The engine reads them directly.</div>
+        <div class="field"><label>Prompt</label><textarea id="studioPrompt" placeholder="Describe the scene..."></textarea></div>
+        <div class="label" style="margin-bottom:8px">Body measurements</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="field"><label>Bust (cm)</label><input type="number" value="86"></div>
+          <div class="field"><label>Underbust (cm)</label><input type="number" value="72"></div>
+          <div class="field"><label>Waist (cm)</label><input type="number" value="64"></div>
+          <div class="field"><label>Hips (cm)</label><input type="number" value="92"></div>
+          <div class="field"><label>Shoulders (cm)</label><input type="number" value="38"></div>
+          <div class="field"><label>Thigh (cm)</label><input type="number" value="54"></div>
+          <div class="field"><label>Inseam (cm)</label><input type="number" value="76"></div>
+          <div class="field"><label>Height (cm)</label><input type="number" value="165"></div>
+        </div>
+        <div class="field"><label>Torso length</label>
+          <div class="zone-pills">
+            <button class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">Short</button>
+            <button class="chip sel" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">Average</button>
+            <button class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">Long</button>
+          </div>
+        </div>
+        <div class="label" style="margin-bottom:8px">Colors — pick a gradient, the AI reads every hex value</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="field" style="margin-bottom:0">
+            <label>Hair</label>
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <input type="color" value="#6B4226" id="hairBase" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('hair')">
+              <input type="color" value="#A67C52" id="hairTip" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('hair')">
+            </div>
+            <div id="hairGrad" style="height:12px;border-radius:6px;background:linear-gradient(90deg,#6B4226,#A67C52);margin-bottom:4px"></div>
+            <input type="range" min="0" max="100" value="100" id="hairAlpha" style="width:100%;margin:4px 0" oninput="updateGrad('hair')"><div class="hint" style="font-size:10px">Opacity</div>
+            <button class="btn-text" onclick="document.getElementById('hairAdv').classList.toggle('hidden')" style="font-size:12px;font-weight:600;margin-top:4px">⚙ Advanced color ▸</button> <button class="btn-text" onclick="resetColor('hair')" style="font-size:11px;margin-top:4px;color:var(--accent);opacity:.7;font-weight:400;cursor:pointer">↺ reset</button>
+            <div id="hairAdv" class="hidden" style="margin-top:8px;padding:10px;background:var(--bg);border-radius:6px">
+              <div class="label" style="margin-bottom:6px">Base color — RGB</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div><div class="hint">R</div><input type="range" min="0" max="255" id="hairR" oninput="advColor('hair')"></div>
+                <div><div class="hint">G</div><input type="range" min="0" max="255" id="hairG" oninput="advColor('hair')"></div>
+                <div><div class="hint">B</div><input type="range" min="0" max="255" id="hairB" oninput="advColor('hair')"></div>
+              </div>
+              <div class="label" style="margin-bottom:6px">Brightness</div>
+              <input type="range" min="0" max="200" value="100" id="hairBright" style="width:100%" oninput="advColor('hair')">
+              <div class="hint" style="margin:4px 0">0 = black, 100 = as picked, 200 = white</div>
+              <div class="label" style="margin-bottom:6px">Direct hex</div>
+              <input type="text" id="hairHexIn" placeholder="#RRGGBBAA" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:11px;font-family:ui-monospace,monospace" oninput="hexIn('hair')">
+            </div>
+            <div class="hint"><span id="hairHex">#6B6B42422626FFFF</span> → <span id="hairHex2">#A6A67C7C5252FFFF</span></div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Eyes</label>
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <input type="color" value="#4A7C59" id="eyeBase" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('eye')">
+              <input type="color" value="#8FBC8F" id="eyeTip" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('eye')">
+            </div>
+            <div id="eyeGrad" style="height:12px;border-radius:6px;background:linear-gradient(90deg,#4A7C59,#8FBC8F);margin-bottom:4px"></div>
+            <input type="range" min="0" max="100" value="100" id="eyeAlpha" style="width:100%;margin:4px 0" oninput="updateGrad('eye')"><div class="hint" style="font-size:10px">Opacity</div>
+            <button class="btn-text" onclick="document.getElementById('eyeAdv').classList.toggle('hidden')" style="font-size:12px;font-weight:600;margin-top:4px">⚙ Advanced color ▸</button> <button class="btn-text" onclick="resetColor('eye')" style="font-size:11px;margin-top:4px;color:var(--accent);opacity:.7;font-weight:400;cursor:pointer">↺ reset</button>
+            <div id="eyeAdv" class="hidden" style="margin-top:8px;padding:10px;background:var(--bg);border-radius:6px">
+              <div class="label" style="margin-bottom:6px">Base color — RGB</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div><div class="hint">R</div><input type="range" min="0" max="255" id="eyeR" oninput="advColor('eye')"></div>
+                <div><div class="hint">G</div><input type="range" min="0" max="255" id="eyeG" oninput="advColor('eye')"></div>
+                <div><div class="hint">B</div><input type="range" min="0" max="255" id="eyeB" oninput="advColor('eye')"></div>
+              </div>
+              <div class="label" style="margin-bottom:6px">Brightness</div>
+              <input type="range" min="0" max="200" value="100" id="eyeBright" style="width:100%" oninput="advColor('eye')">
+              <div class="hint" style="margin:4px 0">0 = black, 100 = as picked, 200 = white</div>
+              <div class="label" style="margin-bottom:6px">Direct hex</div>
+              <input type="text" id="eyeHexIn" placeholder="#RRGGBBAA" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:11px;font-family:ui-monospace,monospace" oninput="hexIn('eye')">
+            </div>
+            <div class="hint"><span id="eyeHex">#4A4A7C7C5959FFFF</span> → <span id="eyeHex2">#8F8FBCBC8F8FFFFF</span></div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Skin</label>
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <input type="color" value="#E8B98A" id="skinBase" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('skin')">
+              <input type="color" value="#C8956C" id="skinTip" style="flex:1;height:36px;padding:2px;cursor:pointer" oninput="updateGrad('skin')">
+            </div>
+            <div id="skinGrad" style="height:12px;border-radius:6px;background:linear-gradient(90deg,#E8B98A,#C8956C);margin-bottom:4px"></div>
+            <input type="range" min="0" max="100" value="100" id="skinAlpha" style="width:100%;margin:4px 0" oninput="updateGrad('skin')"><div class="hint" style="font-size:10px">Opacity</div>
+            <button class="btn-text" onclick="document.getElementById('skinAdv').classList.toggle('hidden')" style="font-size:12px;font-weight:600;margin-top:4px">⚙ Advanced color ▸</button> <button class="btn-text" onclick="resetColor('skin')" style="font-size:11px;margin-top:4px;color:var(--accent);opacity:.7;font-weight:400;cursor:pointer">↺ reset</button>
+            <div id="skinAdv" class="hidden" style="margin-top:8px;padding:10px;background:var(--bg);border-radius:6px">
+              <div class="label" style="margin-bottom:6px">Base color — RGB</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div><div class="hint">R</div><input type="range" min="0" max="255" id="skinR" oninput="advColor('skin')"></div>
+                <div><div class="hint">G</div><input type="range" min="0" max="255" id="skinG" oninput="advColor('skin')"></div>
+                <div><div class="hint">B</div><input type="range" min="0" max="255" id="skinB" oninput="advColor('skin')"></div>
+              </div>
+              <div class="label" style="margin-bottom:6px">Brightness</div>
+              <input type="range" min="0" max="200" value="100" id="skinBright" style="width:100%" oninput="advColor('skin')">
+              <div class="hint" style="margin:4px 0">0 = black, 100 = as picked, 200 = white</div>
+              <div class="label" style="margin-bottom:6px">Direct hex</div>
+              <input type="text" id="skinHexIn" placeholder="#RRGGBBAA" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:11px;font-family:ui-monospace,monospace" oninput="hexIn('skin')">
+            </div>
+            <div class="hint"><span id="skinHex">#E8E8B9B98A8AFFFF</span> → <span id="skinHex2">#C8C895956C6CFFFF</span></div>
+          </div>
+        </div>
+        <div class="hint" style="margin-bottom:12px">Engine reads: defined waist (0.70) · hourglass build · hair #6B4226 · eyes #4A7C59</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn" onclick="toast('Generation queued (simulated)')">Generate</button>
+          <button class="btn-ghost" onclick="toast('Would open LoRA / Style packs')">Style packs</button>
+          <button class="btn-ghost" onclick="toast('Write it for me')">Write it for me</button>
+        </div>
+        <button class="btn-text" onclick="toast('Lock-in: saves measurements to character card')">🔒 Lock in details to character</button>
+      </div>
+      <div class="card">
+        <h2>Scene background</h2>
+        <div class="sub">Per-generation only. Doesn't touch your character.</div>
+        <div class="field"><label>Background</label><input type="text" placeholder="e.g. clockwork garden at dusk"></div>
+      </div>
+      <div class="card">
+        <h2>Reference</h2>
+        <div class="sub">Drop a reference image. The engine uses it for pose, style, or composition.</div>
+        <button class="btn-ghost" onclick="toast('File picker would open')">Add reference image</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen" id="s-settings">
+      <h1 class="st">Settings</h1>
+      <p class="ssub">Everything runs locally; the app holds memory only while a story is running.</p>
+      <div class="golden">
+        <div class="gr-title">The golden rule</div>
+        <p>Nothing in any zone enables sexual content involving minors. This is the floor — it stands over every setting and every world, and nothing can switch it off.</p>
+      </div>
+      <div class="card">
+        <h2>Where things live</h2>
+        <div class="sub">Alice is the container — these are the folders it reads from. Defaults work for most people.</div>
+        <div class="path-row">
+          <div class="path-info">
+            <div class="path-name">Text engine models</div>
+            <div class="path-desc">Where Alice looks for the AI that writes your stories.</div>
+            <span class="path-value">~/.local/share/front-porch-ai/models/text</span>
+          </div>
+          <button class="btn-ghost" onclick="toast('Folder picker would open')">Change</button>
+        </div>
+        <div class="path-row">
+          <div class="path-info">
+            <div class="path-name">Image engine models</div>
+            <div class="path-desc">Where Alice looks for the AI that draws your pictures.</div>
+            <span class="path-value">~/.local/share/front-porch-ai/models/image</span>
+          </div>
+          <button class="btn-ghost" onclick="toast('Folder picker would open')">Change</button>
+        </div>
+        <div class="path-row">
+          <div class="path-info">
+            <div class="path-name">My character cards</div>
+            <div class="path-desc">Where your saved characters live.</div>
+            <span class="path-value">~/.local/share/front-porch-ai/characters</span>
+          </div>
+          <button class="btn-ghost" onclick="toast('Folder picker would open')">Change</button>
+        </div>
+        <div class="path-row">
+          <div class="path-info">
+            <div class="path-name">My worlds</div>
+            <div class="path-desc">Where your saved worlds and lore live.</div>
+            <span class="path-value">~/.local/share/front-porch-ai/worlds</span>
+          </div>
+          <button class="btn-ghost" onclick="toast('Folder picker would open')">Change</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Engines</h2>
+        <div class="sub">What's plugged into Alice. Swap engines without Alice caring.</div>
+        <div class="engine-row">
+          <span class="engine-dot"></span>
+          <div class="engine-info"><div class="engine-name">Text engine — KoboldCpp</div><div class="engine-detail">Running · Qwen3 8B · Vulkan</div></div>
+          <button class="btn-text" onclick="toast('Engine picker')">Swap</button>
+        </div>
+        <div class="engine-row">
+          <span class="engine-dot"></span>
+          <div class="engine-info"><div class="engine-name">Image engine — Built-in</div><div class="engine-detail">Ready · Native C++ · Vulkan · No server</div></div>
+          <button class="btn-text" onclick="toast('Engine picker')">Swap</button>
+        </div>
+        <div class="engine-row">
+          <span class="engine-dot" style="background:var(--faint)"></span>
+          <div class="engine-info"><div class="engine-name" style="color:var(--muted)">Game engine — none</div><div class="engine-detail">Alice 9</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Engine resources</h2>
+        <div class="sub">How the engines share your machine's memory.</div>
+        <div class="engine-row">
+          <span class="engine-dot"></span>
+          <div class="engine-info"><div class="engine-name">RX 580 · 8 GB VRAM · 32 GB RAM</div><div class="engine-detail">Auto-detected · Vulkan</div></div>
+          <button class="btn-text" onclick="toast('Resource details')">Details</button>
+        </div>
+        <div class="hint" style="margin-top:8px">Budget: 2 GB harness · Model cap: 7 GB</div>
+      </div>
+      <div class="card">
+        <h2>Content zone</h2>
+        <div class="sub">The rails everything runs on.</div>
+        <div class="zone-pills">
+          <button class="chip sel">Safe Commons</button>
+          <button class="chip" onclick="toast('Zone change needs confirmation')">NSFW</button>
+          <button class="chip" onclick="toast('Zone change needs confirmation')">Dead Dove</button>
+        </div>
+      </div>
+      <button class="adv-toggle" onclick="document.getElementById('advBody').classList.toggle('hidden');this.textContent=document.getElementById('advBody').classList.contains('hidden')?'Advanced ▸':'Advanced ▾'">Advanced ▸</button>
+      <div id="advBody" class="hidden">
+        <div class="card">
+          <h2>Advanced paths</h2>
+          <div class="path-row"><div class="path-info"><div class="path-name">Backups</div><span class="path-value">~/.local/share/front-porch-ai/backups</span></div><button class="btn-ghost" onclick="toast('Folder picker')">Change</button></div>
+          <div class="path-row"><div class="path-info"><div class="path-name">Logs</div><span class="path-value">~/.local/share/front-porch-ai/logs</span></div><button class="btn-ghost" onclick="toast('Folder picker')">Change</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>About</h2>
+        <div class="sub">Alice edition · v1.5.0-alice8 · Design lead: Scarlet1987</div>
+        <div class="hint">Rabbit Hole — follow the white rabbit.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+  function go(id, el){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('s-'+id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function ctab(id, el){
+    ['mc','npc','you'].forEach(t=>document.getElementById('ct-'+t).classList.add('hidden'));
+    document.getElementById('ct-'+id).classList.remove('hidden');
+    el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  // Kardashev live check — flags gear that exceeds the selected tech level
+  const _kardTech = [
+    ['plasma','antimatter','teleport','nanobot','nanite','quantum','singularity','warp','ftl'],
+    ['fusion','orbital','laser','railgun','ai ','android'],
+    ['dyson','stellar','megastructure'],
+    []
+  ];
+  const _kardNames = ['Type 0 — Planetary','Type I — Stellar','Type II — Galactic','Type III — Universal'];
+  function kardCheck(){
+    const sel = document.getElementById('kardSelect');
+    if(!sel) return;
+    const level = parseInt(sel.value);
+    document.getElementById('kardNote').textContent =
+      'Gear is checked against ' + _kardNames[level] + ' — no tech above your scale.';
+    const inputs = document.querySelectorAll('#gearSections input');
+    let flagged = [];
+    inputs.forEach(inp=>{
+      const v = inp.value.toLowerCase();
+      for(let l = level + 1; l < 4; l++){
+        for(const kw of _kardTech[l]){
+          if(v.includes(kw)){ flagged.push(inp.value.trim()); break; }
+        }
+      }
+    });
+    const warn = document.getElementById('gearWarn');
+    if(flagged.length){
+      warn.textContent = '⚠ Exceeds ' + _kardNames[level] + ': ' + [...new Set(flagged)].join(', ');
+    } else {
+      warn.textContent = '';
+    }
+  }
+  const replies = [
+    "The spire... it's ticking again. But the rhythm is wrong. Like it's counting down to something.",
+    "*she reaches out, her brass fingers trembling* Don't go near it. Not yet. Not until we understand.",
+    "You always know what to say. That's why the garden brought you here, I think."
+  ];
+  let ri = 0;
+  function sendChat(){
+    const inp = document.getElementById('chatInput');
+    const txt = inp.value.trim();
+    if(!txt) return;
+    const box = document.getElementById('chatMsgs');
+    box.innerHTML += '<div class="msg user"><div class="who">YOU</div>'+txt.replace(/</g,'&lt;')+'</div>';
+    inp.value = '';
+    box.scrollTop = box.scrollHeight;
+    setTimeout(()=>{
+      box.innerHTML += '<div class="msg ai"><div class="who">AETHEREIA</div>'+replies[ri++ % replies.length]+'</div>';
+      box.scrollTop = box.scrollHeight;
+    }, 900);
+  }
+  function to64bit(hex8){
+    // Expand each 8-bit channel to 16-bit by doubling digits: RRGGBBAA -> RRRRGGGGBBBBAAAA
+    const h = hex8.replace('#','').toUpperCase();
+    const r = h.substr(0,2), g = h.substr(2,2), b = h.substr(4,2), a = h.substr(6,2) || 'FF';
+    return '#' + r+r + g+g + b+b + a+a;
+  }
+  const _gradTimers = {};
+  function updateGrad(which){
+    // Debounce: batch rapid oninput events into one DOM update per frame
+    if(_gradTimers[which]) return;
+    _gradTimers[which] = requestAnimationFrame(()=>{
+      _gradTimers[which] = null;
+      _updateGradNow(which);
+    });
+  }
+  function _updateGradNow(which){
+    const base = document.getElementById(which+'Base').value;
+    const tip = document.getElementById(which+'Tip').value;
+    const alpha = document.getElementById(which+'Alpha');
+    const a = alpha ? Math.round(alpha.value * 2.55).toString(16).padStart(2,'0').toUpperCase() : 'FF';
+    document.getElementById(which+'Grad').style.background =
+      'linear-gradient(90deg,'+base+','+tip+')';
+    document.getElementById(which+'Hex').textContent = to64bit(base + a);
+    document.getElementById(which+'Hex2').textContent = to64bit(tip + a);
+  }
+  const _colorDefaults = {hair:['#6B4226','#A67C52'],eye:['#4A7C59','#8FBC8F'],skin:['#E8B98A','#C8956C']};
+  function resetColor(which){
+    const d = _colorDefaults[which];
+    document.getElementById(which+'Base').value = d[0];
+    document.getElementById(which+'Tip').value = d[1];
+    const alpha = document.getElementById(which+'Alpha');
+    if(alpha) alpha.value = 100;
+    const adv = document.getElementById(which+'Adv');
+    if(adv && !adv.classList.contains('hidden')){
+      ['R','G','B'].forEach(c=>{
+        const el = document.getElementById(which+c);
+        if(el) el.value = 128;
+      });
+      const br = document.getElementById(which+'Bright');
+      if(br) br.value = 100;
+      const hi = document.getElementById(which+'HexIn');
+      if(hi) hi.value = '';
+    }
+    updateGrad(which);
+    toast('Color reset to default');
+  }
+  const _advTimers = {};
+  function advColor(which){
+    if(_advTimers[which]) return;
+    _advTimers[which] = requestAnimationFrame(()=>{
+      _advTimers[which] = null;
+      _advColorNow(which);
+    });
+  }
+  function _advColorNow(which){
+    const r = parseInt(document.getElementById(which+'R').value);
+    const g = parseInt(document.getElementById(which+'G').value);
+    const b = parseInt(document.getElementById(which+'B').value);
+    const bright = parseInt(document.getElementById(which+'Bright').value) / 100;
+    const adj = v => Math.max(0, Math.min(255, Math.round(v * bright)));
+    const hex = '#' + [adj(r),adj(g),adj(b)].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();
+    document.getElementById(which+'Base').value = hex;
+    updateGrad(which);
+  }
+  function hexIn(which){
+    let v = document.getElementById(which+'HexIn').value.trim();
+    if(/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(v)){
+      document.getElementById(which+'Base').value = v.substr(0,7);
+      updateGrad(which);
+    }
+  }
+  function newWorld(scale, desc){
+    const input = document.getElementById('scaleNameInput');
+    const name = input ? input.value.trim() : '';
+    if(!name){ toast('Name your '+scale+' first'); if(input) input.focus(); return; }
+    const n = name;
+    if(input) input.value = '';
+    document.getElementById('scaleHint').innerHTML =
+      '<strong style="color:var(--accent)">'+scale+': '+n+'</strong> — '+desc+'. The engine will scope travel, communication, and stakes to this scale.';
+    toast(scale+' "'+n+'" created');
+  }
+  let _stagePicked = false;
+  let _stageName = '';
+  function pickStage(){
+    const input = document.getElementById('stageNameInput');
+    const name = input ? input.value.trim() : '';
+    if(!name){ toast('Name your Stage first'); if(input) input.focus(); return; }
+    _stageName = name;
+    _stagePicked = true;
+    const btn = document.getElementById('stageBtn');
+    btn.textContent = '✓ Stage: ' + _stageName;
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    if(input){ input.disabled = true; input.style.opacity = '.5'; }
+    ['universe','galaxy','planet','continent','city','village'].forEach(id=>{
+      document.getElementById('sc-'+id).disabled = false;
+    });
+    document.getElementById('lockHint').textContent = '(unlocked)';
+    document.getElementById('childScales').style.opacity = '1';
+    const scaleInput = document.getElementById('scaleNameInput');
+    if(scaleInput) scaleInput.disabled = false;
+    document.getElementById('scaleHint').innerHTML =
+      '<strong style="color:var(--accent)">Stage set: '+_stageName+'.</strong> Now pick where in it your story lives. The physics engine reads scale + Kardashev and handles the rest.';
+    toast('Stage "'+_stageName+'" created — drill down to a scale');
+  }
+</script>
+</body>
+</html>

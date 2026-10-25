@@ -1,0 +1,232 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+part of 'setup_step.dart';
+
+/// Extra Settings body and field helpers for [SetupStep].
+extension SetupStepFields on SetupStep {
+  Widget _inputLabel(
+    BuildContext context,
+    String text, {
+    bool required = false,
+  }) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        if (required)
+          Text(
+            ' *',
+            style: TextStyle(
+              color: AppColors.resolve(
+                context,
+                Colors.redAccent,
+                Colors.red.shade700,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildExtraSettingsBody(BuildContext context, CreatorState state) {
+    final storage = Provider.of<StorageService>(context, listen: false);
+    final hardwareService = Provider.of<HardwareService>(
+      context,
+      listen: false,
+    );
+
+    // Kept the way Settings keeps it, for the model a launch will load, and
+    // shown from what is kept. A preset that names a model on this computer
+    // owns the choice of model.
+    Future<void> choosePreset(String? path) async {
+      await chooseKoboldPreset(storage, path);
+      // The preset's context, or the user's own back: the box shows it.
+      state.contextSizeController.text = storage.backendSettings.contextSize
+          .toString();
+      if (storage.backendSettings.kcppsHasModel &&
+          storage.backendSettings.kcppsModelFileExists) {
+        state.selectedLocalModelPath = '';
+      }
+      state.notify();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          KcppsSelector(
+            storage: storage,
+            localPresets: state.localPresets,
+            hint: 'Optional \u2014 select a .kcpps preset',
+            onChanged: choosePreset,
+            onExternalClear: () => choosePreset(null),
+            onBrowsePicked: choosePreset,
+            onModelStatusChanged: (_) => state.notify(),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerOf(context),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: hardwareService.isDetecting
+                ? const Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : hardwareService.hardwareInfo == null
+                ? const Text(
+                    'Hardware not detected.',
+                    style: TextStyle(color: Colors.redAccent),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoRow(
+                        context,
+                        'GPU',
+                        hardwareService.hardwareInfo!.gpuName,
+                      ),
+                      const SizedBox(height: 4),
+                      _buildInfoRow(
+                        context,
+                        'VRAM',
+                        '${hardwareService.hardwareInfo!.vramMb} MB${hardwareService.hardwareInfo!.isSharedMemory ? ' (Shared)' : ''}',
+                      ),
+                    ],
+                  ),
+          ),
+          const SizedBox(height: 16),
+          GpuLayersField(
+            dense: true,
+            manual: storage.backendSettings.gpuLayersManual,
+            retiredLayers: storage.backendSettings.retiredGpuLayers,
+            onDismissRetired: () {
+              storage.backendSettings.dismissGpuLayersNote();
+              state.notify();
+            },
+            controller: state.gpuLayersController,
+            onManualChanged: (v) {
+              storage.backendSettings.setGpuLayersManual(v);
+              state.notify();
+            },
+            onLayersChanged: (v) {
+              final val = int.tryParse(v);
+              if (val != null) storage.backendSettings.setGpuLayers(val);
+            },
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: PresetContextLock(
+                  locked: storage.backendSettings.presetOwnsContext,
+                  child: _buildSettingsTextField(
+                    context,
+                    label: 'Context Size',
+                    controller: state.contextSizeController,
+                    isNumber: true,
+                    onChanged: (v) {
+                      final val = int.tryParse(v);
+                      if (val != null) {
+                        storage.backendSettings.setContextSize(val);
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                'KV Quantization:',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: KvQuantPicker(
+                  value: storage.backendSettings.kvQuant,
+                  onChanged: (val) {
+                    storage.backendSettings.setKvQuant(val);
+                    state.notify();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textTertiary(context),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsTextField(
+    BuildContext context, {
+    required String label,
+    required TextEditingController controller,
+    required bool isNumber,
+    required ValueChanged<String> onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      style: TextStyle(color: AppColors.textPrimary(context)),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: AppColors.textSecondary(context)),
+        filled: true,
+        fillColor: AppColors.surfaceContainerOf(context),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
