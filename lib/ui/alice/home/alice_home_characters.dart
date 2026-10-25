@@ -3,7 +3,7 @@
 //
 // Alice Home: Character cards card. Part of alice_home.dart.
 //
-// Empty state per the approved preview (🎭 "No characters yet" →
+// Empty state per the approved preview ("No characters yet" →
 // "Create your first character"). Populated: a grid of character cards
 // from CharacterRepository — tap opens the chat, Edit opens the real
 // character editor, Delete runs the repository delete pipeline after a
@@ -23,6 +23,7 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
           const AliceSectionHead(
             title: 'Character cards',
             subtitle: 'Tap one to open the chat',
+            icon: Icons.people_rounded,
           ),
           const SizedBox(height: 10),
           if (characters.isEmpty)
@@ -41,9 +42,13 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
       child: Center(
         child: Column(
           children: [
-            const Opacity(
+            Opacity(
               opacity: 0.4,
-              child: Text('🎭', style: TextStyle(fontSize: 48)),
+              child: Icon(
+                Icons.people_rounded,
+                size: 48,
+                color: AppColors.porchAmberOf(context),
+              ),
             ),
             const SizedBox(height: 12),
             const Text(
@@ -135,6 +140,7 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
             children: [
               AliceButton(
                 label: '+ character card',
+                icon: Icons.add_rounded,
                 onPressed: () => Provider.of<AppState>(
                   context,
                   listen: false,
@@ -142,11 +148,13 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
               ),
               AliceButton(
                 label: 'edit char',
+                icon: Icons.edit_rounded,
                 ghost: true,
                 onPressed: () => _editCharacterFromHome(context, selected),
               ),
               AliceDangerButton(
                 label: '− delete',
+                icon: Icons.delete_rounded,
                 onPressed: () => _confirmDeleteCharacter(context, selected),
               ),
             ],

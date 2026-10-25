@@ -150,6 +150,11 @@ aur_key.pub
 # them, but the theme system needs real background images checked in).
 !assets/backgrounds/*.png
 
+# Allow the in-app Rabbit Hole icon set (the *.png rule above would block
+# them, but Home credits and the rail resolve these image assets).
+!assets/images/rabbit-hole-icon/*.png
+!assets/images/rabbit-hole-icon-teal.png
+
 # Allow the Linux launcher icons (the *.png rule above would block them, but
 # the desktop entries resolve Icon=front-porch-ai from these files — the
 # hicolor set the .deb and AUR packages install, plus the AUR source copies).

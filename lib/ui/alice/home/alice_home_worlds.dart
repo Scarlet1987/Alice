@@ -3,7 +3,7 @@
 //
 // Alice Home: Worlds card. Part of alice_home.dart.
 //
-// Empty state per the approved preview (🌌 "No worlds yet" →
+// Empty state per the approved preview ("No worlds yet" →
 // "Build your first world"). Populated: every place world from
 // WorldRepository as a labeled collapsible panel — roots on top,
 // children drilled down under their parent, each row labeled with its
@@ -22,6 +22,7 @@ extension _AliceHomeWorlds on _AliceHomeScreenState {
           const AliceSectionHead(
             title: 'Worlds',
             subtitle: 'Where your stories are set',
+            icon: Icons.explore_rounded,
           ),
           const SizedBox(height: 10),
           if (worlds.isEmpty)
@@ -52,9 +53,13 @@ extension _AliceHomeWorlds on _AliceHomeScreenState {
       child: Center(
         child: Column(
           children: [
-            const Opacity(
+            Opacity(
               opacity: 0.4,
-              child: Text('🌌', style: TextStyle(fontSize: 48)),
+              child: Icon(
+                Icons.public_rounded,
+                size: 48,
+                color: AppColors.porchAmberOf(context),
+              ),
             ),
             const SizedBox(height: 12),
             const Text(

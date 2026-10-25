@@ -141,12 +141,14 @@ class AliceSectionHead extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Color? barColor;
+  final IconData? icon;
 
   const AliceSectionHead({
     super.key,
     required this.title,
     this.subtitle,
     this.barColor,
+    this.icon,
   });
 
   @override
@@ -155,12 +157,20 @@ class AliceSectionHead extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AliceGradientTitle(
-          title: title,
-          tint: barColor ?? AppColors.porchAmberOf(context),
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+        Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: AppColors.porchAmberOf(context)),
+              const SizedBox(width: 8),
+            ],
+            _AliceGradientTitle(
+              title: title,
+              tint: barColor ?? AppColors.porchAmberOf(context),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
         if (subtitle != null)
           Padding(

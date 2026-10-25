@@ -16,6 +16,7 @@ class AliceButton extends StatelessWidget {
   final bool ghost;
   final bool small;
   final bool block;
+  final IconData? icon;
 
   const AliceButton({
     super.key,
@@ -24,6 +25,7 @@ class AliceButton extends StatelessWidget {
     this.ghost = false,
     this.small = false,
     this.block = false,
+    this.icon,
   });
 
   @override
@@ -50,13 +52,19 @@ class AliceButton extends StatelessWidget {
         fontSize: small ? 13 : 14,
       ),
     );
-    final btn = ghost
-        ? OutlinedButton(onPressed: onPressed, style: style, child: Text(label))
-        : ElevatedButton(
-            onPressed: onPressed,
-            style: style,
-            child: Text(label),
+    final btnLabel = icon == null
+        ? Text(label)
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18),
+              const SizedBox(width: 6),
+              Text(label),
+            ],
           );
+    final btn = ghost
+        ? OutlinedButton(onPressed: onPressed, style: style, child: btnLabel)
+        : ElevatedButton(onPressed: onPressed, style: style, child: btnLabel);
     if (block) {
       return SizedBox(width: double.infinity, child: btn);
     }
@@ -71,11 +79,13 @@ class AliceButton extends StatelessWidget {
 class AliceDangerButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
+  final IconData? icon;
 
   const AliceDangerButton({
     super.key,
     required this.label,
     required this.onPressed,
+    this.icon,
   });
 
   @override
@@ -107,7 +117,16 @@ class AliceDangerButton extends StatelessWidget {
           TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
         ),
       ),
-      child: Text(label),
+      child: icon == null
+          ? Text(label)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16),
+                const SizedBox(width: 6),
+                Text(label),
+              ],
+            ),
     );
   }
 }

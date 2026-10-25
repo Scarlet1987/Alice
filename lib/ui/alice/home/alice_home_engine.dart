@@ -44,6 +44,7 @@ extension _AliceHomeEngine on _AliceHomeScreenState {
               const AliceSectionHead(
                 title: 'Engine status',
                 subtitle: 'Shown at the Advanced detail level',
+                icon: Icons.memory_rounded,
               ),
               const SizedBox(height: 6),
               AliceKeyValue(

@@ -146,25 +146,13 @@ class _AliceNavRail extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(8, 2, 8, 12),
             child: Row(
               children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF5EEAD4),
-                        Color(0xFF14B8A6),
-                        Color(0xFF0F766E),
-                      ],
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    '❋',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/rabbit-hole-icon/48.png',
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 10),

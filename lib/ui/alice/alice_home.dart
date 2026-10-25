@@ -172,6 +172,7 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
             const AliceSectionHead(
               title: 'Stage',
               subtitle: 'Where your stories are set, widest to narrowest',
+              icon: Icons.public_rounded,
             ),
             const SizedBox(height: 10),
             _buildWorldsCard(context),
@@ -241,7 +242,14 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
                   ),
                 ),
                 alignment: Alignment.center,
-                child: const Text('🐇', style: TextStyle(fontSize: 28)),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/rabbit-hole-icon/64.png',
+                    width: 56,
+                    height: 56,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               const Expanded(
@@ -354,6 +362,7 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
         const AliceSectionHead(
           title: 'Continue chatting',
           subtitle: 'Your most recent stories',
+          icon: Icons.chat_bubble_rounded,
         ),
         const SizedBox(height: 8),
         FutureBuilder<List<_RecentStory>>(
