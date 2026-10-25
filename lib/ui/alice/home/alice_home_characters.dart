@@ -101,20 +101,81 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
     );
   }
 
+  /// The preview's toolbar, under the Character cards band: it acts
+  /// on the selected card. If the selection was deleted, it falls
+  /// back to the first remaining card — the world position rule, in
+  /// miniature: after a delete, focus lands on what is adjacent,
+  /// never on a card that is gone. Chat entry stays available in
+  /// Continue chatting below, since a tile tap now selects.
+  Widget _buildCharacterToolbar(
+    BuildContext context,
+    List<CharacterCard> characters,
+  ) {
+    final theme = Theme.of(context);
+    if (characters.isEmpty) return const SizedBox.shrink();
+    final selected = characters.firstWhere(
+      (c) => c.stableGroupId == _selectedCharacterId,
+      orElse: () => characters.first,
+    );
+    return AliceTranslucentCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Selected: ${selected.name} — the toolbar below acts on '
+            'this card.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              AliceButton(
+                label: '+ character card',
+                onPressed: () => Provider.of<AppState>(
+                  context,
+                  listen: false,
+                ).setIndex(_aliceCreatorIndex),
+              ),
+              AliceButton(
+                label: 'edit char',
+                ghost: true,
+                onPressed: () => _editCharacterFromHome(context, selected),
+              ),
+              AliceDangerButton(
+                label: '− delete',
+                onPressed: () => _confirmDeleteCharacter(context, selected),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCharacterTile(BuildContext context, CharacterCard character) {
     final theme = Theme.of(context);
     final tagline = character.personality.trim().isNotEmpty
         ? character.personality.trim().split('\n').first
         : character.description.trim().split('\n').first;
     final role = _homeRoleLabel(character);
+    final selected = character.stableGroupId == _selectedCharacterId;
     return InkWell(
-      onTap: () => _openCharacter(character),
+      onTap: () => _selectCharacter(character.stableGroupId),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.cardOf(context),
-          border: Border.all(color: AppColors.borderOf(context)),
+          border: Border.all(
+            color: selected
+                ? AppColors.porchAmberOf(context)
+                : AppColors.borderOf(context),
+            width: selected ? 2 : 1,
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

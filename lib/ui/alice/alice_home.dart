@@ -16,6 +16,7 @@ import 'package:front_porch_ai/models/models.dart';
 import 'package:front_porch_ai/providers/app_state.dart';
 import 'package:front_porch_ai/services/services.dart';
 import 'package:front_porch_ai/services/storage/storage.dart';
+import 'package:front_porch_ai/ui/alice/alice_forest_background.dart';
 import 'package:front_porch_ai/ui/alice/alice_motion.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
 import 'package:front_porch_ai/ui/pages/edit_character_page.dart';
@@ -63,6 +64,11 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
   Future<List<_RecentStory>>? _recentStories;
   int? _storiesForCharacterCount;
 
+  /// The character card the Home toolbar acts on. Null means no
+  /// selection yet; the toolbar then falls back to the first card,
+  /// so the toolbar is never a dead row on a populated porch.
+  String? _selectedCharacterId;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -105,20 +111,11 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
   void _goChat() =>
       Provider.of<AppState>(context, listen: false).setIndex(_aliceChatIndex);
 
-  Future<void> _openCharacter(CharacterCard character) async {
-    if (_openingChat || !mounted) return;
-    _openingChat = true;
-    try {
-      // setActiveCharacter resumes the character's most recent session.
-      await Provider.of<ChatService>(
-        context,
-        listen: false,
-      ).setActiveCharacter(character);
-      if (!mounted) return;
-      _goChat();
-    } finally {
-      _openingChat = false;
-    }
+  /// Selects a character card for the Home toolbar. This lives on
+  /// the state class (not the characters extension) because only a
+  /// State subclass may call setState.
+  void _selectCharacter(String id) {
+    setState(() => _selectedCharacterId = id);
   }
 
   /// Opens one specific recent session, like the old home's history dialog.
@@ -159,27 +156,171 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
         ? '${_greetingWord()}, $personaName'
         : _greetingWord();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context, greeting, detailLevel, storage),
-          const SizedBox(height: 18),
-          _buildWorldsCard(context),
-          const SizedBox(height: 18),
-          _buildCharactersCard(context, characters),
-          const SizedBox(height: 18),
-          AliceCard(child: _buildContinueChatting(context)),
-          if (detailLevel.reveals(DetailLevel.advanced)) ...[
+    // Master-template bands, in the preview's order: YOUR PORCH
+    // header, then the Stage band (worlds, tier rows, Credits at its
+    // end), then the Character cards band with its action toolbar,
+    // then Continue chatting. The forest background sits behind all
+    // of it at the preview's locked 80% opacity.
+    return AliceForestBackground(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPorchHeader(context, greeting, detailLevel, storage),
             const SizedBox(height: 18),
-            _buildEngineStatus(context, storage),
+            const AliceSectionHead(
+              title: 'Stage',
+              subtitle: 'Where your stories are set, widest to narrowest',
+            ),
+            const SizedBox(height: 10),
+            _buildWorldsCard(context),
+            const SizedBox(height: 12),
+            _buildCreditsBand(context),
+            const SizedBox(height: 18),
+            _buildCharactersCard(context, characters),
+            const SizedBox(height: 12),
+            _buildCharacterToolbar(context, characters),
+            const SizedBox(height: 18),
+            AliceCard(child: _buildContinueChatting(context)),
+            if (detailLevel.reveals(DetailLevel.advanced)) ...[
+              const SizedBox(height: 18),
+              _buildEngineStatus(context, storage),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+
+  /// YOUR PORCH header band: the preview's title, the greeting, and
+  /// the detail-level control, which orders and emphasizes but never
+  /// hides a field.
+  Widget _buildPorchHeader(
+    BuildContext context,
+    String greeting,
+    DetailLevel detailLevel,
+    StorageService storage,
+  ) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const AliceScreenTitle(title: 'YOUR PORCH'),
+        const SizedBox(height: 4),
+        Text(
+          '$greeting — your worlds and characters will live here.',
+          style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+        ),
+        const SizedBox(height: 12),
+        _buildHeader(context, greeting, detailLevel, storage),
+      ],
+    );
+  }
+
+  /// Credits, at the end of the Stage band, exactly as in the
+  /// preview: the Art Nouveau ring around a black circle, ALICE,
+  /// the slogan, an air gap, then hardware credits on the left and
+  /// fork plus design credits on the right. Factual credit only.
+  Widget _buildCreditsBand(BuildContext context) {
+    final theme = Theme.of(context);
+    return AliceTranslucentCard(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                  border: Border.all(
+                    color: AppColors.porchAmberOf(context),
+                    width: 2,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: const Text('🐇', style: TextStyle(fontSize: 28)),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'ALICE',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Follow the white rabbit',
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Hardware & drivers',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Mesa Vulkan drivers (RADV) — the open stack '
+                      "Alice's engines run on; the RX 580 recipe proven "
+                      'by AI Visions Lab.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Fork's credits",
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Front Porch AI by linux4life1.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Design credits',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Scarlet1987 — design lead, Alice edition.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
+  /// Detail-level control only; the YOUR PORCH title and greeting
+  /// already live in [_buildPorchHeader], so this must not repeat them.
   Widget _buildHeader(
     BuildContext context,
     String greeting,
@@ -187,71 +328,21 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
     StorageService storage,
   ) {
     final theme = Theme.of(context);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final narrow = constraints.maxWidth < 640;
-        final segBlock = Column(
-          crossAxisAlignment: narrow
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.end,
-          children: [
-            AliceSegmentedControl<DetailLevel>(
-              values: DetailLevel.values,
-              labels: [for (final d in DetailLevel.values) d.label],
-              selected: detailLevel,
-              onChanged: storage.uiSettings.setDetailLevel,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              detailLevel.description,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.hintColor,
-              ),
-            ),
-          ],
-        );
-        if (narrow) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AliceScreenTitle(title: 'On your porch'),
-              const SizedBox(height: 4),
-              Text(
-                '$greeting — pick up a story where you left off, or start '
-                'a new one on the porch.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.hintColor,
-                ),
-              ),
-              const SizedBox(height: 12),
-              segBlock,
-            ],
-          );
-        }
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AliceScreenTitle(title: 'On your porch'),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$greeting — pick up a story where you left off, or '
-                    'start a new one on the porch.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.hintColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            segBlock,
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AliceSegmentedControl<DetailLevel>(
+          values: DetailLevel.values,
+          labels: [for (final d in DetailLevel.values) d.label],
+          selected: detailLevel,
+          onChanged: storage.uiSettings.setDetailLevel,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          detailLevel.description,
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+        ),
+      ],
     );
   }
 
