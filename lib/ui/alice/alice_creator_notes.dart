@@ -223,14 +223,6 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
 
   Widget _kardashevCard(BuildContext context, ThemeData theme) {
     final draft = widget.draft;
-    const types = [
-      KardashevType.type1,
-      KardashevType.type2,
-      KardashevType.type3,
-      KardashevType.type4,
-      KardashevType.type5,
-      KardashevType.beyond,
-    ];
     return AliceTranslucentCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,46 +232,48 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
           ListenableBuilder(
             listenable: draft,
             builder: (context, _) {
-              return Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
+              Widget chip(KardashevType type) => ChoiceChip(
+                label: Text(type.label),
+                selected: draft.kardashev == type,
+                onSelected: draft.kardashevLocked
+                    ? null
+                    : (_) => draft.setKardashev(type),
+              );
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final type in types) ...[
-                    if (type == KardashevType.type4)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          '{all skills are earned}',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      chip(KardashevType.type1),
+                      chip(KardashevType.type2),
+                      chip(KardashevType.type3),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'all skills are earned',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      chip(KardashevType.type4),
+                      chip(KardashevType.type5),
+                      chip(KardashevType.beyond),
+                      if (draft.kardashevLocked)
+                        TextButton(
+                          onPressed: draft.unlockKardashev,
+                          child: const Text('Unlock scale'),
                         ),
-                      ),
-                    ChoiceChip(
-                      label: Text(type.label),
-                      selected: draft.kardashev == type,
-                      onSelected: draft.kardashevLocked
-                          ? null
-                          : (_) => draft.setKardashev(type),
-                    ),
-                  ],
-                  if (draft.kardashevLocked) ...[
-                    const SizedBox(width: 4),
-                    TextButton(
-                      onPressed: draft.unlockKardashev,
-                      child: const Text('Unlock scale'),
-                    ),
-                  ],
+                    ],
+                  ),
                 ],
               );
             },
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Selected: ${draft.kardashev.label}'
-            '${draft.kardashevLocked ? ' (locked until you unlock it)' : ''}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
           ),
           const SizedBox(height: 8),
           ExpansionTile(
