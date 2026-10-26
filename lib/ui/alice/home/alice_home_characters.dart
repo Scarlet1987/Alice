@@ -293,7 +293,7 @@ extension _AliceHomeCharacters on _AliceHomeScreenState {
               ),
             ),
             const SizedBox(height: 8),
-            const AliceChip(label: 'Creator'),
+            const AliceChip(label: 'World, Lore and Details'),
           ],
         ),
       ),
