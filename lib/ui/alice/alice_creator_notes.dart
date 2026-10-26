@@ -111,13 +111,26 @@ class CreatorNotesBoard extends StatefulWidget {
 
 class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
   final Map<String, bool> _open = {};
+  // Gear by limb itself is collapsible: closed by default, like the
+  // Worlds tiers and the Kardashev rubric. Closed is not hidden —
+  // the header and its arrow are always visible.
+  bool _gearOpen = false;
+  // Kardashev card is collapsible the same way: closed by default,
+  // header and arrow always visible, so closed is not hidden.
+  bool _kardashevOpen = false;
+  // Rubric uses the SAME collapsible header as Gear sections, not
+  // Material's ExpansionTile — one collapsible look on the whole board.
+  bool _rubricOpen = false;
   final Map<String, GlobalKey> _keys = {};
 
   GlobalKey _keyFor(String title) =>
       _keys.putIfAbsent(title, () => GlobalKey());
 
   void _jumpTo(String title) {
-    setState(() => _open[title] = true);
+    setState(() {
+      _gearOpen = true;
+      _open[title] = true;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = _keyFor(title).currentContext;
       if (context != null) {
@@ -128,6 +141,7 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
 
   void _showAll() {
     setState(() {
+      _gearOpen = true;
       for (final section in _notesSections) {
         _open[section.title] = true;
       }
@@ -148,13 +162,30 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AliceSectionHead(
-                title: 'Gear by limb',
-                subtitle: 'Tap a section to open it.',
+              InkWell(
+                onTap: () => setState(() => _gearOpen = !_gearOpen),
+                borderRadius: BorderRadius.circular(20),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: AliceSectionHead(
+                        title: 'Gear by limb',
+                        subtitle: 'Tap to open it, then tap a section.',
+                      ),
+                    ),
+                    Icon(
+                      _gearOpen
+                          ? Icons.keyboard_arrow_down_rounded
+                          : Icons.keyboard_arrow_right_rounded,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              for (final section in _notesSections)
-                _gearSection(context, section),
+              if (_gearOpen) ...[
+                const SizedBox(height: 8),
+                for (final section in _notesSections)
+                  _gearSection(context, section),
+              ],
             ],
           ),
         ),
@@ -227,79 +258,139 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AliceSectionHead(title: 'Kardeshev scale selection'),
-          const SizedBox(height: 8),
-          ListenableBuilder(
-            listenable: draft,
-            builder: (context, _) {
-              Widget chip(KardashevType type) => ChoiceChip(
-                label: Text(type.label),
-                selected: draft.kardashev == type,
-                onSelected: draft.kardashevLocked
-                    ? null
-                    : (_) => draft.setKardashev(type),
-              );
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      chip(KardashevType.type1),
-                      chip(KardashevType.type2),
-                      chip(KardashevType.type3),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'all skills are earned',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      chip(KardashevType.type4),
-                      chip(KardashevType.type5),
-                      chip(KardashevType.beyond),
-                      if (draft.kardashevLocked)
-                        TextButton(
-                          onPressed: draft.unlockKardashev,
-                          child: const Text('Unlock scale'),
-                        ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          ExpansionTile(
-            title: const Text(
-              'What each type means — layman\u2019s rubric',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-            children: [
-              for (final entry in _kardashevRubric.entries)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: RichText(
-                    text: TextSpan(
-                      style: theme.textTheme.bodyMedium,
-                      children: [
-                        TextSpan(
-                          text: '${entry.key}: ',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        TextSpan(text: entry.value),
-                      ],
-                    ),
+          InkWell(
+            onTap: () => setState(() => _kardashevOpen = !_kardashevOpen),
+            borderRadius: BorderRadius.circular(20),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: AliceSectionHead(
+                    title: 'Kardeshev scale selection',
+                    subtitle: 'Tap to open it.',
                   ),
                 ),
-            ],
+                Icon(
+                  _kardashevOpen
+                      ? Icons.keyboard_arrow_down_rounded
+                      : Icons.keyboard_arrow_right_rounded,
+                ),
+              ],
+            ),
           ),
+          if (_kardashevOpen) ...[
+            const SizedBox(height: 8),
+            ListenableBuilder(
+              listenable: draft,
+              builder: (context, _) {
+                Widget chip(KardashevType type) => ChoiceChip(
+                  label: Text(type.label),
+                  selected: draft.kardashev == type,
+                  onSelected: draft.kardashevLocked
+                      ? null
+                      : (_) => draft.setKardashev(type),
+                );
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        chip(KardashevType.type1),
+                        chip(KardashevType.type2),
+                        chip(KardashevType.type3),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'all skills are earned',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        chip(KardashevType.type4),
+                        chip(KardashevType.type5),
+                        chip(KardashevType.beyond),
+                        if (draft.kardashevLocked)
+                          TextButton(
+                            onPressed: draft.unlockKardashev,
+                            child: const Text('Unlock scale'),
+                          ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).dividerColor),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () => setState(() => _rubricOpen = !_rubricOpen),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 11,
+                      ),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'What each type means — layman\u2019s rubric',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            _rubricOpen
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_right_rounded,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (_rubricOpen)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+                      child: Column(
+                        children: [
+                          for (final entry in _kardashevRubric.entries)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: theme.textTheme.bodyMedium,
+                                  children: [
+                                    TextSpan(
+                                      text: '${entry.key}: ',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    TextSpan(text: entry.value),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
