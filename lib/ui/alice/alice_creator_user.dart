@@ -53,7 +53,7 @@ class UserPane extends StatelessWidget {
         AliceSectionHead(
           title: 'How other users see you',
           subtitle:
-              'Real name and birthday, persona name and pronouns, and a '
+              'Real name and birthday, display name and pronouns, and a '
               'short bio — nothing about any character.',
           barColor: AppColors.porchAmberOf(context),
         ),
@@ -69,7 +69,7 @@ class UserPane extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         AliceTextField(
-          label: 'Persona name',
+          label: 'Display name',
           controller: draft.userPersonaName,
           hint: 'The name other users see',
         ),
@@ -114,13 +114,13 @@ class UserPane extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         AliceButton(
-          label: 'Save persona',
+          label: 'Save user data',
           onPressed: () async {
             final err = await draft.saveUserPersona();
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(err ?? 'Persona saved.'),
+                content: Text(err ?? 'User data saved.'),
                 behavior: SnackBarBehavior.floating,
               ),
             );

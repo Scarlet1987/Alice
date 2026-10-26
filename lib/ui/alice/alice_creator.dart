@@ -25,7 +25,9 @@ const _glossary = <String, String>{
   'You (User)':
       'Your real-world self — how other users see you. Nothing about any '
       'character lives here.',
-  'Persona': 'The name other users see, which can differ from your real name.',
+  'Display name':
+      'The name other users see for you — not a character — '
+      'which can differ from your real name.',
   'Greeting':
       'The character\u2019s first message — what they say when a chat opens.',
   'Lorebook':

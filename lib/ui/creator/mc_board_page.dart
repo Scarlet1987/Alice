@@ -346,7 +346,7 @@ class _UserPane extends StatelessWidget {
           const SizedBox(height: PorchSpacing.sm),
           const TextField(
             decoration: InputDecoration(
-              labelText: 'Persona name',
+              labelText: 'Display name',
               border: OutlineInputBorder(),
               isDense: true,
             ),
@@ -369,7 +369,7 @@ class _UserPane extends StatelessWidget {
             ),
           ),
           const SizedBox(height: PorchSpacing.md),
-          PorchPrimaryButton(label: 'Save persona', onPressed: () {}),
+          PorchPrimaryButton(label: 'Save user data', onPressed: () {}),
         ],
       ),
     );
