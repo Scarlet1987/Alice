@@ -15,7 +15,6 @@ import 'package:front_porch_ai/ui/alice/alice_creator_mc_voice.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_mc_world.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_notes.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
-import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
 /// The Main Character pane.
 class McPane extends StatelessWidget {
@@ -79,10 +78,13 @@ class McPane extends StatelessWidget {
         // notes gear saves alongside them in the same card build.
         const SizedBox(height: 10),
         CreatorNotesBoard(draft: draft),
+        // Accent lane, 2026-10-26: teal (porchAmber, the default)
+        // for every section on this window. Previously Personality
+        // was pink (lustAccent), others were blue/teal mixes —
+        // Personality read purple while the rest read green.
         AliceCollapsibleSection(
           title: 'Personality',
           subtitle: 'Tone, sarcasm, alignment, and the mission underneath.',
-          barColor: AppColors.lustAccentOf(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -127,7 +129,6 @@ class McPane extends StatelessWidget {
             subtitle:
                 'Appearance, head to toe — what the world notices and '
                 'reacts to.',
-            barColor: AppColors.porchHoneyOf(context),
             child: McAppearanceSection(draft: draft),
           ),
         AliceCollapsibleSection(
@@ -135,7 +136,6 @@ class McPane extends StatelessWidget {
           subtitle:
               'The first message, the voice that speaks it, and dialogue '
               'that teaches their rhythm.',
-          barColor: AppColors.porchAmberOf(context),
           child: McVoiceSection(draft: draft),
         ),
         AliceCollapsibleSection(
@@ -143,7 +143,6 @@ class McPane extends StatelessWidget {
           subtitle:
               'The image engine for your scenes and the voice models for '
               'your characters, on two shelves.',
-          barColor: AppColors.frostAccentOf(context),
           child: McModelFeaturesSection(draft: draft),
         ),
         if (draft.showAllFields)
@@ -152,7 +151,6 @@ class McPane extends StatelessWidget {
             subtitle:
                 'Where they live, widest to narrowest — plus the lore book '
                 'grown from your saves.',
-            barColor: AppColors.journalAccentOf(context),
             child: McWorldSection(draft: draft),
           ),
         const SizedBox(height: 12),

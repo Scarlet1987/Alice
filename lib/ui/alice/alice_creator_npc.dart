@@ -11,7 +11,6 @@ import 'package:front_porch_ai/ui/alice/alice_creator_draft.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_fields.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_npc_actions.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
-import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
 /// The NPC pane: supporting cast, drafted by the AI.
 class NpcPane extends StatelessWidget {
@@ -28,7 +27,6 @@ class NpcPane extends StatelessWidget {
         AliceSectionHead(
           title: 'NPCs — supporting cast',
           subtitle: 'The AI writes your NPCs — you just give the spark.',
-          barColor: AppColors.porchHoneyOf(context),
         ),
         const SizedBox(height: 8),
         Text(
