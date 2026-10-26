@@ -29,14 +29,12 @@ class McPane extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AliceTextField(label: 'Name', controller: draft.mcName),
-        if (draft.showAllFields) ...[
-          const SizedBox(height: 10),
-          AliceTextField(
-            label: 'Scenario',
-            controller: draft.mcScenario,
-            hint: 'Where the story opens…',
-          ),
-        ],
+        const SizedBox(height: 10),
+        AliceTextField(
+          label: 'Scenario',
+          controller: draft.mcScenario,
+          hint: 'Where the story opens…',
+        ),
         const SizedBox(height: 10),
         Text('Gender identity', style: theme.textTheme.labelLarge),
         const SizedBox(height: 4),
@@ -123,14 +121,13 @@ class McPane extends StatelessWidget {
             ],
           ),
         ),
-        if (draft.showAllFields)
-          AliceCollapsibleSection(
-            title: 'What the world sees',
-            subtitle:
-                'Appearance, head to toe — what the world notices and '
-                'reacts to.',
-            child: McAppearanceSection(draft: draft),
-          ),
+        AliceCollapsibleSection(
+          title: 'What the world sees',
+          subtitle:
+              'Appearance, head to toe — what the world notices and '
+              'reacts to.',
+          child: McAppearanceSection(draft: draft),
+        ),
         AliceCollapsibleSection(
           title: 'Greeting, voice & dialogue',
           subtitle:
@@ -145,20 +142,14 @@ class McPane extends StatelessWidget {
               'your characters, on two shelves.',
           child: McModelFeaturesSection(draft: draft),
         ),
-        if (draft.showAllFields)
-          AliceCollapsibleSection(
-            title: 'World',
-            subtitle:
-                'Where they live, widest to narrowest — plus the lore book '
-                'grown from your saves.',
-            child: McWorldSection(draft: draft),
-          ),
-        const SizedBox(height: 12),
-        AlicePeekButton(
-          showingAll: draft.showAllFields,
-          onToggle: draft.toggleShowAllFields,
+        AliceCollapsibleSection(
+          title: 'World',
+          subtitle:
+              'Where they live, widest to narrowest — plus the lore book '
+              'grown from your saves.',
+          child: McWorldSection(draft: draft),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(

@@ -217,29 +217,3 @@ class AliceAreaLabel extends StatelessWidget {
     );
   }
 }
-
-/// "Show every field anyway" — reveals the Balanced+ gated fields.
-class AlicePeekButton extends StatelessWidget {
-  final bool showingAll;
-  final VoidCallback onToggle;
-
-  const AlicePeekButton({
-    super.key,
-    required this.showingAll,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: TextButton(
-        onPressed: onToggle,
-        child: Text(
-          showingAll
-              ? 'Hide the extra fields — back to the simple view'
-              : 'Show every field anyway — detail level is a default, not a cage',
-        ),
-      ),
-    );
-  }
-}

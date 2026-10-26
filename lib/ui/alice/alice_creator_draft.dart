@@ -77,17 +77,8 @@ const List<String> kNpcRoles = [
 class AliceCreatorDraft extends ChangeNotifier {
   CreatorTab tab = CreatorTab.mc;
 
-  /// "Show every field anyway" — reveals the Balanced+ gated fields.
-  /// Detail level is a default, never a cage.
-  bool showAllFields = false;
-
   void setTab(CreatorTab t) {
     tab = t;
-    notifyListeners();
-  }
-
-  void toggleShowAllFields() {
-    showAllFields = !showAllFields;
     notifyListeners();
   }
 

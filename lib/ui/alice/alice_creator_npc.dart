@@ -97,39 +97,35 @@ class NpcPane extends StatelessWidget {
             ),
           ],
         ),
-        if (draft.showAllFields) ...[
-          const SizedBox(height: 10),
-          Text('Role in the story', style: theme.textTheme.labelLarge),
-          const SizedBox(height: 4),
-          DropdownButtonFormField<String>(
-            // ignore: deprecated_member_use
-            value: draft.npcRole,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              isDense: true,
-            ),
-            items: [
-              for (final r in kNpcRoles)
-                DropdownMenuItem(value: r, child: Text(r)),
-            ],
-            onChanged: (r) {
-              if (r != null) draft.setNpcRole(r);
-            },
+        const SizedBox(height: 10),
+        Text('Role in the story', style: theme.textTheme.labelLarge),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          // ignore: deprecated_member_use
+          value: draft.npcRole,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            isDense: true,
           ),
-        ],
+          items: [
+            for (final r in kNpcRoles)
+              DropdownMenuItem(value: r, child: Text(r)),
+          ],
+          onChanged: (r) {
+            if (r != null) draft.setNpcRole(r);
+          },
+        ),
         const SizedBox(height: 10),
         AliceTextField(
           label: 'One-line concept — the spark; one line is plenty',
           controller: draft.npcConcept,
           hint: 'e.g. the ferry master who knows more than she\u2019ll say',
         ),
-        if (draft.showAllFields) ...[
-          const SizedBox(height: 10),
-          AliceTextField(
-            label: 'Relationship to the Main Character',
-            controller: draft.npcRelationship,
-          ),
-        ],
+        const SizedBox(height: 10),
+        AliceTextField(
+          label: 'Relationship to the Main Character',
+          controller: draft.npcRelationship,
+        ),
         const SizedBox(height: 12),
         AliceButton(
           label: draft.npcDrafting ? 'Drafting…' : 'Draft this NPC with AI',
@@ -140,11 +136,6 @@ class NpcPane extends StatelessWidget {
           const SizedBox(height: 12),
           _DraftOutput(draft: draft),
         ],
-        const SizedBox(height: 12),
-        AlicePeekButton(
-          showingAll: draft.showAllFields,
-          onToggle: draft.toggleShowAllFields,
-        ),
         const SizedBox(height: 8),
       ],
     );
@@ -174,9 +165,7 @@ class _DraftOutput extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            draft.showAllFields
-                ? 'Review what the AI filled in, then save the card.'
-                : 'Save it as-is, or show every field to review the details.',
+            'Review what the AI filled in, then save the card.',
             style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
           ),
           const SizedBox(height: 8),
@@ -186,18 +175,16 @@ class _DraftOutput extends StatelessWidget {
               label: 'Opening scene',
               value: _shorten(card.scenario),
             ),
-          if (draft.showAllFields) ...[
-            if (card.description.trim().isNotEmpty)
-              AliceKeyValue(
-                label: 'Appearance (AI draft)',
-                value: _shorten(card.description),
-              ),
-            if (card.personality.trim().isNotEmpty)
-              AliceKeyValue(
-                label: 'Personality (AI draft)',
-                value: _shorten(card.personality),
-              ),
-          ],
+          if (card.description.trim().isNotEmpty)
+            AliceKeyValue(
+              label: 'Appearance (AI draft)',
+              value: _shorten(card.description),
+            ),
+          if (card.personality.trim().isNotEmpty)
+            AliceKeyValue(
+              label: 'Personality (AI draft)',
+              value: _shorten(card.personality),
+            ),
           const SizedBox(height: 10),
           Row(
             children: [
