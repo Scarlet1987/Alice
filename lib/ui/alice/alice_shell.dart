@@ -272,12 +272,18 @@ class _AliceNavRail extends StatelessWidget {
                 color: isOn ? theme.colorScheme.onSurface : theme.hintColor,
               ),
               const SizedBox(width: 11),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: isOn ? FontWeight.w600 : FontWeight.w500,
-                  color: isOn ? theme.colorScheme.onSurface : theme.hintColor,
+              // Long labels wrap to a second line instead of
+              // overflowing the 228px rail (World, Lore and Details
+              // overflowed by up to 100px on metal, 2026-10-26).
+              Expanded(
+                child: Text(
+                  label,
+                  softWrap: true,
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: isOn ? FontWeight.w600 : FontWeight.w500,
+                    color: isOn ? theme.colorScheme.onSurface : theme.hintColor,
+                  ),
                 ),
               ),
             ],
