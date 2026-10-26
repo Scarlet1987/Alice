@@ -10,6 +10,10 @@ Web home: https://scarlet1987.github.io — the redesigned GitHub homepage, and 
 
 .deb and Flatpak — from the G1 release, once it is cut from this repo.
 
+## How Alice splits the work
+
+New here? Start with [HOW-ALICE-SPLITS-THE-WORK.md](HOW-ALICE-SPLITS-THE-WORK.md) — a plain-language guide to how text, pictures, voices, and music are split between processor, graphics card, and memory, and how the "When last we left our heroes…" recap is capped. Feedback on that guide is welcome at this repo.
+
 ## Working previews
 
 Open these HTML files in Firefox. The chat preview pane strips scripts, so jump buttons, collapsibles, and the Kardashev selector will look dead there — that is the pane, not the files.
