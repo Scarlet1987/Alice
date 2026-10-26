@@ -1,5 +1,7 @@
 # How Alice splits the work
 
+> **Coming soon — not yet in a release.** This describes the next version of Alice, in development on this repo's main branch. The latest downloadable release is still v1.5.0-alice7 on the fork; a release from this repo (G1) has not been cut yet. What you read here is what is coming, and feedback now is early feedback, before release.
+
 A plain-language guide to how Alice divides work between your processor,
 your graphics card, and your memory — so a new scene stays fast, stable,
 and consistent, on everyday hardware.
