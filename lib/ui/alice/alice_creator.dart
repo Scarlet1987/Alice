@@ -94,20 +94,6 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
     );
   }
 
-  String get _tabDescription {
-    switch (_draft.tab) {
-      case CreatorTab.mc:
-        return 'The protagonist of the story — the character who interacts '
-            'with the world. Their whole board lives here.';
-      case CreatorTab.npc:
-        return 'The supporting cast. The AI writes them — you just give '
-            'the spark.';
-      case CreatorTab.user:
-        return 'Your real-world self. Slim by design — nothing about any '
-            'character lives here.';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -158,13 +144,6 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
                       labels: const ['Main Character', 'NPC', 'You (User)'],
                       selected: _draft.tab,
                       onChanged: _draft.setTab,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _tabDescription,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.hintColor,
-                      ),
                     ),
                     const SizedBox(height: 14),
                     switch (_draft.tab) {

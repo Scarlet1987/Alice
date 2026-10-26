@@ -93,7 +93,6 @@ class AliceCreatorDraft extends ChangeNotifier {
 
   // ── Main Character: core ──────────────────────────────────────────
   final mcName = TextEditingController();
-  final mcRole = TextEditingController();
   final mcScenario = TextEditingController();
 
   GenderIdentity gender = GenderIdentity.female;
@@ -458,7 +457,6 @@ class AliceCreatorDraft extends ChangeNotifier {
     }
     for (final c in [
       mcName,
-      mcRole,
       mcScenario,
       genderCustom,
       pronounCustom,

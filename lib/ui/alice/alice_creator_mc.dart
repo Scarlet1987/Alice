@@ -29,19 +29,7 @@ class McPane extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AliceInfoWell(
-          title: 'The Main Character board.',
-          body:
-              'The protagonist\u2019s whole board — every section below, '
-              'folded until you open it. Your own persona (You tab) stays slim.',
-        ),
         AliceTextField(label: 'Name', controller: draft.mcName),
-        const SizedBox(height: 10),
-        AliceTextField(
-          label: 'Role in the story',
-          controller: draft.mcRole,
-          hint: 'e.g. Keeper of the Gullwatch light',
-        ),
         if (draft.showAllFields) ...[
           const SizedBox(height: 10),
           AliceTextField(
