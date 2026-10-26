@@ -1,9 +1,22 @@
 // Copyright (C) 2026 Front Porch AI
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
-// Alice edition Worlds screen: real place data from WorldRepository,
-// rendered as tier chains (Stage → Universe → Planet → Continent →
-// City/Village/Town). No mock data — empty state when no worlds exist.
+// Alice Worlds, rebuilt from Elaina's 2026-10-25 sketch and the condensed
+// preview: a centred Stage container holding Jump to, the How worlds
+// work rules, and one closed-by-default tier section per tier. Real
+// place data only, from WorldRepository.placeWorlds. No Stage
+// description line and no empty-state card: both were deleted from
+// the preview, so an empty store simply shows the tier sections with
+// their + controls to start.
+//
+// Two model notes, both deliberate and reversible. The sketch ladder
+// includes Galaxy, which the store had no tier for, so WorldTier
+// gained galaxy (tier is a string in placeTraits, not a Drift column,
+// so no migration; an older build reading "galaxy" falls back to
+// planet). City, Village, and Town are one stored settlement tier,
+// so a settlement world carries a settlementKind placeTrait; a world
+// without one shows in all three sections, labelled unsorted, until
+// it is edited to one kind — nothing is hidden, nothing is guessed.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,273 +25,394 @@ import 'package:front_porch_ai/models/lorebook.dart';
 import 'package:front_porch_ai/models/world.dart' as world_model;
 import 'package:front_porch_ai/providers/app_state.dart';
 import 'package:front_porch_ai/services/services.dart';
-import 'package:front_porch_ai/services/storage/settings/detail_level.dart';
+import 'package:front_porch_ai/ui/alice/alice_forest_background.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
+import 'package:front_porch_ai/ui/theme/app_colors.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 
-/// Alice Worlds: every place world from the real world store, grouped into
-/// hierarchy chains by root (a world with no parent in the store).
-class AliceWorldsScreen extends StatelessWidget {
+part 'worlds/alice_worlds_sections.dart';
+part 'worlds/alice_worlds_dialog.dart';
+
+class AliceWorldsScreen extends StatefulWidget {
   const AliceWorldsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer3<WorldRepository, CharacterRepository, StorageService>(
-      builder: (context, worldRepo, charRepo, storage, _) {
-        final places = worldRepo.placeWorlds;
-        final detail = storage.uiSettings.detailLevel;
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-          children: [
-            _PageHeader(
-              onNewWorld: () => _showNewWorldDialog(context, worldRepo),
-            ),
-            const SizedBox(height: 14),
-            if (places.isEmpty)
-              _EmptyState(
-                onNewWorld: () => _showNewWorldDialog(context, worldRepo),
-              ),
-            for (final chain in _rootChains(places))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: _WorldCard(
-                  chain: chain,
-                  characterCount: (world_model.World w) => charRepo.characters
-                      .where((c) => c.worldNames.contains(w.name))
-                      .length,
-                ),
-              ),
-            if (detail == DetailLevel.advanced) _contextPagingCard(),
-          ],
-        );
-      },
-    );
-  }
+  State<AliceWorldsScreen> createState() => _AliceWorldsScreenState();
 }
 
-/// One root world plus its descendant rows, depth-first, cycle-safe.
-class _ChainRow {
-  final world_model.World world;
-  final int depth;
-  const _ChainRow(this.world, this.depth);
-}
+class _AliceWorldsScreenState extends State<AliceWorldsScreen> {
+  final _scrollController = ScrollController();
+  final _sectionKeys = {
+    for (final section in _WorldsSection.values) section: GlobalKey(),
+  };
+  final _openSections = <_WorldsSection>{};
+  String? _selectedWorldId;
 
-List<List<_ChainRow>> _rootChains(List<world_model.World> worlds) {
-  final byId = {for (final w in worlds) w.id: w};
-  final roots = <world_model.World>[];
-  final seen = <String>{};
-  for (final w in worlds) {
-    final parentId = w.parentWorldId;
-    if (parentId == null ||
-        parentId.isEmpty ||
-        !byId.containsKey(parentId) ||
-        parentId == w.id) {
-      if (seen.add(w.id)) roots.add(w);
-    }
-  }
-  // Orphaned cycles (no reachable root): show them as their own card.
-  for (final w in worlds) {
-    if (seen.add(w.id)) roots.add(w);
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
-  final childrenOf = <String, List<world_model.World>>{};
-  for (final w in worlds) {
-    final parentId = w.parentWorldId;
-    if (parentId != null && parentId.isNotEmpty && byId.containsKey(parentId)) {
-      childrenOf.putIfAbsent(parentId, () => []).add(w);
-    }
-  }
-  for (final kids in childrenOf.values) {
-    kids.sort(
-      (a, b) => a.tier.index.compareTo(b.tier.index) != 0
-          ? a.tier.index.compareTo(b.tier.index)
-          : a.name.compareTo(b.name),
-    );
+  /// World position, for real: open [section], select [worldId] if
+  /// given, and scroll to the section after the frame lands.
+  void _focusSection(_WorldsSection section, {String? worldId}) {
+    setState(() {
+      _openSections.add(section);
+      if (worldId != null) _selectedWorldId = worldId;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _sectionKeys[section]?.currentContext;
+      if (context != null && mounted) {
+        Scrollable.ensureVisible(context, duration: Durations.short4);
+      }
+    });
   }
 
-  final chains = <List<_ChainRow>>[];
-  for (final root in roots) {
-    final rows = <_ChainRow>[];
-    final visited = <String>{};
-    void walk(world_model.World w, int depth) {
-      if (!visited.add(w.id)) return;
-      rows.add(_ChainRow(w, depth));
-      for (final kid in childrenOf[w.id] ?? const []) {
-        walk(kid, depth + 1);
+  void _jumpTo(_WorldsSection section) => _focusSection(section);
+
+  void _focusAdjacentAfterDelete(
+    _WorldsSection section,
+    List<world_model.World> before,
+    String deletedId,
+  ) {
+    final index = before.indexWhere((w) => w.id == deletedId);
+    world_model.World? adjacent;
+    if (index >= 0) {
+      if (index + 1 < before.length) {
+        adjacent = before[index + 1];
+      } else if (index > 0) {
+        adjacent = before[index - 1];
       }
     }
-
-    walk(root, 0);
-    chains.add(rows);
+    _focusSection(section, worldId: adjacent?.id);
+    if (adjacent == null) setState(() => _selectedWorldId = null);
   }
-  return chains;
-}
 
-class _PageHeader extends StatelessWidget {
-  final VoidCallback onNewWorld;
+  Future<void> _addWorld(
+    WorldRepository repo,
+    List<world_model.World> all, {
+    required _WorldsSection section,
+    world_model.World? parent,
+  }) async {
+    final created = await showWarmDialogOf<world_model.World>(
+      context,
+      builder: (_) => _WorldDialog(
+        initialSection: section,
+        initialParent: parent,
+        allWorlds: all,
+      ),
+    );
+    if (created == null || !mounted) return;
+    await repo.saveWorld(created);
+    if (!mounted) return;
+    final target = _WorldsSection.forWorld(created) ?? section;
+    _focusSection(target, worldId: created.id);
+  }
 
-  const _PageHeader({required this.onNewWorld});
+  Future<void> _editWorld(
+    WorldRepository repo,
+    List<world_model.World> all,
+    world_model.World world, {
+    _WorldsSection? fromSection,
+  }) async {
+    final edited = await showWarmDialogOf<world_model.World>(
+      context,
+      builder: (_) => _WorldDialog(
+        existing: world,
+        initialSection:
+            fromSection ??
+            _WorldsSection.forWorld(world) ??
+            _WorldsSection.planet,
+        allWorlds: all,
+      ),
+    );
+    if (edited == null || !mounted) return;
+    await repo.saveWorld(edited);
+    if (!mounted) return;
+    final target = _WorldsSection.forWorld(edited) ?? _WorldsSection.planet;
+    _focusSection(target, worldId: edited.id);
+  }
+
+  Future<void> _deleteWorld(
+    WorldRepository repo,
+    List<world_model.World> all,
+    world_model.World world,
+  ) async {
+    final confirmed = await showWarmDialog<bool>(
+      context,
+      title: 'Delete ${world.name}?',
+      destructive: true,
+      content: const WarmDialogText(
+        'This deletes the world itself. Worlds under it are not '
+        'deleted; they become top-level until you give them a parent.',
+      ),
+      actions: [
+        warmDialogCancel(context),
+        warmDialogConfirm(
+          context,
+          label: 'Delete',
+          destructive: true,
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ],
+    );
+    if (confirmed != true || !mounted) return;
+    final section = _WorldsSection.forWorld(world);
+    final before = section == null
+        ? <world_model.World>[]
+        : _sectionWorlds(section, all);
+    await repo.deleteWorld(world);
+    if (!mounted) return;
+    if (section != null) {
+      _focusAdjacentAfterDelete(section, before, world.id);
+    } else {
+      setState(() => _selectedWorldId = null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final worlds = context.watch<WorldRepository>().placeWorlds;
+    final repo = context.read<WorldRepository>();
+    final selected = _selectedWorldId == null
+        ? null
+        : worlds.where((w) => w.id == _selectedWorldId).firstOrNull;
+    return AliceForestBackground(
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 18),
+            AliceTranslucentCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildStageHead(context, repo, worlds, selected),
+                  const SizedBox(height: 18),
+                  _buildJumpTo(context),
+                  const SizedBox(height: 18),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth < 800) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildRules(context),
+                            const SizedBox(height: 18),
+                            _buildBoard(context, repo, worlds),
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 300, child: _buildRules(context)),
+                          const SizedBox(width: 18),
+                          Expanded(child: _buildBoard(context, repo, worlds)),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/images/rabbit-hole-icon/128.png',
+            width: 96,
+            height: 96,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stack) => const SizedBox(
+              width: 96,
+              height: 96,
+              child: Icon(Icons.public_rounded, size: 48),
+            ),
+          ),
+        ),
+        const SizedBox(width: 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AliceScreenTitle(title: 'Worlds'),
-              const SizedBox(height: 4),
+              const Text(
+                'Worlds',
+                style: TextStyle(fontSize: 34, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
               Text(
-                'Widest to narrowest. Descriptions live on disk and page into '
-                'the story only when a scene needs them — your detail level '
-                'decides how deep.',
-                style: theme.textTheme.bodySmall?.copyWith(
+                'Where your stories are set.',
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.hintColor,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
-        AliceButton(label: 'New world', onPressed: onNewWorld),
       ],
     );
   }
-}
 
-class _EmptyState extends StatelessWidget {
-  final VoidCallback onNewWorld;
-
-  const _EmptyState({required this.onNewWorld});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return AliceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AliceSectionHead(
-            title: 'No worlds yet',
-            subtitle: 'Build your first place to start mapping it out',
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Worlds nest widest to narrowest: Stage → Universe → Planet → '
-            'Continent → City/Village/Town. Add a top-level world first, '
-            'then hang places beneath it.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
-          ),
-          const SizedBox(height: 12),
-          AliceButton(label: 'New world', onPressed: onNewWorld, block: true),
-        ],
-      ),
-    );
-  }
-}
-
-class _WorldCard extends StatelessWidget {
-  final List<_ChainRow> chain;
-  final int Function(world_model.World) characterCount;
-
-  const _WorldCard({required this.chain, required this.characterCount});
-
-  @override
-  Widget build(BuildContext context) {
-    final root = chain.first.world;
-    final breadcrumb = chain.map((r) => r.world.tier.label).toSet().join(' → ');
-    return AliceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AliceSectionHead(title: root.name, subtitle: breadcrumb),
-          for (final row in chain)
-            _TierRow(
-              world: row.world,
-              depth: row.depth,
-              characterCount: characterCount(row.world),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TierRow extends StatelessWidget {
-  final world_model.World world;
-  final int depth;
-  final int characterCount;
-
-  const _TierRow({
-    required this.world,
-    required this.depth,
-    required this.characterCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final lorebookCount = world.lorebook.entries.length;
-    return Padding(
-      padding: EdgeInsets.only(left: depth * 18.0, top: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 118,
-            child: Text(
-              world.tier.label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.hintColor,
-                fontWeight: FontWeight.w700,
+  /// Centred Stage head: heading on top, three equal finished
+  /// buttons below it. No Stage + / - buttons, by Elaina's deletion.
+  Widget _buildStageHead(
+    BuildContext context,
+    WorldRepository repo,
+    List<world_model.World> worlds,
+    world_model.World? selected,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          'Stage',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: AliceButton(
+                label: '+ new world',
+                icon: Icons.add_rounded,
+                onPressed: () =>
+                    _addWorld(repo, worlds, section: _WorldsSection.universe),
               ),
             ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: AliceButton(
+                label: 'edit world',
+                ghost: true,
+                icon: Icons.edit_rounded,
+                onPressed: selected == null
+                    ? null
+                    : () => _editWorld(repo, worlds, selected),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: AliceDangerButton(
+                label: 'delete',
+                icon: Icons.delete_rounded,
+                onPressed: selected == null
+                    ? null
+                    : () => _deleteWorld(repo, worlds, selected),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildJumpTo(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const AliceSectionHead(title: 'Jump to'),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final section in _WorldsSection.values)
+              AliceButton(
+                label: section.title,
+                ghost: true,
+                small: true,
+                icon: section.icon,
+                onPressed: () => _jumpTo(section),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRules(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardOf(context),
+        border: Border.all(color: AppColors.borderSoftOf(context)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const AliceSectionHead(title: 'How worlds work'),
+          const SizedBox(height: 8),
+          _rule(
+            context,
+            'World position.',
+            'After an add, focus lands on the changed section. After a '
+                'delete, focus lands on what is adjacent to it — because '
+                'where you start the story is where you are.',
           ),
-          Expanded(
-            child: Column(
+          _rule(
+            context,
+            'Name it yourself.',
+            'Pressing + at any level prompts you to name that level. '
+                'The AI never fills it in for you, and each scale you '
+                'add is the boundary of what can be played in.',
+          ),
+          _rule(
+            context,
+            'Every field is + − your text.',
+            'Every field carries + to add an instance and − to remove '
+                'one, with your own text in it. At least one entry is kept.',
+          ),
+          Text(
+            'Nothing hidden. No show-all gates. Labels are always '
+            'visible; depth comes from scrolling and from these '
+            'collapsible sections.',
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.only(top: 14),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: AppColors.borderSoftOf(context)),
+              ),
+            ),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  world.name,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                Icon(
+                  Icons.menu_book_rounded,
+                  size: 20,
+                  color: AppColors.porchAmberOf(context),
                 ),
-                if (world.description.trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => context.read<AppState>().setIndex(2),
                     child: Text(
-                      world.description,
-                      style: theme.textTheme.bodySmall?.copyWith(
+                      'Lore Book lives in creator. The full lore book is '
+                      'in Creator\u2019s World section. Worlds is the '
+                      'place ladder itself.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.hintColor,
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      AliceChip(
-                        label:
-                            '$characterCount ${characterCount == 1 ? 'character' : 'characters'} here',
-                      ),
-                      AliceChip(
-                        label:
-                            '$lorebookCount ${lorebookCount == 1 ? 'lorebook entry' : 'lorebook entries'}',
-                      ),
-                      AliceButton(
-                        label: 'Visit in chat',
-                        ghost: true,
-                        small: true,
-                        onPressed: () => context.read<AppState>().setIndex(1),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),
@@ -287,108 +421,65 @@ class _TierRow extends StatelessWidget {
       ),
     );
   }
-}
 
-/// Advanced-only: how much of the hierarchy enters context per scene.
-Widget _contextPagingCard() {
-  return const AliceCard(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AliceSectionHead(
-          title: 'Context paging',
-          subtitle:
-              'How much of the hierarchy enters context per scene, by detail level',
-        ),
-        SizedBox(height: 8),
-        AliceKeyValue(label: 'Simple', value: "Current town + the MC's card"),
-        AliceKeyValue(
-          label: 'Balanced',
-          value: 'Town + continent, lorebook on keyword',
-        ),
-        AliceKeyValue(
-          label: 'Advanced',
-          value: 'Full chain, paged on demand per scene',
-        ),
-      ],
-    ),
-  );
-}
-
-/// Create-a-world dialog: name, tier, description. Saves into the real
-/// world store via [WorldRepository.saveWorld].
-void _showNewWorldDialog(BuildContext context, WorldRepository repo) {
-  final nameController = TextEditingController();
-  final descController = TextEditingController();
-  var tier = world_model.WorldTier.planet;
-
-  showDialog<void>(
-    context: context,
-    builder: (dialogContext) => StatefulBuilder(
-      builder: (ctx, setDialogState) {
-        final theme = Theme.of(ctx);
-        return AlertDialog(
-          title: const Text('New world'),
-          content: SizedBox(
-            width: 420,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: nameController,
-                  autofocus: true,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<world_model.WorldTier>(
-                  // ignore: deprecated_member_use
-                  value: tier,
-                  decoration: const InputDecoration(labelText: 'Tier'),
-                  items: [
-                    for (final t in world_model.WorldTier.values)
-                      DropdownMenuItem(value: t, child: Text(t.label)),
-                  ],
-                  onChanged: (t) => setDialogState(() => tier = t ?? tier),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Hang more places under this one from the world library.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.hintColor,
-                  ),
-                ),
-              ],
+  Widget _rule(BuildContext context, String title, String body) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '$title ',
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                if (name.isEmpty) return;
-                final world = world_model.World(
-                  name: name,
-                  description: descController.text.trim(),
-                  lorebook: Lorebook(entries: []),
-                )..tier = tier;
-                repo.saveWorld(world);
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Save world'),
+            TextSpan(
+              text: body,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+              ),
             ),
           ],
-        );
-      },
-    ),
-  );
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBoard(
+    BuildContext context,
+    WorldRepository repo,
+    List<world_model.World> worlds,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final section in _WorldsSection.values)
+          _TierSection(
+            key: _sectionKeys[section],
+            section: section,
+            open: _openSections.contains(section),
+            onHeaderTap: () => setState(() {
+              if (_openSections.contains(section)) {
+                _openSections.remove(section);
+              } else {
+                _openSections.add(section);
+              }
+            }),
+            worlds: _sectionWorlds(section, worlds),
+            allWorlds: worlds,
+            selectedWorldId: _selectedWorldId,
+            onSelect: (world) => setState(() => _selectedWorldId = world.id),
+            onAdd: () => _addWorld(repo, worlds, section: section),
+            onAddChild: (parent) {
+              final child = _childSection(section);
+              if (child == null) return;
+              _addWorld(repo, worlds, section: child, parent: parent);
+            },
+            onEdit: (world) =>
+                _editWorld(repo, worlds, world, fromSection: section),
+            onDelete: (world) => _deleteWorld(repo, worlds, world),
+          ),
+      ],
+    );
+  }
 }

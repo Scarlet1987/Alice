@@ -129,6 +129,15 @@ class World {
       ? placeTraits.remove('parentWorldId')
       : placeTraits['parentWorldId'] = v;
 
+  /// City, village, or town kind for a settlement-tier world, stored in
+  /// [placeTraits] like [tier]. Null means the kind was never set: the
+  /// world shows in the City, Village, and Town sections, labelled
+  /// unsorted, until it is edited to one kind. Nothing is hidden.
+  String? get settlementKind => placeTraits['settlementKind']?.toString();
+  set settlementKind(String? v) => (v == null || v.isEmpty)
+      ? placeTraits.remove('settlementKind')
+      : placeTraits['settlementKind'] = v;
+
   World({
     String? id,
     required this.name,
@@ -242,6 +251,7 @@ bool attachedWorldsAllowClimate(Iterable<World> worlds) {
 enum WorldTier {
   stage,
   universe,
+  galaxy,
   planet,
   continent,
   settlement,
@@ -255,6 +265,7 @@ extension WorldTierLabel on WorldTier {
   String get label => switch (this) {
     WorldTier.stage => 'Stage',
     WorldTier.universe => 'Universe',
+    WorldTier.galaxy => 'Galaxy',
     WorldTier.planet => 'Planet',
     WorldTier.continent => 'Continent',
     WorldTier.settlement => 'City / Village / Town',
@@ -265,7 +276,8 @@ extension WorldTierLabel on WorldTier {
   String get description => switch (this) {
     WorldTier.stage =>
       'The world the character creates — the details of the user\u2019s main world: the land, the broad strokes.',
-    WorldTier.universe => 'Contains planets; parent level above Planet.',
+    WorldTier.universe => 'Contains galaxies; parent level above Galaxy.',
+    WorldTier.galaxy => 'Contains planets; parent level above Planet.',
     WorldTier.planet =>
       'The finer details; holds the broad strokes for its continents (and extras).',
     WorldTier.continent => 'Child of a planet.',
@@ -278,7 +290,8 @@ extension WorldTierLabel on WorldTier {
   WorldTier? get parentTier => switch (this) {
     WorldTier.stage => null,
     WorldTier.universe => WorldTier.stage,
-    WorldTier.planet => WorldTier.universe,
+    WorldTier.galaxy => WorldTier.universe,
+    WorldTier.planet => WorldTier.galaxy,
     WorldTier.continent => WorldTier.planet,
     WorldTier.settlement => WorldTier.continent,
     WorldTier.district => WorldTier.settlement,
