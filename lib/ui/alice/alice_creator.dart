@@ -119,7 +119,7 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const AliceScreenTitle(
-                                title: 'Character creator',
+                                title: 'World, Lore and Details',
                               ),
                               const SizedBox(height: 2),
                               Text(

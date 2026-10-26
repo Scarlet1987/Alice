@@ -180,7 +180,12 @@ class _AliceNavRail extends StatelessWidget {
           ),
           _navButton(context, 0, Icons.home_rounded, 'Home'),
           _navButton(context, 1, Icons.chat_bubble_rounded, 'Chat'),
-          _navButton(context, 2, Icons.person_add_rounded, 'Creator'),
+          _navButton(
+            context,
+            2,
+            Icons.person_add_rounded,
+            'World, Lore and Details',
+          ),
           _navButton(context, 3, Icons.public_rounded, 'Worlds'),
           _navButton(context, 4, Icons.settings_rounded, 'Settings'),
           const Spacer(),
