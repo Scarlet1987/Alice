@@ -4,6 +4,8 @@
 // Alice edition shared widgets. Flat, simple, no runtime font loading,
 // minimal shadows. Colors come from AppColors (already teal).
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:front_porch_ai/ui/alice/alice_motion.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
@@ -348,66 +350,82 @@ class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderOf(context)),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => setState(() => _open = !_open),
-            borderRadius: BorderRadius.circular(14),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _AliceGradientTitle(
-                          title: widget.title,
-                          tint:
-                              widget.barColor ??
-                              AppColors.porchAmberOf(context),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (widget.subtitle != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              widget.subtitle!,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                color: Theme.of(context).hintColor,
+    // Picked lane, 2026-10-26: translucent card, same as Gear by limb
+    // and the other notes-board cards — 88% fill + blur, radius 28,
+    // border #35473F. Previously this section was border-only and
+    // completely transparent, so Personality looked transparent while
+    // Gear looked solid on the same window. That scatter is gone:
+    // every section card on this window is now the same card.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          margin: const EdgeInsets.only(top: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF22332D).withValues(alpha: 0.88),
+            border: Border.all(color: const Color(0xFF35473F)),
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Column(
+            children: [
+              InkWell(
+                onTap: () => setState(() => _open = !_open),
+                borderRadius: BorderRadius.circular(14),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 11,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _AliceGradientTitle(
+                              title: widget.title,
+                              tint:
+                                  widget.barColor ??
+                                  AppColors.porchAmberOf(context),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          ),
-                      ],
-                    ),
+                            if (widget.subtitle != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  widget.subtitle!,
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        _open
+                            ? Icons.keyboard_arrow_down_rounded
+                            : Icons.keyboard_arrow_right_rounded,
+                        color: Theme.of(context).hintColor,
+                      ),
+                    ],
                   ),
-                  Icon(
-                    _open
-                        ? Icons.keyboard_arrow_down_rounded
-                        : Icons.keyboard_arrow_right_rounded,
-                    color: Theme.of(context).hintColor,
-                  ),
-                ],
+                ),
               ),
-            ),
+              if (_open)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+                  child: widget.child,
+                ),
+            ],
           ),
-          if (_open)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-              child: widget.child,
-            ),
-        ],
+        ),
       ),
     );
   }
