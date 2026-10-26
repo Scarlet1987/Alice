@@ -129,6 +129,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/rabbit-hole-icon/
     - assets/backgrounds/
     - assets/audio/
     # React PWA (built from web_ui/ by `npm run build`). Served by the web

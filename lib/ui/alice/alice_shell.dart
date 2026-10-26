@@ -153,6 +153,8 @@ class _AliceNavRail extends StatelessWidget {
                     width: 36,
                     height: 36,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox(width: 36, height: 36),
                   ),
                 ),
                 const SizedBox(width: 10),
