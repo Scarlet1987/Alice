@@ -68,24 +68,26 @@ jobs:
           echo "Setting version to: $FLUTTER_VERSION"
           # Use the full version (including 4th part if present) for the Dart display constant
           DISPLAY_VERSION="$VERSION"
+          # Route A (2026-10-28): pubspec.yaml carries no version. Persist the
+          # build name/number for the later `flutter build` steps instead.
+          echo "FLUTTER_BUILD_NAME=${FLUTTER_VERSION%%+*}" >> "$GITHUB_ENV"
+          echo "FLUTTER_BUILD_NUMBER=${FLUTTER_VERSION##*+}" >> "$GITHUB_ENV"
           # Use Python for cross-platform reliability (sed can fail silently with Windows \r\n line endings)
           python3 -c "
           import re
-          # Update pubspec.yaml
-          with open('pubspec.yaml', 'r') as f: content = f.read()
-          content = re.sub(r'^version: .*$', 'version: $FLUTTER_VERSION', content, flags=re.MULTILINE)
-          with open('pubspec.yaml', 'w') as f: f.write(content)
           # Patch only the appVersion constant (preserve all committed getters and comments).
           # This eliminates duplication and prevents compile breaks when app_version.dart evolves.
+          # Route A: do NOT write a version to pubspec.yaml; appVersion is the single source of truth.
           with open('lib/app_version.dart', 'r') as f: content = f.read()
           content = re.sub(r\"^const String appVersion = '.*';\$\", "const String appVersion = '$DISPLAY_VERSION';", content, flags=re.MULTILINE)
           with open('lib/app_version.dart', 'w') as f: f.write(content)
           "
-          # Verify both were updated (visible in CI logs)
-          echo "Verifying pubspec version:"
-          grep '^version:' pubspec.yaml
+          # Verify the version constant was updated (visible in CI logs).
+          # Route A: there is no pubspec version to verify.
           echo "Verifying Dart version constant:"
           cat lib/app_version.dart
+          echo "Build name/number for flutter build:"
+          echo "FLUTTER_BUILD_NAME=${FLUTTER_VERSION%%+*} FLUTTER_BUILD_NUMBER=${FLUTTER_VERSION##*+}"
 
       - name: Install dependencies
         run: flutter pub get
@@ -108,13 +110,13 @@ jobs:
 
       - name: Build Application
         if: matrix.platform != 'linux'
-        run: flutter build ${{ matrix.platform }} --release
+        run: flutter build ${{ matrix.platform }} --release --build-name=${{ env.FLUTTER_BUILD_NAME }} --build-number=${{ env.FLUTTER_BUILD_NUMBER }}
 
       - name: Build Application (Linux)
         if: matrix.platform == 'linux'
         env:
           CXXFLAGS: "-Wno-unknown-warning-option"
-        run: flutter build linux --release
+        run: flutter build linux --release --build-name=${{ env.FLUTTER_BUILD_NAME }} --build-number=${{ env.FLUTTER_BUILD_NUMBER }}
 
       # ── Guard: the Linux bundle MUST be able to reach SQLite ──
       # v1.1.0 shipped with no SQLite in the bundle and bricked every Linux

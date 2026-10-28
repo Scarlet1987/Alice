@@ -202,6 +202,13 @@ jobs:
           echo "Version written: $VERSION"
           echo "Current lib/app_version.dart (after patch):"
           cat lib/app_version.dart
+          # Route A (2026-10-28): pubspec.yaml carries no version, so persist
+          # the build name/number for the later `flutter build` steps.
+          # First 3 segments = build name, last segment = build number.
+          NIGHTLY_BASE=$(echo "$VERSION" | cut -d. -f1-3)
+          NIGHTLY_BUILD=$(echo "$VERSION" | rev | cut -d. -f1 | rev)
+          echo "FLUTTER_BUILD_NAME=$NIGHTLY_BASE" >> "$GITHUB_ENV"
+          echo "FLUTTER_BUILD_NUMBER=$NIGHTLY_BUILD" >> "$GITHUB_ENV"
 
       - name: Prepare Friendly Release Notes (for in-app update dialog)
         id: release_notes
@@ -255,13 +262,13 @@ jobs:
 
       - name: Build Application
         if: matrix.platform != 'linux'
-        run: flutter build ${{ matrix.platform }} --release
+        run: flutter build ${{ matrix.platform }} --release --build-name=${{ env.FLUTTER_BUILD_NAME }} --build-number=${{ env.FLUTTER_BUILD_NUMBER }}
 
       - name: Build Application (Linux)
         if: matrix.platform == 'linux'
         env:
           CXXFLAGS: "-Wno-unknown-warning-option"
-        run: flutter build linux --release
+        run: flutter build linux --release --build-name=${{ env.FLUTTER_BUILD_NAME }} --build-number=${{ env.FLUTTER_BUILD_NUMBER }}
 
       # ── Guard: the Linux bundle MUST be able to reach SQLite ──
       # v1.1.0 shipped with no SQLite in the bundle and bricked every Linux
