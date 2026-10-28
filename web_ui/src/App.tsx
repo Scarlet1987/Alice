@@ -31,7 +31,6 @@ import { StoryLorePage } from './pages/StoryLorePage';
 import { StoryRunLogPage } from './pages/StoryRunLogPage';
 import { ModelsPage } from './pages/ModelsPage';
 import { AccountPage } from './pages/AccountPage';
-import { StoopSection } from './pages/stoop/StoopSection';
 import { restoreSpellCheckLang, syncSpellCheckLang } from './spellCheckLang';
 
 restoreSpellCheckLang();
@@ -86,7 +85,6 @@ export function App() {
         <Route path="/stories/:id/lore" element={<StoryLorePage />} />
         <Route path="/stories/:id/log" element={<StoryRunLogPage />} />
         <Route path="/models" element={<ModelsPage />} />
-        <Route path="/stoop/*" element={<StoopSection />} />
         <Route path="/edit/:id" element={<CharacterEditPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

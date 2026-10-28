@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Source scans for the 1.3 medium follow-ups that are wiring, not math:
-// web Chaos SPIN NOW, Stoop Discussion fail-closed, reunification copies
-// group_members with the group row.
+// web Chaos SPIN NOW, reunification copies group_members with the group row.
+// (Stoop Discussion test removed 2026-10-28 with the Stoop removal.)
 
 import 'dart:io';
 
@@ -16,14 +16,6 @@ void main() {
     ).readAsStringSync();
     expect(src, contains('SPIN NOW'));
     expect(src, contains('/api/chat/chance-time/spin'));
-  });
-
-  test('Stoop Discussion treats commentsEnabled as === true (fail-closed)', () {
-    final src = File(
-      'web_ui/src/pages/stoop/StoopDiscussion.tsx',
-    ).readAsStringSync();
-    expect(src, contains('detail.commentsEnabled === true'));
-    expect(src, contains('setEnabled(false)'));
   });
 
   test('reunification copies group_members with the group row', () {

@@ -123,39 +123,5 @@ void main() {
       reason: 'the listener must come off before the controller is disposed',
     );
   });
-
-  test('Stoop browse drops responses from a superseded filter', () {
-    // A page load in flight when the user taps another type chip used to
-    // append its cards on top of the new filter's grid and desync _page.
-    final src = _read('lib/ui/pages/repository/stoop_browse_view.dart');
-    final loadAll = _between(
-      src,
-      'Future<void> _loadAll() async {',
-      'Future<void> _loadMore() async {',
-      what: '_loadAll',
-    );
-    expect(
-      loadAll,
-      contains('++_reqGen'),
-      reason: 'a full reload must claim a new request generation',
-    );
-    expect(
-      loadAll,
-      contains('gen != _reqGen'),
-      reason: 'two overlapping _loadAlls race and the slower response wins, '
-          'leaving the grid showing a filter the chips no longer show',
-    );
-    final loadMore = _between(
-      src,
-      'Future<void> _loadMore() async {',
-      'void _onScroll() {',
-      what: '_loadMore',
-    );
-    expect(
-      loadMore,
-      contains('gen != _reqGen'),
-      reason: 'an in-flight page append lands on top of a newer filter, '
-          'mixing cards into the grid and skipping a page',
-    );
-  });
+  // Stoop browse test removed 2026-10-28 with the Stoop removal.
 }
