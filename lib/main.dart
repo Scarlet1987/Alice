@@ -78,6 +78,7 @@ import 'package:front_porch_ai/ui/widgets/db_init_error_app.dart';
 // extensions. Order below mirrors the original file's top-to-bottom layout.
 part 'main.startup.dart';
 part 'main.providers.dart';
+part 'main.providers.core.dart';
 part 'main.lifecycle.dart';
 part 'main.recovery.dart';
 part 'main.migration.dart';

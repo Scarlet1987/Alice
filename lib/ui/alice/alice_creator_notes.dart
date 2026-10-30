@@ -19,85 +19,7 @@ import 'package:front_porch_ai/ui/alice/alice_creator_draft.dart';
 import 'package:front_porch_ai/ui/alice/alice_forest_background.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
 import 'package:front_porch_ai/ui/creator/sections/kardashev_section.dart';
-
-/// Layman's rubric, wording exactly as in the approved preview.
-const _kardashevRubric = <String, String>{
-  'Type 1 — Planetary':
-      'Controls all the energy of one planet. Can tame weather, '
-      'volcanoes, and earthquakes, and power everything from the '
-      'planet itself. Can\u2019t yet harness a whole star.',
-  'Type 2 — Stellar':
-      'Controls all the energy of one star. Can build a Dyson swarm '
-      'around its sun, settle a whole solar system, and travel easily '
-      'between planets. Can\u2019t yet use other stars at scale.',
-  'Type 3 — Galactic':
-      'Controls all the energy of one galaxy. Can travel between '
-      'stars, use billions of stars at once, and move planets. '
-      'Can\u2019t yet leave its galaxy or control another one.',
-  'All skills are earned':
-      'No type hands a character everything at once. No matter how '
-      'advanced the civilization is, skills are earned in the story.',
-  'Type 4 — Universal':
-      'Controls all the energy of one universe. Can cross the '
-      'universe, bend space and time, and use whole galaxies like '
-      'tools. Can\u2019t yet leave its universe.',
-  'Type 5 — Multiversal':
-      'Controls energy across many universes. Can step between '
-      'realities and use more than one universe at once. Its only '
-      'real limit is what you decide it is.',
-  'Beyond — You define it':
-      'No preset power level. You name what this civilization '
-      'commands, and the gear check measures against your own '
-      'description instead of a fixed scale.',
-};
-
-class _NotesSection {
-  const _NotesSection({
-    required this.title,
-    required this.fields,
-    this.subheading,
-    this.subfields = const [],
-  });
-
-  final String title;
-  final List<String> fields;
-  final String? subheading;
-  final List<String> subfields;
-}
-
-const _notesSections = [
-  _NotesSection(
-    title: 'Accessories',
-    fields: [
-      'Earrings and piercings',
-      'Necklace',
-      'Amulet',
-      'Collar',
-      'Thigh accessories',
-    ],
-  ),
-  _NotesSection(title: 'Armor', fields: ['Chest', 'Torso', 'Legs', 'Thigh']),
-  _NotesSection(
-    title: 'Weapons',
-    fields: ['Long range', 'Close range', 'Intimate range'],
-  ),
-  _NotesSection(
-    title: 'Clothing',
-    fields: ['Intimates', 'Style of intimates'],
-    subheading: 'Outer wear',
-    subfields: ['Head', 'Torso', 'Chest', 'Legs', 'Feet'],
-  ),
-  _NotesSection(
-    title: 'Items',
-    fields: [],
-    subheading: 'Consumables',
-    subfields: [
-      'Health potion',
-      'Mana potion',
-      'Consumable other — food, water, etc.',
-    ],
-  ),
-];
+import 'package:front_porch_ai/ui/alice/alice_creator_notes_data.dart';
 
 /// The notes-structure board for the Main Character tab.
 class CreatorNotesBoard extends StatefulWidget {
@@ -142,7 +64,7 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
   void _showAll() {
     setState(() {
       _gearOpen = true;
-      for (final section in _notesSections) {
+      for (final section in notesSections) {
         _open[section.title] = true;
       }
     });
@@ -183,7 +105,7 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
               ),
               if (_gearOpen) ...[
                 const SizedBox(height: 8),
-                for (final section in _notesSections)
+                for (final section in notesSections)
                   _gearSection(context, section),
               ],
             ],
@@ -366,7 +288,7 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
                       padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
                       child: Column(
                         children: [
-                          for (final entry in _kardashevRubric.entries)
+                          for (final entry in kardashevRubric.entries)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: RichText(
@@ -396,7 +318,7 @@ class _CreatorNotesBoardState extends State<CreatorNotesBoard> {
     );
   }
 
-  Widget _gearSection(BuildContext context, _NotesSection section) {
+  Widget _gearSection(BuildContext context, NotesSection section) {
     final open = _open[section.title] ?? false;
     return Container(
       key: _keyFor(section.title),

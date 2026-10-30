@@ -45,6 +45,7 @@ part 'kobold_service_exit.dart';
 part 'kobold_service_idle.dart';
 part 'kobold_service_keeper.dart';
 part 'kobold_service_process.dart';
+part 'kobold_service_spawn.dart';
 part 'kobold_service_requests.dart';
 part 'kobold_service_speed.dart';
 

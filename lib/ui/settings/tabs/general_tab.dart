@@ -32,6 +32,7 @@ import 'package:front_porch_ai/ui/settings/dialogs/color_picker_dialog.dart';
 import 'package:front_porch_ai/ui/dialogs/update_dialog.dart';
 
 part 'general_tab.about.dart';
+part 'general_tab.model_instructions.dart';
 
 /// Settings → General.
 class GeneralTab extends StatelessWidget {
@@ -391,106 +392,7 @@ class GeneralTab extends StatelessWidget {
           const SizedBox(height: 8),
           _buildPorchLifePointer(context),
           const SizedBox(height: 24),
-          const SectionHeader('Model Instructions'),
-          const SizedBox(height: 8),
-          // Prompt library row simplified for smallest (full chips/load/save use the extracted dialogs)
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: null,
-                  isExpanded: true,
-                  hint: const Text(
-                    'Load saved prompt...',
-                    style: TextStyle(fontSize: 13),
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.cardOf(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                  ),
-                  items: storageService.presetSettings.savedPrompts
-                      .map(
-                        (p) => DropdownMenuItem<String>(
-                          value: p['name'],
-                          child: Text(
-                            p['name']!,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (name) {
-                    if (name != null) {
-                      storageService.presetSettings.loadSavedPrompt(name, (p) {
-                        storageService.generationSettings.setSystemPrompt(p);
-                      });
-                      systemPromptController.text =
-                          storageService.generationSettings.systemPrompt;
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                tooltip: 'Save current prompt',
-                icon: Icon(Icons.save, color: AppColors.logWarn),
-                onPressed: () => showSavePromptDialog(context, storageService),
-              ),
-              IconButton(
-                tooltip: 'Delete a saved prompt',
-                icon: Icon(Icons.delete_outline, color: AppColors.logError),
-                onPressed: () =>
-                    showDeletePromptDialog(context, storageService),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Built-in preset chips (simplified inline for smallest; full would use PresetChip widget)
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              _presetChip(
-                '📡 API Default',
-                defaultApiSystemPrompt,
-                storageService,
-              ),
-              _presetChip(
-                '🖥️ KoboldCPP',
-                defaultKoboldSystemPrompt,
-                storageService,
-              ),
-              _presetChip(
-                '👥 Group Chat',
-                defaultGroupSystemPrompt,
-                storageService,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          AppTextField(
-            controller: systemPromptController,
-            maxLines: 5,
-            style: theme.textTheme.bodyMedium,
-            decoration: InputDecoration(
-              hintText: 'System Prompt...',
-              hintStyle: TextStyle(color: theme.textTheme.bodySmall?.color),
-              filled: true,
-              fillColor: AppColors.cardOf(context),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onChanged: (val) =>
-                storageService.generationSettings.setSystemPrompt(val),
-          ),
+          _buildModelInstructionsSection(context),
 
           const SectionHeader('About & License'),
           _buildAboutSection(context),

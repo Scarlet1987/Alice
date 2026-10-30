@@ -125,51 +125,7 @@ Widget _buildRootWidget(AppDatabase db, bool needsMigration) {
   return riverpod.ProviderScope(
     child: MultiProvider(
       providers: [
-        Provider<AppDatabase>.value(value: db),
-        Provider<bool>.value(value: needsMigration), // migration flag
-        ChangeNotifierProvider(create: (_) => StorageService()),
-        // AppState owns only transient UI state (selected tab index).
-        // Theme / dark mode is now driven exclusively by StorageService (single source of truth,
-        // persisted, notifies after async prefs load). This eliminates the prior race + glue bugs.
-        ChangeNotifierProvider(create: (_) => AppState()),
-        ChangeNotifierProxyProvider<StorageService, DownloadManager>(
-          create: (context) => DownloadManager(
-            targetDir: Provider.of<StorageService>(
-              context,
-              listen: false,
-            ).modelsDir.path,
-          ),
-          // Re-point the target dir on every storage notify (notably the one
-          // after async init sets rootPath) so downloads always land in the
-          // configured models folder, not a relative path captured at create.
-          update: (context, storage, previous) =>
-              (previous ?? DownloadManager(targetDir: storage.modelsDir.path))
-                ..targetDir = storage.modelsDir.path,
-        ),
-        ChangeNotifierProxyProvider<StorageService, KoboldService>(
-          create: (context) => KoboldService(
-            Provider.of<StorageService>(context, listen: false),
-          ),
-          update: (context, storage, previous) =>
-              previous ?? KoboldService(storage),
-        ),
-        ChangeNotifierProvider(
-          create: (context) {
-            final hardware = HardwareService();
-            context.read<KoboldService>()
-              ..hardwareInfo = (() => hardware.hardwareInfo)
-              ..hardwareWhenKnown = hardware.whenKnown
-              ..readFreeMemory = () async {
-                final storage = context.read<StorageService>();
-                final free = await hardware.readFreeMemory(
-                  gpuId: storage.backendSettings.gpuId,
-                );
-                hardware.freeBeforeEngine = free;
-                return free;
-              };
-            return hardware;
-          },
-        ),
+        ..._coreProviders(db, needsMigration),
         ChangeNotifierProxyProvider<StorageService, CharacterRepository>(
           create: (context) => CharacterRepository(
             db,

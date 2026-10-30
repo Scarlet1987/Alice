@@ -379,3 +379,120 @@ extension ChatServiceSceneGuest on ChatService {
   /// The candidate the popup should show (null = nothing pending).
   DetectedCharacter? get pendingGuestDetection => _sceneGuest.pendingDetection;
 }
+
+/// Scene-guest minting helpers, moved from chat_service_guest_flow.dart
+/// so that file stays under the 500-line god-file bar. No behaviour change.
+extension ChatServiceGuestMint on ChatService {
+  Future<GuestMintResult> _mintSceneGuest(
+    String name,
+    String concept, {
+    void Function(String step)? onStatus,
+    Map<String, String> overrides = const {},
+  }) async {
+    final repo = _characterRepository;
+    if (repo == null) return const GuestMintResult.failure('no repository');
+    return SceneGuestFactory(repo, _storageService).mint(
+      name: name,
+      concept: concept,
+      sceneGrounding: _buildGuestGrounding(name),
+      llm: testLlmServiceOverride ?? _llmProvider?.activeService,
+      host: _mintHost,
+      onStatus: onStatus,
+      overrides: overrides,
+    );
+  }
+
+  /// Collect the in-chat narration that portrays [name] so a minted Scene Guest
+  /// is built from how the character actually appeared — not invented from a
+  /// bare name (which produced cards with nothing in common with the scene).
+  /// Returns the most recent lines that mention the guest (by their first name,
+  /// word-boundary), bounded for tokens; empty when the name hasn't come up yet.
+  String _buildGuestGrounding(String name) {
+    final first = name.trim().split(RegExp(r'\s+')).first;
+    if (first.length < 2) return '';
+    // If the guest's first name overlaps the host's or the user's name, the
+    // name-matched excerpts are dominated by the host/user, and grounding would
+    // build the guest FROM the host's portrayal (the "guest IS the host" bug).
+    // Skip grounding in that case and let concept-only generation handle it.
+    final firstLc = first.toLowerCase();
+    final hostFirst = (_mintHost?.name ?? '')
+        .trim()
+        .split(RegExp(r'\s+'))
+        .first
+        .toLowerCase();
+    final userFirst = _userPersonaService.persona.name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .first
+        .toLowerCase();
+    if (firstLc == hostFirst || firstLc == userFirst) return '';
+    final re = RegExp(
+      r'\b' + RegExp.escape(first) + r'\b',
+      caseSensitive: false,
+    );
+    final hits = <String>[];
+    for (final m in _messages) {
+      if (m.sender == 'System') continue;
+      final t = m.displayText.trim();
+      if (t.isEmpty || !re.hasMatch(t)) continue;
+      hits.add(t);
+    }
+    if (hits.isEmpty) return '';
+    final recent = hits.length > 10 ? hits.sublist(hits.length - 10) : hits;
+    var joined = recent.join('\n---\n');
+    const cap = 4000;
+    if (joined.length > cap) joined = joined.substring(joined.length - cap);
+    return joined;
+  }
+
+  /// Re-resolve `_sceneGuest.cards` from `_sceneGuest.ids` using the repository.
+  /// Called whenever the id list changes or on session load. Drops ids that no
+  /// longer resolve (e.g. the guest character was deleted from the library).
+  ///
+  /// IMPORTANT: a guest is NOT scenario-stripped on its shared library card here
+  /// (getCharacterCardById returns the repository's live reference — mutating it
+  /// would corrupt the character for when it's opened as a normal host). The
+  /// guest's scenario is instead blanked only in the prompt at guest-turn time
+  /// (see `guestSpeaker != null` in `_generateResponse`).
+  Future<void> _resolveSceneGuestCards() async {
+    if (_disposed) return;
+    final repo = _characterRepository;
+    if (repo == null) return;
+    // Never run two passes at once: each awaits per-id DB reads and then mutates
+    // the shared id/card lists, so overlapping passes could read a half-mutated
+    // list or race the DB. Coalesce concurrent requests into one trailing re-run.
+    if (_sceneGuest.resolving) {
+      _sceneGuest.resolvePending = true;
+      return;
+    }
+    final token = _currentSessionId;
+    _sceneGuest.resolving = true;
+    try {
+      do {
+        _sceneGuest.resolvePending = false;
+        final resolved = <CharacterCard>[];
+        final validIds = <String>[];
+        for (final id in List<String>.from(_sceneGuest.ids)) {
+          if (_sceneChanged(token)) {
+            return; // disposed or chat switched mid-pass
+          }
+          final card = await repo.getCharacterCardById(id);
+          if (card != null) {
+            resolved.add(card);
+            validIds.add(id);
+          }
+        }
+        if (_sceneChanged(token)) return;
+        _sceneGuest.ids
+          ..clear()
+          ..addAll(validIds);
+        _sceneGuest.cards
+          ..clear()
+          ..addAll(resolved);
+        notifyListeners();
+      } while (_sceneGuest.resolvePending && !_disposed);
+    } finally {
+      _sceneGuest.resolving = false;
+    }
+  }
+}
