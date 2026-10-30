@@ -1,0 +1,103 @@
+# Quarantined test files, from CI run 40744899304 (commit 902d7a8, Oct 28, 2026)
+# 207 failures: 40 load-failed files + 167 named tests, grouped by file here.
+# File-level quarantine: a file listed here moves WHOLE to the quarantine job,
+# including any passing tests in that same file. Those passing tests are not
+# lost — they run in the quarantine job, non-blocking, until the file is
+# removed from this list after its failures are fixed.
+# To un-quarantine a file: delete its line here, in its own commit, after
+# its tests pass in the quarantine job.
+# Do NOT add a file here to make a test green without a failing-test reason.
+test/hygiene/raw_dialogs_ratchet_test.dart
+test/hygiene/god_file_ratchet_test.dart
+test/hygiene/raw_colors_ratchet_test.dart
+test/ui/dialogs/city96_loader_dialog_test.dart
+test/ui/pages/styled_text_controller_api_test.dart
+test/ui/pages/world_create_dialog_footer_test.dart
+test/ui/pages/world_lore_from_character_test.dart
+test/ui/avatar_creation/avatar_prompt_rules_test.dart
+test/ui/avatar_creation/avatar_pack_plan_test.dart
+test/ui/avatar_creation/avatar_creation_controller_test.dart
+test/ui/settings/general_tab_preset_chip_test.dart
+test/ui/settings/settings_dropdown_follows_kept_reload_test.dart
+test/ui/settings/backend_tab_order_test.dart
+test/ui/settings/kobold_status_card_manual_layers_test.dart
+test/ui/settings/kobold_status_card_ceiling_test.dart
+test/ui/settings/settings_preset_kept_for_its_model_test.dart
+test/ui/settings/kobold_status_card_backend_test.dart
+test/ui/settings/kobold_status_card_test.dart
+test/ui/settings/settings_model_dropdown_last_used_test.dart
+test/ui/settings/settings_advanced_context_box_test.dart
+test/ui/settings/settings_browse_preset_reloads_test.dart
+test/ui/settings/kobold_status_card_swa_test.dart
+test/ui/settings/settings_reload_refused_test.dart
+test/ui/settings/settings_start_keeps_saved_launch_settings_test.dart
+test/ui/settings/kobold_status_card_leave_test.dart
+test/ui/settings/kobold_status_card_speed_test_test.dart
+test/ui/image_studio/expression_pack_dialog_test.dart
+test/ui/image_studio/expression_prompt_rules_pack_journey_test.dart
+test/ui/image_studio/expression_workspace_test.dart
+test/ui/image_studio/studio_dialog_desk_test.dart
+test/ui/image_studio/workspace_description_guard_test.dart
+test/ui/image_studio/expression_workspace_review_test.dart
+test/ui/image_studio/studio_comfy_address_test.dart
+test/ui/image_studio/studio_desk_a1111_refresh_test.dart
+test/ui/image_studio/studio_graph_filter_test.dart
+test/ui/image_studio/draw_things_desk_catalog_test.dart
+test/ui/image_studio/studio_model_sheet_test.dart
+test/ui/image_studio/studio_desk_settings_test.dart
+test/ui/image_studio/studio_desk_test.dart
+test/ui/image_studio/gguf_support_confirmation_live_test.dart
+test/golden/emotion/emotion_labels_golden_test.dart
+test/ui/alice_home_test.dart
+test/services/expression_prompt_rules_flight_test.dart
+test/services/web/image_desk_catalog_test.dart
+test/services/web/expression_pack_routes_test.dart
+test/services/web/image_loader_support_routes_test.dart
+test/services/web/image_desk_edit_test.dart
+test/services/web/image_desk_routes_test.dart
+test/services/web/local_model_unreadable_test.dart
+test/services/web/image_desk_graph_test.dart
+test/services/web/local_model_facade_test.dart
+test/services/web/local_model_measured_test.dart
+test/services/web/city96_no_ask_test.dart
+test/services/web/image_installed_choice_cache_test.dart
+test/services/web/image_facade_city96_test.dart
+test/services/web/local_model_manual_layers_test.dart
+test/services/web/local_model_short_model_test.dart
+test/services/image_gen_generate_test.dart
+test/services/image_gen_remote_host_test.dart
+test/services/kobold/kobold_status_facts_manual_layers_test.dart
+test/services/kobold/kobold_status_facts_backend_test.dart
+test/services/capability/model_slot_split_test.dart
+test/services/capability/comfy_pack_saved_edit_test.dart
+test/services/image/studio_desk_readiness_test.dart
+test/services/image/comfy_city96_existing_support_test.dart
+test/services/image/qwen_edit_full_denoise_test.dart
+test/services/image/comfy_city96_portable_locator_test.dart
+test/services/image/studio_graph_model_filter_test.dart
+test/services/image/gguf_loader_suite_test.dart
+test/services/image/comfy_node_list_retry_test.dart
+test/services/image/gguf_review_regression_test.dart
+test/services/image/comfy_chained_edit_prompt_test.dart
+test/services/image/comfy_city96_loader_dirs_test.dart
+test/services/image/gguf_workflow_compat_test.dart
+test/services/image/qwen_latent_edit_graph_menu_test.dart
+test/services/image/comfy_image_compare_output_test.dart
+test/services/image/comfy_error_wording_test.dart
+test/services/image/comfy_city96_gate_test.dart
+test/services/image/studio_workflow_resolve_test.dart
+test/services/image/comfy_subgraph_widget_values_test.dart
+test/services/image/comfy_shift_default_test.dart
+test/services/image/studio_desk_picks_test.dart
+test/services/image/comfy_reroute_convert_test.dart
+test/services/image/studio_installed_choice_test.dart
+test/services/image/comfy_workflow_adapt_test.dart
+test/services/image/comfy_saved_gguf_edit_test.dart
+test/services/image/comfy_workflow_convert_test.dart
+test/services/image/comfy_template_prompt_order_test.dart
+test/services/image/comfy_one_path_test.dart
+test/services/image/studio_graph_menu_test.dart
+test/services/image/expression_pack_flight_test.dart
+test/services/image/comfy_cancel_test.dart
+test/deps/dependency_floor_test.dart
+test/services/image/image_job_pins_test.dart
