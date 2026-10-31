@@ -31,6 +31,7 @@ import 'package:front_porch_ai/ui/dialogs/pick_character_lore_entries_dialog.dar
 import 'package:front_porch_ai/ui/pages/world_management_page.dart';
 
 import '../../golden/support/fakes.dart';
+import '../../golden/support/fakes_storage.dart';
 
 CharacterCard _keeper() {
   return CharacterCard(
@@ -81,8 +82,13 @@ void main() {
 
   testWidgets('the picker returns only the ticked entries', (tester) async {
     CharacterLoreSelection? pick;
+    final storage = FakeStorageService();
+    addTearDown(storage.dispose);
+
     await tester.pumpWidget(
-      MaterialApp(
+      ChangeNotifierProvider<StorageService>.value(
+        value: storage,
+        child: MaterialApp(
         home: Builder(
           builder: (context) => Scaffold(
             body: TextButton(
@@ -99,6 +105,7 @@ void main() {
             ),
           ),
         ),
+      ),
       ),
     );
 
@@ -205,8 +212,13 @@ void main() {
       if (portrait.existsSync()) await portrait.delete();
     });
 
+    final storage = FakeStorageService();
+    addTearDown(storage.dispose);
+
     await tester.pumpWidget(
-      MaterialApp(
+      ChangeNotifierProvider<StorageService>.value(
+        value: storage,
+        child: MaterialApp(
         home: Builder(
           builder: (context) => Scaffold(
             body: TextButton(
@@ -230,6 +242,7 @@ void main() {
             ),
           ),
         ),
+      ),
       ),
     );
 

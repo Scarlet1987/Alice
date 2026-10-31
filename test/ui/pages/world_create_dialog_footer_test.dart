@@ -30,6 +30,7 @@ import 'package:front_porch_ai/ui/pages/world_management_page.dart';
 import 'package:front_porch_ai/ui/pages/worlds/place_traits_editor.dart';
 
 import '../../golden/support/fakes.dart';
+import '../../golden/support/fakes_storage.dart';
 
 Finder _createWorldBtn() => find.widgetWithText(ElevatedButton, 'Create World');
 
@@ -76,9 +77,15 @@ Future<void> _pumpPage(WidgetTester tester, Size window) async {
   final worlds = FakeWorldRepository();
   addTearDown(worlds.dispose);
 
+  final storage = FakeStorageService();
+  addTearDown(storage.dispose);
+
   await tester.pumpWidget(
-    ChangeNotifierProvider<WorldRepository>.value(
-      value: worlds,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<WorldRepository>.value(value: worlds),
+        ChangeNotifierProvider<StorageService>.value(value: storage),
+      ],
       child: MaterialApp(
         theme: ThemeData(useMaterial3: true, fontFamily: 'Roboto'),
         home: const WorldManagementPage(),
