@@ -21,6 +21,7 @@ import 'package:front_porch_ai/ui/alice/alice_motion.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
 import 'package:front_porch_ai/ui/pages/edit_character_page.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 import 'package:front_porch_ai/utils/utils.dart';
 
 part 'home/alice_home_characters.dart';

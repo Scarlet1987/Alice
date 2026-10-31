@@ -13,6 +13,7 @@ import 'package:front_porch_ai/ui/alice/alice_forest_background.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_npc.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_user.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 
 /// Plain-English glossary for the creator screen.
 const _glossary = <String, String>{
@@ -63,11 +64,10 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
   }
 
   void _showGlossary() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('What do these words mean?'),
-        content: SingleChildScrollView(
+    showWarmDialog<void>(
+      context,
+      title: 'What do these words mean?',
+      content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -92,7 +92,6 @@ class _AliceCreatorScreenState extends State<AliceCreatorScreen> {
             child: const Text('Close'),
           ),
         ],
-      ),
     );
   }
 

@@ -13,6 +13,7 @@ import 'package:front_porch_ai/services/character_repository.dart';
 import 'package:front_porch_ai/services/llm_provider.dart';
 import 'package:front_porch_ai/services/llm_service.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator_draft.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 
 void _snack(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -137,11 +138,11 @@ extension NpcDraftActions on AliceCreatorDraft {
     // Sentinel distinguishes "Start from scratch" (explicit) from dialog
     // dismiss (Cancel/X → null → do nothing).
     const scratchSentinel = '__scratch__';
-    final picked = await showDialog<dynamic>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Load NPC'),
-        content: SizedBox(
+    final picked = await showWarmDialog<dynamic>(
+      context,
+      title: 'Load NPC',
+      width: 380,
+      content: SizedBox(
           width: 380,
           height: 320,
           child: Column(
@@ -150,7 +151,7 @@ extension NpcDraftActions on AliceCreatorDraft {
             children: [
               OutlinedButton.icon(
                 onPressed: () =>
-                    Navigator.of(dialogContext).pop(scratchSentinel),
+                    Navigator.of(context).pop(scratchSentinel),
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Start from scratch'),
               ),
@@ -180,7 +181,7 @@ extension NpcDraftActions on AliceCreatorDraft {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                          onTap: () => Navigator.of(dialogContext).pop(npc),
+                          onTap: () => Navigator.of(context).pop(npc),
                         ),
                     ],
                   ),
@@ -190,11 +191,10 @@ extension NpcDraftActions on AliceCreatorDraft {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
+            onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
         ],
-      ),
     );
     if (!context.mounted) return;
     if (picked == scratchSentinel) {
@@ -228,11 +228,11 @@ extension NpcDraftActions on AliceCreatorDraft {
     final hair = TextEditingController(text: ext.appearanceHair);
     final features = TextEditingController(text: ext.appearanceFeatures);
     try {
-      final saved = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text('Edit ${card.name}'),
-          content: SizedBox(
+      final saved = await showWarmDialog<bool>(
+        context,
+        title: 'Edit ${card.name}',
+        width: 380,
+        content: SizedBox(
             width: 380,
             child: SingleChildScrollView(
               child: Column(
@@ -255,15 +255,14 @@ extension NpcDraftActions on AliceCreatorDraft {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
+              onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
+              onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Save changes'),
             ),
           ],
-        ),
       );
       if (saved == true) {
         ext.appearanceAge = age.text.trim();

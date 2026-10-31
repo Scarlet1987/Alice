@@ -24,6 +24,7 @@ import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/wizard_data_service.dart';
 import 'package:front_porch_ai/ui/alice/alice_widgets.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 
 part 'alice_setup_wizard_steps.dart';
 
@@ -154,30 +155,28 @@ class _AliceSetupWizardState extends State<AliceSetupWizard> {
   // ── Step 0: reinstall data choice ────────────────────────────────
 
   Future<bool> _confirmWipe() async {
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Start completely fresh?'),
-        content: const Text(
+    final result = await showWarmDialog<bool>(
+      context,
+      title: 'Start completely fresh?',
+      destructive: true,
+      content: const Text(
           'This will permanently delete all existing data — chats, '
           'characters, worlds, settings, and downloaded models. '
           'This cannot be undone. Are you sure?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
+            onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
+            onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.destructiveRed,
             ),
             child: const Text('Yes, wipe it all'),
           ),
         ],
-      ),
     );
     return result == true;
   }
