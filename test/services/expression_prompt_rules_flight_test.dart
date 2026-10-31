@@ -27,6 +27,7 @@ class _RecordingImage extends ChangeNotifier implements ImageGenService {
     double? denoise,
     StudioIntent intent = StudioIntent.create,
     double? editStrength,
+    String? sessionId,
   }) async {
     prompts.add(prompt);
     return Uint8List.fromList([1]);

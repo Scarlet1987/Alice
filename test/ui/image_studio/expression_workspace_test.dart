@@ -69,6 +69,7 @@ class WorkspaceImages extends ChangeNotifier implements ImageGenService {
     double? denoise,
     StudioIntent intent = StudioIntent.create,
     double? editStrength,
+    String? sessionId,
   }) async {
     calls.add((intent: intent, source: referenceImage, prompt: prompt));
     if (!paused) return picture;

@@ -19,6 +19,7 @@
 /// Creator notes data, extracted from alice_creator_notes.dart so that
 /// board file stays under the 500-line god-file bar. No wording change:
 /// the Kardashev rubric and the Gear-by-limb sections are moved whole.
+library;
 
 /// Layman's rubric, wording exactly as in the approved preview.
 const kardashevRubric = <String, String>{

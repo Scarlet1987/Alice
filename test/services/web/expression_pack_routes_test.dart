@@ -91,6 +91,7 @@ class _ZoneEngine extends ChangeNotifier implements ImageGenService {
     double? denoise,
     StudioIntent intent = StudioIntent.create,
     double? editStrength,
+    String? sessionId,
   }) async {
     phone.add(Zone.current[kCity96NoAsk] == true);
     return Uint8List.fromList(_portrait);

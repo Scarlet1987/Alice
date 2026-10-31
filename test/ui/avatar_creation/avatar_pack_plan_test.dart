@@ -63,6 +63,7 @@ class _Engine extends ChangeNotifier implements ImageGenService {
     double? denoise,
     StudioIntent intent = StudioIntent.create,
     double? editStrength,
+    String? sessionId,
   }) async {
     if (isPortrait) return portrait;
     pictures.add(intent);

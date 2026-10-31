@@ -29,6 +29,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
 import 'package:window_manager/window_manager.dart';
