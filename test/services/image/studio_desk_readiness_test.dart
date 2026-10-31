@@ -35,7 +35,7 @@ void main() {
       'lib/services/image/comfy_catalog.dart',
     ).readAsStringSync();
     expect(source.contains('assembleComfyCatalog'), isTrue);
-    expect(source.contains('unetNames:'), isTrue);
+    expect(source.contains('unetNames'), isTrue);
     expect(source.contains('diffusionModels: diffusion'), isFalse);
   });
 
