@@ -1,8 +1,11 @@
+// Copyright (C) 2026 Front Porch AI
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:front_porch_ai/services/image_gen_service.dart';
-import 'package:front_porch_ai/services/storage/storage_service.dart';
+import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/web/facade/image_facade.dart';
 
 void main() {
