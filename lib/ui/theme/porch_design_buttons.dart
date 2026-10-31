@@ -8,13 +8,14 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-import 'package:flutter/material.dart';
-
-import 'package:front_porch_ai/ui/theme/app_colors.dart';
+part of 'porch_design.dart';
 
 /// Porch buttons, empty and loading states, extracted from porch_design.dart
 /// so that file stays under the 500-line god-file bar. No behaviour change:
-/// the same widgets, moved whole.
+/// the same widgets, moved whole. This is a part, not a separate library:
+/// the buttons use PorchSpacing, PorchRadius and PorchType from this file,
+/// which a separate library cannot see (porch_design.dart used to export
+/// it, which did not put those names in the buttons file's scope).
 
 class PorchPrimaryButton extends StatelessWidget {
   const PorchPrimaryButton({

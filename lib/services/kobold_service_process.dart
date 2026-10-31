@@ -283,6 +283,16 @@ extension KoboldServiceProcess on KoboldService {
     }
   }
 
+  /// Regex matching KoboldCPP per-token / per-batch progress messages.
+  /// These are purely informational counters that fire for every token and
+  /// would otherwise flood the log with thousands of identical-looking lines.
+  /// Lives in this extension, not the spawn extension: _addLog here is its
+  /// only user, and extension statics are not shared across extensions.
+  static final RegExp _progressLinePattern = RegExp(
+    r'^(Generating \(|Processing Prompt(?: \[BATCH\])? \()',
+    caseSensitive: false,
+  );
+
   void _addLog(String data) {
     if (data.trim().isEmpty) return;
 

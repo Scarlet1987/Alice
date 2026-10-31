@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
-export 'porch_design_buttons.dart';
+part 'porch_design_buttons.dart';
 
 /// The Porch design system: spacing, radii, type scale, shared components and
 /// the app [ThemeData] builder (including the OLED true-black variant).

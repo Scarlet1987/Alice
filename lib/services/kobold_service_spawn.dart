@@ -159,14 +159,6 @@ extension KoboldServiceSpawn on KoboldService {
     }
   }
 
-  /// Regex matching KoboldCPP per-token / per-batch progress messages.
-  /// These are purely informational counters that fire for every token and
-  /// would otherwise flood the log with thousands of identical-looking lines.
-  static final RegExp _progressLinePattern = RegExp(
-    r'^(Generating \(|Processing Prompt(?: \[BATCH\])? \()',
-    caseSensitive: false,
-  );
-
   /// [lines] from [from] finishing a reply, while [from] is still the
   /// process the app runs: from then on a crash is not a first-reply crash.
 }
