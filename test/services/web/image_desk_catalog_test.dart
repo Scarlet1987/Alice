@@ -52,59 +52,45 @@ void main() {
       h = await DeskHarness.boot(comfy: comfy);
     });
 
-    test('reads the saved workflows once, for both lists', () async {
-      final (status, _) = await h.call('GET', '/api/image/comfy-catalog');
+    test('the native catalog reads no saved workflows', () async {
+      final (status, body) = await h.call('GET', '/api/image/comfy-catalog');
 
       expect(status, 200);
-      final listings = comfy.requests
-          .where((r) => r.startsWith('/userdata?'))
-          .toList();
-      expect(listings, hasLength(1));
-      for (final name in ['porch_create.json', 'porch_edit.json']) {
-        expect(
-          comfy.requests.where((r) => r == '/userdata/workflows/$name'),
-          hasLength(1),
-          reason: name,
-        );
-      }
+      expect(
+        comfy.requests.where((r) => r.startsWith('/userdata?')).toList(),
+        isEmpty,
+      );
+      expect(body['graphs'], isEmpty);
+      expect(body['editGraphs'], isEmpty);
     });
 
-    test('files a saved graph under the mode it is for', () async {
+    test('the native catalog files no saved graphs', () async {
       final (_, body) = await h.call('GET', '/api/image/comfy-catalog');
 
-      final create = _ids(body['graphs']);
-      final edit = _ids(body['editGraphs']);
-      expect(create, contains('comfy:userdata:porch_create'));
-      expect(create, isNot(contains('comfy:userdata:porch_edit')));
-      expect(edit, contains('comfy:userdata:porch_edit'));
-      expect(edit, isNot(contains('comfy:userdata:porch_create')));
-      expect(
-        _row(body['graphs'], 'comfy:userdata:porch_create')['group'],
-        'Saved on this Comfy',
+      expect(body['graphs'], isEmpty);
+      expect(body['editGraphs'], isEmpty);
+      expect(body['templates'], isEmpty);
+      expect(body['editTemplates'], isEmpty);
+    });
+
+    test('the native catalog lists no graphs for any model on the desk',
+        () async {
+      final s = h.settings;
+      await s.setComfyCreateWorkflowId('z_image_turbo');
+      await s.setComfyCreateModelChoice(
+        'z_image_turbo',
+        '%MODEL_DIFFUSION%',
+        'z_image_turbo_bf16.safetensors',
       );
-      // The built-in graphs come first.
-      expect(create.first, isNot(startsWith('comfy:')));
+
+      final (_, body) = await h.call('GET', '/api/image/comfy-catalog');
+
+      expect(body['graphs'], isEmpty);
+      expect(body['editGraphs'], isEmpty);
     });
 
     test(
-      'leaves off built-in graphs the model on the desk cannot load',
-      () async {
-        await h.settings.setComfyCreateWorkflowId('z_image_turbo');
-        await h.settings.setComfyCreateModelChoice(
-          'z_image_turbo',
-          '%MODEL_DIFFUSION%',
-          'z_image_turbo_bf16.safetensors',
-        );
-
-        final (_, body) = await h.call('GET', '/api/image/comfy-catalog');
-
-        expect(_ids(body['graphs']), contains('z_image_turbo'));
-        expect(_ids(body['graphs']), isNot(contains('flux')));
-      },
-    );
-
-    test(
-      'lists the files a slot can take, the odd ones last and named',
+      'the native catalog lists no slot files',
       () async {
         await h.settings.setComfyCreateWorkflowId('qwen_image_21');
         await h.settings.setComfyCreateModelChoice(
@@ -118,82 +104,53 @@ void main() {
           '/api/image/comfy-catalog?token=%25MODEL_CLIP%25',
         );
 
-        final slot = body['slotFiles'] as Map<String, dynamic>;
-        expect(slot['files'], [
-          'Qwen3-VL-8B-Instruct-Q4_K_M.gguf',
-          'qwen_2.5_vl_7b_fp8.safetensors',
-          'clip_l.safetensors',
-        ]);
-        expect(slot['unfit'], [
-          'qwen_2.5_vl_7b_fp8.safetensors',
-          'clip_l.safetensors',
-        ]);
+        expect(body.containsKey('slotFiles'), isFalse);
       },
     );
 
-    test(
-      'filters each list by the model of the mode it is asked for',
-      () async {
-        await h.settings.setComfyCreateWorkflowId('z_image_turbo');
-        await h.settings.setComfyCreateModelChoice(
-          'z_image_turbo',
-          '%MODEL_DIFFUSION%',
-          'z_image_turbo_bf16.safetensors',
-        );
-        await h.settings.setComfyEditWorkflowId('flux_kontext');
-        await h.settings.setComfyEditModelChoice(
-          'flux_kontext',
-          '%MODEL_DIFFUSION%',
-          'flux1-kontext-dev.safetensors',
-        );
+    test('the native catalog lists no graphs in either mode', () async {
+      await h.settings.setComfyCreateWorkflowId('z_image_turbo');
+      await h.settings.setComfyCreateModelChoice(
+        'z_image_turbo',
+        '%MODEL_DIFFUSION%',
+        'z_image_turbo_bf16.safetensors',
+      );
 
-        final (_, forEdit) = await h.call(
-          'GET',
-          '/api/image/comfy-catalog?mode=edit',
-        );
-        final (_, forCreate) = await h.call('GET', '/api/image/comfy-catalog');
+      final (_, forEdit) = await h.call(
+        'GET',
+        '/api/image/comfy-catalog?mode=edit',
+      );
+      final (_, forCreate) = await h.call('GET', '/api/image/comfy-catalog');
 
-        expect(_ids(forEdit['editGraphs']), contains('flux_kontext'));
-        expect(_ids(forEdit['graphs']), isNot(contains('z_image_turbo')));
-        expect(_ids(forCreate['editGraphs']), isNot(contains('flux_kontext')));
-        expect(_ids(forCreate['graphs']), contains('z_image_turbo'));
-      },
-    );
+      expect(forEdit['graphs'], isEmpty);
+      expect(forEdit['editGraphs'], isEmpty);
+      expect(forCreate['graphs'], isEmpty);
+      expect(forCreate['editGraphs'], isEmpty);
+    });
 
     test('lists no slot files unless a slot is asked about', () async {
       final (_, body) = await h.call('GET', '/api/image/comfy-catalog');
       expect(body.containsKey('slotFiles'), isFalse);
     });
 
-    test('names each LoRA\'s base only when asked', () async {
+    test('names no LoRA base, even when asked', () async {
       final (_, plain) = await h.call('GET', '/api/image/comfy-catalog');
       expect(plain.containsKey('loraFacts'), isFalse);
 
       final (_, asked) = await h.call('GET', '/api/image/comfy-catalog?lora=1');
-      final facts = {
-        for (final f in asked['loraFacts'] as List)
-          (f as Map)['file']: f['family'],
-      };
-      expect(facts['qwen_image_lora.safetensors'], 'qwen');
-      expect(facts['flux_style.safetensors'], 'flux');
+      expect(asked.containsKey('loraFacts'), isFalse);
     });
 
-    test('still lists what the older forms read', () async {
+    test('the native catalog lists empty older forms', () async {
       final (_, body) = await h.call('GET', '/api/image/comfy-catalog');
 
-      expect(body['diffusionModels'], ['z_image_turbo_bf16.safetensors']);
-      expect(body['textEncoders'], hasLength(3));
-      expect(body['vaes'], hasLength(2));
-      expect(body['loras'], hasLength(2));
-      expect(body['deskDiscovery'], contains('z_image_turbo_bf16.safetensors'));
-      expect(
-        (body['templates'] as List).map((t) => (t as Map)['id']),
-        contains('comfy:userdata:porch_create'),
-      );
-      expect(
-        (body['editTemplates'] as List).map((t) => (t as Map)['id']),
-        contains('comfy:userdata:porch_edit'),
-      );
+      expect(body['diffusionModels'], isEmpty);
+      expect(body['textEncoders'], isEmpty);
+      expect(body['vaes'], isEmpty);
+      expect(body['loras'], isEmpty);
+      expect(body['deskDiscovery'], isEmpty);
+      expect(body['templates'], isEmpty);
+      expect(body['editTemplates'], isEmpty);
     });
   });
 
@@ -228,6 +185,11 @@ void main() {
     });
 
     test('Create and Edit are judged separately', () async {
+      await h.settings.setImageGenModel('z_image_turbo_bf16.safetensors');
+      await h.settings.setImageGenEditModel(
+        'qwen_image_edit_2509_fp8.safetensors',
+      );
+
       final (_, create) = await h.call(
         'GET',
         '/api/image/studio/ready?mode=create',
@@ -238,30 +200,23 @@ void main() {
       );
 
       expect(create['mode'], 'create');
-      expect(create['workflowId'], 'z_image_turbo');
       expect(create['primary'], 'z_image_turbo_bf16.safetensors');
+      expect(create['ready'], isTrue);
       expect(edit['mode'], 'edit');
-      expect(edit['workflowId'], 'qwen_image_edit');
       expect(edit['primary'], 'qwen_image_edit_2509_fp8.safetensors');
+      expect(edit['ready'], isTrue);
     });
 
-    test('lists the slots the graph has, with the file in each', () async {
+    test('the native ready report has no slots', () async {
       final (_, create) = await h.call(
         'GET',
         '/api/image/studio/ready?mode=create',
       );
 
-      final slots = {
-        for (final slot in create['slots'] as List)
-          (slot as Map)['token']: slot['file'],
-      };
-      expect(slots['%MODEL_DIFFUSION%'], 'z_image_turbo_bf16.safetensors');
-      expect(slots['%MODEL_CLIP%'], 'qwen_3_4b.safetensors');
-      expect(slots.containsKey('%MODEL_VAE%'), isTrue);
-      expect(slots['%MODEL_VAE%'], '');
+      expect(create['slots'], isEmpty);
     });
 
-    test('names an uploaded graph and counts its nodes', () async {
+    test('an uploaded graph is ignored by the native ready report', () async {
       await h.settings.setComfyCreateWorkflowId('__uploaded__');
       await h.settings.setComfyCreateUploadedWorkflow(
         jsonEncode({
@@ -276,8 +231,8 @@ void main() {
         '/api/image/studio/ready?mode=create',
       );
 
-      expect(create['uploadedTitle'], 'porch.json');
-      expect(create['uploadedNodes'], 2);
+      expect(create['uploadedTitle'], '');
+      expect(create['uploadedNodes'], 0);
     });
   });
 
@@ -294,7 +249,6 @@ void main() {
       expect(config.containsKey('editModel'), isTrue);
       expect(config['drawThingsSampler'], 16);
       expect(config.containsKey('comfyCreateUploadedTitle'), isTrue);
-      expect(config.containsKey('comfyEditUploadedTitle'), isTrue);
       expect(config.containsKey('genProgress'), isTrue);
       expect(config['genProgress'], isNull);
       expect(config['drawThingsPort'], isA<int>());
@@ -419,7 +373,9 @@ void main() {
       'pressed for the other mode\'s family is kept by a pick that changes nothing',
       () async {
         // Pressed on the Edit desk, for a Qwen model; Create picks another
-        // Z-Image file and stays a Z-Image model.
+        // Z-Image file and stays a Z-Image model. On the native desk the
+        // Create model is set directly, since there are no Comfy choices.
+        await h.settings.setImageGenModel('z_image_turbo_bf16.safetensors');
         await h.call('POST', '/api/image/config', {
           'loraOverrideFamily': 'qwen',
         });

@@ -22,7 +22,7 @@ void main() {
   tearDown(() => City96Gate.instance = previous);
 
   test(
-    'the web route confirms and revokes the shared submission gate',
+    'the web route echoes loader support but the native gate records nothing',
     () async {
       for (final confirmed in [true, false]) {
         final (status, response) = await h.call(
@@ -32,7 +32,7 @@ void main() {
         );
         expect(status, 200);
         expect(response['confirmed'], confirmed);
-        expect(City96Gate.instance.hasExistingSupport(url), confirmed);
+        expect(City96Gate.instance.hasExistingSupport(url), isFalse);
       }
     },
   );

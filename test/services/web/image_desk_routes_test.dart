@@ -25,7 +25,7 @@ void main() {
 
   group('choosing a model', () {
     test(
-      'follows the file to its graph and fills the empty encoder and VAE',
+      'picking a model stores the file and leaves the workflow alone',
       () async {
         await boot();
         await h.settings.setComfyCreateWorkflowId('sd');
@@ -38,16 +38,9 @@ void main() {
             });
 
         expect(status, 200);
-        expect(config['comfyCreateWorkflowId'], 'z_image_turbo');
-        expect(
-          h.choices()['z_image_turbo/%MODEL_DIFFUSION%'],
-          'z_image_turbo_bf16.safetensors',
-        );
-        expect(
-          h.choices()['z_image_turbo/%MODEL_CLIP%'],
-          'qwen_3_4b.safetensors',
-        );
-        expect(h.choices()['z_image_turbo/%MODEL_VAE%'], 'ae.safetensors');
+        expect(config['comfyCreateWorkflowId'], 'sd');
+        expect(config['model'], 'z_image_turbo_bf16.safetensors');
+        expect(h.choices(), isEmpty);
       },
     );
 
@@ -61,7 +54,7 @@ void main() {
         'my_own_encoder.safetensors',
       );
 
-      final (status, _) = await h.call('POST', '/api/image/studio/pick', {
+      final (status, config) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'model',
         'mode': 'create',
         'file': 'z_image_turbo_bf16.safetensors',
@@ -72,7 +65,8 @@ void main() {
         h.choices()['z_image_turbo/%MODEL_CLIP%'],
         'my_own_encoder.safetensors',
       );
-      expect(h.choices()['z_image_turbo/%MODEL_VAE%'], 'ae.safetensors');
+      expect(h.choices()['z_image_turbo/%MODEL_VAE%'], isNull);
+      expect(config['model'], 'z_image_turbo_bf16.safetensors');
     });
 
     test('a saved Comfy graph stays on the desk', () async {
@@ -89,13 +83,11 @@ void main() {
 
       expect(status, 200);
       expect(config['comfyCreateWorkflowId'], saved);
-      expect(
-        h.choices()['$saved/%MODEL_DIFFUSION%'],
-        'z_image_turbo_bf16.safetensors',
-      );
+      expect(config['model'], 'z_image_turbo_bf16.safetensors');
+      expect(h.choices()['$saved/%MODEL_DIFFUSION%'], isNull);
     });
 
-    test('Edit is its own graph and its own choices', () async {
+    test('Edit keeps its own model, apart from Create', () async {
       await boot();
       final s = h.settings;
       await s.setComfyCreateWorkflowId('z_image_turbo');
@@ -109,12 +101,10 @@ void main() {
 
       expect(status, 200);
       expect(config['comfyEditWorkflowId'], 'qwen_image_edit');
-      expect(
-        h.choices(edit: true)['qwen_image_edit/%MODEL_DIFFUSION%'],
-        'qwen_image_edit_2509_fp8.safetensors',
-      );
+      expect(config['editModel'], 'qwen_image_edit_2509_fp8.safetensors');
       expect(config['comfyCreateWorkflowId'], 'z_image_turbo');
       expect(h.choices(), isEmpty);
+      expect(h.choices(edit: true), isEmpty);
     });
 
     test(
@@ -135,7 +125,8 @@ void main() {
   });
 
   group('choosing a graph', () {
-    test('a bundled graph is taken, and its empty slots are filled', () async {
+    test('a bundled graph is refused: the native engine has no graphs',
+        () async {
       await boot();
       final s = h.settings;
       await s.setComfyCreateWorkflowId('sd');
@@ -145,22 +136,26 @@ void main() {
         'z_image_turbo_bf16.safetensors',
       );
 
-      final (status, config) = await h.call('POST', '/api/image/studio/pick', {
+      final (status, body) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'graph',
         'mode': 'create',
         'id': 'z_image_turbo',
       });
 
-      expect(status, 200);
-      expect(config['comfyCreateWorkflowId'], 'z_image_turbo');
-      expect(
-        h.choices()['z_image_turbo/%MODEL_CLIP%'],
-        'qwen_3_4b.safetensors',
-      );
+      expect(status, 400);
+      expect(body['code'], 'no_graphs');
     });
 
     test('a name that is on no list is refused', () async {
       await boot();
+      final s = h.settings;
+      await s.setComfyCreateWorkflowId('sd');
+      await s.setComfyCreateModelChoice(
+        'z_image_turbo',
+        '%MODEL_DIFFUSION%',
+        'z_image_turbo_bf16.safetensors',
+      );
+
       final (status, body) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'graph',
         'mode': 'create',
@@ -168,12 +163,20 @@ void main() {
       });
 
       expect(status, 400);
-      expect(body['code'], 'unknown_graph');
-      expect(h.settings.comfyCreateWorkflowId, isNot('evil_graph'));
+      expect(body['code'], 'no_graphs');
+      expect(h.settings.comfyCreateWorkflowId, 'sd');
     });
 
-    test('an uploaded graph can only be chosen when there is one', () async {
+    test('an uploaded graph is refused: no graphs on native', () async {
       await boot();
+      final s = h.settings;
+      await s.setComfyCreateWorkflowId('sd');
+      await s.setComfyCreateModelChoice(
+        'z_image_turbo',
+        '%MODEL_DIFFUSION%',
+        'z_image_turbo_bf16.safetensors',
+      );
+
       final (status, body) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'graph',
         'mode': 'create',
@@ -181,37 +184,41 @@ void main() {
       });
 
       expect(status, 400);
-      expect(body['code'], 'unknown_graph');
+      expect(body['code'], 'no_graphs');
     });
   });
 
   group('choosing a slot', () {
-    test('sets one text encoder of the graph on the desk', () async {
+    test('a slot pick is refused: no slots on native', () async {
       await boot();
-      await h.settings.setComfyCreateWorkflowId('z_image_turbo');
+      final s = h.settings;
+      await s.setComfyCreateWorkflowId('z_image_turbo');
 
-      final (status, _) = await h.call('POST', '/api/image/studio/pick', {
+      final (status, body) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'support',
         'mode': 'create',
         'token': '%MODEL_CLIP%',
         'file': 'clip_l.safetensors',
       });
 
-      expect(status, 200);
-      expect(h.choices()['z_image_turbo/%MODEL_CLIP%'], 'clip_l.safetensors');
+      expect(status, 400);
+      expect(body['code'], 'no_slots');
     });
 
     test('a token that is not a model slot is refused', () async {
       await boot();
+      final s = h.settings;
+      await s.setComfyCreateWorkflowId('z_image_turbo');
+
       final (status, body) = await h.call('POST', '/api/image/studio/pick', {
         'kind': 'support',
         'mode': 'create',
-        'token': 'steps',
-        'file': 'x.safetensors',
+        'token': '%MODEL_LORA%',
+        'file': 'clip_l.safetensors',
       });
 
       expect(status, 400);
-      expect(body['code'], 'bad_slot');
+      expect(body['code'], 'no_slots');
     });
   });
 
