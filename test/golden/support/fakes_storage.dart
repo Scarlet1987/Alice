@@ -53,6 +53,7 @@ class FakeStorageService extends ChangeNotifier implements StorageService {
       _memorySettings,
       _presetSettings,
       _lorebookSettings,
+      _engineResourcesSettings,
     ]) {
       s.initializeBase(null, notifyListeners);
     }
@@ -108,6 +109,7 @@ class FakeStorageService extends ChangeNotifier implements StorageService {
   final _memorySettings = MemorySettings();
   final _presetSettings = PresetSettings();
   final _lorebookSettings = LorebookSettings();
+  final _engineResourcesSettings = EngineResourcesSettings();
 
   @override
   GenerationSettings get generationSettings => _generationSettings;
@@ -135,6 +137,9 @@ class FakeStorageService extends ChangeNotifier implements StorageService {
   PresetSettings get presetSettings => _presetSettings;
   @override
   LorebookSettings get lorebookSettings => _lorebookSettings;
+  @override
+  EngineResourcesSettings get engineResourcesSettings =>
+      _engineResourcesSettings;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

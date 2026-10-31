@@ -51,6 +51,7 @@ import 'package:front_porch_ai/services/image/model_family.dart'
 import 'package:front_porch_ai/services/image_gen_service.dart';
 import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/storage/settings/backend_settings.dart';
+import 'package:front_porch_ai/services/storage/settings/engine_resources_settings.dart';
 import 'package:front_porch_ai/services/storage/settings/image_gen_settings.dart';
 
 /// flutter_test's binding replaces every HttpClient with a mock that always
@@ -640,6 +641,10 @@ class _FakeStorageForGenerate extends ChangeNotifier implements StorageService {
 
   @override
   final BackendSettings backendSettings = BackendSettings();
+
+  @override
+  final EngineResourcesSettings engineResourcesSettings =
+      EngineResourcesSettings();
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
