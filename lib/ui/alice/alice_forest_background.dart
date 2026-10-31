@@ -14,6 +14,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'package:front_porch_ai/ui/theme/app_colors.dart';
+
 /// Forest background behind [child], at the preview's locked opacity.
 class AliceForestBackground extends StatelessWidget {
   final Widget child;
@@ -41,8 +43,8 @@ class AliceForestBackground extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromRGBO(8, 13, 12, 0.30),
-                  Color.fromRGBO(22, 33, 30, 0.55),
+                  AppColors.forestGradientTop,
+                  AppColors.forestGradientBottom,
                 ],
               ),
             ),
@@ -73,8 +75,8 @@ class AliceTranslucentCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF22332D).withValues(alpha: 0.88),
-            border: Border.all(color: const Color(0xFF35473F)),
+            color: AppColors.translucentCardFill.withValues(alpha: 0.88),
+            border: Border.all(color: AppColors.translucentCardBorder),
             borderRadius: BorderRadius.circular(28),
           ),
           child: child,

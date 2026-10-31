@@ -248,11 +248,10 @@ Future<void> _pinMemoryDialog(
   CharacterCard character,
 ) async {
   final controller = TextEditingController();
-  final note = await showDialog<String>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Pin a memory'),
-      content: Column(
+  final note = await showWarmDialog<String>(
+    context,
+    title: 'Pin a memory',
+    content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -286,7 +285,6 @@ Future<void> _pinMemoryDialog(
           child: const Text('Pin it'),
         ),
       ],
-    ),
   );
   controller.dispose();
   if (note == null || !context.mounted) return;
@@ -322,13 +320,17 @@ Future<void> _showNpcPicker(BuildContext context, ChatService chat) async {
     }
     return;
   }
-  final selected = await showDialog<CharacterCard>(
-    context: context,
-    builder: (context) => SimpleDialog(
-      title: const Text('Bring in an NPC'),
+  // Was SimpleDialog; now WarmDialog with the same options as content
+  // tiles, so the picker is theme-aware and routes through the one
+  // dialog scaffold. Tapping a tile still pops with that card.
+  final selected = await showWarmDialog<CharacterCard>(
+    context,
+    title: 'Bring in an NPC',
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         for (final card in candidates)
-          SimpleDialogOption(
+          TextButton(
             onPressed: () => Navigator.of(context).pop(card),
             child: Row(
               children: [
@@ -401,8 +403,13 @@ Future<void> launchSceneIllustrator(
   }
 
   if (!context.mounted) return;
-  await showDialog(
-    context: context,
+  // Was a bare showDialog; now showWarmDialogOf, which is the same
+  // showDialog call in the exempt warm-dialog file. Barrier stays
+  // non-dismissible, and the full ImageStudio widget is unchanged —
+  // it does not fit title/content/actions, so it is NOT forced into
+  // showWarmDialog.
+  await showWarmDialogOf(
+    context,
     barrierDismissible: false,
     builder: (_) => ImageStudio(
       mode: ImageGenMode.customPrompt,

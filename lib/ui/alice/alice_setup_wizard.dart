@@ -171,7 +171,9 @@ class _AliceSetupWizardState extends State<AliceSetupWizard> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.destructiveRed,
+            ),
             child: const Text('Yes, wipe it all'),
           ),
         ],
@@ -239,7 +241,7 @@ class _AliceSetupWizardState extends State<AliceSetupWizard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withValues(alpha: 0.72),
+      color: AppColors.pureBlack.withValues(alpha: 0.72),
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

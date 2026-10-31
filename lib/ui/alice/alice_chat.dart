@@ -24,6 +24,7 @@ import 'package:front_porch_ai/services/storage/storage.dart';
 import 'package:front_porch_ai/services/storage/settings/detail_level.dart';
 import 'package:front_porch_ai/services/image_prompt/image_prompt.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
+import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 import 'package:front_porch_ai/ui/widgets/glossary.dart';
 import 'package:front_porch_ai/ui/chat/widgets/memory_checkpoint_nudge.dart';
 import 'package:front_porch_ai/ui/image_studio/image_studio.dart';

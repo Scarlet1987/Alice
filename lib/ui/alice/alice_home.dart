@@ -235,7 +235,7 @@ class _AliceHomeScreenState extends State<AliceHomeScreen> {
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black,
+                  color: AppColors.pureBlack,
                   border: Border.all(
                     color: AppColors.porchAmberOf(context),
                     width: 2,

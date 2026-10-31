@@ -358,6 +358,41 @@ class AppColors {
   static Color chaosHotOf(BuildContext context) =>
       resolve(context, chaosHot, chaosHotLight);
 
+  // ---------------------------------------------------------------------------
+  // Sweep tokens (2026-10-31, Fix-1 raw colours) — exact values from the
+  // raw colours they replace, so the look does not change. Const tokens
+  // (not *Of resolvers) are used deliberately here: the avatar palette
+  // and forest overlay are fixed hues, not theme-aware chrome.
+  // ---------------------------------------------------------------------------
+
+  /// Pure black, e.g. the rabbit-icon ring fill in Home credits.
+  static const Color pureBlack = Color(0xFF000000);
+
+  /// Pure white, e.g. the initial letter on a coloured avatar.
+  static const Color pureWhite = Colors.white;
+
+  /// Avatar palette teal (was raw 0xFF0F766E in AliceAvatar).
+  static const Color avatarTeal = Color(0xFF0F766E);
+
+  /// Avatar palette blue (was raw 0xFF3366A3 in AliceAvatar).
+  static const Color avatarBlue = Color(0xFF3366A3);
+
+  /// Destructive-confirm red, exact redAccent value (was Colors.redAccent
+  /// on the setup-wizard wipe button). Named for its job, not its hue.
+  static const Color destructiveRed = Color(0xFFFF5252);
+
+  /// Translucent card fill, 88% at use site (was raw 0xFF22332D).
+  static const Color translucentCardFill = Color(0xFF22332D);
+
+  /// Translucent card border (was raw 0xFF35473F).
+  static const Color translucentCardBorder = Color(0xFF35473F);
+
+  /// Forest overlay gradient, top stop (was fromRGBO 8,13,12,0.30).
+  static const Color forestGradientTop = Color.fromRGBO(8, 13, 12, 0.30);
+
+  /// Forest overlay gradient, bottom stop (was fromRGBO 22,33,30,0.55).
+  static const Color forestGradientBottom = Color.fromRGBO(22, 33, 30, 0.55);
+
   /// Positive trust bar/icon accent.
   static const Color trustAccent = Color(0xFF5EEAD4);
   static const Color trustAccentLight = Color(0xFF0E7A6D);

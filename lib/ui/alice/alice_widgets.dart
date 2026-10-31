@@ -236,10 +236,10 @@ class AliceAvatar extends StatelessWidget {
     // Deterministic color from name hash, in the teal/pink/blue family.
     final palette = [
       AppColors.porchAmber,
-      const Color(0xFFC2437F),
-      const Color(0xFF0F766E),
-      const Color(0xFF3366A3),
-      const Color(0xFFF472B6),
+      AppColors.chaosAccentLight,
+      AppColors.avatarTeal,
+      AppColors.avatarBlue,
+      AppColors.lustAccent,
     ];
     final bg = background ?? palette[name.hashCode.abs() % palette.length];
     return Container(
@@ -250,7 +250,7 @@ class AliceAvatar extends StatelessWidget {
       child: Text(
         initial,
         style: TextStyle(
-          color: Colors.white,
+          color: AppColors.pureWhite,
           fontWeight: FontWeight.w700,
           fontSize: size * 0.38,
         ),
@@ -363,8 +363,8 @@ class _AliceCollapsibleSectionState extends State<AliceCollapsibleSection> {
         child: Container(
           margin: const EdgeInsets.only(top: 10),
           decoration: BoxDecoration(
-            color: const Color(0xFF22332D).withValues(alpha: 0.88),
-            border: Border.all(color: const Color(0xFF35473F)),
+            color: AppColors.translucentCardFill.withValues(alpha: 0.88),
+            border: Border.all(color: AppColors.translucentCardBorder),
             borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
