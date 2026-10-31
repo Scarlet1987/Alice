@@ -53,9 +53,12 @@ void main() {
           ChangeNotifierProvider<ImageGenService>.value(value: gen),
         ],
         child: const MaterialApp(
-          home: ImageStudio(
-            mode: ImageGenMode.customPrompt,
-            characterName: 'Ada',
+          // The no-graphs snackbar needs a Scaffold, as in the real page.
+          home: Scaffold(
+            body: ImageStudio(
+              mode: ImageGenMode.customPrompt,
+              characterName: 'Ada',
+            ),
           ),
         ),
       ),
