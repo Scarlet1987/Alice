@@ -273,11 +273,15 @@ void main() {
     addTearDown(worlds.dispose);
     addTearDown(characters.dispose);
 
+    final storage = FakeStorageService();
+    addTearDown(storage.dispose);
+
     await tester.pumpWidget(
       MultiProvider(
         providers: [
           ChangeNotifierProvider<WorldRepository>.value(value: worlds),
           ChangeNotifierProvider<CharacterRepository>.value(value: characters),
+          ChangeNotifierProvider<StorageService>.value(value: storage),
         ],
         child: MaterialApp(
           theme: ThemeData(useMaterial3: true, fontFamily: 'Roboto'),

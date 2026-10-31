@@ -123,8 +123,9 @@ void main() {
 
       expect(
         find.text(
-          'Shown on the Worlds grid and packed into .fpworld. '
-          'Required to share on the Stoop.',
+          // Stoop suffix removed with Stoop (902d7a8); lib text is
+          // the first sentence only, see world_management_page.basics.dart.
+          'Shown on the Worlds grid and packed into .fpworld.',
         ),
         findsOneWidget,
       );
@@ -173,6 +174,15 @@ void main() {
           '$tag Atmosphere',
         );
         _expectFullyAboveFooter(tester, find.text('Gravity'), '$tag Gravity');
+        // Traits expand the scroll body; on a small window the
+        // lorebook section starts below the fold. Scroll it into view
+        // first, as the climate OFF test already does, then check it
+        // against the footer. The footer is a Column sibling below the
+        // Expanded scroll body, not an overlay, so a below-fold rect
+        // before scrolling is not a painted overlap.
+        await tester.ensureVisible(find.text('No lorebook entries yet'));
+        await _bounded(tester);
+
         _expectFullyAboveFooter(
           tester,
           find.text('No lorebook entries yet'),
