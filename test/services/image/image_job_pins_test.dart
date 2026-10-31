@@ -225,7 +225,7 @@ void main() {
       });
     });
 
-    test('a second generate while one is running returns null', () {
+    test('a second generate while one is running queues behind it', () {
       return _withRealHttp(() async {
         server.holdTxt2Img = Completer<void>();
         final started = Completer<void>();
@@ -234,12 +234,12 @@ void main() {
         };
         final first = service.generateImage(prompt: 'hold');
         await started.future.timeout(const Duration(seconds: 5));
-        final second = await service.generateImage(prompt: 'overlap');
-        expect(second, isNull);
-        expect(service.statusMessage, kAlreadyGeneratingMessage);
-        expect(server.txt2imgCount, 1);
+        final second = service.generateImage(prompt: 'overlap');
         server.holdTxt2Img!.complete();
         expect(await first, _png);
+        expect(await second, _png);
+        expect(server.txt2imgCount, 2);
+        expect(service.statusMessage, isNot(kAlreadyGeneratingMessage));
       });
     });
 

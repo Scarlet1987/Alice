@@ -227,21 +227,20 @@ void main() {
     );
 
     test(
-      'a second overlapping call is refused while one is in flight '
-      '(reentrancy guard) and the first still completes',
+      'a second overlapping call queues behind one in flight '
+      '(queue policy) and both complete',
       () => _withRealHttp(() async {
         final f1 = service.generateImage(prompt: 'first');
         final f2 = service.generateImage(prompt: 'second');
 
-        final r2 = await f2;
-        expect(r2, isNull, reason: 'second call must be refused, not queued');
-
         final r1 = await f1;
         expect(r1, isNotNull);
+        final r2 = await f2;
+        expect(r2, isNotNull);
         expect(
           fake.txt2imgCount,
-          1,
-          reason: 'only the first call reached the server',
+          2,
+          reason: 'both calls reached the server, one after the other',
         );
       }),
     );
