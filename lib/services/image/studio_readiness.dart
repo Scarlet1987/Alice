@@ -98,11 +98,6 @@ ModelFamily familyForRun({
   return ImageModelFamily.detectFromName(primaryFile);
 }
 
-/// Obsolete: template titles were a ComfyUI concept.
-bool isCreateTemplateTitle(String title) => false;
-
-/// Obsolete: template titles were a ComfyUI concept.
-bool isEditTemplateTitle(String title) => false;
 
 /// PNG text chunks. Null when neither chunk is JSON.
 String? pngWorkflowText(Map<String, String> texts) {

@@ -282,14 +282,6 @@ void main() {
     },
   );
 
-  test('a mixed create and edit title is not a Create row', () {
-    expect(
-      isCreateTemplateTitle('Flux.2 Klein 9B: Text to Image Image Edit'),
-      isFalse,
-    );
-    expect(isCreateTemplateTitle('Z-Image-Turbo: Text to Image'), isTrue);
-  });
-
   test('the run family is the diffusion file, not the text encoder', () {
     expect(
       familyForRun(

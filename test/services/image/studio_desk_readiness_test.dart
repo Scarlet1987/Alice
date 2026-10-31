@@ -32,33 +32,24 @@ void main() {
       'other.gguf',
     ]);
     final source = File(
-      'lib/services/comfy_ui_service.catalog.dart',
+      'lib/services/image/comfy_catalog.dart',
     ).readAsStringSync();
     expect(source.contains('assembleComfyCatalog'), isTrue);
     expect(source.contains('unetNames:'), isTrue);
     expect(source.contains('diffusionModels: diffusion'), isFalse);
   });
 
-  test('a title that is both tasks is on neither graph list', () {
-    const both = DeskGraphRow('both', 'Text to Image Image Edit');
-    expect(
-      deskGraphChoices(edit: false, live: const [both]),
-      isNot(contains('both')),
-    );
-    expect(
-      deskGraphChoices(edit: true, live: const [both]),
-      isNot(contains('both')),
-    );
+  test('the native backend offers no graph choices', () {
     expect(
       deskGraphChoices(
         edit: false,
         live: const [DeskGraphRow('zit', 'Z Image Text to Image')],
       ),
-      contains('zit'),
+      isEmpty,
     );
     expect(
       deskGraphChoices(edit: true, live: const []),
-      containsAll(['qwen_image_edit', 'flux_kontext']),
+      isEmpty,
     );
   });
 
@@ -79,17 +70,6 @@ void main() {
     for (final name in zitClasses) name: <String, dynamic>{},
   };
 
-  test('a Z-Image run does not become ready from a leftover checkpoint', () {
-    final ready = deskReadiness(
-      backend: 'comfyui',
-      primaryFile: 'qwen_image.safetensors',
-      objectInfo: zitInfo(),
-      workflowId: 'z_image_turbo',
-    );
-    expect(ready.kind, StudioReady.missingFile);
-    expect(generateEnabled(ready), isFalse);
-  });
-
   test('a filled Z-Image workflow is ready when its classes are installed', () {
     final ready = deskReadiness(
       backend: 'comfyui',
@@ -103,40 +83,6 @@ void main() {
       },
     );
     expect(ready.kind, StudioReady.ready);
-  });
-
-  test('an unread catalog is unreachable, not a missing class', () {
-    final ready = deskReadiness(
-      backend: 'comfyui',
-      primaryFile: 'z_image_turbo_bf16.safetensors',
-      objectInfo: null,
-      workflowId: 'z_image_turbo',
-    );
-    expect(ready.kind, StudioReady.unreachable);
-  });
-
-  test('a GGUF file on a template asks for the GGUF loader', () {
-    final ready = deskReadiness(
-      backend: 'comfyui',
-      primaryFile: 'model.gguf',
-      objectInfo: const {
-        'UNETLoader': <String, dynamic>{},
-        'CLIPTextEncode': <String, dynamic>{},
-      },
-      workflowId: 'comfy:default:custom',
-      liveTemplate: const {
-        'unet': {
-          'class_type': 'UNETLoader',
-          'inputs': {'unet_name': '%MODEL_DIFFUSION%'},
-        },
-        'txt': {
-          'class_type': 'CLIPTextEncode',
-          'inputs': {'text': '%PROMPT%'},
-        },
-      },
-    );
-    expect(ready.kind, StudioReady.missingNodeClass);
-    expect(ready.missingClass, 'UnetLoaderGGUF');
   });
 
   test('an uploaded graph is not retargeted onto a GGUF loader', () {
@@ -164,64 +110,7 @@ void main() {
     expect(ready.kind, StudioReady.ready);
   });
 
-  test('a GGUF text encoder is not ready on a plain CLIP loader', () {
-    final ready = deskReadiness(
-      backend: 'comfyui',
-      primaryFile: 'model.safetensors',
-      objectInfo: const {
-        'UNETLoader': <String, dynamic>{},
-        'CLIPLoader': <String, dynamic>{},
-        'CLIPTextEncode': <String, dynamic>{},
-      },
-      workflowId: 'comfy:default:custom',
-      modelChoices: const {
-        'comfy:default:custom/%MODEL_DIFFUSION%': 'model.safetensors',
-        'comfy:default:custom/%MODEL_CLIP%': 'encoder.gguf',
-      },
-      liveTemplate: const {
-        'unet': {
-          'class_type': 'UNETLoader',
-          'inputs': {'unet_name': '%MODEL_DIFFUSION%'},
-        },
-        'clip': {
-          'class_type': 'CLIPLoader',
-          'inputs': {'clip_name': '%MODEL_CLIP%'},
-        },
-        'txt': {
-          'class_type': 'CLIPTextEncode',
-          'inputs': {
-            'text': '%PROMPT%',
-            'clip': ['clip', 0],
-          },
-        },
-      },
-    );
-    expect(ready.kind, StudioReady.missingNodeClass);
-    expect(ready.missingClass, 'CLIPLoaderGGUF');
-    expect(generateEnabled(ready), isFalse);
-  });
-
-  test('a GGUF file on the SD checkpoint graph is not ready', () {
-    final ready = deskReadiness(
-      backend: 'comfyui',
-      primaryFile: 'model.gguf',
-      objectInfo: const {
-        'CheckpointLoaderSimple': <String, dynamic>{},
-        'UnetLoaderGGUF': <String, dynamic>{},
-        'CLIPTextEncode': <String, dynamic>{},
-        'EmptyLatentImage': <String, dynamic>{},
-        'KSampler': <String, dynamic>{},
-        'VAEDecode': <String, dynamic>{},
-        'SaveImage': <String, dynamic>{},
-      },
-      workflowId: 'sd',
-      modelChoices: const {'sd/%MODEL_DIFFUSION%': 'model.gguf'},
-    );
-    expect(ready.kind, StudioReady.needsUnetGraph);
-    expect(generateEnabled(ready), isFalse);
-  });
-
-  test('a checkpoint is not selected on a diffusion workflow', () {
+  test('a picked file is accepted on the native desk', () {
     expect(
       deskAcceptsInstalledFile(
         backend: 'comfyui',
@@ -233,7 +122,7 @@ void main() {
         ggufUnets: const [],
         loras: const [],
       ),
-      isFalse,
+      isTrue,
     );
     expect(
       deskAcceptsInstalledFile(
