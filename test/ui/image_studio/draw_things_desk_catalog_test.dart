@@ -123,12 +123,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Reachable · 2 diffusion files · 1 LoRAs'),
-      findsOneWidget,
-    );
+    expect(find.text('Draw Things · Connected'), findsOneWidget);
 
-    await tester.tap(find.text('Add'));
+    await tester.ensureVisible(find.textContaining('Advanced'));
+    await tester.tap(find.textContaining('Advanced'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add style pack'));
     await tester.pumpAndSettle();
     expect(find.text('detail.safetensors'), findsOneWidget);
     expect(
@@ -181,12 +181,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Reachable · 1 diffusion files · 3 LoRAs'),
-      findsOneWidget,
-    );
+    expect(find.text('Draw Things · Connected'), findsOneWidget);
 
-    await tester.tap(find.text('Add'));
+    await tester.ensureVisible(find.textContaining('Advanced'));
+    await tester.tap(find.textContaining('Advanced'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add style pack'));
     await tester.pumpAndSettle();
     final sheet = find.byType(AlertDialog);
     expect(

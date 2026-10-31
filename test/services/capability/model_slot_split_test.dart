@@ -149,10 +149,10 @@ void main() {
       expect(ImageReferenceResolver.packEditMode(s), isFalse);
     });
 
-    test('ComfyUI is gated on the Edit tab\'s workflow readiness (unfilled '
-        'model slots → img2img fallback)', () async {
+    test('native offers edit; readiness is enforced by the native backend '
+        '(migrated ComfyUI backend, no workflow gating)', () async {
       final s = await _loadedSettings({'image_gen_backend': 'comfyui'});
-      expect(ImageReferenceResolver.packEditMode(s), isFalse);
+      expect(ImageReferenceResolver.packEditMode(s), isTrue);
     });
   });
 }

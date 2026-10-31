@@ -141,10 +141,13 @@ void main() {
       tester,
     ) async {
       await pump(tester, const StudioDesk(), service: _ReachableA1111(storage));
-      await tester.tap(find.text('Check'));
+      // LoRAs are listed automatically on pump; the sheet opens from
+      // Advanced, not from a Check button that no longer exists.
+      await tester.ensureVisible(find.textContaining('Advanced'));
+      await tester.tap(find.textContaining('Advanced'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add'));
+      await tester.tap(find.text('Add style pack'));
       await tester.pumpAndSettle();
       expect(find.text('lora1.safetensors'), findsWidgets);
       expect(find.text('lora2.safetensors'), findsWidgets);
@@ -213,6 +216,11 @@ void main() {
       await storage.imageGenSettings.setImageGenBackend('remote');
       await pump(tester, const StudioDesk());
 
+      // Remote-account notes live in the knobs inside Advanced.
+      await tester.ensureVisible(find.textContaining('Advanced'));
+      await tester.tap(find.textContaining('Advanced'));
+      await tester.pumpAndSettle();
+
       expect(
         find.textContaining('No Remote API key configured'),
         findsOneWidget,
@@ -230,6 +238,11 @@ void main() {
       await storage.backendSettings.setRemoteApiKey('nk-test');
       await storage.imageGenSettings.setImageGenBackend('remote');
       await pump(tester, const StudioDesk());
+
+      // Remote-account notes live in the knobs inside Advanced.
+      await tester.ensureVisible(find.textContaining('Advanced'));
+      await tester.tap(find.textContaining('Advanced'));
+      await tester.pumpAndSettle();
 
       expect(
         find.textContaining('Bills your Remote API account (nano-gpt.com)'),

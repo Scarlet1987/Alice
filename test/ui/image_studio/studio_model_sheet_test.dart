@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:front_porch_ai/ui/image_studio/studio_model_sheet.dart';
 
-const _marker = 'The name does not look like it fits this model.';
+const _marker = 'This file might not work with the current setup.';
 
 void main() {
   const items = [

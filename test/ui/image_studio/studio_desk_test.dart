@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 void main() {
   test(
-    'a comfy run uses the workflow file, not a leftover checkpoint name',
+    'the desk primary is the saved model, not a workflow file',
     () {
       expect(
         deskPrimaryFile(
@@ -22,7 +22,7 @@ void main() {
           },
           legacyModel: 'qwen_image.safetensors',
         ),
-        'z_image_turbo_bf16.safetensors',
+        'qwen_image.safetensors',
       );
     },
   );

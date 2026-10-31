@@ -64,23 +64,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
   }
 
-  testWidgets('Change graph hides premades that cannot load the model', (
-    tester,
-  ) async {
-    await pumpDesk(tester);
-    await tester.ensureVisible(find.text('Change graph'));
-    await tester.tap(find.text('Change graph'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Change graph — Create'), findsOneWidget);
-    expect(find.text('Z-Image Turbo'), findsOneWidget);
-    expect(find.text('Text to image · z_image_turbo'), findsOneWidget);
-    expect(find.text('Flux / Schnell / Krea'), findsNothing);
-    expect(find.text('Qwen-Image'), findsNothing);
-    expect(find.text('Qwen-Image 2.1'), findsNothing);
-    expect(find.text('SD / SDXL / Pony / Illustrious'), findsNothing);
-    expect(find.text('Text to image · flux'), findsNothing);
-    expect(find.text('Text to image · qwen_image'), findsNothing);
-    expect(find.text('Text to image · sd'), findsNothing);
-  });
+  testWidgets(
+    'Change workflow on the native desk explains there are no graphs',
+    (tester) async {
+      await pumpDesk(tester);
+      await tester.ensureVisible(find.textContaining('Advanced ▸'));
+      await tester.tap(find.textContaining('Advanced ▸'));
+      await tester.pump();
+      await tester.ensureVisible(find.text('Change workflow'));
+      await tester.tap(find.text('Change workflow'));
+      await tester.pump();
+      expect(
+        find.text('The built-in engine picks models directly — no graphs.'),
+        findsOneWidget,
+      );
+      expect(find.text('Change graph — Create'), findsNothing);
+    },
+  );
 }

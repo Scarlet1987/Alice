@@ -238,7 +238,9 @@ void main() {
     expect(find.text('Pack uses this edit model.'), findsNothing);
   });
 
-  testWidgets('a GGUF model leaves the checkpoint graph', (tester) async {
+  testWidgets('a GGUF model is picked directly, with no graph to leave', (
+    tester,
+  ) async {
     await pumpDesk(
       tester,
       const Size(1040, 1600),
@@ -247,32 +249,8 @@ void main() {
         await storage.imageGenSettings.setComfyCreateWorkflowId('sd');
       },
     );
-    expect(find.text('Change graph'), findsOneWidget);
-    await show(tester, find.text('Change graph'));
-    await tester.tap(find.text('Change graph'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Change graph — Create'), findsOneWidget);
-    expect(find.text(kStudioDropCopy), findsOneWidget);
-    expect(find.text('JSON, or a PNG from Comfy’s Save.'), findsOneWidget);
-    expect(find.text('Text to image graphs'), findsOneWidget);
-    expect(find.text('Flux / Schnell / Krea'), findsOneWidget);
-    expect(find.text('Qwen-Image'), findsOneWidget);
-    expect(find.text('SD / SDXL / Pony / Illustrious'), findsOneWidget);
-    expect(find.text('Text to image · flux'), findsOneWidget);
-    expect(find.text('Text to image · qwen_image'), findsOneWidget);
-    expect(find.text('Text to image · sd'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Z-Image Turbo'),
-      120,
-      scrollable: find.byType(Scrollable).last,
-    );
-    expect(find.text('Z-Image Turbo'), findsOneWidget);
-    expect(find.text('Text to image · z_image_turbo'), findsOneWidget);
-    expect(find.text('Choose file'), findsOneWidget);
-    await tester.tap(find.text('Close').last);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    // No graph picker exists on the native desk: Change workflow only
+    // explains that the built-in engine picks models directly.
     await show(tester, find.text('Change model'));
     await tester.tap(find.text('Change model'));
     await tester.pump();
@@ -280,17 +258,22 @@ void main() {
       find.byWidgetPredicate(
         (widget) =>
             widget is TextField &&
-            widget.decoration?.hintText == 'Search families or files',
+            widget.decoration?.hintText == 'Search by name',
       ),
       'z_image_turbo_q8.gguf',
     );
     await tester.pump();
     await tester.tap(find.text('Use this name'));
     await tester.pump();
+    expect(find.text('z_image_turbo_q8.gguf'), findsOneWidget);
+    await show(tester, find.textContaining('Advanced ▸'));
+    await tester.tap(find.textContaining('Advanced ▸'));
+    await tester.pump();
     expect(
-      find.text('Workflow · GGUF · chosen for this file · z_image_turbo'),
+      find.textContaining('GGUF · chosen for this file'),
       findsOneWidget,
     );
+    expect(find.text('Change graph — Create'), findsNothing);
   });
 
   testWidgets('a saved GGUF file on the checkpoint graph is not swapped', (
@@ -348,7 +331,7 @@ void main() {
   });
 
   testWidgets(
-    'a chosen encoder and VAE are shown as chosen, whatever their names',
+    'native has no encoder or VAE slots, so chosen support files are not shown',
     (tester) async {
       await pumpDesk(
         tester,
@@ -375,8 +358,14 @@ void main() {
           );
         },
       );
-      expect(find.text('clip_l.safetensors'), findsOneWidget);
-      expect(find.text('qwen_image_vae.safetensors'), findsOneWidget);
+      // The support section lives in Advanced; opening it proves the
+      // section itself is absent, not just off-screen.
+      await show(tester, find.textContaining('Advanced ▸'));
+      await tester.tap(find.textContaining('Advanced ▸'));
+      await tester.pump();
+      expect(find.text('clip_l.safetensors'), findsNothing);
+      expect(find.text('qwen_image_vae.safetensors'), findsNothing);
+      expect(find.text('Extra files this setup loads'), findsNothing);
       expect(find.text('Not chosen'), findsNothing);
     },
   );
@@ -386,9 +375,14 @@ void main() {
     expect(find.byKey(const Key('studio-desk-narrow')), findsOneWidget);
     expect(find.byKey(const Key('studio-desk-wide')), findsNothing);
     expect(find.text('Write it for me'), findsOneWidget);
-    expect(find.text(kStudioCheckpointSupport), findsOneWidget);
+    // Native has no checkpoint graph, so its support note never renders.
+    expect(find.text(kStudioCheckpointSupport), findsNothing);
     expect(find.text('Generate'), findsOneWidget);
     expect(find.textContaining('Advanced ▸'), findsOneWidget);
+    await show(tester, find.textContaining('Advanced ▸'));
+    await tester.tap(find.textContaining('Advanced ▸'));
+    await tester.pump();
+    expect(find.text(kStudioCheckpointSupport), findsNothing);
   });
 
   testWidgets('metadata clash keeps Generate off until Use anyway', (
@@ -416,10 +410,14 @@ void main() {
       },
     );
 
+    // LoRA badges live in Advanced, so open it before the badge expects.
+    await show(tester, find.textContaining('Advanced ▸'));
+    await tester.tap(find.textContaining('Advanced ▸'));
+    await tester.pump();
     expect(find.text('other base'), findsOneWidget);
     expect(
       find.textContaining(
-        'Generate stays off until you pick a matching LoRA or press Use anyway.',
+        'Generate is paused. Open Advanced to pick a matching one',
       ),
       findsOneWidget,
     );
@@ -462,6 +460,10 @@ void main() {
       },
     );
 
+    // The LoRA badge lives in Advanced, so open it before the badge expects.
+    await show(tester, find.textContaining('Advanced ▸'));
+    await tester.tap(find.textContaining('Advanced ▸'));
+    await tester.pump();
     expect(find.text('likely'), findsOneWidget);
     expect(find.text('other base'), findsNothing);
     expect(find.text('Use anyway'), findsNothing);
