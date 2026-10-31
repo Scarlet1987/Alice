@@ -29,7 +29,28 @@ import 'package:provider/provider.dart';
 
 import 'package:front_porch_ai/services/services.dart';
 import 'package:front_porch_ai/services/storage/storage.dart';
+import 'package:front_porch_ai/services/web/web_server_host.dart';
 import 'package:front_porch_ai/ui/settings/tabs/general_tab.dart';
+
+import '../../golden/support/fakes.dart';
+
+/// GeneralTab's companion card reads the web server host; the update row
+/// (when supported) reads the update service. Neither is what this test is
+/// about, so both stand in idle.
+class _IdleWebServer extends ChangeNotifier implements WebServerHost {
+  @override
+  bool get isRunning => false;
+  @override
+  String? get lastStartError => null;
+  @override
+  bool get lastStartPortConflict => false;
+  @override
+  bool get hasActiveClient => false;
+  @override
+  String? get connectedClientIp => null;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class _FakeStorage extends ChangeNotifier implements StorageService {
   _FakeStorage() {
@@ -74,8 +95,16 @@ void main() {
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
-        ChangeNotifierProvider<StorageService>.value(
-          value: storage,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<StorageService>.value(value: storage),
+            ChangeNotifierProvider<WebServerHost>.value(
+              value: _IdleWebServer(),
+            ),
+            ChangeNotifierProvider<UpdateService>.value(
+              value: FakeUpdateService(),
+            ),
+          ],
           child: MaterialApp(
             home: Scaffold(
               body: GeneralTab(systemPromptController: controller),

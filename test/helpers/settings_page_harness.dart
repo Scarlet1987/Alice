@@ -254,6 +254,7 @@ class SettingsPageRig {
 
   late final ListedModels models;
   late final ReadyBackendManager backend;
+  late final ImageGenService imageGen;
 }
 
 /// A model file grown to its real size from a real GGUF header fixture.
@@ -322,10 +323,12 @@ Future<SettingsPageRig> buildRig(
     );
     rig.models = ListedModels([a, b]);
     rig.backend = ReadyBackendManager(exe);
+    rig.imageGen = ImageGenService(store);
     await before?.call(rig);
   });
   addTearDown(() {
     rig.kobold.dispose();
+    rig.imageGen.dispose();
     rig.dir.deleteSync(recursive: true);
   });
   return rig;
@@ -355,6 +358,7 @@ Widget withRigProviders(
     ChangeNotifierProvider<ExpressionClassifierService>.value(
       value: IdleClassifier(),
     ),
+    ChangeNotifierProvider<ImageGenService>.value(value: rig.imageGen),
     ChangeNotifierProvider<WebServerHost>.value(value: IdleWebServer()),
   ],
   child: child,

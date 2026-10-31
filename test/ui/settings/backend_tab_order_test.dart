@@ -13,6 +13,7 @@ import 'package:front_porch_ai/ui/settings/tabs/backend/worker_backend_section.d
 import 'package:front_porch_ai/ui/settings/tabs/backend_tab.dart';
 
 import '../../golden/support/fakes.dart';
+import '../../golden/support/fakes_services.dart';
 import '../../golden/support/fakes_storage.dart';
 
 class _Store extends FakeStorageService {
@@ -37,17 +38,40 @@ class _Mgr extends ChangeNotifier implements BackendManager {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Real KoboldService, minus the constructor's live-server probe: this test
+/// never starts an engine, it only renders the health row's phase.
+class _IdleKobold extends KoboldService {
+  _IdleKobold(super.storage);
+
+  @override
+  Future<void> reconnectIfAlive() async {}
+}
+
 void main() {
   testWidgets('H0 chat stack is contiguous before Side jobs', (tester) async {
     final url = TextEditingController(text: kNanoGptApiV1);
     final key = TextEditingController();
     addTearDown(url.dispose);
     addTearDown(key.dispose);
+    // BackendTab always builds EngineResourcesCard, whose health row reads
+    // KoboldService and ImageGenService and whose header reads
+    // HardwareService — the real app provides all three, so this mount must
+    // too. The services share the tab's store, as in the app.
+    final store = _Store();
+    final kobold = _IdleKobold(store);
+    final imageGen = ImageGenService(store);
+    addTearDown(kobold.dispose);
+    addTearDown(imageGen.dispose);
 
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<StorageService>.value(value: _Store()),
+          ChangeNotifierProvider<StorageService>.value(value: store),
+          ChangeNotifierProvider<KoboldService>.value(value: kobold),
+          ChangeNotifierProvider<ImageGenService>.value(value: imageGen),
+          ChangeNotifierProvider<HardwareService>.value(
+            value: FakeHardwareService(),
+          ),
           ChangeNotifierProvider<LLMProvider>.value(
             value: FakeLLMProvider(activeBackend: BackendType.openRouter),
           ),
