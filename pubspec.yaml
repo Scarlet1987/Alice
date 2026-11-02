@@ -91,7 +91,7 @@ dev_dependencies:
   # Dev-only: test/flutter_test_config.dart uses GoogleFonts.config to forbid
   # runtime font fetching in tests. The app bundles its fonts natively
   # (assets/fonts/, declared below) and never depends on this package.
-  google_fonts: ^8.2.1
+  google_fonts: ^9.0.0
   drift_dev: ^2.35.1
   build_runner: ^2.16.1
 
