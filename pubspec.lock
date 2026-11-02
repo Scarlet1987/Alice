@@ -249,6 +249,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  convertlib:
+    dependency: transitive
+    description:
+      name: convertlib
+      sha256: "5874961a2c30a76b65363550897f58d6980deec67320bbfa8021b45cb2797c9c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.1"
   cross_file:
     dependency: "direct main"
     description:
@@ -603,18 +611,10 @@ packages:
     dependency: "direct main"
     description:
       name: hashlib
-      sha256: f547a6273fa2bba211e903f32b234a6a7097aca1d218d2391f40021d25e7f200
+      sha256: b998d270c41c782d4e75e8fd19c8f43b64070f65bfeb528bbf886bb253cbb35b
       url: "https://pub.dev"
     source: hosted
-    version: "1.24.0"
-  hashlib_codecs:
-    dependency: transitive
-    description:
-      name: hashlib_codecs
-      sha256: "8cea9ccafcfeaa7324d2ae52c61c69f7ff71f4237507a018caab31b9e416e3b1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.6.0"
+    version: "2.4.2"
   hooks:
     dependency: transitive
     description:
