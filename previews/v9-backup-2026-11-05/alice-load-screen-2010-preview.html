@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alice — Load screen preview (bright happy edgy)</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#7dff9e;color:#08210f;font-family:Georgia,Palatino,Times,serif;display:flex;align-items:center;justify-content:center}
+  .screen{width:min(960px,94vw);min-height:min(600px,92vh);position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(180deg,#b8ff5e 0%,#4dff88 30%,#00c853 58%,#00914f 100%);box-shadow:0 24px 60px rgba(0,60,20,.45);border:4px solid #08210f}
+  /* bright diagonal sun rays */
+  .screen:before{content:"";position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg at 50% 38%,rgba(255,255,255,.28) 0 12deg,transparent 12deg 26deg);pointer-events:none}
+  .burst{position:absolute;left:50%;top:32%;transform:translate(-50%,-50%);width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#fff59d 0%,#ffe600 45%,rgba(255,230,0,0) 72%)}
+  .trees{position:absolute;left:0;right:0;bottom:118px;height:190px;background:radial-gradient(circle at 12% 100%,#08210f 0 60px,transparent 61px),radial-gradient(circle at 28% 100%,#00c853 0 80px,transparent 81px),radial-gradient(circle at 48% 100%,#08210f 0 70px,transparent 71px),radial-gradient(circle at 68% 100%,#00c853 0 90px,transparent 91px),radial-gradient(circle at 86% 100%,#08210f 0 65px,transparent 66px)}
+  .rabbit{position:absolute;left:50%;bottom:150px;transform:translateX(-50%) rotate(-4deg);width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ffe600 78%);border:4px solid #08210f;box-shadow:6px 8px 0 #ff4d8d;display:flex;align-items:center;justify-content:center;font-size:68px}
+  .rabbit:before{content:"";position:absolute;top:-40px;left:18px;width:18px;height:56px;background:#fff;border:4px solid #08210f;border-radius:12px;transform:rotate(-14deg)}
+  .rabbit:after{content:"";position:absolute;top:-40px;right:18px;width:18px;height:56px;background:#fff;border:4px solid #08210f;border-radius:12px;transform:rotate(14deg)}
+  .copy{position:relative;text-align:center;padding:44px 28px 0}
+  .copy h1{margin:0;font-size:76px;letter-spacing:.02em;color:#fff;-webkit-text-stroke:2px #08210f;text-shadow:5px 5px 0 #ff4d8d,0 8px 0 rgba(0,0,0,.15);transform:rotate(-2deg)}
+  .copy .tag{display:inline-block;margin-top:16px;background:#ff4d8d;color:#fff;font-weight:900;font-size:21px;padding:10px 20px;border-radius:999px;border:3px solid #08210f;box-shadow:4px 4px 0 #08210f;transform:rotate(1deg)}
+  .copy .sub{margin:16px 0 0;color:#08210f;font-weight:700;font-size:19px}
+  .bar-wrap{position:absolute;left:0;right:0;bottom:0;background:#ffe600;padding:20px 28px 16px;border-top:4px solid #08210f}
+  .bar{height:26px;border-radius:999px;background:#fff;border:3px solid #08210f;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ff4d8d,#ff8a00,#00c853);animation:fill 9s ease-in-out infinite}
+  @keyframes fill{0%{width:4%}55%{width:68%}85%{width:92%}100%{width:100%}}
+  .status{display:flex;justify-content:space-between;gap:12px;margin-top:10px;color:#08210f;font-size:17px;font-weight:700}
+  .foot{margin:10px 0 0;text-align:center;color:#08210f;font-size:14px;font-weight:700}
+</style>
+</head>
+<body>
+  <div class="screen">
+    <div class="burst"></div>
+    <div class="trees"></div>
+    <div class="rabbit">🐇</div>
+    <div class="copy">
+      <h1>ALICE!</h1>
+      <div class="tag">Follow the White Rabbit!</div>
+      <p class="sub">Rabbit Hole • Alice v1.0 — install version 1</p>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar"><i></i></div>
+      <div class="status"><span id="tip">Loading your world…</span><span><b>LET'S GO!</b></span></div>
+      <p class="foot">Local first. No rent, no cloud. Your hardware, your story.</p>
+    </div>
+  </div>
+<script>
+  const tips=["Loading your world…","Waking the models…","Setting the stage…","Polishing the looking glass…"];
+  let i=0; setInterval(()=>{ i=(i+1)%tips.length; document.getElementById('tip').textContent=tips[i]; }, 3000);
+</script>
+</body>
+</html>
