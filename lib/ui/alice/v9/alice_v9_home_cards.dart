@@ -40,17 +40,14 @@ class StageCard extends StatelessWidget {
         children: [
           const V9Heading('stage'),
           const SizedBox(height: 16),
-          if (stageNames.isEmpty)
-            const V9Muted(
-              'No stages yet — create a world on the Worlds screen first.',
-            )
-          else
-            V9CoverFlow(
-              items: stageNames,
-              selected: stageIndex,
-              onSelect: (i) => state.selectStage(stageNames[i]),
-              emptyText: 'No stages yet.',
-            ),
+          V9CoverFlow(
+            items: stageNames,
+            selected: stageIndex,
+            onSelect: (i) => state.selectStage(stageNames[i]),
+            emptyText:
+                'No stages yet — create a world on the Worlds screen first.',
+            onCreate: onNew,
+          ),
           const SizedBox(height: 8),
           const V9Muted('Cover Flow, centered.'),
           const SizedBox(height: 12),
@@ -98,22 +95,18 @@ class CharCard extends StatelessWidget {
         children: [
           const V9Heading('current char'),
           const SizedBox(height: 16),
-          if (charNames.isEmpty)
-            const V9Muted(
-              'No characters yet — make one in Char creator first.',
-            )
-          else
-            V9CoverFlow(
-              items: charNames,
-              selected: charIndex,
-              onSelect: (i) {
-                final card = context
-                    .read<CharacterRepository>()
-                    .characters[i];
-                state.selectCharacter(card.dbId);
-              },
-              emptyText: 'No characters yet.',
-            ),
+          V9CoverFlow(
+            items: charNames,
+            selected: charIndex,
+            onSelect: (i) {
+              final card = context
+                  .read<CharacterRepository>()
+                  .characters[i];
+              state.selectCharacter(card.dbId);
+            },
+            emptyText: 'No characters yet — make one in Char creator first.',
+            onCreate: onNew,
+          ),
           const SizedBox(height: 8),
           const V9Muted('Cover Flow, centered.'),
           const SizedBox(height: 12),

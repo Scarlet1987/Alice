@@ -176,11 +176,15 @@ class V9Muted extends StatelessWidget {
 
 /// Cover Flow: three cards in a row, the centre one larger and raised.
 /// Tapping a card selects it; the centre card is the current pick.
+/// Empty library: the same three-card shape, as outlines with no names
+/// on them — the centre card is the create action, the side cards do
+/// nothing. No fake character or stage is ever invented here.
 class V9CoverFlow extends StatelessWidget {
   final List<String> items;
   final int selected;
   final ValueChanged<int> onSelect;
   final String emptyText;
+  final VoidCallback? onCreate;
 
   const V9CoverFlow({
     super.key,
@@ -188,14 +192,103 @@ class V9CoverFlow extends StatelessWidget {
     required this.selected,
     required this.onSelect,
     required this.emptyText,
+    this.onCreate,
   });
 
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: V9Muted('Nothing here yet.'),
+      return Column(
+        children: [
+          Row(
+            children: [
+              for (var i = 0; i < 3; i++)
+                Expanded(
+                  flex: i == 1 ? 13 : 10,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: i == 1
+                        ? InkWell(
+                            onTap: onCreate,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              height: 180,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.aliceDark.withValues(
+                                  alpha: 0.35,
+                                ),
+                                border: Border.all(
+                                  color: AppColors.aliceGreen,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.pureBlack.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 20,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '+new',
+                                    textAlign: TextAlign.center,
+                                    style: _v9Serif.copyWith(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.pureWhite,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'create your first',
+                                    textAlign: TextAlign.center,
+                                    style: _v9Serif.copyWith(
+                                      fontSize: 14,
+                                      color: AppColors.alicePale,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 150,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: AppColors.aliceGreen.withValues(
+                                  alpha: 0.5,
+                                ),
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '—',
+                              textAlign: TextAlign.center,
+                              style: _v9Serif.copyWith(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.alicePale.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          V9Muted(emptyText),
+        ],
       );
     }
     final start = (selected - 1).clamp(0, items.length - 1);
