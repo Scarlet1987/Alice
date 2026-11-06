@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alice — Combined preview v9, fixes 2026-11-05 (readable pale text, pale dropdown popups, centred Pocket, centred headings and buttons, empty Cover Flow shape, one browse one check one drop in asset box, Pocket aligned with Stage/Char), preview only</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0f3d22 0%,#14532e 60%,#0f3d22 100%);color:#fff;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;font-size:20px;line-height:1.55}
+  .banner{display:grid;grid-template-columns:1fr 2fr 1fr;gap:16px;align-items:center;padding:20px 28px;max-width:1450px;margin:0 auto;background:linear-gradient(180deg,#14532e 0%,#00914f 100%);border-radius:0 0 16px 16px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+  .banner .credits{font-size:16px;color:#d9f0e3;text-align:center}
+  .banner .credits b{display:block;color:#fff}
+  .banner .center{text-align:center}
+  .banner .center b{font-size:44px;display:block;line-height:1.1;color:#fff}
+  .banner .center .rh{font-size:22px;color:#d9f0e3}
+  .banner .center .follow{font-size:20px;font-weight:800;color:#fff}
+  .home-label{font-size:15px;color:#d9f0e3;padding:12px 28px 0;max-width:1450px;margin:0 auto}
+  .pagenav{display:flex;gap:14px;padding:16px 28px;flex-wrap:wrap;background:#0f3d22;border-bottom:2px solid #00914f;max-width:1450px;margin:0 auto}
+  .pagenav button{background:#00914f;color:#fff;border:1px solid #666;border-radius:12px;padding:16px 20px;font-size:20px;font-weight:800;cursor:pointer;min-height:58px}
+  .pagenav button[aria-pressed="true"]{background:#00914f;color:#fff;outline:4px solid #d9f0e3}
+  .pagenav .dead{flex:1 1 120px}
+  .page{display:none}
+  .page.active{display:block}
+  .layout{display:flex;gap:24px;padding:24px 28px;max-width:1450px;margin:0 auto}
+  .rail{width:270px;flex-shrink:0}
+  .rail .jump{border:2px solid #00914f;border-radius:12px;padding:16px;margin:0 0 20px;background:rgba(29,77,51,.88);color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.35);border-top:3px solid #00914f}
+  .rail h2{margin:0 0 12px;font-size:20px;background:#00914f;color:#fff;padding:10px 12px;border-radius:8px;text-align:center;transition:transform .15s ease,box-shadow .15s ease;cursor:pointer;box-shadow:0 3px 0 #007a42,0 5px 8px rgba(0,0,0,.25)}
+  .rail h2:hover{transform:translateY(-2px);box-shadow:0 3px 0 #007a42,0 6px 10px rgba(0,0,0,.3)}
+  .rail button{display:block;width:100%;background:#00914f;color:#fff;border:1px solid #666;border-radius:10px;padding:16px 10px;margin:0 0 12px;font-size:18px;font-weight:700;cursor:pointer;min-height:56px}
+  .main{flex:1;min-width:0}
+  .container{border:2px solid #00914f;border-radius:12px;padding:24px;margin:0 0 32px;background:rgba(29,77,51,.88);color:#fff}
+  .container>h2{margin:0 0 22px;font-size:30px;background:#00914f;color:#fff;padding:12px 14px;border-radius:8px;display:block;text-align:center;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;letter-spacing:.02em}
+  .row{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 22px}
+  .box{border:2px solid #00914f;border-radius:12px;padding:20px;flex:1 1 280px;background:rgba(29,77,51,.88);color:#fff}
+  .box>h3{margin:0 0 16px;font-size:24px;background:#00914f;color:#fff;padding:10px 12px;border-radius:8px;display:block;text-align:center;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;letter-spacing:.02em}
+  /* Fix round 7 (2026-11-05): headings centred in their full-width green
+     bar, matching Dart V9Heading (textAlign center). .box>h2 covers the
+     "stage" and "current char" headings and the Pocket heading, which
+     had no green background at all before — plain left-aligned h2 over
+     a centred Cover Flow. .previewbox h3 covers the model preview
+     pane headings. Nested h3s (e.g. "class choice" inside
+     #creator-physical) are covered by .box h3 below. */
+  .box h2{margin:0 0 22px;font-size:30px;background:#00914f;color:#fff;padding:12px 14px;border-radius:8px;display:block;text-align:center;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;letter-spacing:.02em}
+  .box h3{display:block;text-align:center}
+  .previewbox h3{margin:0 0 16px;font-size:24px;background:#00914f;color:#fff;padding:10px 12px;border-radius:8px;display:block;text-align:center;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;letter-spacing:.02em}
+  .btn{background:#00914f;color:#fff;border:1px solid #666;border-radius:10px;padding:18px 12px;font-size:19px;font-weight:700;cursor:pointer;min-height:60px;width:100%}
+  select,input[type="text"],textarea{width:100%;padding:16px;border:2px solid #999;border-radius:8px;background:#d9f0e3;color:#000;font-size:20px}
+  /* Fix round 5 (2026-11-05): black text inside pale boxes — selected value,
+     typed text, and placeholder at ~60% black. Previously inherited white
+     theme text on pale #d9f0e3 washed out (torso length, bio white-on-white). */
+  select::placeholder,input[type="text"]::placeholder,textarea::placeholder{color:rgba(0,0,0,.6);opacity:1}
+  textarea{background:#fff;color:#000}
+  /* Fix round 5b (2026-11-05): dropdown popup list — pale background,
+     black option text, same as the closed box. */
+  select option{color:#000;background:#d9f0e3}
+  textarea{min-height:90px;background:#fff}
+  .list button{display:block;width:100%;text-align:left;background:rgba(255,255,255,.92);color:#111;border:0;border-bottom:1px solid #ddd;padding:14px 8px;font-size:20px;cursor:pointer}
+  .list button.sel{background:#d9f0e3;font-weight:700;outline:2px solid #00914f}
+  .list button.sel::before{content:"▸ "}
+  .previewbox{border:2px solid #00914f;border-radius:12px;padding:20px;min-height:220px;background:rgba(29,77,51,.88);color:#fff}
+  .previewbox.large{min-height:440px}
+  /* Fix round 7 (2026-11-05): helper/muted text centres with its centred
+     heading, matching Dart V9Muted (textAlign center). */
+  .muted{color:#d9f0e3;font-size:19px;text-align:center}
+  .drop{border:3px dashed #00914f;border-radius:12px;padding:26px;text-align:center;margin:14px 0;background:#d9f0e3;color:#111}
+  .drop.over{background:#d9f0e3}
+  .grid2{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+  .grid2 .stack{display:flex;flex-direction:column;gap:20px}
+  label{display:block;margin:16px 0 8px;font-weight:800}
+  .optrow{display:flex;gap:10px;flex-wrap:wrap}
+  .optrow button{flex:1 1 120px;background:#00914f;color:#fff;border:1px solid #666;border-radius:10px;padding:16px 8px;font-size:18px;font-weight:700;cursor:pointer;min-height:56px}
+  .optrow button.sel{background:#fff;color:#00914f;outline:3px solid #00914f}
+  .custom-input{display:none;width:100%;margin-top:10px}
+  .custom-saved{display:none;color:#00914f;font-size:15px;margin:6px 0 0}
+  .fieldrow{display:flex;gap:16px;flex-wrap:wrap}
+  .fieldrow>div{flex:1 1 180px}
+  .measure-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px}
+  .measure-cell{border:2px solid #00914f;border-radius:10px;padding:8px 10px 10px;background:rgba(29,77,51,.88);color:#fff}
+  .measure-cell label{display:block;margin:0 0 4px;font-size:18px;font-weight:800}
+  .measure-cell input[type="range"]{width:100%;margin:0;height:28px}
+  .measure-cell select{padding:8px;margin:0}
+  .measure-cell.empty{border:0;background:transparent}
+  #creator-tailors{padding:14px 16px}
+  #creator-tailors>h3{margin-bottom:8px}
+  #creator-tailors .muted{margin:4px 0}
+
+  .stage{border:2px solid #00914f;border-radius:12px;background:rgba(29,77,51,.88);min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;margin:0 0 16px}
+  .stage b{font-size:24px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px}
+  .big3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .big3 .btn{min-height:120px;font-size:20px}
+  .btn.small{width:auto;padding:12px 18px;min-height:48px;font-size:18px;font-family:Georgia,'Palatino Linotype','Times New Roman',serif;letter-spacing:.03em}
+  @media (max-width:900px){
+    .layout{flex-direction:column;padding:16px}
+    .rail{width:auto}
+    .grid2{grid-template-columns:1fr}
+    .previewbox.large{min-height:260px}
+    .measure-grid{grid-template-columns:repeat(2,1fr)}
+  }
+
+  /* v9 dark: serif throughout, text pop, 3D buttons, light hardware tax */
+  h2,h3,b,button{text-shadow:0 2px 4px rgba(0,0,0,.45)}
+  .muted{text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .home-grid{display:grid;grid-template-columns:270px 1fr 1fr;gap:24px;padding:24px 28px;max-width:1450px;margin:0 auto;align-items:stretch}
+  .home-grid>main,.home-grid>aside{display:flex;flex-direction:column}
+  .home-grid>main>section,.home-grid>aside>section{flex:1}
+  .coverflow{display:flex;gap:12px;align-items:center;justify-content:center;margin:8px 0 16px;perspective:900px}
+  .coverflow .card{flex:1;border-radius:12px;min-height:150px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;font-weight:700;font-size:17px;color:#14532e;background:linear-gradient(180deg,#fff,#d9f0e3);box-shadow:0 8px 20px rgba(0,0,0,.2);transition:transform .2s ease,box-shadow .2s ease;cursor:pointer}
+  .coverflow .card:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 16px 30px rgba(0,0,0,.28)}
+  .coverflow .card.center{flex:1.3;min-height:180px;background:linear-gradient(180deg,#b8e6c9 0%,#7cc79b 35%,#2f7a4e 70%,#14532e 100%);color:#fff;position:relative;overflow:hidden;animation:float 4s ease-in-out infinite;box-shadow:0 16px 32px rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.5)}
+  .coverflow .card.center:before{content:'';position:absolute;left:50%;top:18px;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe0b3,#e8a87c 70%);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+  .coverflow .card.center:after{content:'';position:absolute;left:0;right:0;bottom:0;height:60px;background:radial-gradient(ellipse 60% 100% at 30% 100%,#0f3d22 0%,transparent 70%),radial-gradient(ellipse 50% 90% at 75% 100%,#14532e 0%,transparent 70%)}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  /* Fix round 8 (2026-11-05): empty Cover Flow shape, matching Dart
+     V9CoverFlow empty branch — three outline placeholder cards, no
+     names on them. Centre card (larger, raised) is the create action;
+     side cards are faint outlines only and do nothing on click. The
+     face circle and hills from the sample centre card are removed
+     here: an empty card has no face and no scenery. */
+  .coverflow .card.empty{background:transparent;border:2px solid rgba(0,145,79,.5);box-shadow:none;color:rgba(217,240,227,.6)}
+  .coverflow .card.empty:hover{transform:none;box-shadow:none}
+  .coverflow .card.empty.center{flex:1.3;min-height:180px;background:rgba(20,83,46,.35);border:2px solid #00914f;color:#fff;box-shadow:0 16px 32px rgba(0,0,0,.3);flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-bottom:0;animation:none}
+  .coverflow .card.empty.center:before,.coverflow .card.empty.center:after{content:none}
+  .coverflow .card.empty.center .empty-label{font-size:20px;font-weight:700;color:#fff}
+  .coverflow .card.empty.center .empty-sub{font-size:14px;font-weight:400;color:#d9f0e3}
+  /* Fix round 10 (2026-11-05): Pocket aligned with Stage / Current Char
+     above it, matching Dart commit 94f7e00. .loadout is now the same
+     three-column grid as .home-grid (270px Jump rail + 24px gap + the
+     two content columns, same 28px side padding, same 1450px cap), so
+     Pocket sits in exactly the Stage+Char area instead of centred on
+     the whole page — that was 147px left of Stage's left edge, a sore
+     thumb. Pocket takes columns 2–3, so its left edge, right edge and
+     centre line match Stage+Char at every width; the 1100px cap stays
+     but the area is 1076px at full width, so it insets equally (zero)
+     and does not re-introduce an offset. Row gap is 0 so the vertical
+     spacing below Pocket is unchanged. The "What is exact" section
+     below it spans all three columns, full width as before. */
+  .loadout{display:grid;grid-template-columns:270px 1fr 1fr;column-gap:24px;row-gap:0;padding:24px 28px;max-width:1450px;margin:0 auto 32px}
+  .loadout>section:not(#pocket){grid-column:1 / -1}
+  /* Fix round 6 (2026-11-05): Pocket in Space Time narrowed and centred —
+     max 1100px, equal margins left/right, heading travels with the card.
+     3x2 grid inside is unchanged. */
+  #pocket{grid-column:2 / span 2;max-width:1100px;margin-left:auto;margin-right:auto}
+  /* pop: shadows, highlights, 3D lift - v7 */
+  .box{box-shadow:0 6px 18px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.9) inset; border-top:3px solid #00914f;}
+  .box:hover{box-shadow:0 10px 26px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.9) inset;}
+  .btn{box-shadow:0 4px 0 #007a42, 0 6px 12px rgba(0,0,0,.18); transition:transform .12s ease, box-shadow .12s ease;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 6px 0 #007a42, 0 10px 18px rgba(0,0,0,.20);}
+  .btn:active{transform:translateY(2px); box-shadow:0 2px 0 #007a42, 0 3px 8px rgba(0,0,0,.16);}
+  .jump button{box-shadow:0 3px 8px rgba(0,0,0,.12);}
+  .jump button:hover{transform:translateY(-1px);}
+  .pagenav button{box-shadow:0 3px 0 #007a42, 0 5px 10px rgba(0,0,0,.15);}
+  .scene{height:170px; border-radius:12px; background:linear-gradient(180deg,#b8e6c9 0%,#7cc79b 35%,#2f7a4e 70%,#1d4d33 100%); position:relative; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.5); transform:perspective(900px) rotateX(2deg); margin-bottom:14px;}
+  .scene:before{content:""; position:absolute; left:0; right:0; bottom:0; height:70px; background:radial-gradient(ellipse 60% 100% at 30% 100%, #0f3d22 0%, transparent 70%), radial-gradient(ellipse 50% 90% at 75% 100%, #14532e 0%, transparent 70%);}
+  /* scene chip removed: that text lives only in the center banner, not under Stage */
+  .cardstack{height:170px; position:relative; margin-bottom:14px; perspective:900px;}
+  .cardstack .mini{position:absolute; inset:0 18px 0 18px; border-radius:12px; box-shadow:0 12px 26px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.6); transform:rotate(-3deg) translateY(4px); background:linear-gradient(180deg,#d9f0e3,#00914f);}
+  .cardstack .mini:nth-child(2){transform:rotate(2deg) translateY(0); background:linear-gradient(180deg,#eafaf0,#2f7a4e);}
+  .cardstack .mini:nth-child(3){transform:rotate(0deg) translateY(-4px); background:linear-gradient(180deg,#fff,#b8e6c9); display:flex; align-items:flex-end; justify-content:center; padding-bottom:16px; color:#14532e; font-weight:700; font-size:17px;}
+  .mini .face{position:absolute; top:18px; left:50%; transform:translateX(-50%); width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #ffe0b3, #e8a87c 70%); box-shadow:0 4px 10px rgba(0,0,0,.25);}
+</style>
+</head>
+<body>
+<p class="home-label">Home page — v9, combined preview, preview only, no Dart yet</p>
+<div class="banner">
+  <div class="credits"><b>hardware credits</b>Hardware credits, as in your sketch, left of the banner.</div>
+  <div class="center"><div class="rh">Rabbit Hole</div><b>Alice</b><div class="follow">Follow the White Rabbit</div></div>
+  <div class="credits"><b>software credits</b>Software credits, as in your sketch, right of the banner.</div>
+</div>
+<div class="pagenav" aria-label="Pages">
+  <button id="btnHome" aria-pressed="true" onclick="showPage('page-home')">Home</button>
+  <button id="btnModels" aria-pressed="false" onclick="showPage('page-models')">Model selection</button>
+  <div class="dead" aria-hidden="true"></div>
+  <button id="btnCreator" aria-pressed="false" onclick="showPage('page-creator')">Char creator</button>
+  <button id="btnProfiles" aria-pressed="false" onclick="showPage('page-profiles')">User profile</button>
+</div>
+
+<!-- HOME PAGE: Home v9, confirmed layout, with Jump To hover fix -->
+<div id="page-home" class="page active">
+<div class="home-grid">
+  <nav class="rail">
+    <div class="jump">
+      <h2>jump to</h2>
+      <button onclick="note('homeNote', 'World lore — jump target in this preview.')">world lore</button>
+      <button onclick="note('homeNote', 'Equip — jump target in this preview.')">equip</button>
+      <button onclick="note('homeNote', 'Char card — jump target in this preview.')">char card</button>
+      <button onclick="note('homeNote', 'FAQ definitions — jump target in this preview.')">FAQ definitions</button>
+      <button onclick="note('homeNote', 'Benchmark — jump target in this preview.')">benchmark</button>
+      <button onclick="note('homeNote', 'Start server — jump target in this preview.')">start server</button>
+    </div>
+    <p class="muted" id="homeNote"></p>
+  </nav>
+  <main>
+    <section class="box" id="stage">
+      <h2>stage</h2>
+      <div class="coverflow"><div class="card empty">—</div><div class="card empty center" onclick="note('homeNote', 'New stage — in the real app this creates a new stage. Preview only.')"><span class="empty-label">+new</span><span class="empty-sub">create your first</span></div><div class="card empty">—</div></div>
+      <p class="muted">No stages yet — create a world on the Worlds screen first.</p>
+      <p class="muted">Cover Flow, centered.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="btn small" onclick="note('homeNote', 'New stage — in the real app this creates a new stage. Preview only.')">+new</button>
+        <button class="btn small" onclick="note('homeNote', 'Edit stage — in the real app this edits the current stage. Preview only.')">edit</button>
+        <button class="btn small" onclick="note('homeNote', 'Delete stage — in the real app this deletes the current stage. Preview only.')">-del</button>
+      </div>
+    </section>
+  </main>
+  <aside>
+    <section class="box" id="current-char">
+      <h2>current char</h2>
+      <div class="coverflow"><div class="card empty">—</div><div class="card empty center" onclick="note('homeNote', 'New character — in the real app this opens Creator. Preview only.')"><span class="empty-label">+new</span><span class="empty-sub">create your first</span></div><div class="card empty">—</div></div>
+      <p class="muted">No characters yet — make one in Char creator first.</p>
+      <p class="muted">Cover Flow, centered.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="btn small" onclick="note('homeNote', 'New character — in the real app this opens Creator. Preview only.')">+new</button>
+        <button class="btn small" onclick="note('homeNote', 'Edit character — in the real app this opens the card in Creator. Preview only.')">edit</button>
+        <button class="btn small" onclick="note('homeNote', 'Delete character — in the real app this deletes the picked card. Preview only.')">-del</button>
+      </div>
+    </section>
+  </aside>
+</div>
+<div class="loadout">
+  <section class="box" id="pocket">
+    <h2>pocket in space time — starting loadout</h2>
+    <p class="muted">One combined label. Pocket in Space Time is the container, and it holds Starting Loadout, fixed inside it — not dynamic, not empty. Lined up with Stage and Current Char above it (max 1100px), as fixed 2026-11-05. Top: weapons | armor | clothing. Bottom: accessories | items | quest items.</p>
+    <div class="grid3">
+      <div class="box"><h3>weapons</h3><div><label>intimate</label><select><option>—</option><option>Option 1</option></select></div><div><label>close range</label><select><option>—</option><option>Option 1</option></select></div><div><label>long range</label><select><option>—</option><option>Option 1</option></select></div></div>
+      <div class="box"><h3>armor</h3><div><label>top armor</label><select><option>—</option><option>Option 1</option></select></div><div><label>helmet</label><select><option>—</option><option>Option 1</option></select></div><div><label>leg armor</label><select><option>—</option><option>Option 1</option></select></div></div>
+      <div class="box"><h3>clothing</h3><div><label>torso</label><select><option>—</option><option>Option 1</option></select></div><div><label>chest</label><select><option>—</option><option>Option 1</option></select></div><div><label>legs</label><select><option>—</option><option>Option 1</option></select></div><div><label>arms</label><select><option>—</option><option>Option 1</option></select></div><div><label>feet</label><select><option>—</option><option>Option 1</option></select></div><div><label>hands</label><select><option>—</option><option>Option 1</option></select></div></div>
+      <div class="box"><h3>accessories</h3><div><label>accessory 1</label><select><option>Option 1</option></select></div><div><label>accessory 2</label><select><option>Option 1</option></select></div><div><label>accessory 3</label><select><option>Option 1</option></select></div><div><label>accessory 4</label><select><option>Option 1</option></select></div></div>
+      <div class="box"><h3>items</h3><div><label>item 1</label><select><option>Option 1</option></select></div><div><label>item 2</label><select><option>Option 1</option></select></div><div><label>item 3</label><select><option>Option 1</option></select></div><div><label>item 4</label><select><option>Option 1</option></select></div></div>
+      <div class="box"><h3>quest items</h3><p class="muted">Quest items were not named in this sketch, so they are left as Option 1, not guessed.</p><div><label>quest item 1</label><select><option>Option 1</option></select></div></div>
+    </div>
+  </section>
+  <section class="box" style="margin-top:24px">
+    <h2>What is exact here, and what is not placed yet</h2>
+    <ul>
+      <li>Exact from your walkthrough: header, nav with dead space, Jump To 6 items in order, Stage Cover Flow +new / edit / -del, air gap, Current Char Cover Flow +new / edit / -del, Pocket in Space Time as the container holding Starting Loadout, fixed inside it, 3 by 2 as above.</li>
+      <li>Weapons / armor / clothing sub-items are carried from drawio 3-4, split into the three new boxes — intimate / close / long range for weapons, top armor / helmet / leg armor for armor, torso / chest / legs / arms / feet / hands for clothing.</li>
+      <li>Not placed yet, not invented: definitions faq and help, connect to phone / start service for away use / on devices, and hardware detect are not separate buttons on Home in this sketch. Jump To has FAQ definitions, Benchmark, and Start server as jump targets — tell me if those are meant to be those buttons, or if they go somewhere else.</li>
+      <li>Pocket is now a narrowed, centred container below Stage / Current Char (max 1100px), holding Starting Loadout inside it. It is fixed, not loaded and built dynamically — that was the other option, and it was not picked.</li>
+      <li>Jump To heading fix in v9: the "jump to" heading above World Lore now lifts on hover like the World Lore button below it — same lift, same single shadow layer, small blur, no backdrop-filter, no animation on the shadow itself.</li>
+    </ul>
+    <p class="muted">Preview only. No Dart until you approve a preview of it. Combined v9: Home v9 + Settings v16 (Model selection and preview panes, Character creator, Profiles), restyled to Home v9 dark green, serif font throughout, text pop, 3D buttons. No structure changes to the other pages.</p>
+  </section>
+</div>
+</div>
+
+<!-- PAGE 1: unchanged from v3 / v7 -->
+<div id="page-models" class="page">
+<div class="layout">
+  <nav class="rail" aria-label="Settings jump panel">
+    <div class="jump">
+      <h2>settings jump panel</h2>
+      <button data-goto="models">media text video</button>
+      <button data-goto="codecs">asset and codecs</button>
+      <button data-goto="models">model settings and filters</button>
+    </div>
+    <p class="muted">Character creator is on the other page.</p>
+  </nav>
+  <main class="main">
+    <section class="container" id="models">
+      <h2>model selection and filters</h2>
+      <div class="row">
+        <div class="box"><h3>image model</h3><label>image model on/off</label><select id="imageOn"><option value="on" selected>on</option><option value="off">off</option></select><p><button class="btn" onclick="note('imageNote','browse model… — in the real app this opens a model picker. Preview only.')">browse model ......</button></p><p id="imageNote" class="muted"></p></div>
+        <div class="box"><h3>text model</h3><label>text model on/off</label><select id="textOn"><option value="on" selected>on</option><option value="off">off</option></select><p><button class="btn" onclick="note('textNote','browse model… — in the real app this opens a model picker. Preview only.')">browse model ......</button></p><p id="textNote" class="muted"></p></div>
+        <div class="box"><h3>voice enginge</h3><label>voice model on/off</label><select id="voiceOn"><option value="on" selected>on</option><option value="off">off</option></select><p><button class="btn" onclick="note('voiceNote','Browse Model… — in the real app this opens a model picker. Preview only.')">Browse Model.....</button></p><p id="voiceNote" class="muted"></p></div>
+      </div>
+      <div class="row">
+        <div class="box"><h3>nararation style</h3><label>nararation person</label><div class="list" data-list="person"><button data-val="first" class="sel">first person</button><button data-val="second">second person</button><button data-val="third">third person</button></div><p class="muted" id="personPreview">I walk into the room.</p></div>
+        <div class="box"><h3>perspective</h3><label>where lines converge</label><div class="list" data-list="persp"><button data-val="one point" class="sel">one point</button><button data-val="two point">two point</button><button data-val="three point">three point</button><button data-val="fish eye">fish eye</button><button data-val="atmospheric perspective">atmospheric perspective</button></div></div>
+        <div class="box"><h3>foreshortening</h3><label>forground back ground diference</label><div class="list" data-list="fore"><button data-val="the golden rule" class="sel">the golden rule</button><button data-val="T-overlap">T-overlap</button><button data-val="Form intersection">Form intersection</button><button data-val="cross contur wraps">cross contur wraps</button></div></div>
+      </div>
+      <div class="container" id="codecs" style="margin-bottom:0">
+        <h2>codec choice and asset check</h2>
+        <div class="row">
+          <div class="box"><label>codec choices</label><select id="codec"><option value="vlc" selected>VLC codec — recommended</option><option value="built">Alice Built in</option><option value="own">Bring your own</option></select><label>codecs</label><div class="list" data-list="codecList"><button data-val="VLC codec" class="sel">VLC codec</button><button data-val="Alice Built in">Alice Built in</button><button data-val="Bring your own">Bring your own</button></div><p id="codecNote" class="muted">VLC codec, recommended. VLC runs headless behind the scenes, with Alice controls on top.</p></div>
+          <!-- Fix round 9b (2026-11-05): browse restored, matching Dart
+               commit fc6e8e3 — exact inverse of round 9. One drop in,
+               one browse, one check: drop zone, file input + green
+               browse..... button (flex 1) beside run check (flex 1.4).
+               Drop zone text is back to "Drop an asset here, or use
+               browse below." -->
+          <div class="box"><h3>asset select and drop in</h3><div class="drop" id="dropZone">Drop an asset here, or use browse below.</div><input type="file" id="fileInput" style="display:none"><p id="fileName" class="muted">No file chosen yet.</p><div class="row" style="margin-bottom:0"><div style="flex:1"><button class="btn" id="browseBtn">browse.....</button></div><div style="flex:1.4"><button class="btn" id="runCheckBtn">run check on asset (s)</button></div></div><p class="muted" id="checkResult">Run a check to see the result here.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="container" id="previews">
+      <h2>preview panes for models</h2>
+      <div class="grid2">
+        <div class="stack">
+          <div class="previewbox"><h3 style="margin-top:0">text to user preview</h3><p id="textPreview">Text to user preview: “Here is a line of text from the model.”</p></div>
+          <div class="previewbox"><h3 style="margin-top:0">voice to user preview</h3><p id="voicePreview">Voice to user preview: “Hello, I'm here.”</p></div>
+        </div>
+        <div class="previewbox large"><h3 style="margin-top:0">composite image to user preview</h3><p id="imagePreview">[composite image preview placeholder]</p></div>
+      </div>
+      <p class="muted">Previews follow the on/off selects above, on this same page.</p>
+    </section>
+  </main>
+</div>
+</div>
+
+<!-- PAGE 2: creator, exact organization of v3-2 -->
+<div id="page-creator" class="page">
+<div class="layout">
+  <nav class="rail" aria-label="Character creator jump panel">
+    <div class="jump">
+      <h2>char. creator jump panel</h2>
+      <button data-goto="creator-tailors">phytsical atributes</button>
+      <button data-goto="creator-personality">personality</button>
+      <button data-goto="creator-tailors">tailors measurements</button>
+      <button data-goto="creator-npc">NPC</button>
+      <button data-goto="creator-mc">Main charecter</button>
+    </div>
+    <p class="muted">Model selection and preview panes are on the other page.</p>
+  </nav>
+  <main class="main">
+    <section class="container" id="creator">
+      <h2>physical and class atributes selction</h2>
+
+      <div class="box" id="creator-tailors" style="margin-bottom:22px">
+        <h3>tailors measurements</h3>
+        <p class="muted">Flat, in your file order — waist / shoulders / height, then underbust / bust / torso length, then thigh girth / [empty] / hips. No sub-groups.</p>
+        <p class="muted">Sliders, not text boxes. Values are stored in cm. Tap cm / in to change what the readout shows. Spelling fixed: shoulders, not shulders.</p>
+        <div style="margin:0 0 8px;text-align:center"><button class="btn" id="unitCm" style="width:auto;padding:10px 16px;min-height:44px">cm</button> <button class="btn" id="unitIn" style="width:auto;padding:10px 16px;min-height:44px;background:#00914f;color:#fff">in</button></div>
+        <div id="sliders" class="measure-grid"></div>
+        <p class="muted" id="measurePreview" style="margin:8px 0 0">Height and torso set the leg length. Leg length is calculated, not typed in — no inseam field.</p>
+      </div>
+
+      <div class="row">
+        <div class="box" id="creator-mc">
+          <h3>name and gender (MC)</h3>
+          <label>Name</label><input type="text" id="charName" placeholder="Main character name">
+          <label>gender identity</label><div class="optrow" data-list="gender-mc"><button data-val="male" class="sel">male</button><button data-val="female">female</button><button data-val="non-Binary">non-Binary</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-gender-mc" data-custom-for="gender-mc" placeholder="Type your gender identity…" aria-label="Your gender identity"><p class="custom-saved" id="saved-gender-mc">Saved.</p>
+          <label>pronouns</label><div class="optrow" data-list="pronouns-mc"><button data-val="he/him" class="sel">he/him</button><button data-val="she/her">she/her</button><button data-val="they/them">they/them</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-pronouns-mc" data-custom-for="pronouns-mc" placeholder="Type your pronouns, e.g. xe/xem…" aria-label="Your pronouns"><p class="custom-saved" id="saved-pronouns-mc">Saved.</p>
+        </div>
+        <div class="box" id="creator-npc">
+          <h3>name and gender (NPC)</h3>
+          <label>Name</label><input type="text" placeholder="NPC name">
+          <label>gender identity</label><div class="optrow" data-list="gender-npc"><button data-val="male" class="sel">male</button><button data-val="female">female</button><button data-val="non-Binary">non-Binary</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-gender-npc" data-custom-for="gender-npc" placeholder="Type your gender identity…" aria-label="Your gender identity"><p class="custom-saved" id="saved-gender-npc">Saved.</p>
+          <label>pronouns</label><div class="optrow" data-list="pronouns-npc"><button data-val="he/him" class="sel">he/him</button><button data-val="she/her">she/her</button><button data-val="they/them">they/them</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-pronouns-npc" data-custom-for="pronouns-npc" placeholder="Type your pronouns, e.g. xe/xem…" aria-label="Your pronouns"><p class="custom-saved" id="saved-pronouns-npc">Saved.</p>
+        </div>
+      </div>
+
+      <div class="box" id="creator-personality">
+        <h3>personality and class alignment</h3>
+        <label>ethical axis</label><select id="ethical"><option>lawful</option><option selected>neutral</option><option>chaotic</option></select>
+        <label>moral axis</label><select id="moral"><option selected>good</option><option>neutral</option><option>evil</option></select>
+        <label>personality manerisims — type it in</label><div style="display:flex;gap:10px;align-items:flex-start"><textarea placeholder="Type it in your own words, one habit per line. For example: fidgets with sleeves when thinking. Avoids eye contact with strangers. Laughs when nervous." style="flex:1;min-height:110px"></textarea><button class="btn" id="mannerHelpBtn" style="width:auto;padding:14px 18px">? Help</button></div><div class="previewbox" id="mannerHelp" style="display:none;min-height:0;margin-top:12px"><b>What is recognized most — draft help text, for your exact-words approval:</b><p>Type it in your own words. Short, concrete habits you can see or hear work best. For example: fidgeting with sleeves, avoiding eye contact, pacing when thinking, humming, tapping a pen, speaking in short bursts, laughing when nervous.</p><p>Type one habit per line, in plain words. The engine reads what you type, not special keywords, and not a picked word from a list.</p></div>
+        <label>how they talk (tone) — type it in</label><div style="display:flex;gap:10px;align-items:flex-start"><textarea placeholder="Type how they talk, in your own words. For example: cocky and sarcastic, but all lady. Short and dry when working, softer and steadier when caring for someone." style="flex:1;min-height:110px"></textarea><button class="btn" id="toneHelpBtn" style="width:auto;padding:14px 18px">? Help</button></div><div class="previewbox" id="toneHelp" style="display:none;min-height:0;margin-top:12px"><b>What is recognized most — draft help text, for your exact-words approval:</b><p>Type it in your own words. A sentence or two about how they talk works best — warm and dry, blunt when working, softer when caring, loud in a crowd, quiet one-to-one.</p><p>Do not pick the closest word from a list. Type the voice as you hear it, in plain words. The engine reads what you type.</p></div>
+        <label>sarcasm level</label><select id="sarcasm"><option selected>0%</option><option>10%</option><option>20%</option><option>30%</option><option>40%</option><option>50%</option><option>60%</option><option>70%</option><option>80%</option><option>90%</option><option>100%</option></select>
+        <div id="creator-physical">
+          <h3 style="margin-top:16px">class choice</h3>
+          <div class="optrow" data-list="class"><button data-val="royalty" class="sel">royalty</button><button data-val="highclass">highclass</button><button data-val="skilled labor">skilled labor</button><button data-val="unskilled labor">unskilled labor</button></div>
+        </div>
+        <p class="muted" id="charPreview">Character preview will update as you type and pick.</p>
+      </div>
+    </section>
+    <section class="container">
+      <h2>What is exact here, and what is a readable adjustment</h2>
+      <ul>
+        <li>Exact organization: tailor's measurements on top, flat — waist / shoulders / height, then underbust / bust / torso length, then thigh girth / [empty middle] / hips, with no sub-groups, in a dense 3-column slider grid; then name and gender (MC) / name and gender (NPC) side by side — You base user data deleted, covered in User profile setup; then personality and class alignment below, with class choice inside it.</li>
+        <li>Readable adjustments only: white background, black text, blue headers, 20px base text, 28–30px headings, large tap targets, and each measurement as a labeled input instead of a tiny label box. On a narrow screen the side-by-side boxes stack, in the same order.</li>
+        <li>Labels are kept as drawn, including spellings, so you can see exactly what the file says.</li>
+        <li>Changed from version 3-2: the torso upper body, hips and legs, and height and preset sub-groups are gone, and so are inseam, leg length (with its embedded-code artifact), build preset, and waist to hip relationship. Those are not in version 3-3, and they are not in this preview.</li>
+        <li>Dropped for now, as before: FAQ box, text input test, power user / backend settings buttons — none are in version 3-2, and none are in this preview.</li>
+      </ul>
+      <p class="muted">Preview only. No Dart until you approve a preview of it.</p>
+    </section>
+  </main>
+</div>
+</div>
+<!-- PAGE 3: Profiles — just for you -->
+<div id="page-profiles" class="page">
+<div class="layout">
+  <nav class="rail" aria-label="Profiles">
+    <div class="jump">
+      <h2>Profiles</h2>
+      <p class="muted">This is you, not a character. Character setup stays in Character creator.</p>
+    </div>
+  </nav>
+  <main class="main">
+    <section class="container">
+      <h2>Profiles</h2>
+      <div class="previewbox large" style="text-align:center">
+        <p style="font-size:28px;margin:0">Banner</p>
+        <p class="muted">Your banner image goes here. Preview only — no image is uploaded or saved.</p>
+        <p><button class="btn" style="width:auto;padding:14px 20px" onclick="document.getElementById('bannerNote').textContent='Change banner… — in the real app this opens an image picker. Preview only.'">Change banner</button></p>
+        <p id="bannerNote" class="muted"></p>
+        <p style="font-size:48px;margin:16px 0 0">○</p>
+        <p class="muted">Your avatar</p>
+      </div>
+      <div class="box">
+        <h3>Your details</h3>
+        <p class="muted">This one is you. This information is how other users see you.</p>
+        <label>Real name</label><input type="text" placeholder="Your real name">
+        <label>gender identity</label><div class="optrow" data-list="gender-profile"><button data-val="male" class="sel">male</button><button data-val="female">female</button><button data-val="non-Binary">non-Binary</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-gender-profile" data-custom-for="gender-profile" placeholder="Type your gender identity…" aria-label="Your gender identity"><p class="custom-saved" id="saved-gender-profile">Saved.</p>
+        <label>Birthday</label><input type="text" placeholder="Birthday">
+        <label>Pronouns</label><div class="optrow" data-list="pronouns-you"><button data-val="he/him" class="sel">he/him</button><button data-val="she/her">she/her</button><button data-val="they/them">they/them</button><button data-val="custom">custom</button></div>
+          <input type="text" class="custom-input" id="custom-pronouns-you" data-custom-for="pronouns-you" placeholder="Type your pronouns, e.g. xe/xem…" aria-label="Your pronouns"><p class="custom-saved" id="saved-pronouns-you">Saved.</p>
+        <label>Bio — about you</label><textarea id="bio" placeholder="A short bio about you…"></textarea>
+        <p class="muted"><span id="bioCount">0</span> / 300 words.</p>
+        <p class="muted">Nothing here is about a main character. Characters are made and edited in Character creator, and listed on Home.</p>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+<script>
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id===id));
+  document.getElementById('btnHome').setAttribute('aria-pressed', id==='page-home' ? 'true' : 'false');
+  document.getElementById('btnModels').setAttribute('aria-pressed', id==='page-models' ? 'true' : 'false');
+  document.getElementById('btnCreator').setAttribute('aria-pressed', id==='page-creator' ? 'true' : 'false');
+  document.getElementById('btnProfiles').setAttribute('aria-pressed', id==='page-profiles' ? 'true' : 'false');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function note(id,txt){ document.getElementById(id).textContent=txt; }
+function goto(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click', ()=>goto(b.dataset.goto)));
+function selectIn(container, btn){
+  container.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+document.querySelectorAll('[data-list]').forEach(c=>{
+  c.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{ selectIn(c,b); syncChar(); syncPerson(); syncCodecList(); }));
+});
+// Custom gender / pronouns: tapping custom opens a text field; what you type is saved.
+function customInputFor(list){ return document.getElementById('custom-'+list); }
+function savedNoteFor(list){ return document.getElementById('saved-'+list); }
+function showCustom(list, show){
+  const inp=customInputFor(list); if(!inp) return;
+  inp.style.display = show ? 'block' : 'none';
+  const note=savedNoteFor(list); if(note) note.style.display = (show && inp.value.trim()) ? 'block' : 'none';
+  if(show) inp.focus();
+}
+document.querySelectorAll('[data-list]').forEach(c=>{
+  const list=c.dataset.list;
+  if(!list.startsWith('gender-') && !list.startsWith('pronouns-')) return;
+  const inp=customInputFor(list); if(!inp) return;
+  // restore a saved custom value, if there is one
+  let saved=''; try{ saved=localStorage.getItem('alice-custom-'+list)||''; }catch(e){}
+  if(saved){
+    inp.value=saved;
+    const btn=c.querySelector('button[data-val="custom"]');
+    if(btn){ btn.dataset.customVal=saved; selectIn(c,btn); showCustom(list,true); }
+  }
+  c.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+    showCustom(list, b.dataset.val==='custom');
+  }));
+  inp.addEventListener('input', ()=>{
+    const v=inp.value.trim();
+    const btn=c.querySelector('button[data-val="custom"]');
+    if(btn) btn.dataset.customVal=v;
+    try{ localStorage.setItem('alice-custom-'+list, v); }catch(e){}
+    const note=savedNoteFor(list); if(note) note.style.display = v ? 'block' : 'none';
+    syncChar();
+  });
+});
+const personLines={first:'I walk into the room.', second:'You walk into the room.', third:'She walks into the room.'};
+function syncPerson(){
+  const el=document.querySelector('[data-list="person"] button.sel');
+  if(el) document.getElementById('personPreview').textContent=personLines[el.dataset.val] || '';
+}
+function syncCodecList(){
+  const el=document.querySelector('[data-list="codecList"] button.sel');
+  if(el) document.getElementById('codec').value = el.dataset.val==='VLC codec' ? 'vlc' : el.dataset.val==='Alice Built in' ? 'built' : 'own';
+}
+const codecNotes={vlc:'VLC codec, recommended. VLC runs headless behind the scenes, with Alice controls on top.', built:'Alice Built in: for common files, no extra player needed.', own:'Bring your own: you supply the player or codec.'};
+document.getElementById('codec').addEventListener('change', e=>{
+  document.getElementById('codecNote').textContent=codecNotes[e.target.value];
+  const map={vlc:'VLC codec', built:'Alice Built in', own:'Bring your own'};
+  const c=document.querySelector('[data-list="codecList"]');
+  c.querySelectorAll('button').forEach(b=>b.classList.toggle('sel', b.dataset.val===map[e.target.value]));
+});
+function setFile(f){ document.getElementById('fileName').textContent=f ? 'Chosen: '+f.name : 'No file chosen yet.'; }
+// Fix round 9b (2026-11-05): browse restored — one browse, one check,
+// one drop in. Browse opens the file picker; drop still works too.
+document.getElementById('browseBtn').addEventListener('click', ()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change', e=>{ const f=e.target.files[0]; if(f) setFile(f); });
+const dz=document.getElementById('dropZone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev, e=>{e.preventDefault(); dz.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev, e=>{e.preventDefault(); dz.classList.remove('over');}));
+dz.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f){ setFile(f); dz.textContent='Dropped: '+f.name; } });
+document.getElementById('runCheckBtn').addEventListener('click', ()=>{
+  const t=document.getElementById('fileName').textContent;
+  document.getElementById('checkResult').textContent = t.includes('Chosen:') ? 'Preview check only: the chosen asset would be checked here in the real app. Alice won\'t pretend it played.' : 'Pick or drop a file first, then run the check. Preview only — nothing is really played.';
+});
+function syncPreviews(){
+  document.getElementById('voicePreview').textContent = document.getElementById('voiceOn').value==='on' ? 'Voice to user preview: “Hello, I\'m here.”' : 'Voice model off — no voice preview.';
+  document.getElementById('imagePreview').textContent = document.getElementById('imageOn').value==='on' ? '[composite image preview placeholder]' : 'Image model off — no image preview.';
+  document.getElementById('textPreview').textContent = document.getElementById('textOn').value==='on' ? 'Text to user preview: “Here is a line of text from the model.”' : 'Text model off — no text preview.';
+}
+['voiceOn','imageOn','textOn'].forEach(id=>document.getElementById(id).addEventListener('change', syncPreviews));
+
+let unit='cm';
+const measureDefs=[
+  {id:'waist', label:'waist', min:50, max:120, val:70},
+  {id:'shoulders', label:'shoulders', min:30, max:60, val:42},
+  {id:'height', label:'height', min:120, max:210, val:170},
+  {id:'underbust', label:'underbust', min:55, max:120, val:75},
+  {id:'bust', label:'bust', min:60, max:130, val:90},
+  {id:'thigh', label:'thigh girth', min:35, max:80, val:55},
+  {id:'hips', label:'hips', min:60, max:140, val:95}
+];
+const slidersEl=document.getElementById('sliders');
+// Grid order is your file order, 3 across: waist / shoulders / height,
+// underbust / bust / torso length, thigh girth / [empty] / hips.
+measureDefs.forEach(d=>{
+  const wrap=document.createElement('div');
+  wrap.className='measure-cell';
+  wrap.innerHTML='<label>'+d.label+' — <span id="'+d.id+'Val"></span></label><input type="range" id="'+d.id+'" min="'+d.min+'" max="'+d.max+'" value="'+d.val+'">';
+  slidersEl.appendChild(wrap);
+  if(d.id==='bust'){
+    const tor=document.createElement('div');
+    tor.className='measure-cell';
+    tor.innerHTML='<label>torso length</label><select id="torsoLen"><option>short</option><option selected>average</option><option>long</option></select>';
+    slidersEl.appendChild(tor);
+  }
+  if(d.id==='thigh'){
+    const empty=document.createElement('div');
+    empty.className='measure-cell empty';
+    slidersEl.appendChild(empty);
+  }
+});
+function fmt(cm, id){ if(unit==='cm') return Math.round(cm)+' cm'; if(id==='height'){ let total=Math.round(cm/2.54); let ft=Math.floor(total/12); let inch=total%12; return ft+' ft '+inch+' inches'; } return (cm/2.54).toFixed(1)+' in'; }
+function syncMeasures(){
+  measureDefs.forEach(d=>{ document.getElementById(d.id+'Val').textContent=fmt(Number(document.getElementById(d.id).value), d.id); });
+  const h=Number(document.getElementById('height').value);
+  const tor=document.getElementById('torsoLen').value;
+  document.getElementById('measurePreview').textContent='Height '+fmt(h,'height')+', torso '+tor+'. Leg length is calculated from height and torso — no inseam field.';
+}
+measureDefs.forEach(d=>document.getElementById(d.id).addEventListener('input', syncMeasures));
+document.querySelectorAll('[data-nudge]').forEach(b=>b.addEventListener('click', ()=>{ const parts=b.dataset.nudge.split('|'); const s=document.getElementById(parts[0]); s.value=Number(s.value)+Number(parts[1]); syncMeasures(); }));
+document.getElementById('torsoLen').addEventListener('change', syncMeasures);
+measureDefs.forEach(d=>document.getElementById(d.id).addEventListener('input', ()=>{ if(typeof syncChar==='function') syncChar(); }));
+document.getElementById('unitCm').addEventListener('click', ()=>{ unit='cm'; syncMeasures(); });
+document.getElementById('unitIn').addEventListener('click', ()=>{ unit='in'; syncMeasures(); });
+syncMeasures();
+function toggleHelp(btnId, boxId){
+  const b=document.getElementById(btnId), h=document.getElementById(boxId);
+  b.addEventListener('click', ()=>{ h.style.display = h.style.display==='none' ? 'block' : 'none'; });
+}
+toggleHelp('mannerHelpBtn','mannerHelp');
+toggleHelp('toneHelpBtn','toneHelp');
+
+const bioEl=document.getElementById('bio'); if(bioEl){ bioEl.addEventListener('input', ()=>{ const w=bioEl.value.trim() ? bioEl.value.trim().split(/\s+/).length : 0; document.getElementById('bioCount').textContent=w; }); }
+function syncChar(){
+  const n=document.getElementById('charName').value || '(unnamed)';
+  const c=document.querySelector('[data-list="class"] button.sel');
+  const pEl=document.querySelector('[data-list="pronouns-mc"] button.sel');
+  const p={dataset:{val: (pEl && pEl.dataset.val==='custom' && pEl.dataset.customVal) ? pEl.dataset.customVal : (pEl?pEl.dataset.val:'')}};
+  const hEl=document.getElementById('height');
+  const hTxt=hEl ? fmt(Number(hEl.value),'height') : '';
+  document.getElementById('charPreview').textContent = n+' — '+(c?c.dataset.val:'')+', '+(p?p.dataset.val:'')+(hTxt ? ', '+hTxt : '')+'.';
+}
+document.getElementById('charName').addEventListener('input', syncChar);
+syncChar(); syncPerson();
+</script>
+</body>
+</html>
