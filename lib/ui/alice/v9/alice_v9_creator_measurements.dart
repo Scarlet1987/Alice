@@ -47,6 +47,7 @@ class MeasurementsCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               V9Button(
                 label: 'cm',

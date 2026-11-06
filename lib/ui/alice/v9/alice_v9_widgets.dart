@@ -52,7 +52,10 @@ class V9Card extends StatelessWidget {
   }
 }
 
-/// A v9 section heading: white serif text on a solid green chip.
+/// A v9 section heading: white serif text on a solid green bar.
+/// The bar stays full width (the green background is the heading's
+/// look) and the words are centred inside it — one place, so every
+/// heading in v9 is centred the same way.
 class V9Heading extends StatelessWidget {
   final String title;
 
@@ -75,6 +78,7 @@ class V9Heading extends StatelessWidget {
       ),
       child: Text(
         title,
+        textAlign: TextAlign.center,
         style: _v9Serif.copyWith(
           fontSize: 24,
           fontWeight: FontWeight.w700,
@@ -96,6 +100,11 @@ class V9Heading extends StatelessWidget {
 /// A v9 button: solid green, white serif words, a 3D bottom edge in the
 /// darker green, lift on hover, press on tap. Both unit buttons (cm/in)
 /// use this — there is no inverted white/green variant in v9.
+/// Centred in its parent by the Center wrapper: in a stretch Column the
+/// button used to stretch full width, and in a plain Row it sat left.
+/// The wrapper is safe at every site — inside an Expanded it centres
+/// the button inside its flex slot, and inside an already-centred Row
+/// it changes nothing.
 class V9Button extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -110,33 +119,37 @@ class V9Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.aliceGreen,
-        foregroundColor: AppColors.pureWhite,
-        padding: EdgeInsets.symmetric(
-          horizontal: small ? 18 : 20,
-          vertical: small ? 12 : 18,
+    return Center(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.aliceGreen,
+          foregroundColor: AppColors.pureWhite,
+          padding: EdgeInsets.symmetric(
+            horizontal: small ? 18 : 20,
+            vertical: small ? 12 : 18,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: AppColors.aliceGreen),
+          ),
+          elevation: 4,
+          shadowColor: AppColors.aliceEdge,
+          textStyle: _v9Serif.copyWith(
+            fontSize: small ? 18 : 19,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.03,
+          ),
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppColors.aliceGreen),
-        ),
-        elevation: 4,
-        shadowColor: AppColors.aliceEdge,
-        textStyle: _v9Serif.copyWith(
-          fontSize: small ? 18 : 19,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.03,
-        ),
+        child: Text(label),
       ),
-      child: Text(label),
     );
   }
 }
 
 /// Muted v9 helper text: pale mint, readable on the dark green.
+/// Centred, with its heading: the helper text sits under a centred
+/// heading, so it centres too instead of sitting left under it.
 class V9Muted extends StatelessWidget {
   final String text;
 
@@ -146,6 +159,7 @@ class V9Muted extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
         color: AppColors.alicePale,
         shadows: const [
