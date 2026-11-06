@@ -44,7 +44,7 @@ import 'package:front_porch_ai/ui/theme/porch_design.dart';
 import 'package:front_porch_ai/ui/theme/porch_theme_scope.dart';
 import 'package:front_porch_ai/ui/window_chrome.dart';
 import 'package:front_porch_ai/ui/window_size_env.dart';
-import 'package:front_porch_ai/ui/alice/alice_shell.dart';
+import 'package:front_porch_ai/ui/alice/v9/alice_v9_shell.dart';
 import 'package:front_porch_ai/ui/alice/alice_setup_wizard.dart';
 import 'package:front_porch_ai/app_version.dart';
 import 'package:front_porch_ai/utils/native_exit.dart';
@@ -452,7 +452,14 @@ class _MyAppState extends State<MyApp> with WindowListener {
                   ).copyWith(textScaler: TextScaler.linear(effectiveScale)),
                   child: Stack(
                     children: [
-                      const AliceShell(),
+                      // Rawhide launches v9 directly (2026-11-05): the
+                      // home screen is AliceV9Shell, with no old shell
+                      // underneath and no Home v9 button to tap. The old
+                      // AliceShell lives on main (eb6b984) — check it out
+                      // to get the old program back. Chat, Worlds, and
+                      // Settings are not in v9 yet, so they are not
+                      // reachable in this build until rebuilt in v9.
+                      const AliceV9Shell(),
                       // Mounted one frame late ON PURPOSE: SetupOverlay reads
                       // SetupService/BackendManager and RemoteLockOverlay
                       // consumes WebServerHost — whose provider reads ~15
