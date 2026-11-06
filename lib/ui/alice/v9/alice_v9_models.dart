@@ -22,11 +22,13 @@ class AliceV9ModelsPage extends StatelessWidget {
 
   Future<void> _browseModel(BuildContext context, String kind) async {
     // file_picker 13: static methods on FilePicker, no `.platform`.
-    final result = await FilePicker.pickFiles(
+    // pickFiles returns List<PlatformFile> directly (see
+    // lib/utils/picker_prefs.dart) — not a FilePickerResult with .files.
+    final files = await FilePicker.pickFiles(
       dialogTitle: 'Pick a $kind model',
     );
-    if (result == null || result.files.isEmpty) return;
-    state.pickModelAsset(result.files.first.name, kind);
+    if (files.isEmpty) return;
+    state.pickModelAsset(files.first.name, kind);
   }
 
   void _runAssetCheck() {

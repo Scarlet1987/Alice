@@ -17,81 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:front_porch_ai/models/models.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_identity.dart';
+import 'package:front_porch_ai/ui/alice/v9/alice_v9_state_types.dart';
 
-part 'alice_v9_state_setters.dart';
-
-/// v9 pages, in the preview's nav order.
-enum V9Page { home, models, creator, profile }
-
-/// Tailor's measurements, in the preview's file order, stored in cm.
-/// Leg length is calculated from height and torso — no inseam field.
-class V9Measurements {
-  double waist;
-  double shoulders;
-  double height;
-  double underbust;
-  double bust;
-  double thigh;
-  double hips;
-  String torsoLength; // short / average / long
-
-  V9Measurements({
-    this.waist = 70,
-    this.shoulders = 42,
-    this.height = 170,
-    this.underbust = 75,
-    this.bust = 90,
-    this.thigh = 55,
-    this.hips = 95,
-    this.torsoLength = 'average',
-  });
-
-  double value(String id) {
-    switch (id) {
-      case 'waist':
-        return waist;
-      case 'shoulders':
-        return shoulders;
-      case 'height':
-        return height;
-      case 'underbust':
-        return underbust;
-      case 'bust':
-        return bust;
-      case 'thigh':
-        return thigh;
-      case 'hips':
-        return hips;
-      default:
-        return 0;
-    }
-  }
-
-  void set(String id, double cm) {
-    switch (id) {
-      case 'waist':
-        waist = cm;
-      case 'shoulders':
-        shoulders = cm;
-      case 'height':
-        height = cm;
-      case 'underbust':
-        underbust = cm;
-      case 'bust':
-        bust = cm;
-      case 'thigh':
-        thigh = cm;
-      case 'hips':
-        hips = cm;
-    }
-  }
-
-  String get line =>
-      'Measurements (cm): waist ${waist.round()}, shoulders '
-      '${shoulders.round()}, height ${height.round()}, underbust '
-      '${underbust.round()}, bust ${bust.round()}, torso $torsoLength, '
-      'thigh ${thigh.round()}, hips ${hips.round()}.';
-}
+export 'alice_v9_state_types.dart';
 
 class AliceV9State extends ChangeNotifier {
   AliceV9State() {
@@ -401,6 +329,132 @@ class AliceV9State extends ChangeNotifier {
     profileSaved = true;
     notifyListeners();
     return null;
+  }
+
+  // ── Widget-facing setters ─────────────────────────────────────────
+  // Widgets mutate state only through these methods. They update the
+  // field (and autosave, where the field is persisted) and notify, so
+  // no widget ever calls notifyListeners() itself — the analyzer
+  // forbids that from outside the ChangeNotifier.
+
+  /// Creator identity pick/custom: set the pick or typed value on the
+  /// given identity, autosave the draft, and notify.
+  void setCreatorIdentityPick(V9Identity identity, String pick) {
+    identity.pick = pick;
+    saveCreatorDraft();
+    notifyListeners();
+  }
+
+  void setCreatorIdentityCustom(V9Identity identity, String text) {
+    identity.custom = text;
+    saveCreatorDraft();
+    notifyListeners();
+  }
+
+  /// User-profile identity pick/custom: same shape, but the save goes
+  /// to the profile record, not the creator draft.
+  void setUserIdentityPick(V9Identity identity, String pick) {
+    identity.pick = pick;
+    saveUserProfile();
+    notifyListeners();
+  }
+
+  void setUserIdentityCustom(V9Identity identity, String text) {
+    identity.custom = text;
+    saveUserProfile();
+    notifyListeners();
+  }
+
+  void setUnitIsCm(bool value) {
+    unitIsCm = value;
+    notifyListeners();
+  }
+
+  void setTorsoLength(String value) {
+    measurements.torsoLength = value;
+    notifyListeners();
+  }
+
+  void setNpcRole(String role) {
+    npcRole = role;
+    notifyListeners();
+  }
+
+  void setEthicalAxis(String value) {
+    ethicalAxis = value;
+    notifyListeners();
+  }
+
+  void setMoralAxis(String value) {
+    moralAxis = value;
+    notifyListeners();
+  }
+
+  void setClassChoice(String choice) {
+    classChoice = choice;
+    notifyListeners();
+  }
+
+  void setImageOn(bool value) {
+    imageOn = value;
+    notifyListeners();
+  }
+
+  void setTextOn(bool value) {
+    textOn = value;
+    notifyListeners();
+  }
+
+  void setVoiceOn(bool value) {
+    voiceOn = value;
+    notifyListeners();
+  }
+
+  void setNarrationPerson(String value) {
+    narrationPerson = value;
+    notifyListeners();
+  }
+
+  void setPerspective(String value) {
+    perspective = value;
+    notifyListeners();
+  }
+
+  void setForeshortening(String value) {
+    foreshortening = value;
+    notifyListeners();
+  }
+
+  /// A picked model file: record it, and note it (note notifies).
+  void pickModelAsset(String name, String kind) {
+    assetName = name;
+    assetCheckResult = 'Chosen: $name. Run a check to see it here.';
+    note('Picked $name as the $kind model.');
+  }
+
+  void runAssetCheck() {
+    if (assetName == null) {
+      assetCheckResult = 'Pick or drop a file first, then run the check.';
+    } else {
+      assetCheckResult =
+          'Preview check only: the chosen asset would be checked here in '
+          'the real app. Alice won\'t pretend it played.';
+    }
+    notifyListeners();
+  }
+
+  void setUserBirthday(DateTime picked) {
+    userBirthday.text =
+        '${picked.year.toString().padLeft(4, '0')}-'
+        '${picked.month.toString().padLeft(2, '0')}-'
+        '${picked.day.toString().padLeft(2, '0')}';
+    notifyListeners();
+  }
+
+  /// The bio word count is derived from the controller text; the page
+  /// rebuilds through this state, so a keystroke needs a nudge.
+  void bioChanged() {
+    notifyListeners();
   }
 
   @override

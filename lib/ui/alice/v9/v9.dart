@@ -16,4 +16,5 @@ export 'alice_v9_models_panes.dart';
 export 'alice_v9_profile.dart';
 export 'alice_v9_shell.dart';
 export 'alice_v9_state.dart';
+export 'alice_v9_state_types.dart';
 export 'alice_v9_widgets.dart';
