@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 
 import 'package:front_porch_ai/models/models.dart';
 import 'package:front_porch_ai/services/character_repository.dart';
-import 'package:front_porch_ai/services/storage/storage.dart';
+import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/world_repository.dart';
 import 'package:front_porch_ai/ui/alice/alice_worlds.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_state.dart';
@@ -176,6 +176,9 @@ class AliceV9HomePage extends StatelessWidget {
     final loadoutCharacters = currentCharacter == null
         ? characters
         : [currentCharacter];
+    // A final local, so the delete closure below sees a non-null card:
+    // the analyzer cannot promote the reassigned `currentCharacter`.
+    final characterToDelete = currentCharacter;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -203,9 +206,9 @@ class AliceV9HomePage extends StatelessWidget {
           character: currentCharacter,
           onNew: () => state.setPage(V9Page.creator),
           onEdit: () => state.setPage(V9Page.creator),
-          onDelete: currentCharacter == null
+          onDelete: characterToDelete == null
               ? null
-              : () => _deleteCharacter(context, currentCharacter),
+              : () => _deleteCharacter(context, characterToDelete),
         );
         final loadout = LoadoutCard(
           key: _loadoutKey,

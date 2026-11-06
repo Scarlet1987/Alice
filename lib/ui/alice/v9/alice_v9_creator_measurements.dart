@@ -26,7 +26,7 @@ const List<(String, String, double, double, double)> kV9MeasureDefs = [
 class MeasurementsCard extends StatelessWidget {
   final AliceV9State state;
 
-  const MeasurementsCard({required this.state});
+  const MeasurementsCard({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -51,19 +51,13 @@ class MeasurementsCard extends StatelessWidget {
               V9Button(
                 label: 'cm',
                 small: true,
-                onPressed: () {
-                  state.unitIsCm = true;
-                  state.notifyListeners();
-                },
+                onPressed: () => state.setUnitIsCm(true),
               ),
               const SizedBox(width: 10),
               V9Button(
                 label: 'in',
                 small: true,
-                onPressed: () {
-                  state.unitIsCm = false;
-                  state.notifyListeners();
-                },
+                onPressed: () => state.setUnitIsCm(false),
               ),
             ],
           ),
@@ -141,7 +135,7 @@ class _TorsoCell extends StatelessWidget {
       children: [
         Text('torso length', style: Theme.of(context).textTheme.labelLarge),
         DropdownButtonFormField<String>(
-          value: state.measurements.torsoLength,
+          initialValue: state.measurements.torsoLength,
           items: const [
             DropdownMenuItem(value: 'short', child: Text('short')),
             DropdownMenuItem(value: 'average', child: Text('average')),
@@ -149,8 +143,7 @@ class _TorsoCell extends StatelessWidget {
           ],
           onChanged: (v) {
             if (v == null) return;
-            state.measurements.torsoLength = v;
-            state.notifyListeners();
+            state.setTorsoLength(v);
           },
           decoration: const InputDecoration(
             filled: true,

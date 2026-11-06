@@ -18,6 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:front_porch_ai/models/models.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_identity.dart';
 
+part 'alice_v9_state_setters.dart';
+
 /// v9 pages, in the preview's nav order.
 enum V9Page { home, models, creator, profile }
 

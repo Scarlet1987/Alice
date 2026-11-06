@@ -21,27 +21,16 @@ class AliceV9ModelsPage extends StatelessWidget {
   const AliceV9ModelsPage({super.key, required this.state});
 
   Future<void> _browseModel(BuildContext context, String kind) async {
-    final result = await FilePicker.platform.pickFiles(
+    // file_picker 13: static methods on FilePicker, no `.platform`.
+    final result = await FilePicker.pickFiles(
       dialogTitle: 'Pick a $kind model',
     );
     if (result == null || result.files.isEmpty) return;
-    final name = result.files.first.name;
-    state.assetName = name;
-    state.assetCheckResult = 'Chosen: $name. Run a check to see it here.';
-    state.note('Picked $name as the $kind model.');
-    state.notifyListeners();
+    state.pickModelAsset(result.files.first.name, kind);
   }
 
   void _runAssetCheck() {
-    if (state.assetName == null) {
-      state.assetCheckResult =
-          'Pick or drop a file first, then run the check.';
-    } else {
-      state.assetCheckResult =
-          'Preview check only: the chosen asset would be checked here in '
-          'the real app. Alice won\'t pretend it played.';
-    }
-    state.notifyListeners();
+    state.runAssetCheck();
   }
 
   @override
@@ -68,28 +57,19 @@ class AliceV9ModelsPage extends StatelessWidget {
                           _ModelBox(
                             title: 'image model',
                             value: state.imageOn,
-                            onChanged: (v) {
-                              state.imageOn = v;
-                              state.notifyListeners();
-                            },
+                            onChanged: (v) => state.setImageOn(v),
                             onBrowse: () => _browseModel(context, 'image'),
                           ),
                           _ModelBox(
                             title: 'text model',
                             value: state.textOn,
-                            onChanged: (v) {
-                              state.textOn = v;
-                              state.notifyListeners();
-                            },
+                            onChanged: (v) => state.setTextOn(v),
                             onBrowse: () => _browseModel(context, 'text'),
                           ),
                           _ModelBox(
                             title: 'voice engine',
                             value: state.voiceOn,
-                            onChanged: (v) {
-                              state.voiceOn = v;
-                              state.notifyListeners();
-                            },
+                            onChanged: (v) => state.setVoiceOn(v),
                             onBrowse: () => _browseModel(context, 'voice'),
                           ),
                         ];
@@ -137,10 +117,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                               'third person',
                             ],
                             selected: state.narrationPerson,
-                            onSelect: (v) {
-                              state.narrationPerson = v;
-                              state.notifyListeners();
-                            },
+                            onSelect: (v) => state.setNarrationPerson(v),
                             preview: _personPreview(state.narrationPerson),
                           ),
                           ListBox(
@@ -154,10 +131,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                               'atmospheric perspective',
                             ],
                             selected: state.perspective,
-                            onSelect: (v) {
-                              state.perspective = v;
-                              state.notifyListeners();
-                            },
+                            onSelect: (v) => state.setPerspective(v),
                           ),
                           ListBox(
                             title: 'foreshortening',
@@ -169,10 +143,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                               'cross contour wraps',
                             ],
                             selected: state.foreshortening,
-                            onSelect: (v) {
-                              state.foreshortening = v;
-                              state.notifyListeners();
-                            },
+                            onSelect: (v) => state.setForeshortening(v),
                           ),
                         ];
                         if (constraints.maxWidth < 700) {

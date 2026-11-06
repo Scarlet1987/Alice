@@ -34,11 +34,7 @@ class AliceV9ProfilePage extends StatelessWidget {
       helpText: 'Your birthday',
     );
     if (picked != null) {
-      state.userBirthday.text =
-          '${picked.year.toString().padLeft(4, '0')}-'
-          '${picked.month.toString().padLeft(2, '0')}-'
-          '${picked.day.toString().padLeft(2, '0')}';
-      state.notifyListeners();
+      state.setUserBirthday(picked);
     }
   }
 
@@ -48,12 +44,6 @@ class AliceV9ProfilePage extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(error ?? 'User profile saved.')),
     );
-  }
-
-  /// Identity changes save straight to the profile record, so a typed
-  /// custom value is saved the moment it is typed, not only on Save.
-  void _saveIdentity() {
-    state.saveUserProfile();
   }
 
   @override
@@ -153,16 +143,16 @@ class AliceV9ProfilePage extends StatelessWidget {
                             options: kV9GenderOptions,
                             customHint: 'Type your gender identity…',
                             value: state.userGender,
-                            onPick: (pick) {
-                              state.userGender.pick = pick;
-                              _saveIdentity();
-                              state.notifyListeners();
-                            },
-                            onCustomChanged: (text) {
-                              state.userGender.custom = text;
-                              _saveIdentity();
-                              state.notifyListeners();
-                            },
+                            onPick: (pick) =>
+                                state.setUserIdentityPick(
+                                  state.userGender,
+                                  pick,
+                                ),
+                            onCustomChanged: (text) =>
+                                state.setUserIdentityCustom(
+                                  state.userGender,
+                                  text,
+                                ),
                             saved: state.profileSaved,
                           ),
                           const SizedBox(height: 12),
@@ -189,16 +179,16 @@ class AliceV9ProfilePage extends StatelessWidget {
                             options: kV9PronounOptions,
                             customHint: 'Type your pronouns, e.g. xe/xem…',
                             value: state.userPronouns,
-                            onPick: (pick) {
-                              state.userPronouns.pick = pick;
-                              _saveIdentity();
-                              state.notifyListeners();
-                            },
-                            onCustomChanged: (text) {
-                              state.userPronouns.custom = text;
-                              _saveIdentity();
-                              state.notifyListeners();
-                            },
+                            onPick: (pick) =>
+                                state.setUserIdentityPick(
+                                  state.userPronouns,
+                                  pick,
+                                ),
+                            onCustomChanged: (text) =>
+                                state.setUserIdentityCustom(
+                                  state.userPronouns,
+                                  text,
+                                ),
                             saved: state.profileSaved,
                           ),
                           const SizedBox(height: 12),
@@ -231,7 +221,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                             controller: state.userBio,
                             minLines: 4,
                             maxLines: 8,
-                            onChanged: (_) => state.notifyListeners(),
+                            onChanged: (_) => state.bioChanged(),
                             decoration: const InputDecoration(
                               hintText: 'A short bio about you…',
                               border: OutlineInputBorder(),

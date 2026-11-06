@@ -22,6 +22,7 @@ class StageCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   const StageCard({
+    super.key,
     required this.state,
     required this.stageNames,
     required this.stageIndex,

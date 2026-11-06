@@ -95,28 +95,29 @@ class AliceV9CreatorPage extends StatelessWidget {
                           nameHint: 'Main character name',
                           gender: state.mcGender,
                           pronouns: state.mcPronouns,
-                          onGenderPick: (pick) {
-                            state.mcGender.pick = pick;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onGenderCustom: (text) {
-                            state.mcGender.custom = text;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onPronounsPick: (pick) {
-                            state.mcPronouns.pick = pick;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onPronounsCustom: (text) {
-                            state.mcPronouns.custom = text;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
+                          onGenderPick: (pick) =>
+                              state.setCreatorIdentityPick(
+                                state.mcGender,
+                                pick,
+                              ),
+                          onGenderCustom: (text) =>
+                              state.setCreatorIdentityCustom(
+                                state.mcGender,
+                                text,
+                              ),
+                          onPronounsPick: (pick) =>
+                              state.setCreatorIdentityPick(
+                                state.mcPronouns,
+                                pick,
+                              ),
+                          onPronounsCustom: (text) =>
+                              state.setCreatorIdentityCustom(
+                                state.mcPronouns,
+                                text,
+                              ),
                           onSave: () => _saveMc(context),
                           saveLabel: 'Save main character',
+                          creatorSaved: state.creatorSaved,
                         );
                         final npc = _IdentityCard(
                           title: 'name and gender (NPC)',
@@ -124,28 +125,29 @@ class AliceV9CreatorPage extends StatelessWidget {
                           nameHint: 'NPC name',
                           gender: state.npcGender,
                           pronouns: state.npcPronouns,
-                          onGenderPick: (pick) {
-                            state.npcGender.pick = pick;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onGenderCustom: (text) {
-                            state.npcGender.custom = text;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onPronounsPick: (pick) {
-                            state.npcPronouns.pick = pick;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
-                          onPronounsCustom: (text) {
-                            state.npcPronouns.custom = text;
-                            state.saveCreatorDraft();
-                            state.notifyListeners();
-                          },
+                          onGenderPick: (pick) =>
+                              state.setCreatorIdentityPick(
+                                state.npcGender,
+                                pick,
+                              ),
+                          onGenderCustom: (text) =>
+                              state.setCreatorIdentityCustom(
+                                state.npcGender,
+                                text,
+                              ),
+                          onPronounsPick: (pick) =>
+                              state.setCreatorIdentityPick(
+                                state.npcPronouns,
+                                pick,
+                              ),
+                          onPronounsCustom: (text) =>
+                              state.setCreatorIdentityCustom(
+                                state.npcPronouns,
+                                text,
+                              ),
                           onSave: () => _saveNpc(context),
                           saveLabel: 'Save NPC',
+                          creatorSaved: state.creatorSaved,
                           extra: _NpcExtras(state: state),
                         );
                         if (constraints.maxWidth < 700) {
@@ -192,6 +194,7 @@ class _IdentityCard extends StatelessWidget {
   final ValueChanged<String> onPronounsCustom;
   final VoidCallback onSave;
   final String saveLabel;
+  final bool creatorSaved;
   final Widget? extra;
 
   const _IdentityCard({
@@ -206,6 +209,7 @@ class _IdentityCard extends StatelessWidget {
     required this.onPronounsCustom,
     required this.onSave,
     required this.saveLabel,
+    required this.creatorSaved,
     this.extra,
   });
 
@@ -237,7 +241,7 @@ class _IdentityCard extends StatelessWidget {
             value: gender,
             onPick: onGenderPick,
             onCustomChanged: onGenderCustom,
-            saved: state.creatorSaved,
+            saved: creatorSaved,
           ),
           const SizedBox(height: 12),
           V9IdentityRow(
@@ -247,7 +251,7 @@ class _IdentityCard extends StatelessWidget {
             value: pronouns,
             onPick: onPronounsPick,
             onCustomChanged: onPronounsCustom,
-            saved: state.creatorSaved,
+            saved: creatorSaved,
           ),
           if (extra != null) ...[const SizedBox(height: 12), extra!],
           const SizedBox(height: 16),
@@ -271,7 +275,7 @@ class _NpcExtras extends StatelessWidget {
         Text('Role', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
-          value: state.npcRole,
+          initialValue: state.npcRole,
           items: const [
             'Ally',
             'Villain',
@@ -284,8 +288,7 @@ class _NpcExtras extends StatelessWidget {
           ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
           onChanged: (v) {
             if (v == null) return;
-            state.npcRole = v;
-            state.notifyListeners();
+            state.setNpcRole(v);
           },
           decoration: const InputDecoration(
             filled: true,

@@ -21,6 +21,7 @@ class ListBox extends StatelessWidget {
   final String? preview;
 
   const ListBox({
+    super.key,
     required this.title,
     required this.label,
     required this.options,
@@ -62,6 +63,7 @@ class ListOption extends StatelessWidget {
   final VoidCallback onTap;
 
   const ListOption({
+    super.key,
     required this.label,
     required this.selected,
     required this.onTap,
@@ -101,7 +103,7 @@ class ListOption extends StatelessWidget {
 class CodecBox extends StatelessWidget {
   final AliceV9State state;
 
-  const CodecBox({required this.state});
+  const CodecBox({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +113,7 @@ class CodecBox extends StatelessWidget {
         Text('codec choices', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
-          value: state.codec,
+          initialValue: state.codec,
           items: const [
             DropdownMenuItem(
               value: 'vlc',
@@ -149,6 +151,7 @@ class PreviewPane extends StatelessWidget {
   final bool large;
 
   const PreviewPane({
+    super.key,
     required this.title,
     required this.body,
     this.large = false,

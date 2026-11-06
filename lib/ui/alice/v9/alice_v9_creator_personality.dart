@@ -14,7 +14,7 @@ import 'package:front_porch_ai/ui/theme/app_colors.dart';
 class PersonalityCard extends StatelessWidget {
   final AliceV9State state;
 
-  const PersonalityCard({required this.state});
+  const PersonalityCard({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -28,20 +28,14 @@ class PersonalityCard extends StatelessWidget {
             label: 'ethical axis',
             value: state.ethicalAxis,
             options: const ['lawful', 'neutral', 'chaotic'],
-            onChanged: (v) {
-              state.ethicalAxis = v;
-              state.notifyListeners();
-            },
+            onChanged: (v) => state.setEthicalAxis(v),
           ),
           const SizedBox(height: 12),
           _AxisDropdown(
             label: 'moral axis',
             value: state.moralAxis,
             options: const ['good', 'neutral', 'evil'],
-            onChanged: (v) {
-              state.moralAxis = v;
-              state.notifyListeners();
-            },
+            onChanged: (v) => state.setMoralAxis(v),
           ),
           const SizedBox(height: 12),
           Text(
@@ -86,7 +80,7 @@ class PersonalityCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           DropdownButtonFormField<int>(
-            value: state.sarcasmPercent,
+            initialValue: state.sarcasmPercent,
             items: [
               for (var percent = 0; percent <= 100; percent += 10)
                 DropdownMenuItem(
@@ -120,10 +114,7 @@ class PersonalityCard extends StatelessWidget {
                 _ClassButton(
                   label: choice,
                   selected: state.classChoice == choice,
-                  onTap: () {
-                    state.classChoice = choice;
-                    state.notifyListeners();
-                  },
+                  onTap: () => state.setClassChoice(choice),
                 ),
             ],
           ),
@@ -156,7 +147,7 @@ class _AxisDropdown extends StatelessWidget {
         Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           items: [
             for (final option in options)
               DropdownMenuItem(value: option, child: Text(option)),
