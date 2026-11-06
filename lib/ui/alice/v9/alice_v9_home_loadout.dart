@@ -12,7 +12,8 @@ import 'package:front_porch_ai/ui/alice/v9/alice_v9_state.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_widgets.dart';
 
 /// Pocket in Space Time, holding the Starting Loadout fixed inside it.
-/// One combined label, stretched fully across, 3x2 grid.
+/// One combined label, narrowed and centred on the page (max 1100px),
+/// 3x2 grid inside.
 class LoadoutCard extends StatelessWidget {
   final AliceV9State state;
   final List<CharacterCard> characters;
@@ -25,8 +26,18 @@ class LoadoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return V9Card(
-      child: Column(
+    // Narrowed and centred, not stretched across the page: Center gives
+    // the card equal margins left and right, ConstrainedBox caps it at
+    // 1100px so the 3-column grid stays readable on a wide desktop
+    // window. Below 1100px the cap does nothing — the card takes the
+    // width the page gives it — and below 700px the grid inside still
+    // stacks to one column. Both Home branches use this same card, so
+    // both get the centred bar.
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: V9Card(
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const V9Heading('pocket in space time — starting loadout'),
@@ -138,6 +149,8 @@ class LoadoutCard extends StatelessWidget {
             },
           ),
         ],
+        ),
+        ),
       ),
     );
   }
