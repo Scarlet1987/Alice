@@ -122,19 +122,13 @@ class AliceV9HomePage extends StatelessWidget {
         TextButton(
           onPressed: () async {
             Navigator.of(context).pop();
-            final storage = Provider.of<StorageService>(
-              context,
-              listen: false,
-            );
+            final storage = Provider.of<StorageService>(context, listen: false);
             await Provider.of<CharacterRepository>(
               context,
               listen: false,
             ).deleteCharacter(
               character,
-              worldRepo: Provider.of<WorldRepository>(
-                context,
-                listen: false,
-              ),
+              worldRepo: Provider.of<WorldRepository>(context, listen: false),
               chatsDir: storage.chatsDir,
             );
             state.selectCharacter(null);
@@ -157,10 +151,9 @@ class AliceV9HomePage extends StatelessWidget {
     final stageNames = [for (final stage in stages) stage.name];
     final stageIndex = stageNames.isEmpty
         ? 0
-        : stageNames.indexOf(state.selectedStageName ?? '').clamp(
-            0,
-            stageNames.length - 1,
-          );
+        : stageNames
+              .indexOf(state.selectedStageName ?? '')
+              .clamp(0, stageNames.length - 1);
     CharacterCard? currentCharacter;
     for (final c in characters) {
       if (c.dbId == state.selectedCharacterId) currentCharacter = c;
@@ -169,10 +162,9 @@ class AliceV9HomePage extends StatelessWidget {
     final charNames = [for (final c in characters) c.name];
     final charIndex = currentCharacter == null || charNames.isEmpty
         ? 0
-        : charNames.indexOf(currentCharacter.name).clamp(
-            0,
-            charNames.length - 1,
-          );
+        : charNames
+              .indexOf(currentCharacter.name)
+              .clamp(0, charNames.length - 1);
     final loadoutCharacters = currentCharacter == null
         ? characters
         : [currentCharacter];
@@ -188,12 +180,12 @@ class AliceV9HomePage extends StatelessWidget {
           stageNames: stageNames,
           stageIndex: stageIndex,
           stages: stages,
-          onNew: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const AliceWorldsScreen()),
-          ),
-          onEdit: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const AliceWorldsScreen()),
-          ),
+          onNew: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const AliceWorldsScreen())),
+          onEdit: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const AliceWorldsScreen())),
           onDelete: stages.isEmpty
               ? null
               : () => _deleteStage(context, stages[stageIndex]),
@@ -301,11 +293,12 @@ class _JumpRailState extends State<_JumpRail> {
             onExit: (_) => setState(() => _headingHover = false),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              transform: Matrix4.translationValues(0, _headingHover ? -2 : 0, 0),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+              transform: Matrix4.translationValues(
+                0,
+                _headingHover ? -2 : 0,
+                0,
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: AppColors.aliceGreen,
                 borderRadius: BorderRadius.circular(8),
@@ -343,12 +336,9 @@ class _JumpRailState extends State<_JumpRail> {
             ),
             const SizedBox(height: 12),
           ],
-          if (widget.state.jumpNote.isNotEmpty)
-            V9Muted(widget.state.jumpNote),
+          if (widget.state.jumpNote.isNotEmpty) V9Muted(widget.state.jumpNote),
         ],
       ),
     );
   }
 }
-
-

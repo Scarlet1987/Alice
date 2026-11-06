@@ -24,9 +24,7 @@ class AliceV9ModelsPage extends StatelessWidget {
     // file_picker 13: static methods on FilePicker, no `.platform`.
     // pickFiles returns List<PlatformFile> directly (see
     // lib/utils/picker_prefs.dart) — not a FilePickerResult with .files.
-    final files = await FilePicker.pickFiles(
-      dialogTitle: 'Pick a $kind model',
-    );
+    final files = await FilePicker.pickFiles(dialogTitle: 'Pick a $kind model');
     if (files.isEmpty) return;
     state.pickModelAsset(files.first.name, kind);
   }
@@ -108,11 +106,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                           ListBox(
                             title: 'narration style',
                             label: 'narration person',
-                            options: const [
-                              'first',
-                              'second',
-                              'third',
-                            ],
+                            options: const ['first', 'second', 'third'],
                             labels: const [
                               'first person',
                               'second person',
@@ -185,8 +179,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                           const SizedBox(height: 12),
                           V9Card(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 const V9Heading('asset select and drop in'),
                                 const SizedBox(height: 8),
@@ -198,9 +191,7 @@ class AliceV9ModelsPage extends StatelessWidget {
                                   state.assetName == null
                                       ? 'No file chosen yet.'
                                       : 'Chosen: ${state.assetName}',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium,
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
@@ -380,4 +371,3 @@ class _ModelBox extends StatelessWidget {
     );
   }
 }
-

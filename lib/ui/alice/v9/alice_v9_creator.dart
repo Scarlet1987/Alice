@@ -42,7 +42,9 @@ class AliceV9CreatorPage extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Character card saved for "${state.mcName.text.trim()}".'),
+          content: Text(
+            'Character card saved for "${state.mcName.text.trim()}".',
+          ),
         ),
       );
     }
@@ -95,26 +97,16 @@ class AliceV9CreatorPage extends StatelessWidget {
                           nameHint: 'Main character name',
                           gender: state.mcGender,
                           pronouns: state.mcPronouns,
-                          onGenderPick: (pick) =>
-                              state.setCreatorIdentityPick(
-                                state.mcGender,
-                                pick,
-                              ),
-                          onGenderCustom: (text) =>
-                              state.setCreatorIdentityCustom(
-                                state.mcGender,
-                                text,
-                              ),
-                          onPronounsPick: (pick) =>
-                              state.setCreatorIdentityPick(
-                                state.mcPronouns,
-                                pick,
-                              ),
-                          onPronounsCustom: (text) =>
-                              state.setCreatorIdentityCustom(
-                                state.mcPronouns,
-                                text,
-                              ),
+                          onGenderPick: (pick) => state.setCreatorIdentityPick(
+                            state.mcGender,
+                            pick,
+                          ),
+                          onGenderCustom: (text) => state
+                              .setCreatorIdentityCustom(state.mcGender, text),
+                          onPronounsPick: (pick) => state
+                              .setCreatorIdentityPick(state.mcPronouns, pick),
+                          onPronounsCustom: (text) => state
+                              .setCreatorIdentityCustom(state.mcPronouns, text),
                           onSave: () => _saveMc(context),
                           saveLabel: 'Save main character',
                           creatorSaved: state.creatorSaved,
@@ -125,21 +117,14 @@ class AliceV9CreatorPage extends StatelessWidget {
                           nameHint: 'NPC name',
                           gender: state.npcGender,
                           pronouns: state.npcPronouns,
-                          onGenderPick: (pick) =>
-                              state.setCreatorIdentityPick(
-                                state.npcGender,
-                                pick,
-                              ),
-                          onGenderCustom: (text) =>
-                              state.setCreatorIdentityCustom(
-                                state.npcGender,
-                                text,
-                              ),
-                          onPronounsPick: (pick) =>
-                              state.setCreatorIdentityPick(
-                                state.npcPronouns,
-                                pick,
-                              ),
+                          onGenderPick: (pick) => state.setCreatorIdentityPick(
+                            state.npcGender,
+                            pick,
+                          ),
+                          onGenderCustom: (text) => state
+                              .setCreatorIdentityCustom(state.npcGender, text),
+                          onPronounsPick: (pick) => state
+                              .setCreatorIdentityPick(state.npcPronouns, pick),
                           onPronounsCustom: (text) =>
                               state.setCreatorIdentityCustom(
                                 state.npcPronouns,
@@ -152,11 +137,7 @@ class AliceV9CreatorPage extends StatelessWidget {
                         );
                         if (constraints.maxWidth < 700) {
                           return Column(
-                            children: [
-                              mc,
-                              const SizedBox(height: 16),
-                              npc,
-                            ],
+                            children: [mc, const SizedBox(height: 16), npc],
                           );
                         }
                         return Row(
@@ -331,4 +312,3 @@ class _NpcExtras extends StatelessWidget {
     );
   }
 }
-

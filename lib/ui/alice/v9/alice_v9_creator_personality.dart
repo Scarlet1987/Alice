@@ -74,20 +74,14 @@ class PersonalityCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            'sarcasm level',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text('sarcasm level', style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 4),
           DropdownButtonFormField<int>(
             isExpanded: true,
             initialValue: state.sarcasmPercent,
             items: [
               for (var percent = 0; percent <= 100; percent += 10)
-                DropdownMenuItem(
-                  value: percent,
-                  child: Text('$percent%'),
-                ),
+                DropdownMenuItem(value: percent, child: Text('$percent%')),
             ],
             onChanged: (v) {
               if (v != null) state.setSarcasmPercent(v);

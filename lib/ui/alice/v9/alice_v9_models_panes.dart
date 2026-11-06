@@ -81,9 +81,7 @@ class ListOption extends StatelessWidget {
               ? AppColors.alicePale
               : AppColors.pureWhite.withValues(alpha: 0.92),
           border: Border.all(
-            color: selected
-                ? AppColors.aliceGreen
-                : AppColors.alicePale,
+            color: selected ? AppColors.aliceGreen : AppColors.alicePale,
             width: selected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -120,14 +118,8 @@ class CodecBox extends StatelessWidget {
               value: 'vlc',
               child: Text('VLC codec — recommended'),
             ),
-            DropdownMenuItem(
-              value: 'built',
-              child: Text('Alice Built in'),
-            ),
-            DropdownMenuItem(
-              value: 'own',
-              child: Text('Bring your own'),
-            ),
+            DropdownMenuItem(value: 'built', child: Text('Alice Built in')),
+            DropdownMenuItem(value: 'own', child: Text('Bring your own')),
           ],
           onChanged: (v) {
             if (v != null) state.setCodec(v);

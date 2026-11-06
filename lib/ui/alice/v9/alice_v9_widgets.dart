@@ -212,10 +212,7 @@ class V9CoverFlow extends StatelessWidget {
                               AppColors.aliceGreen,
                               AppColors.aliceDark,
                             ]
-                          : [
-                              AppColors.pureWhite,
-                              AppColors.alicePale,
-                            ],
+                          : [AppColors.pureWhite, AppColors.alicePale],
                     ),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
@@ -289,9 +286,9 @@ class V9SlotDropdown extends StatelessWidget {
             border: const OutlineInputBorder(),
             isDense: true,
           ),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.pureBlack,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
         ),
       ],
     );

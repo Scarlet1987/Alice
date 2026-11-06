@@ -151,9 +151,7 @@ class AliceV9State extends ChangeNotifier {
   /// Live character preview, as in the preview: updates as you type
   /// and pick, including a typed custom pronoun.
   String get characterPreview {
-    final name = mcName.text.trim().isEmpty
-        ? '(unnamed)'
-        : mcName.text.trim();
+    final name = mcName.text.trim().isEmpty ? '(unnamed)' : mcName.text.trim();
     final height = formatMeasure(measurements.height, isHeight: true);
     return '$name — $classChoice, ${mcPronouns.resolved}, $height, '
         'sarcasm $sarcasmPercent%.';
@@ -252,8 +250,7 @@ class AliceV9State extends ChangeNotifier {
           ? ''
           : 'Relationship to MC: ${npcRelationship.text.trim()}',
       scenario: npcConcept.text.trim(),
-      systemPrompt:
-          'Gender: ${npcGender.resolved} (${npcPronouns.resolved}).',
+      systemPrompt: 'Gender: ${npcGender.resolved} (${npcPronouns.resolved}).',
       tags: const ['npc'],
     );
   }
