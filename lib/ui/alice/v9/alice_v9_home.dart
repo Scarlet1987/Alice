@@ -237,23 +237,33 @@ class AliceV9HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                // Stretch, not start: Stage and Current Char are the same
-                // height (preview v2 fix), their button rows centred.
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    width: 270,
-                    child: _JumpRail(
-                      state: state,
-                      onJump: (t) => _jump(context, t),
+              // IntrinsicHeight, not a bare stretch Row: the scroll view
+              // gives this Column infinite height, and a Row with
+              // CrossAxisAlignment.stretch under it tries to fill that
+              // infinite height — "BoxConstraints forces an infinite
+              // height" on first paint, and the never-laid-out boxes
+              // then fail every hit test. IntrinsicHeight measures the
+              // tallest card first, so stretch has a finite height to
+              // fill and Stage / Current Char stay the same height.
+              IntrinsicHeight(
+                child: Row(
+                  // Stretch, not start: Stage and Current Char are the
+                  // same height (preview v2 fix), button rows centred.
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: 270,
+                      child: _JumpRail(
+                        state: state,
+                        onJump: (t) => _jump(context, t),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(child: stageCard),
-                  const SizedBox(width: 24),
-                  Expanded(child: charCard),
-                ],
+                    const SizedBox(width: 24),
+                    Expanded(child: stageCard),
+                    const SizedBox(width: 24),
+                    Expanded(child: charCard),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               loadout,
