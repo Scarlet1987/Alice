@@ -274,6 +274,7 @@ class V9SlotDropdown extends StatelessWidget {
         Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           initialValue: value,
           hint: Text(items.isEmpty ? emptyHint : '—'),
           items: [

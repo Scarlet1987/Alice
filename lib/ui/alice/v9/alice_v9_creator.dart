@@ -275,6 +275,7 @@ class _NpcExtras extends StatelessWidget {
         Text('Role', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           initialValue: state.npcRole,
           items: const [
             'Ally',

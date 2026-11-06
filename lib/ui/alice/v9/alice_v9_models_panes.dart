@@ -113,6 +113,7 @@ class CodecBox extends StatelessWidget {
         Text('codec choices', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           initialValue: state.codec,
           items: const [
             DropdownMenuItem(

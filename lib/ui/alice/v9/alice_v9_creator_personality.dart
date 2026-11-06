@@ -80,6 +80,7 @@ class PersonalityCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           DropdownButtonFormField<int>(
+            isExpanded: true,
             initialValue: state.sarcasmPercent,
             items: [
               for (var percent = 0; percent <= 100; percent += 10)
@@ -147,6 +148,7 @@ class _AxisDropdown extends StatelessWidget {
         Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           initialValue: value,
           items: [
             for (final option in options)

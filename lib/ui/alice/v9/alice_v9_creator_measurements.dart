@@ -135,6 +135,7 @@ class _TorsoCell extends StatelessWidget {
       children: [
         Text('torso length', style: Theme.of(context).textTheme.labelLarge),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           initialValue: state.measurements.torsoLength,
           items: const [
             DropdownMenuItem(value: 'short', child: Text('short')),
