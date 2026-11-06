@@ -183,7 +183,9 @@ class AliceV9ModelsPage extends StatelessWidget {
                               children: [
                                 const V9Heading('asset select and drop in'),
                                 const SizedBox(height: 8),
-                                const V9Muted('Drop assets here.'),
+                                const V9Muted(
+                                  'Drop an asset here, or use browse below.',
+                                ),
                                 const SizedBox(height: 8),
                                 Text(
                                   state.assetName == null
@@ -192,9 +194,24 @@ class AliceV9ModelsPage extends StatelessWidget {
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 const SizedBox(height: 12),
-                                V9Button(
-                                  label: 'run check on asset(s)',
-                                  onPressed: _runAssetCheck,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: V9Button(
+                                        label: 'browse.....',
+                                        onPressed: () =>
+                                            _browseModel(context, 'asset'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      flex: 2,
+                                      child: V9Button(
+                                        label: 'run check on asset(s)',
+                                        onPressed: _runAssetCheck,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 8),
                                 V9Muted(state.assetCheckResult),
