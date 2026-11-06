@@ -206,8 +206,14 @@ class _IdentityCard extends StatelessWidget {
           const SizedBox(height: 4),
           TextField(
             controller: nameController,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             decoration: InputDecoration(
               hintText: nameHint,
+              hintStyle: TextStyle(
+                color: AppColors.pureBlack.withValues(alpha: 0.6),
+              ),
               border: const OutlineInputBorder(),
               filled: true,
               fillColor: AppColors.alicePale,
@@ -258,6 +264,9 @@ class _NpcExtras extends StatelessWidget {
         DropdownButtonFormField<String>(
           isExpanded: true,
           initialValue: state.npcRole,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: const [
             'Ally',
             'Villain',
@@ -284,9 +293,15 @@ class _NpcExtras extends StatelessWidget {
         const SizedBox(height: 4),
         TextField(
           controller: state.npcConcept,
-          decoration: const InputDecoration(
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
+          decoration: InputDecoration(
             hintText: 'The spark the AI writes from…',
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(
+              color: AppColors.pureBlack.withValues(alpha: 0.6),
+            ),
+            border: const OutlineInputBorder(),
             filled: true,
             fillColor: AppColors.alicePale,
             isDense: true,
@@ -300,9 +315,15 @@ class _NpcExtras extends StatelessWidget {
         const SizedBox(height: 4),
         TextField(
           controller: state.npcRelationship,
-          decoration: const InputDecoration(
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
+          decoration: InputDecoration(
             hintText: 'e.g. old friend, rival, mentor…',
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(
+              color: AppColors.pureBlack.withValues(alpha: 0.6),
+            ),
+            border: const OutlineInputBorder(),
             filled: true,
             fillColor: AppColors.alicePale,
             isDense: true,

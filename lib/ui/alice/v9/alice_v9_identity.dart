@@ -139,8 +139,14 @@ class _V9IdentityRowState extends State<V9IdentityRow> {
           TextField(
             controller: _customController,
             onChanged: widget.onCustomChanged,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             decoration: InputDecoration(
               hintText: widget.customHint,
+              hintStyle: TextStyle(
+                color: AppColors.pureBlack.withValues(alpha: 0.6),
+              ),
               border: const OutlineInputBorder(),
               filled: true,
               fillColor: AppColors.alicePale,

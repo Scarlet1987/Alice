@@ -129,9 +129,18 @@ class AliceV9ProfilePage extends StatelessWidget {
                           const SizedBox(height: 4),
                           TextField(
                             controller: state.userRealName,
-                            decoration: const InputDecoration(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: AppColors.pureBlack),
+                            decoration: InputDecoration(
                               hintText: 'Your real name',
-                              border: OutlineInputBorder(),
+                              hintStyle: TextStyle(
+                                color: AppColors.pureBlack.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              border: const OutlineInputBorder(),
                               filled: true,
                               fillColor: AppColors.alicePale,
                               isDense: true,
@@ -165,9 +174,18 @@ class AliceV9ProfilePage extends StatelessWidget {
                             controller: state.userBirthday,
                             readOnly: true,
                             onTap: () => _pickBirthday(context),
-                            decoration: const InputDecoration(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: AppColors.pureBlack),
+                            decoration: InputDecoration(
                               hintText: 'Birthday — tap to pick a date',
-                              border: OutlineInputBorder(),
+                              hintStyle: TextStyle(
+                                color: AppColors.pureBlack.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              border: const OutlineInputBorder(),
                               filled: true,
                               fillColor: AppColors.alicePale,
                               isDense: true,
@@ -222,9 +240,18 @@ class AliceV9ProfilePage extends StatelessWidget {
                             minLines: 4,
                             maxLines: 8,
                             onChanged: (_) => state.bioChanged(),
-                            decoration: const InputDecoration(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: AppColors.pureBlack),
+                            decoration: InputDecoration(
                               hintText: 'A short bio about you…',
-                              border: OutlineInputBorder(),
+                              hintStyle: TextStyle(
+                                color: AppColors.pureBlack.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              border: const OutlineInputBorder(),
                               filled: true,
                               fillColor: AppColors.pureWhite,
                             ),

@@ -137,6 +137,9 @@ class _TorsoCell extends StatelessWidget {
         DropdownButtonFormField<String>(
           isExpanded: true,
           initialValue: state.measurements.torsoLength,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: const [
             DropdownMenuItem(value: 'short', child: Text('short')),
             DropdownMenuItem(value: 'average', child: Text('average')),

@@ -45,12 +45,18 @@ class PersonalityCard extends StatelessWidget {
           const SizedBox(height: 4),
           TextField(
             controller: state.mcPersonality,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             minLines: 4,
             maxLines: 6,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText:
                   'Type it in your own words, one habit per line. For example: fidgets with sleeves when thinking.',
-              border: OutlineInputBorder(),
+              hintStyle: TextStyle(
+                color: AppColors.pureBlack.withValues(alpha: 0.6),
+              ),
+              border: const OutlineInputBorder(),
               filled: true,
               fillColor: AppColors.alicePale,
             ),
@@ -63,12 +69,18 @@ class PersonalityCard extends StatelessWidget {
           const SizedBox(height: 4),
           TextField(
             controller: state.mcTone,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             minLines: 4,
             maxLines: 6,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText:
                   'Type how they talk, in your own words. For example: cocky and sarcastic, but all lady.',
-              border: OutlineInputBorder(),
+              hintStyle: TextStyle(
+                color: AppColors.pureBlack.withValues(alpha: 0.6),
+              ),
+              border: const OutlineInputBorder(),
               filled: true,
               fillColor: AppColors.alicePale,
             ),
@@ -79,6 +91,9 @@ class PersonalityCard extends StatelessWidget {
           DropdownButtonFormField<int>(
             isExpanded: true,
             initialValue: state.sarcasmPercent,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             items: [
               for (var percent = 0; percent <= 100; percent += 10)
                 DropdownMenuItem(value: percent, child: Text('$percent%')),
@@ -144,6 +159,9 @@ class _AxisDropdown extends StatelessWidget {
         DropdownButtonFormField<String>(
           isExpanded: true,
           initialValue: value,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: [
             for (final option in options)
               DropdownMenuItem(value: option, child: Text(option)),

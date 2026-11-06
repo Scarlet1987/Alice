@@ -113,6 +113,9 @@ class CodecBox extends StatelessWidget {
         DropdownButtonFormField<String>(
           isExpanded: true,
           initialValue: state.codec,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: const [
             DropdownMenuItem(
               value: 'vlc',
