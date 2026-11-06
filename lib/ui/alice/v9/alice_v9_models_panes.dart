@@ -112,6 +112,7 @@ class CodecBox extends StatelessWidget {
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           isExpanded: true,
+          dropdownColor: AppColors.alicePale,
           initialValue: state.codec,
           style: Theme.of(
             context,
@@ -119,10 +120,25 @@ class CodecBox extends StatelessWidget {
           items: const [
             DropdownMenuItem(
               value: 'vlc',
-              child: Text('VLC codec — recommended'),
+              child: Text(
+                'VLC codec — recommended',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
             ),
-            DropdownMenuItem(value: 'built', child: Text('Alice Built in')),
-            DropdownMenuItem(value: 'own', child: Text('Bring your own')),
+            DropdownMenuItem(
+              value: 'built',
+              child: Text(
+                'Alice Built in',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'own',
+              child: Text(
+                'Bring your own',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
           ],
           onChanged: (v) {
             if (v != null) state.setCodec(v);

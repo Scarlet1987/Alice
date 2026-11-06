@@ -136,14 +136,33 @@ class _TorsoCell extends StatelessWidget {
         Text('torso length', style: Theme.of(context).textTheme.labelLarge),
         DropdownButtonFormField<String>(
           isExpanded: true,
+          dropdownColor: AppColors.alicePale,
           initialValue: state.measurements.torsoLength,
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: const [
-            DropdownMenuItem(value: 'short', child: Text('short')),
-            DropdownMenuItem(value: 'average', child: Text('average')),
-            DropdownMenuItem(value: 'long', child: Text('long')),
+            DropdownMenuItem(
+              value: 'short',
+              child: Text(
+                'short',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'average',
+              child: Text(
+                'average',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'long',
+              child: Text(
+                'long',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
           ],
           onChanged: (v) {
             if (v == null) return;

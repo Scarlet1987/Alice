@@ -263,6 +263,7 @@ class _NpcExtras extends StatelessWidget {
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           isExpanded: true,
+          dropdownColor: AppColors.alicePale,
           initialValue: state.npcRole,
           style: Theme.of(
             context,
@@ -276,7 +277,7 @@ class _NpcExtras extends StatelessWidget {
             'Comic relief',
             'Love interest',
             'Wildcard',
-          ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+          ].map((r) => DropdownMenuItem(value: r, child: Text(r, style: const TextStyle(color: AppColors.pureBlack)))).toList(),
           onChanged: (v) {
             if (v == null) return;
             state.setNpcRole(v);

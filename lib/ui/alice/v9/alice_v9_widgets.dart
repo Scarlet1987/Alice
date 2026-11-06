@@ -272,6 +272,7 @@ class V9SlotDropdown extends StatelessWidget {
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           isExpanded: true,
+          dropdownColor: AppColors.alicePale,
           initialValue: value,
           hint: Text(
             items.isEmpty ? emptyHint : '—',
@@ -280,9 +281,21 @@ class V9SlotDropdown extends StatelessWidget {
             ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           ),
           items: [
-            const DropdownMenuItem<String>(value: null, child: Text('—')),
+            const DropdownMenuItem<String>(
+              value: null,
+              child: Text(
+                '—',
+                style: TextStyle(color: AppColors.pureBlack),
+              ),
+            ),
             for (final item in items)
-              DropdownMenuItem<String>(value: item, child: Text(item)),
+              DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: const TextStyle(color: AppColors.pureBlack),
+                ),
+              ),
           ],
           onChanged: items.isEmpty ? null : onChanged,
           decoration: InputDecoration(

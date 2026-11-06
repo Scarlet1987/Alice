@@ -90,13 +90,20 @@ class PersonalityCard extends StatelessWidget {
           const SizedBox(height: 4),
           DropdownButtonFormField<int>(
             isExpanded: true,
+            dropdownColor: AppColors.alicePale,
             initialValue: state.sarcasmPercent,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
             items: [
               for (var percent = 0; percent <= 100; percent += 10)
-                DropdownMenuItem(value: percent, child: Text('$percent%')),
+                DropdownMenuItem(
+                  value: percent,
+                  child: Text(
+                    '$percent%',
+                    style: const TextStyle(color: AppColors.pureBlack),
+                  ),
+                ),
             ],
             onChanged: (v) {
               if (v != null) state.setSarcasmPercent(v);
@@ -158,13 +165,20 @@ class _AxisDropdown extends StatelessWidget {
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           isExpanded: true,
+          dropdownColor: AppColors.alicePale,
           initialValue: value,
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
           items: [
             for (final option in options)
-              DropdownMenuItem(value: option, child: Text(option)),
+              DropdownMenuItem(
+                value: option,
+                child: Text(
+                  option,
+                  style: const TextStyle(color: AppColors.pureBlack),
+                ),
+              ),
           ],
           onChanged: (v) {
             if (v != null) onChanged(v);
