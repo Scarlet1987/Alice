@@ -12,8 +12,8 @@ import 'package:front_porch_ai/ui/alice/v9/alice_v9_state.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_widgets.dart';
 
 /// Pocket in Space Time, holding the Starting Loadout fixed inside it.
-/// One combined label, narrowed and centred on the page (max 1100px),
-/// 3x2 grid inside.
+/// One combined label, narrowed and centred in the width Home gives it
+/// (max 1100px), 3x2 grid inside.
 class LoadoutCard extends StatelessWidget {
   final AliceV9State state;
   final List<CharacterCard> characters;
@@ -26,10 +26,13 @@ class LoadoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Narrowed and centred, not stretched across the page: Center gives
-    // the card equal margins left and right, ConstrainedBox caps it at
-    // 1100px so the 3-column grid stays readable on a wide desktop
-    // window. Below 1100px the cap does nothing — the card takes the
+    // Narrowed and centred, not stretched across the width it is
+    // given: Center gives the card equal margins left and right,
+    // ConstrainedBox caps it at 1100px so the 3-column grid stays
+    // readable on a wide desktop window. In the wide branch Home gives
+    // it the Stage+Char area right of the Jump rail, so it lines up
+    // with those cards; in the narrow branch that width is the full
+    // page. Below 1100px the cap does nothing — the card takes the
     // width the page gives it — and below 700px the grid inside still
     // stacks to one column. Both Home branches use this same card, so
     // both get the centred bar.

@@ -4,10 +4,11 @@
 // Alice v9 Home (combined preview v9): header, nav with dead space,
 // Jump To (6 items, in order), Stage Cover Flow +new/edit/-del, Current
 // Char Cover Flow +new/edit/-del, then Pocket in Space Time holding the
-// Starting Loadout 3x2, stretched fully across. Stage and Current Char
-// are the same size, their button rows centred. The Jump To heading lifts
-// on hover like a button. Loadout dropdowns are fed by the selected
-// character's owned items — never "Option 1".
+// Starting Loadout 3x2, lined up under Stage / Current Char (same left
+// and right edges as the two cards above it, same centre line). Stage
+// and Current Char are the same size, their button rows centred. The
+// Jump To heading lifts on hover like a button. Loadout dropdowns are
+// fed by the selected character's owned items — never "Option 1".
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -258,7 +259,20 @@ class AliceV9HomePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              loadout,
+              // Pocket lines up with Stage / Current Char above it, not
+              // with the whole page: the same 270px Jump rail + 24px gap
+              // sits to its left, so it gets exactly the Stage+Char
+              // width. Its centre is their centre, and when it is
+              // narrower than them (the 1100px cap inside LoadoutCard)
+              // it is inset by equal margins on both sides.
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(width: 270),
+                  const SizedBox(width: 24),
+                  Expanded(child: loadout),
+                ],
+              ),
             ],
           ),
         );
