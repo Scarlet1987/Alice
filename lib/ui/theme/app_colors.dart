@@ -365,6 +365,30 @@ class AppColors {
   // and forest overlay are fixed hues, not theme-aware chrome.
   // ---------------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------------
+  // Alice v9 (combined preview v9, 2026-11-05): white and green, not white
+  // and blue. Accent green only — no green wash. All v9 literals live
+  // here; v9 UI code uses only these tokens (raw-colour ratchet).
+  // ---------------------------------------------------------------------------
+
+  /// Alice v9 accent green — buttons, headings, borders.
+  static const Color aliceGreen = Color(0xFF00914F);
+
+  /// Alice v9 dark green — banner gradient, page background.
+  static const Color aliceDark = Color(0xFF14532E);
+
+  /// Alice v9 deepest green — page background gradient end.
+  static const Color aliceDeep = Color(0xFF0F3D22);
+
+  /// Alice v9 3D button bottom edge.
+  static const Color aliceEdge = Color(0xFF007A42);
+
+  /// Alice v9 pale mint — dropdown fills, selected list rows.
+  static const Color alicePale = Color(0xFFD9F0E3);
+
+  /// Alice v9 light mint — page background tint.
+  static const Color aliceLight = Color(0xFFEFFAF3);
+
   /// Pure black, e.g. the rabbit-icon ring fill in Home credits.
   static const Color pureBlack = Color(0xFF000000);
 

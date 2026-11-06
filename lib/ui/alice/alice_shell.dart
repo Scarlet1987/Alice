@@ -10,6 +10,7 @@ import 'package:front_porch_ai/ui/alice/alice_chat.dart';
 import 'package:front_porch_ai/ui/alice/alice_creator.dart';
 import 'package:front_porch_ai/ui/alice/alice_home.dart';
 import 'package:front_porch_ai/ui/alice/alice_settings.dart';
+import 'package:front_porch_ai/ui/alice/v9/v9.dart';
 import 'package:front_porch_ai/ui/alice/alice_worlds.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -188,6 +189,51 @@ class _AliceNavRail extends StatelessWidget {
           ),
           _navButton(context, 3, Icons.public_rounded, 'Worlds'),
           _navButton(context, 4, Icons.settings_rounded, 'Settings'),
+          // v9 front end (combined preview v9): a full-screen route, not
+          // a sixth AppState tab, so the five-tab shell keeps its index
+          // mapping. The older Home/Creator stay reachable until their
+          // own rebuilds; v9 is the current look for Home, Models,
+          // Creator, and Profile.
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AliceV9Shell()),
+              ),
+              hoverColor: AppColors.porchAmberOf(context).withValues(
+                alpha: 0.08,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: const Border(
+                    left: BorderSide(color: AppColors.aliceGreen, width: 3),
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.home_rounded, size: 20),
+                    SizedBox(width: 11),
+                    Expanded(
+                      child: Text(
+                        'Home v9',
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           const Spacer(),
           // Backend status card at the bottom of the rail
           Container(
