@@ -664,6 +664,22 @@ jobs:
           pattern: build-*
           merge-multiple: true
 
+      # The in-app updater fails closed without a published checksum source:
+      # self-update, KoboldCpp, OpenCode and Tailscale all refuse to execute
+      # a download with no hash. Generate SHA256SUMS over the installers
+      # here so it publishes alongside them.
+      - name: Generate SHA256SUMS
+        shell: bash
+        run: |
+          sha256sum \
+            Front_Porch_AI-Linux.AppImage \
+            Front_Porch_AI-Linux.deb \
+            Front_Porch_AI-Linux.rpm \
+            Front_Porch_AI_Linux.tar.gz \
+            Front_Porch_AI_Setup.exe \
+            Front_Porch_AI.pkg > SHA256SUMS
+          cat SHA256SUMS
+
       # Mirror the Beta/Nightly "friendly notes" step: pull the bullet list under the
       # first "## " heading of docs/main.md into the GitHub release body. The in-app
       # "Update Available" dialog renders that body as the user-facing What's New.
@@ -702,6 +718,7 @@ jobs:
             Front_Porch_AI_Linux.tar.gz
             Front_Porch_AI_Setup.exe
             Front_Porch_AI.pkg
+            SHA256SUMS
           prerelease: ${{ contains(github.ref_name, 'beta') }}
           body: ${{ steps.release_notes.outputs.body }}
         env:
@@ -728,6 +745,13 @@ jobs:
           echo "Published assets:"
           echo "$ASSETS"
           MISSING=0
+          # SHA256SUMS is tiny by design (a few hundred bytes of hashes),
+          # so it is checked for presence only — never against the 1 MB
+          # installer size floor below.
+          if ! echo "$ASSETS" | awk '$1 == "SHA256SUMS" {found=1} END {exit !found}'; then
+            echo "::error::release asset MISSING: SHA256SUMS"
+            MISSING=1
+          fi
           for NAME in $EXPECTED; do
             SIZE=$(echo "$ASSETS" | awk -v n="$NAME" '$1 == n {print $2}')
             if [ -z "$SIZE" ]; then
