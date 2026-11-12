@@ -18,6 +18,31 @@
 
 part of 'backend_manager.dart';
 
+/// Verifies a staged KoboldCpp binary against the checksum published with
+/// its release. Fail-closed: throws and deletes [file] when the release
+/// publishes no hash for [assetName] or the bytes do not match. The download
+/// entry point ([BackendManagerDownload._downloadBackendImpl]) calls this
+/// before swapping the staged binary live; tests drive it directly against
+/// a local checksum server.
+///
+/// A hash is only ever trusted from a SHA256SUMS manifest or a per-asset
+/// `.sha256` published with the LostRuins/koboldcpp release. That release
+/// currently publishes neither, so engine downloads fail closed until
+/// upstream publishes one. Never invent a hash value.
+@visibleForTesting
+Future<void> verifyStagedKoboldEngine({
+  required File file,
+  required String assetName,
+  required String? sha256SumsUrl,
+  http.Client? client,
+}) => verifyFileAgainstChecksumSource(
+  file: file,
+  assetName: assetName,
+  sumsUrl: sha256SumsUrl,
+  assetLabel: 'koboldcpp engine',
+  client: client,
+);
+
 /// Stream-to-.part then swap. Version check and availability stay on
 /// [BackendManager]. [BackendManager.swapStagedBinary] stays on the class
 /// — backend_binary_staging_test calls it.
@@ -191,14 +216,15 @@ extension BackendManagerDownload on BackendManager {
         );
       }
 
-      // Integrity: the binary is chmod +x and executed after this point —
-      // refuse if the bytes don't match the published build hash.
-      // TODO: publish SHA256SUMS per KoboldCpp build and plumb the expected
-      // hash through from the release metadata.
-      await VerifySha256.verifyFileOrThrow(
-        file,
-        null, // no published hash yet — logs TODO, does not block
-        assetLabel: 'koboldcpp engine',
+      // Integrity: the binary is chmod +x and executed after this point.
+      // The expected hash comes only from a SHA256SUMS manifest or a
+      // per-asset .sha256 published with the LostRuins/koboldcpp release
+      // (captured in checkForUpdates). No published hash means no swap:
+      // the .part file is deleted and the download fails.
+      await verifyStagedKoboldEngine(
+        file: file,
+        assetName: executableName,
+        sha256SumsUrl: _remoteChecksumUrl,
       );
 
       // Only now does the complete binary become the live executable.

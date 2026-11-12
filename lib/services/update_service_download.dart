@@ -18,6 +18,25 @@
 
 part of 'update_service.dart';
 
+/// Verifies a staged installer against the release's published checksum
+/// source. Fail-closed: throws and deletes [file] when the release publishes
+/// no hash for [assetName] or the bytes do not match. The download entry
+/// point ([UpdateServiceDownload._downloadUpdateImpl]) calls this before
+/// staging; tests drive it directly against a local checksum server.
+@visibleForTesting
+Future<void> verifyStagedUpdateInstaller({
+  required File file,
+  required String assetName,
+  required String? sha256SumsUrl,
+  http.Client? client,
+}) => verifyFileAgainstChecksumSource(
+  file: file,
+  assetName: assetName,
+  sumsUrl: sha256SumsUrl,
+  assetLabel: 'self-update $assetName',
+  client: client,
+);
+
 /// Download the chosen GitHub asset to a temp file.
 extension UpdateServiceDownload on UpdateService {
   /// Download the installer to a temp directory.
@@ -89,13 +108,15 @@ extension UpdateServiceDownload on UpdateService {
           throw Exception('installer download is an HTML page, not a binary');
         }
 
-        // Integrity: refuse to stage an installer whose bytes don't match the
-        // published release hash. TODO: publish SHA256SUMS per release asset
-        // and plumb the expected hash through from the release metadata.
-        await VerifySha256.verifyFileOrThrow(
-          file,
-          null, // no published hash yet — logs TODO, does not block
-          assetLabel: 'self-update $assetName',
+        // Integrity: refuse to stage an installer whose bytes don't match
+        // the hash published with the release (SHA256SUMS manifest or a
+        // per-asset .sha256). A release with no published hash for this
+        // asset fails closed: the download is deleted and nothing stages.
+        await verifyStagedUpdateInstaller(
+          file: file,
+          assetName: assetName,
+          sha256SumsUrl: _sha256SumsUrl.isEmpty ? null : _sha256SumsUrl,
+          client: client,
         );
 
         _pendingInstallerPath = installerPath;

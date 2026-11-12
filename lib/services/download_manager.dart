@@ -17,8 +17,8 @@
 // along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -297,7 +297,9 @@ class DownloadManager extends ChangeNotifier {
         task.state = DownloadTaskState.verifying;
         notifyListeners();
 
-        final actualHash = await _calculateSha256(task.targetPath);
+        // The bytes on disk are still the staged temp file — the rename to
+        // targetPath only happens in task.complete(), after this check.
+        final actualHash = await _calculateSha256(task.tempPath);
         if (actualHash != task.expectedSha256) {
           task.fail(
             'SHA256 mismatch: expected ${task.expectedSha256}, got $actualHash',
@@ -417,13 +419,12 @@ class DownloadManager extends ChangeNotifier {
     task.updateProgress(receivedBytes, totalSize);
   }
 
-  /// Calculates SHA256 hash of a file.
+  /// Calculates the real SHA-256 hash of a file, streaming so large model
+  /// files are not held in memory.
   Future<String> _calculateSha256(String filePath) async {
     final file = File(filePath);
-    final bytes = await file.readAsBytes();
-    // Note: For production, consider using crypto package for SHA256
-    // This is a placeholder - actual SHA256 would require dart:crypto
-    return jsonEncode(bytes.take(100).toList()); // Placeholder
+    final digest = await sha256.bind(file.openRead()).first;
+    return digest.toString();
   }
 
   @override

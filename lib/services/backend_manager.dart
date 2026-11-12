@@ -27,7 +27,7 @@ import 'package:front_porch_ai/services/kobold/kobold.dart';
 import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/hardware_service.dart';
 import 'package:front_porch_ai/services/update_service.dart';
-import 'package:front_porch_ai/services/security/verify_sha256.dart';
+import 'package:front_porch_ai/services/security/release_checksums.dart';
 import 'package:front_porch_ai/utils/utils.dart';
 
 part 'backend_manager.download.dart';
@@ -52,6 +52,11 @@ class BackendManager extends ChangeNotifier {
   int? _localSize;
   String? _remoteVersion;
   int? _remoteAssetSize;
+  // Download URL of the release's published checksum source (a SHA256SUMS
+  // manifest or a per-asset .sha256 for the engine binary), captured in
+  // checkForUpdates. Null when the release publishes no hash — the engine
+  // download then fails closed instead of swapping an unverified binary.
+  String? _remoteChecksumUrl;
   bool _isCheckingVersion = false;
   String? _versionError;
 
@@ -321,6 +326,14 @@ class BackendManager extends ChangeNotifier {
           final tag = (body['tag_name'] as String?) ?? '';
           _remoteVersion = tag.replaceFirst(RegExp(r'^[vV]'), '');
           final exeName = _getExecutableName();
+          // The only trusted hash source: a SHA256SUMS manifest or a
+          // per-asset .sha256 published with this LostRuins/koboldcpp
+          // release. v1.124.2 publishes neither, so this stays null and
+          // the download fails closed until upstream publishes one.
+          _remoteChecksumUrl = findChecksumAssetUrl(
+            (body['assets'] as List?) ?? [],
+            exeName,
+          );
           for (final a in (body['assets'] as List?) ?? []) {
             if (a['name'] == exeName) {
               _remoteAssetSize = a['size'] as int?;

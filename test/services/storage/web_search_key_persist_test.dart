@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
 
-// Tavily must survive a restart when the macOS keychain comes back empty.
-// MCP tokens and OpenRouter keys already live in SharedPreferences for that
-// reason. The old keychain-only save deleted the prefs copy, so a keychain
-// miss on the next launch left Wikipedia as the only search backend.
+// Tavily lives ONLY in the OS secure store (Finding 1, audit §4a), so the
+// secure store is the durable copy across restarts — SharedPreferences
+// never holds the key and cannot resurrect it. An emptied secure store
+// loses the key (fail closed); nothing falls back to plaintext.
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,36 +33,51 @@ String get _key => isPreRelease ? 'beta_search_api_key' : 'search_api_key';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('Tavily key survives a restart when the keychain is empty', () async {
-    SharedPreferences.setMockInitialValues({});
-    FlutterSecureStorage.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    final first = WebSearchSettings()..initializeBase(prefs, () {});
-    await first.load();
-    await first.setSearchApiKey('tavily-keep-me');
+  test(
+    'Tavily key survives a restart from the secure store; an emptied keychain loses it',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      FlutterSecureStorage.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final first = WebSearchSettings()..initializeBase(prefs, () {});
+      await first.load();
+      await first.setSearchApiKey('tavily-keep-me');
 
-    FlutterSecureStorage.setMockInitialValues({});
-    final second = WebSearchSettings()..initializeBase(prefs, () {});
-    await second.load();
+      // Restart with the secure store intact: the key comes back, and
+      // prefs never holds a copy of it.
+      final second = WebSearchSettings()..initializeBase(prefs, () {});
+      await second.load();
 
-    expect(
-      second.searchApiKey,
-      'tavily-keep-me',
-      reason:
-          'prefs must be the durable copy — the macOS keychain is the '
-          'store that does not come back after an ad-hoc / Rawhide relaunch',
-    );
-    expect(prefs.getString(_key), 'tavily-keep-me');
-  });
+      expect(second.searchApiKey, 'tavily-keep-me');
+      expect(prefs.containsKey(_key), isFalse);
 
-  test('a keychain-only leftover is copied into prefs on load', () async {
-    SharedPreferences.setMockInitialValues({});
-    FlutterSecureStorage.setMockInitialValues({_key: 'from-keychain'});
-    final prefs = await SharedPreferences.getInstance();
-    final settings = WebSearchSettings()..initializeBase(prefs, () {});
-    await settings.load();
+      // Restart with the secure store emptied: the key is gone and prefs
+      // does not resurrect it — fail closed, no plaintext fallback.
+      FlutterSecureStorage.setMockInitialValues({});
+      final third = WebSearchSettings()..initializeBase(prefs, () {});
+      await third.load();
 
-    expect(settings.searchApiKey, 'from-keychain');
-    expect(prefs.getString(_key), 'from-keychain');
-  });
+      expect(third.searchApiKey, isEmpty);
+      expect(third.hasApiKey, isFalse);
+      expect(prefs.containsKey(_key), isFalse);
+    },
+  );
+
+  test(
+    'a keychain-only value loads from the secure store and is not copied into prefs',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      FlutterSecureStorage.setMockInitialValues({_key: 'from-keychain'});
+      final prefs = await SharedPreferences.getInstance();
+      final settings = WebSearchSettings()..initializeBase(prefs, () {});
+      await settings.load();
+
+      expect(settings.searchApiKey, 'from-keychain');
+      expect(prefs.containsKey(_key), isFalse);
+      expect(
+        await const FlutterSecureStorage().read(key: _key),
+        'from-keychain',
+      );
+    },
+  );
 }

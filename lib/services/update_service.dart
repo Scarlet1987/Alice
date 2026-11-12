@@ -23,7 +23,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:front_porch_ai/app_version.dart';
-import 'package:front_porch_ai/services/security/verify_sha256.dart';
+import 'package:front_porch_ai/services/security/release_checksums.dart';
 import 'package:front_porch_ai/utils/native_exit.dart';
 
 part 'update_service_download.dart';
@@ -72,6 +72,11 @@ class UpdateService extends ChangeNotifier {
   double _downloadProgress = 0.0;
   bool _autoCheckEnabled = true;
   String? _pendingInstallerPath;
+  // Download URL of the release's published checksum source (a SHA256SUMS
+  // manifest or a per-asset .sha256), captured in checkForUpdate alongside
+  // the installer URL. Empty when the release publishes no hash — the
+  // download then fails closed instead of staging an unverified installer.
+  String _sha256SumsUrl = '';
   // The actual asset filename chosen. Used so download names the temp file
   // after the real remote asset (the extension drives the platform install
   // dispatch at install time).
@@ -266,6 +271,7 @@ class UpdateService extends ChangeNotifier {
       _latestVersion = normalizedVersion;
       _downloadUrl = installerUrl;
       _selectedAssetName = resolvedAssetName ?? _platformAsset;
+      _sha256SumsUrl = findChecksumAssetUrl(assets, _selectedAssetName) ?? '';
       _releaseNotes = targetRelease['body'] as String? ?? '';
       // The friendly "What's New" (including the macOS .pkg+shim transition note)
       // comes from docs/<Branch>.md (e.g. docs/Rawhide.md) via the CI release_notes

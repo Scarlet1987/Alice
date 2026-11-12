@@ -26,5 +26,6 @@ export 'opencode_manager.dart';
 export 'opencode_paths.dart';
 export 'opencode_pin.dart';
 export 'opencode_process.dart';
+export 'opencode_transfer.dart';
 export 'opencode_version.dart';
 export 'opencode_voice_plugin.dart';

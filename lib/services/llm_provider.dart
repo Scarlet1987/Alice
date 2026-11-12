@@ -76,7 +76,7 @@ class LLMProvider extends ChangeNotifier {
 
   /// Unofficial SuperGrok sign-in; its token rides every api.x.ai request
   /// through [BackendSettings.bearerOverlay].
-  late final SuperGrokAuth superGrok = SuperGrokAuth.inPrefs(
+  late final SuperGrokAuth superGrok = SuperGrokAuth.inSecureStore(
     () => _storageService.backendSettings.prefs,
     _storageService.backendSettings.k('xai_supergrok_session'),
   );

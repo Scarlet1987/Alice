@@ -26,6 +26,7 @@ import 'kobold_launch_fields.dart';
 import 'settings_base.dart';
 import 'preset_settings.dart'; // for parseKcppsFile (static)
 import 'remote_api_key_vault.dart';
+import '../secure_credential_store.dart';
 import 'worker_backend_settings.dart';
 
 /// Backend, remote API, reasoning, Kobold launch flags, model/kcpps paths,
@@ -33,12 +34,22 @@ import 'worker_backend_settings.dart';
 ///
 /// Lifted Stage 7. kcppsHasModel + context override from active preset logic
 /// preserved exactly.
+///
+/// Remote API keys live ONLY in the OS secure store (see
+/// [SecureCredentialStore]) — never in SharedPreferences. [load] reads the
+/// non-secret settings synchronously; [loadSecrets] (awaited by
+/// StorageService init) loads and one-way migrates the keys.
 class BackendSettings
     with
         SettingsBase,
         WorkerBackendFields,
         KoboldLaunchFields,
         ChatContextFields {
+  BackendSettings({SecureCredentialStore? secureStore})
+    : _secureStore = secureStore ?? SecureCredentialStore.secure();
+
+  final SecureCredentialStore _secureStore;
+
   String _backendType = 'kobold'; // 'kobold' or 'openRouter'
   bool _backendChoiceDone = false; // first-launch engine choice answered
   String _remoteApiKey = '';
@@ -155,30 +166,16 @@ class BackendSettings
 
   void load() {
     _backendType = prefs?.getString(k('backend_type')) ?? 'kobold';
-    _remoteApiKey = prefs?.getString(k('remote_api_key')) ?? '';
     _remoteApiUrl =
         prefs?.getString(k('remote_api_url')) ?? 'https://openrouter.ai/api/v1';
     _remoteModelName = prefs?.getString(k('remote_model_name')) ?? '';
-    _remoteApiKeys = RemoteApiKeyVault.decode(
-      prefs?.getString(k('remote_api_keys')),
-    );
+    // Keys are NOT read here: [loadSecrets] loads them from the secure
+    // store (migrating any leftover prefs copies) once init awaits it.
+    _remoteApiKeys = RemoteApiKeyVault();
+    _remoteApiKey = '';
     _remoteApiModels = RemoteApiKeyVault.decode(
       prefs?.getString(k('remote_api_models')),
     );
-    // Pre-fix installs had one shared key. Never put a leftover `sk-or-`
-    // into the Nano slot (or the inverse) — that is the community stuck
-    // state. Attribute by key shape; persist when migration changes either.
-    final beforeKey = _remoteApiKey;
-    final beforeVault = _remoteApiKeys.encode();
-    _remoteApiKey = applyLegacySharedRemoteApiKey(
-      vault: _remoteApiKeys,
-      activeUrl: _remoteApiUrl,
-      sharedKey: _remoteApiKey,
-    );
-    if (_remoteApiKey != beforeKey || _remoteApiKeys.encode() != beforeVault) {
-      prefs?.setString(k('remote_api_key'), _remoteApiKey);
-      prefs?.setString(k('remote_api_keys'), _remoteApiKeys.encode());
-    }
     // Seed the live model into this host's slot so a later visit can
     // still read remoteApiModelFor. The live picker is cleared on
     // host/type change — it must not restore into the new host.
@@ -239,16 +236,58 @@ class BackendSettings
     loadKoboldLaunch();
   }
 
+  /// Loads the remote API keys from the OS secure store. One-way migrates
+  /// any key still in SharedPreferences (the per-URL vault JSON, then the
+  /// pre-vault single shared key) into the secure store and deletes the
+  /// prefs copies. A secure-store failure throws
+  /// [SecureCredentialStoreException] — the keys stay empty and the user
+  /// re-enters them; there is no plaintext fallback.
+  Future<void> loadSecrets() async {
+    final vaultKey = k('remote_api_keys');
+    final encoded = await _secureStore.readOrMigrate(
+      prefs: prefs,
+      prefsKey: vaultKey,
+      secureKey: vaultKey,
+    );
+    _remoteApiKeys = RemoteApiKeyVault.decode(encoded);
+    // Pre-fix installs had one shared key. Never put a leftover `sk-or-`
+    // into the Nano slot (or the inverse) — that is the community stuck
+    // state. Attribute by key shape; persist when migration changes either.
+    final legacy = prefs?.getString(k('remote_api_key'))?.trim() ?? '';
+    if (legacy.isNotEmpty) {
+      final beforeVault = _remoteApiKeys.encode();
+      _remoteApiKey = applyLegacySharedRemoteApiKey(
+        vault: _remoteApiKeys,
+        activeUrl: _remoteApiUrl,
+        sharedKey: legacy,
+      );
+      await prefs?.remove(k('remote_api_key'));
+      if (_remoteApiKeys.encode() != beforeVault) {
+        await _persistRemoteApiKeys();
+      }
+    } else {
+      _remoteApiKey = _remoteApiKeys.keyFor(_remoteApiUrl);
+    }
+    notify();
+  }
+
   /// Write a key into [url]'s vault slot without changing the live mouth
   /// host. Worker settings reuse the same per-host keys.
   Future<void> setRemoteApiKeyFor(String url, String value) async {
     if (value == bearerOverlay?.call(url)) return;
+    final beforeVault = _remoteApiKeys.encode();
+    final beforeLive = _remoteApiKey;
     _remoteApiKeys.put(url, value);
     if (normalizeRemoteApiUrl(url) == normalizeRemoteApiUrl(_remoteApiUrl)) {
       _remoteApiKey = value;
-      await prefs?.setString(k('remote_api_key'), value);
     }
-    await _persistRemoteApiKeys();
+    try {
+      await _persistRemoteApiKeys();
+    } catch (_) {
+      _remoteApiKeys = RemoteApiKeyVault.decode(beforeVault);
+      _remoteApiKey = beforeLive;
+      rethrow;
+    }
     notify();
   }
 
@@ -309,14 +348,24 @@ class BackendSettings
 
   Future<void> setRemoteApiKey(String value) async {
     if (value == bearerOverlay?.call(_remoteApiUrl)) return;
+    final beforeVault = _remoteApiKeys.encode();
+    final beforeLive = _remoteApiKey;
     _remoteApiKey = value;
     _remoteApiKeys.put(_remoteApiUrl, value);
-    await prefs?.setString(k('remote_api_key'), value);
-    await _persistRemoteApiKeys();
+    try {
+      await _persistRemoteApiKeys();
+    } catch (_) {
+      _remoteApiKeys = RemoteApiKeyVault.decode(beforeVault);
+      _remoteApiKey = beforeLive;
+      rethrow;
+    }
     notify();
   }
 
   Future<void> setRemoteApiUrl(String value) async {
+    final beforeVault = _remoteApiKeys.encode();
+    final beforeLive = _remoteApiKey;
+    final beforeUrl = _remoteApiUrl;
     if (_remoteApiKey.isNotEmpty &&
         remoteApiKeyBelongsToUrl(_remoteApiKey, _remoteApiUrl)) {
       _remoteApiKeys.put(_remoteApiUrl, _remoteApiKey);
@@ -326,8 +375,15 @@ class BackendSettings
     _remoteApiUrl = value;
     _remoteApiKey = _remoteApiKeys.keyFor(value);
     await prefs?.setString(k('remote_api_url'), value);
-    await prefs?.setString(k('remote_api_key'), _remoteApiKey);
-    await _persistRemoteApiKeys();
+    try {
+      await _persistRemoteApiKeys();
+    } catch (_) {
+      _remoteApiKeys = RemoteApiKeyVault.decode(beforeVault);
+      _remoteApiKey = beforeLive;
+      _remoteApiUrl = beforeUrl;
+      await prefs?.setString(k('remote_api_url'), beforeUrl);
+      rethrow;
+    }
     if (previousSlot != _modelSlot()) {
       await _clearLiveRemoteModel();
     }
@@ -336,7 +392,7 @@ class BackendSettings
   }
 
   Future<void> _persistRemoteApiKeys() async {
-    await prefs?.setString(k('remote_api_keys'), _remoteApiKeys.encode());
+    await _secureStore.write(k('remote_api_keys'), _remoteApiKeys.encode());
   }
 
   Future<void> setRemoteModelName(String value) async {

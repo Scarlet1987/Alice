@@ -4,8 +4,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:front_porch_ai/services/storage/settings/remote_api_key_vault.dart';
 import 'package:front_porch_ai/services/storage_service.dart';
 
 /// Mock the path_provider plugin so StorageService._init() can resolve
@@ -23,12 +25,15 @@ void setupPathProviderMock() {
       });
 }
 
-/// Helper: create a StorageService backed by an in-memory SharedPreferences
-/// and wait for its async init to complete before returning.
+/// Helper: create a StorageService backed by in-memory SharedPreferences
+/// and an empty secure-store mock, and wait for its async init to complete
+/// before returning. The secure-store mock is global test state, so it is
+/// reset here — otherwise a key written by one test leaks into the next.
 Future<StorageService> createStorageService([
   Map<String, Object> initialValues = const {},
 ]) async {
   SharedPreferences.setMockInitialValues(initialValues);
+  FlutterSecureStorage.setMockInitialValues({});
   final service = StorageService();
   await service.initialized;
   return service;
@@ -290,12 +295,21 @@ void main() {
       expect(prefs.getString('backend_type'), 'openRouter');
     });
 
-    test('setRemoteApiKey persists to SharedPreferences', () async {
-      final svc = await createStorageService();
-      await svc.backendSettings.setRemoteApiKey('sk-test-key');
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('remote_api_key'), 'sk-test-key');
-    });
+    test(
+      'setRemoteApiKey persists to the secure store, never SharedPreferences',
+      () async {
+        final svc = await createStorageService();
+        await svc.backendSettings.setRemoteApiKey('sk-test-key');
+        final prefs = await SharedPreferences.getInstance();
+        expect(svc.backendSettings.remoteApiKey, 'sk-test-key');
+        expect(prefs.getString('remote_api_key'), isNull);
+        expect(prefs.containsKey('remote_api_keys'), isFalse);
+        final vault = RemoteApiKeyVault.decode(
+          await const FlutterSecureStorage().read(key: 'remote_api_keys'),
+        );
+        expect(vault.keyFor('https://openrouter.ai/api/v1'), 'sk-test-key');
+      },
+    );
 
     test('setRemoteApiUrl persists to SharedPreferences', () async {
       final svc = await createStorageService();
@@ -396,12 +410,20 @@ void main() {
       expect(prefs.getBool('tts_auto_play'), true);
     });
 
-    test('setOpenaiTtsApiKey persists to SharedPreferences', () async {
-      final svc = await createStorageService();
-      await svc.ttsSettings.setOpenaiTtsApiKey('test-key');
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('openai_tts_api_key'), 'test-key');
-    });
+    test(
+      'setOpenaiTtsApiKey persists to the secure store, never SharedPreferences',
+      () async {
+        final svc = await createStorageService();
+        await svc.ttsSettings.setOpenaiTtsApiKey('test-key');
+        final prefs = await SharedPreferences.getInstance();
+        expect(svc.ttsSettings.openaiTtsApiKey, 'test-key');
+        expect(prefs.containsKey('openai_tts_api_key'), isFalse);
+        expect(
+          await const FlutterSecureStorage().read(key: 'openai_tts_api_key'),
+          'test-key',
+        );
+      },
+    );
 
     test('setOpenaiTtsModel persists to SharedPreferences', () async {
       final svc = await createStorageService();
@@ -417,12 +439,20 @@ void main() {
       expect(prefs.getString('openai_tts_base_url'), 'https://custom.tts/v1');
     });
 
-    test('setElevenlabsApiKey persists to SharedPreferences', () async {
-      final svc = await createStorageService();
-      await svc.ttsSettings.setElevenlabsApiKey('el-key');
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('elevenlabs_api_key'), 'el-key');
-    });
+    test(
+      'setElevenlabsApiKey persists to the secure store, never SharedPreferences',
+      () async {
+        final svc = await createStorageService();
+        await svc.ttsSettings.setElevenlabsApiKey('el-key');
+        final prefs = await SharedPreferences.getInstance();
+        expect(svc.ttsSettings.elevenlabsApiKey, 'el-key');
+        expect(prefs.containsKey('elevenlabs_api_key'), isFalse);
+        expect(
+          await const FlutterSecureStorage().read(key: 'elevenlabs_api_key'),
+          'el-key',
+        );
+      },
+    );
 
     test('setElevenlabsModel persists to SharedPreferences', () async {
       final svc = await createStorageService();

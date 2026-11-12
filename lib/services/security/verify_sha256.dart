@@ -66,6 +66,37 @@ class VerifySha256 {
     return true;
   }
 
+  /// Fail-closed verification for a staged download: throws (and deletes
+  /// [file]) when [expectedHex] is missing — the null case [verifyFileOrThrow]
+  /// only reports as false — and when the bytes do not match. Callers must
+  /// use this before staging, swapping, unpacking, or opening a download.
+  /// The null→false behaviour of [verifyFileOrThrow] is unchanged (an
+  /// existing test pins it); this is the layer that turns it into a block.
+  static Future<void> verifyFileOrDelete(
+    File file,
+    String? expectedHex, {
+    required String assetLabel,
+  }) async {
+    bool ok;
+    try {
+      ok = await verifyFileOrThrow(file, expectedHex, assetLabel: assetLabel);
+    } on StateError {
+      try {
+        await file.delete();
+      } catch (_) {}
+      rethrow;
+    }
+    if (!ok) {
+      try {
+        await file.delete();
+      } catch (_) {}
+      throw StateError(
+        'No published SHA-256 for $assetLabel — refusing to execute an '
+        'unverified download.',
+      );
+    }
+  }
+
   /// Returns true when [bytes]' SHA-256 matches [expectedHex].
   /// For in-memory downloads (OpenCode) before writing to disk.
   static bool verifyBytes(List<int> bytes, String expectedHex) {

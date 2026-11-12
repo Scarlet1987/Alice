@@ -28,6 +28,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:front_porch_ai/services/security/file_permissions.dart';
+import 'package:front_porch_ai/database/database.encryption.dart';
 import 'package:front_porch_ai/app_version.dart';
 import 'package:front_porch_ai/database/session_gen_overrides_heal.dart';
 import 'package:front_porch_ai/services/db_reunification_service.dart';
@@ -206,13 +207,17 @@ class AppDatabase extends _$AppDatabase {
     }
 
     _dbPath = file.path;
+    // Encrypt at rest (SQLCipher): the key lives only in the OS secure
+    // store. A plaintext DB is migrated in place first; an encrypted DB is
+    // probed with the key. Both fail closed — a missing/unreadable key or a
+    // wrong key throws here and startup shows the DB-init error window
+    // instead of opening plaintext.
+    final dbKey = await loadDatabaseKey();
+    await ensureDatabaseEncrypted(file, dbKey);
     _instance = AppDatabase._internal(
       NativeDatabase.createInBackground(
         file,
-        setup: (db) {
-          db.execute('PRAGMA synchronous = FULL');
-          debugPrint('[DB] PRAGMA synchronous = FULL set');
-        },
+        setup: (db) => setupEncryptedConnection(db, dbKey),
       ),
     );
 
@@ -273,6 +278,11 @@ class AppDatabase extends _$AppDatabase {
   /// For testing: create a temporary database backed by a real file.
   /// Uses a system temp directory so the background isolate can access it.
   ///
+  /// Test databases stay UNENCRYPTED by design: they hold fixture data in
+  /// a temp dir, and the encrypted path is covered by
+  /// [AppDatabase.forEncryptedFile] plus test/database/
+  /// database_encryption_test.dart. Do not "fix" this by adding a key here.
+  ///
   /// [sameIsolate] runs SQLite on the calling isolate (in-memory) instead of
   /// the background one. Required inside `testWidgets`: the fake-async test
   /// zone never yields to the real event loop, so a cross-isolate database
@@ -293,11 +303,27 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Open a specific DB file for reunification (runs migrations, not a singleton).
+  /// Legacy plaintext temp files only — the existing reunification tests open
+  /// plaintext fixtures through this. Real user files go through
+  /// [forEncryptedFile] after [ensureDatabaseEncrypted].
   factory AppDatabase.forReunification(File file) {
     return AppDatabase._internal(
       NativeDatabase.createInBackground(
         file,
         setup: (db) => db.execute('PRAGMA synchronous = FULL'),
+      ),
+    );
+  }
+
+  /// Open a specific ENCRYPTED DB file (reunification temp copies, tests).
+  /// The file must already be encrypted with [base64Key] — call
+  /// [ensureDatabaseEncrypted] first when it may still be plaintext, or the
+  /// first query fails closed instead of opening plaintext.
+  factory AppDatabase.forEncryptedFile(File file, String base64Key) {
+    return AppDatabase._internal(
+      NativeDatabase.createInBackground(
+        file,
+        setup: (db) => setupEncryptedConnection(db, base64Key),
       ),
     );
   }

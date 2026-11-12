@@ -15,6 +15,21 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 environment:
   sdk: ^3.10.8
 
+# Native SQLite engine: SQLCipher, via the sqlite3 3.x build hook.
+# sqlcipher_flutter_libs 0.7.0+eol is a tombstone ("Not used anymore, update
+# to version 3.x of package:sqlite3 instead") and ships no native code, so
+# it is deliberately NOT a dependency. The hook downloads the precompiled
+# SQLCipher library (hash-verified) and the sqlite3 API stays unchanged.
+# NEVER depend on sqlite3_flutter_libs and sqlcipher at once, and never
+# remove this block without also removing the PRAGMA key setup in
+# lib/database/database.encryption.dart — a plain-SQLite build would then
+# silently write plaintext databases. Enforced at runtime: the setup
+# asserts PRAGMA cipher_version is non-empty (fail closed).
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -84,6 +99,7 @@ dependencies:
   riverpod_annotation: ^4.0.6
   flutter_markdown_plus: ^1.0.12
   flutter_secure_storage: ^11.2.0
+  sqlite3: ^3.5.2
 
 dev_dependencies:
   flutter_test:

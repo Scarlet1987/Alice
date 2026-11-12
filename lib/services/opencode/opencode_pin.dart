@@ -16,8 +16,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
 
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+
+import 'package:http/http.dart' as http;
+
+import 'package:front_porch_ai/services/security/release_checksums.dart';
 
 /// Honesty copy when GitHub has not told us the zip size yet.
 const kOpenCodeDownloadMegabytes = 44;
@@ -74,6 +79,54 @@ Uri openCodeLatestDownloadUri({String? os, String? arch}) {
     arch: arch ?? openCodeCurrentArch(),
   );
   return Uri.parse('$kOpenCodeGitHubLatestDownloadBase/$asset');
+}
+
+/// Fetches the published SHA-256 for this platform's OpenCode asset in
+/// release [tag] (without the leading `v`), or null when the release
+/// publishes no hash for it. The only trusted source is a per-asset
+/// `<asset>.sha256` or a `SHA256SUMS` manifest published with the
+/// anomalyco/opencode release; v1.19.5 publishes neither, so installs fail
+/// closed until upstream publishes one. Never invent a hash value.
+/// [apiBase] is a test seam for the GitHub API base URL.
+Future<String?> openCodeFetchReleaseChecksum(String tag, {Uri? apiBase}) async {
+  final asset = openCodeReleaseAssetName(
+    os: openCodeCurrentOs(),
+    arch: openCodeCurrentArch(),
+  );
+  final base =
+      apiBase ??
+      Uri.parse(
+        'https://api.github.com/repos/$kOpenCodeGitHubOwner/$kOpenCodeGitHubRepo/',
+      );
+  final client = http.Client();
+  try {
+    final resp = await client
+        .get(
+          base.resolve('releases/tags/v$tag'),
+          headers: {
+            'Accept': 'application/vnd.github+json',
+            'User-Agent': 'FrontPorchAI',
+          },
+        )
+        .timeout(const Duration(seconds: 10));
+    if (resp.statusCode != 200) return null;
+    final json = jsonDecode(resp.body);
+    if (json is! Map) return null;
+    final sumsUrl = findChecksumAssetUrl(json['assets'] as List? ?? [], asset);
+    if (sumsUrl == null) return null;
+    if (sumsUrl.toLowerCase().endsWith('.sha256')) {
+      return await fetchSha256FromUrl(client: client, url: Uri.parse(sumsUrl));
+    }
+    return await fetchSha256ForAsset(
+      client: client,
+      sumsUrl: sumsUrl,
+      assetName: asset,
+    );
+  } catch (_) {
+    return null;
+  } finally {
+    client.close();
+  }
 }
 
 bool openCodeLooksLikeBrewPath(String path) {

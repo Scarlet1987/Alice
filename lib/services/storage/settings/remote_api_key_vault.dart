@@ -40,9 +40,10 @@ String normalizeRemoteApiUrl(String url) {
 
 /// Per-URL API keys for OpenRouter / Nano-GPT / custom hosts.
 ///
-/// The live `remote_api_key` pref is the key for the *active* URL. This vault
-/// remembers the others so a preset switch restores the right key (or empty)
-/// instead of carrying the previous host's key into Check Connection.
+/// The live key for the *active* URL is held in memory and persisted as
+/// part of the vault in the OS secure store. This vault remembers the
+/// others so a preset switch restores the right key (or empty) instead
+/// of carrying the previous host's key into Check Connection.
 class RemoteApiKeyVault {
   RemoteApiKeyVault([Map<String, String>? initial])
     : _keys = {

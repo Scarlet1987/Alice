@@ -18,11 +18,11 @@
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:front_porch_ai/services/chat/chat.dart' show parseWikiBaseUrl;
 
+import '../secure_credential_store.dart';
 import 'settings_base.dart';
 
 /// Canonical wiki URL, or null if unsafe. MediaWiki hosts → origin.
@@ -50,21 +50,29 @@ String wikiHostLabel(String url) {
 /// Default OFF. The global is read live at generation time, so flipping it
 /// applies to already-open chats. There is no per-chat or sidebar override.
 ///
-/// The key lives in SharedPreferences — the same durable store as OpenRouter
-/// keys and MCP tokens. macOS keychain was the previous store; ad-hoc /
-/// Rawhide launches often come back empty (the reason MCP left the
-/// keychain). A leftover keychain value is copied into prefs on load.
+/// The key lives ONLY in the OS secure store (see [SecureCredentialStore]) —
+/// never in SharedPreferences. On load, a key still in prefs is moved into
+/// the secure store and deleted from prefs. A secure-store failure leaves
+/// the key empty (re-enter it); there is no plaintext fallback.
 /// No key → Wikipedia.
 class WebSearchSettings with SettingsBase {
   WebSearchSettings({
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(
       mOptions: MacOsOptions(usesDataProtectionKeychain: false),
     ),
-  }) : _secureStorage = secureStorage;
+    SecureCredentialStore? secureStore,
+  }) : _store =
+           secureStore ??
+           SecureCredentialStore(
+             readKey: (key) => secureStorage.read(key: key),
+             writeKey: (key, value) =>
+                 secureStorage.write(key: key, value: value),
+             deleteKey: (key) => secureStorage.delete(key: key),
+           );
 
   static const _apiKeyName = 'search_api_key';
 
-  final FlutterSecureStorage _secureStorage;
+  final SecureCredentialStore _store;
   bool _webSearchDefault = false;
   String _searchApiKey = '';
   String _wikiBaseUrl = '';
@@ -142,26 +150,16 @@ class WebSearchSettings with SettingsBase {
       _searchApiKey = '';
       return;
     }
-    final fromPrefs = prefs?.getString(key)?.trim() ?? '';
-    if (fromPrefs.isNotEmpty) {
-      _searchApiKey = fromPrefs;
-      if (prefs?.getString(key) != fromPrefs) {
-        await prefs?.setString(key, fromPrefs);
-      }
-      return;
-    }
-    try {
-      final secured = (await _secureStorage.read(key: key))?.trim() ?? '';
-      if (secured.isEmpty) {
-        _searchApiKey = '';
-        return;
-      }
-      _searchApiKey = secured;
-      await prefs?.setString(key, secured);
-    } catch (e, st) {
-      _searchApiKey = '';
-      debugPrint('[WebSearch] keychain read failed (prefs empty): $e\n$st');
-    }
+    // Secure store is authoritative; a leftover prefs copy is moved into
+    // it and deleted from prefs. A store failure throws instead of
+    // falling back to plaintext.
+    _searchApiKey =
+        await _store.readOrMigrate(
+          prefs: prefs,
+          prefsKey: key,
+          secureKey: key,
+        ) ??
+        '';
   }
 
   Future<void> setWebSearchDefault(bool value) async {
@@ -173,25 +171,17 @@ class WebSearchSettings with SettingsBase {
   Future<void> setSearchApiKey(String value) async {
     final key = k(_apiKeyName);
     final trimmed = value.trim();
-    _searchApiKey = trimmed;
     if (prefs == null) {
+      _searchApiKey = trimmed;
       notify();
       return;
     }
     if (trimmed.isEmpty) {
-      await prefs?.remove(key);
+      await _store.delete(key);
     } else {
-      await prefs?.setString(key, trimmed);
+      await _store.write(key, trimmed);
     }
-    try {
-      if (trimmed.isEmpty) {
-        await _secureStorage.delete(key: key);
-      } else {
-        await _secureStorage.write(key: key, value: trimmed);
-      }
-    } catch (e, st) {
-      debugPrint('[WebSearch] keychain write failed (prefs kept): $e\n$st');
-    }
+    _searchApiKey = trimmed;
     notify();
   }
 

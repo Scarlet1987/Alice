@@ -23,6 +23,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:front_porch_ai/services/security/release_checksums.dart';
 import 'package:front_porch_ai/services/security/verify_sha256.dart';
 
 /// How an install attempt resolved — drives what the tutorial tells the user
@@ -63,11 +64,14 @@ class TailscaleInstallResult {
 
 /// "Install Tailscale for me", using each OS's official, blessed mechanism so
 /// we never hand-roll downloads or silently elevate:
-///   • macOS   — the standalone .pkg (the only variant with `tailscale serve`),
-///               opened in the Installer so Gatekeeper verifies the signature.
+///   • macOS   — the versioned standalone .pkg (the only variant with
+///               `tailscale serve`), verified against its published
+///               `<pkg>.sha256` before the Installer opens it.
 ///   • Windows — winget (downloads + UAC-elevates), else the download page.
-///   • Linux   — the official distro-detecting install.sh via pkexec, else the
-///               command + download page.
+///   • Linux   — the official package via the native package manager
+///               (apt/dnf/yum/pacman/zypper under pkexec), else the official
+///               command + download page. install.sh is never downloaded or
+///               run as root: Tailscale publishes no hash for it.
 /// The two unavoidable human gates (admin approval, browser sign-in) are OS
 /// security boundaries we deliberately keep, not automate around.
 class TailscaleInstaller {
@@ -96,39 +100,75 @@ class TailscaleInstaller {
     return const TailscaleInstallResult(TailscaleInstallOutcome.unsupported);
   }
 
-  Future<TailscaleInstallResult> _installMac() async {
-    // Download the standalone .pkg over HTTPS from the official package server,
-    // then open it — the macOS Installer checks Tailscale's signature and the
-    // user approves with admin rights. (The App Store variant is sandboxed and
-    // can't run `tailscale serve`, so we deliberately use the standalone pkg.)
-    final res = await http
-        .get(Uri.parse(macPkgUrl))
-        .timeout(const Duration(seconds: 120));
-    if (res.statusCode != 200 || res.bodyBytes.isEmpty) {
-      await _open(macPkgUrl);
-      return const TailscaleInstallResult(
-        TailscaleInstallOutcome.openedDownloadPage,
-        downloadUrl: macPkgUrl,
-      );
-    }
-    final tmpDir = await Directory.systemTemp.createTemp('fpai_tailscale_');
-    final file = File(p.join(tmpDir.path, 'Tailscale-macos.pkg'));
-    await file.writeAsBytes(res.bodyBytes);
-    // Integrity: verify before handing to the Installer.
-    // TODO: pin the expected SHA-256 for the Tailscale macOS pkg and verify
-    // here before opening. Gatekeeper checks the Developer ID signature, but
-    // a hash pin catches a swapped download before it reaches the Installer.
-    await VerifySha256.verifyFileOrThrow(
-      file,
-      null, // no pinned hash yet — logs TODO, does not block
-      assetLabel: 'tailscale macOS pkg',
+  /// Resolves the versioned macOS pkg URL behind the `Tailscale-latest-`
+  /// alias (the alias itself publishes no `.sha256`). Returns null when the
+  /// alias does not redirect to a versioned `Tailscale-N.N.N-macos.pkg`.
+  /// [latestUrl] overrides the alias URL; it is a test seam only.
+  @visibleForTesting
+  static Future<Uri?> resolveVersionedMacPkg(
+    http.Client client, {
+    Uri? latestUrl,
+  }) async {
+    final target = await resolveRedirectTarget(
+      client: client,
+      url: latestUrl ?? Uri.parse(macPkgUrl),
     );
-    final open = await Process.run('open', [file.path]);
-    return open.exitCode == 0
-        ? const TailscaleInstallResult(
-            TailscaleInstallOutcome.launchedInstaller,
-          )
-        : const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+    if (target == null) return null;
+    if (!RegExp(
+      r'Tailscale-[0-9]+\.[0-9]+\.[0-9]+-macos\.pkg$',
+    ).hasMatch(target.path)) {
+      return null;
+    }
+    return target;
+  }
+
+  Future<TailscaleInstallResult> _installMac() async {
+    // The standalone .pkg (the only variant with `tailscale serve`) is
+    // opened in the Installer so Gatekeeper verifies the signature — but
+    // first the download itself is verified against the hash Tailscale
+    // publishes at `<versioned-pkg-url>.sha256`. The `latest` alias has no
+    // .sha256, so resolve it to the versioned pkg, fetch that pkg's hash,
+    // download the versioned pkg, and verify before opening. Any failure
+    // blocks the install: the unverified file is deleted, never opened.
+    final client = http.Client();
+    try {
+      final pkgUrl = await resolveVersionedMacPkg(client);
+      if (pkgUrl == null) {
+        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+      }
+      final expected = await fetchSha256FromUrl(
+        client: client,
+        url: Uri.parse('${pkgUrl.toString()}.sha256'),
+      );
+      if (expected == null) {
+        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+      }
+      final res = await client
+          .get(pkgUrl)
+          .timeout(const Duration(seconds: 120));
+      if (res.statusCode != 200 || res.bodyBytes.isEmpty) {
+        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+      }
+      final tmpDir = await Directory.systemTemp.createTemp('fpai_tailscale_');
+      final file = File(p.join(tmpDir.path, p.basename(pkgUrl.path)));
+      await file.writeAsBytes(res.bodyBytes);
+      await VerifySha256.verifyFileOrDelete(
+        file,
+        expected,
+        assetLabel: 'tailscale macOS pkg',
+      );
+      final open = await Process.run('open', [file.path]);
+      return open.exitCode == 0
+          ? const TailscaleInstallResult(
+              TailscaleInstallOutcome.launchedInstaller,
+            )
+          : const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+    } catch (e) {
+      debugPrint('[TailscaleInstaller] mac install error: $e');
+      return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
+    } finally {
+      client.close();
+    }
   }
 
   Future<TailscaleInstallResult> _installWindows() async {
@@ -159,55 +199,64 @@ class TailscaleInstaller {
     );
   }
 
+  /// Native package managers that carry an official Tailscale package,
+  /// with the argv that installs it (run under pkexec for the admin gate).
+  /// No install.sh is ever downloaded or executed: Tailscale publishes no
+  /// hash for it, so a script fetched over HTTPS cannot be verified before
+  /// running it as root.
+  static const Map<String, List<String>> _linuxPackageManagers = {
+    'apt-get': ['apt-get', 'install', '-y', 'tailscale'],
+    'dnf': ['dnf', 'install', '-y', 'tailscale'],
+    'yum': ['yum', 'install', '-y', 'tailscale'],
+    'pacman': ['pacman', '-S', '--noconfirm', 'tailscale'],
+    'zypper': ['zypper', 'install', '-y', 'tailscale'],
+  };
+
+  /// The install argv for a detected package manager, or null when the
+  /// manager is not one we install Tailscale through.
+  @visibleForTesting
+  static List<String>? installArgvForManager(String manager) =>
+      _linuxPackageManagers[manager];
+
+  /// First supported native package manager found on PATH, or null.
+  static Future<String?> detectLinuxPackageManager() async {
+    for (final manager in _linuxPackageManagers.keys) {
+      if (await _commandAvailable('which', [manager])) return manager;
+    }
+    return null;
+  }
+
   Future<TailscaleInstallResult> _installLinux() async {
-    // pkexec shows a graphical password dialog on most desktops. We download
-    // install.sh first, verify its hash, then execute the verified file —
-    // never pipe a remote script straight into a root shell.
-    if (!await _commandAvailable('which', const ['pkexec'])) {
-      await _open(linuxDownloadUrl);
-      return const TailscaleInstallResult(
-        TailscaleInstallOutcome.needsManualCommand,
-        command: linuxCommand,
-        downloadUrl: linuxDownloadUrl,
-      );
-    }
-    try {
-      final res = await http
-          .get(Uri.parse('https://tailscale.com/install.sh'))
-          .timeout(const Duration(seconds: 60));
-      if (res.statusCode != 200 || res.bodyBytes.isEmpty) {
-        throw Exception('install.sh download HTTP ${res.statusCode}');
-      }
-      final tmpDir = await Directory.systemTemp.createTemp('fpai_tailscale_');
-      final script = File(p.join(tmpDir.path, 'install.sh'));
-      await script.writeAsBytes(res.bodyBytes);
-      // Integrity: pin the expected SHA-256 of install.sh. The script changes
-      // upstream, so this pin must be refreshed with each app release that
-      // bumps it — a stale pin fails closed (refuses to run).
-      // TODO: publish the pinned hash per release; currently no pin set.
-      await VerifySha256.verifyFileOrThrow(
-        script,
-        null, // no pinned hash yet — logs TODO, does not block
-        assetLabel: 'tailscale install.sh',
-      );
-      final r = await Process.run('pkexec', [
-        'sh',
-        script.path,
-      ]).timeout(const Duration(minutes: 5));
-      if (r.exitCode == 0) {
-        return const TailscaleInstallResult(TailscaleInstallOutcome.installed);
-      }
-    } catch (e) {
-      debugPrint('[TailscaleInstaller] linux install error: $e');
-    }
-    return const TailscaleInstallResult(
+    // Install the official Tailscale package through the distro's native
+    // package manager under pkexec — never download install.sh and run it
+    // as root (Tailscale publishes no hash for it). When no supported
+    // manager is present, or the install fails, hand the user the official
+    // command and download page instead of running anything ourselves.
+    const manual = TailscaleInstallResult(
       TailscaleInstallOutcome.needsManualCommand,
       command: linuxCommand,
       downloadUrl: linuxDownloadUrl,
     );
+    if (!await _commandAvailable('which', const ['pkexec'])) return manual;
+    final manager = await detectLinuxPackageManager();
+    if (manager == null) return manual;
+    final argv = installArgvForManager(manager)!;
+    try {
+      final r = await Process.run(
+        'pkexec',
+        argv,
+      ).timeout(const Duration(minutes: 5));
+      if (r.exitCode == 0) {
+        return const TailscaleInstallResult(TailscaleInstallOutcome.installed);
+      }
+      debugPrint('[TailscaleInstaller] $manager install failed: ${r.stderr}');
+    } catch (e) {
+      debugPrint('[TailscaleInstaller] linux install error: $e');
+    }
+    return manual;
   }
 
-  Future<bool> _commandAvailable(String exe, List<String> probe) async {
+  static Future<bool> _commandAvailable(String exe, List<String> probe) async {
     try {
       return (await Process.run(
             exe,

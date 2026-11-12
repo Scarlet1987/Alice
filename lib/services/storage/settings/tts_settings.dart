@@ -17,12 +17,23 @@
 // along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
 
 import 'dart:io';
+import '../secure_credential_store.dart';
 import 'settings_base.dart';
 
 /// TTS engine, voice, speed, API keys, concurrency and related settings.
 ///
 /// Lifted mechanically (Stage 7). All persistence + notify via base.
+///
+/// The OpenAI and ElevenLabs keys live ONLY in the OS secure store (see
+/// [SecureCredentialStore]) — never in SharedPreferences. [load] reads the
+/// non-secret settings synchronously; [loadSecrets] (awaited by
+/// StorageService init) loads and one-way migrates the keys.
 class TtsSettings with SettingsBase {
+  TtsSettings({SecureCredentialStore? secureStore})
+    : _secureStore = secureStore ?? SecureCredentialStore.secure();
+
+  final SecureCredentialStore _secureStore;
+
   bool _ttsEnabled = false;
   String _ttsEngine = 'kokoro'; // 'kokoro', 'openai', 'elevenlabs', 'piper'
   String _ttsVoiceModel =
@@ -70,7 +81,10 @@ class TtsSettings with SettingsBase {
     _ttsVoiceModel = prefs?.getString(k('tts_voice_model')) ?? '';
     _ttsSpeechRate = prefs?.getDouble(k('tts_speech_rate')) ?? 1.0;
     _ttsAutoPlay = prefs?.getBool(k('tts_auto_play')) ?? false;
-    _openaiTtsApiKey = prefs?.getString(k('openai_tts_api_key')) ?? '';
+    // Keys are NOT read here: [loadSecrets] loads them from the secure
+    // store (migrating any leftover prefs copies) once init awaits it.
+    _openaiTtsApiKey = '';
+    _elevenlabsApiKey = '';
     _ttsConcurrency =
         (prefs?.getInt(k('tts_concurrency')) ?? Platform.numberOfProcessors)
             .clamp(1, 8);
@@ -79,7 +93,7 @@ class TtsSettings with SettingsBase {
     _openaiTtsBaseUrl =
         prefs?.getString(k('openai_tts_base_url')) ??
         'https://api.openai.com/v1';
-    _elevenlabsApiKey = prefs?.getString(k('elevenlabs_api_key')) ?? '';
+    // Keys are NOT read here: see [loadSecrets].
     _elevenlabsModel =
         prefs?.getString(k('elevenlabs_model')) ?? 'eleven_flash_v2_5';
     _elevenlabsStability = prefs?.getDouble(k('elevenlabs_stability')) ?? 0.5;
@@ -89,8 +103,32 @@ class TtsSettings with SettingsBase {
     _ttsNarrateQuotedOnly =
         prefs?.getBool(k('tts_narrate_quoted_only')) ?? false;
     _ttsIgnoreAsterisks = prefs?.getBool(k('tts_ignore_asterisks')) ?? false;
-    _ttsReplaceCurlyQuotes = prefs?.getBool(k('tts_replace_curly_quotes')) ?? false;
+    _ttsReplaceCurlyQuotes =
+        prefs?.getBool(k('tts_replace_curly_quotes')) ?? false;
     _directorDelay = prefs?.getDouble(k('director_delay')) ?? 15.0;
+  }
+
+  /// Loads the TTS API keys from the OS secure store. One-way migrates
+  /// any key still in SharedPreferences into the secure store and deletes
+  /// the prefs copy. A secure-store failure throws
+  /// [SecureCredentialStoreException] — the keys stay empty and the user
+  /// re-enters them; there is no plaintext fallback.
+  Future<void> loadSecrets() async {
+    _openaiTtsApiKey =
+        await _secureStore.readOrMigrate(
+          prefs: prefs,
+          prefsKey: k('openai_tts_api_key'),
+          secureKey: k('openai_tts_api_key'),
+        ) ??
+        '';
+    _elevenlabsApiKey =
+        await _secureStore.readOrMigrate(
+          prefs: prefs,
+          prefsKey: k('elevenlabs_api_key'),
+          secureKey: k('elevenlabs_api_key'),
+        ) ??
+        '';
+    notify();
   }
 
   Future<void> setTtsEnabled(bool value) async {
@@ -124,8 +162,13 @@ class TtsSettings with SettingsBase {
   }
 
   Future<void> setOpenaiTtsApiKey(String value) async {
-    _openaiTtsApiKey = value;
-    await prefs?.setString(k('openai_tts_api_key'), value);
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      await _secureStore.delete(k('openai_tts_api_key'));
+    } else {
+      await _secureStore.write(k('openai_tts_api_key'), trimmed);
+    }
+    _openaiTtsApiKey = trimmed;
     notify();
   }
 
@@ -142,8 +185,13 @@ class TtsSettings with SettingsBase {
   }
 
   Future<void> setElevenlabsApiKey(String value) async {
-    _elevenlabsApiKey = value;
-    await prefs?.setString(k('elevenlabs_api_key'), value);
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      await _secureStore.delete(k('elevenlabs_api_key'));
+    } else {
+      await _secureStore.write(k('elevenlabs_api_key'), trimmed);
+    }
+    _elevenlabsApiKey = trimmed;
     notify();
   }
 

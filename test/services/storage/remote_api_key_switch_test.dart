@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:front_porch_ai/services/services.dart';
 import 'package:front_porch_ai/services/storage/settings/remote_api_key_vault.dart';
@@ -37,7 +38,13 @@ void _mockPathProvider() {
 }
 
 Future<StorageService> _storage([Map<String, Object> seed = const {}]) async {
+  // The secure-store mock is global test state: without a reset here, a
+  // key written by an earlier test leaks into the vault of the next one
+  // (Finding 1: keys live only in the secure store now), so a legacy prefs
+  // seed would never be migrated and a keyless switch would see the
+  // previous host's key.
   SharedPreferences.setMockInitialValues(seed);
+  FlutterSecureStorage.setMockInitialValues({});
   final service = StorageService();
   await service.initialized;
   return service;

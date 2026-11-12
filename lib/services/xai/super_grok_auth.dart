@@ -25,8 +25,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:front_porch_ai/services/openrouter_native_tools.dart';
 import 'package:front_porch_ai/services/remote_reachability.dart';
 import 'package:front_porch_ai/services/storage/settings/remote_api_key_vault.dart';
+import 'package:front_porch_ai/services/storage/secure_credential_store.dart';
 import 'package:front_porch_ai/services/xai/xai_oauth_client.dart';
 import 'package:front_porch_ai/services/xai/xai_tokens.dart';
+
+/// Mutable holder for the encoded session when the secure store is the
+/// backing store: the read closure must stay synchronous, so [load] fills
+/// this in before decoding.
+class SecureSessionHolder {
+  String? value;
+}
 
 enum SuperGrokPhase { signedOut, waiting, signedIn }
 
@@ -40,10 +48,18 @@ class SuperGrokAuth extends ChangeNotifier {
     required Future<void> Function(String? encoded) writeSession,
     XaiOAuthClient? client,
     http.Client Function()? httpClientFactory,
+    SecureCredentialStore? secureStore,
+    String? secureKey,
+    SharedPreferences? Function()? legacyPrefs,
+    SecureSessionHolder? sessionHolder,
   }) : _readSession = readSession,
        _writeSession = writeSession,
        _httpClientFactory = httpClientFactory ?? http.Client.new,
-       _client = client ?? XaiOAuthClient(clientFactory: httpClientFactory);
+       _client = client ?? XaiOAuthClient(clientFactory: httpClientFactory),
+       _secureStore = secureStore,
+       _secureKey = secureKey,
+       _legacyPrefs = legacyPrefs,
+       _sessionHolder = sessionHolder;
 
   /// Session lives beside the other API keys in SharedPreferences — the
   /// macOS keychain comes back empty on ad-hoc Rawhide launches.
@@ -63,10 +79,46 @@ class SuperGrokAuth extends ChangeNotifier {
     },
   );
 
+  /// Session lives ONLY in the OS secure store (see
+  /// [SecureCredentialStore]). On [load], a session still in
+  /// SharedPreferences is moved into the secure store and deleted from
+  /// prefs. A secure-store failure leaves the user signed out; there is
+  /// no plaintext fallback.
+  factory SuperGrokAuth.inSecureStore(
+    SharedPreferences? Function() prefs,
+    String key, {
+    SecureCredentialStore? store,
+  }) {
+    final holder = SecureSessionHolder();
+    final secure = store ?? SecureCredentialStore.secure();
+    return SuperGrokAuth(
+      readSession: () => holder.value,
+      writeSession: (encoded) async {
+        holder.value = encoded;
+        if (encoded == null) {
+          await secure.delete(key);
+        } else {
+          await secure.write(key, encoded);
+        }
+      },
+      secureStore: secure,
+      secureKey: key,
+      legacyPrefs: prefs,
+      sessionHolder: holder,
+    );
+  }
+
   final String? Function() _readSession;
   final Future<void> Function(String? encoded) _writeSession;
   final http.Client Function() _httpClientFactory;
   final XaiOAuthClient _client;
+
+  /// Set only by [SuperGrokAuth.inSecureStore]: the secure store the
+  /// session migrates into on [load].
+  final SecureCredentialStore? _secureStore;
+  final String? _secureKey;
+  final SharedPreferences? Function()? _legacyPrefs;
+  final SecureSessionHolder? _sessionHolder;
 
   XaiTokens? _tokens;
   XaiDeviceCode? _pending;
@@ -108,6 +160,14 @@ class SuperGrokAuth extends ChangeNotifier {
   };
 
   Future<void> load() async {
+    if (_secureStore != null && _secureKey != null) {
+      final migrated = await _secureStore.readOrMigrate(
+        prefs: _legacyPrefs?.call(),
+        prefsKey: _secureKey,
+        secureKey: _secureKey,
+      );
+      _sessionHolder?.value = migrated;
+    }
     final saved = XaiTokens.decode(_readSession());
     if (saved == null) return;
     _tokens = saved;

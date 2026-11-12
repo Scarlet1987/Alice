@@ -22,6 +22,7 @@ import 'package:drift/drift.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:front_porch_ai/database/database.dart';
+import 'package:front_porch_ai/database/database.encryption.dart';
 import 'package:front_porch_ai/services/db_reunification_insert.dart';
 
 /// Result of diffing the old stable DB against the (now-primary) beta DB.
@@ -177,11 +178,17 @@ class DbReunificationService {
     final tempPath = p.join(tempDir.path, 'stable_migrated.db');
     await stableBackup.copy(tempPath);
 
+    // The backup predates encryption or not: a plaintext temp copy is
+    // encrypted in place, an encrypted one is probed with the key. A wrong
+    // key fails closed here instead of opening plaintext.
+    final dbKey = await loadDatabaseKey();
+    await ensureDatabaseEncrypted(File(tempPath), dbKey);
+
     // Open with Drift — this will run migrations (v1→v4) on the temp copy
     // Suppress the "multiple databases" warning since we're intentionally
     // opening a separate file for diffing, not sharing a QueryExecutor.
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-    final tempDb = AppDatabase.forReunification(File(tempPath));
+    final tempDb = AppDatabase.forEncryptedFile(File(tempPath), dbKey);
 
     try {
       // Wait for the DB to be ready (migrations run during first query)
@@ -340,8 +347,13 @@ class DbReunificationService {
     final tempPath = p.join(tempDir.path, 'stable_migrated.db');
     await stableBackup.copy(tempPath);
 
+    // Same as diffStableOnly: encrypt a plaintext temp copy in place, or
+    // probe an encrypted one with the key. Fails closed on a wrong key.
+    final dbKey = await loadDatabaseKey();
+    await ensureDatabaseEncrypted(File(tempPath), dbKey);
+
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-    final tempDb = AppDatabase.forReunification(File(tempPath));
+    final tempDb = AppDatabase.forEncryptedFile(File(tempPath), dbKey);
 
     try {
       await tempDb.customSelect('SELECT 1').get();

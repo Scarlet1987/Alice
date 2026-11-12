@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:front_porch_ai/database/database.dart';
+import 'package:front_porch_ai/database/database.encryption.dart';
 import 'package:front_porch_ai/services/security/file_permissions.dart';
 
 /// Creates timestamped backups of the SQLite database (now the primary safety
@@ -89,7 +90,7 @@ class BackupService {
     if (!await backupDir.exists()) {
       await backupDir.create(recursive: true);
     }
-    // Owner-only: backups are plaintext DB copies.
+    // Owner-only: backups are encrypted DB copies (same key as the live DB).
     await FilePermissions.hardenDir(backupDir);
     return backupDir;
   }
@@ -115,6 +116,11 @@ class BackupService {
     // moment (the DB runs in rollback-journal mode, so writes mutate the
     // file in place) and produce a torn, unrestorable backup — discovered
     // only at restore time, after the primary DB has already failed.
+    // The snapshot stays encrypted: VACUUM INTO runs on the live encrypted
+    // connection, so the target file is written through the same SQLCipher
+    // codec. test/database/database_encryption_test.dart proves the backup
+    // is unreadable without the key — never "fix" a backup problem by
+    // exporting plaintext.
     try {
       final db = await AppDatabase.instance();
       await db.customStatement(
@@ -167,6 +173,12 @@ class BackupService {
     if (!await backupFile.exists()) {
       throw FileSystemException('Backup file not found', backupPath);
     }
+
+    // The backup must be openable with the current key BEFORE it replaces
+    // the live DB: a plaintext legacy backup is encrypted in place first,
+    // an unreadable one fails here with the live DB still intact.
+    final dbKey = await loadDatabaseKey();
+    await ensureDatabaseEncrypted(backupFile, dbKey);
 
     // Close the live DB
     await AppDatabase.closeAndReset();

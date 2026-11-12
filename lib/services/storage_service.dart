@@ -391,6 +391,23 @@ class StorageService extends ChangeNotifier {
       );
     }
 
+    // Secrets load separately: a secure-store failure leaves the keys
+    // empty (the user re-enters them) and must not wedge the rest of
+    // init — but there is no plaintext fallback.
+    for (final loadSecrets in <Future<void> Function()>[
+      _backendSettings.loadSecrets,
+      _ttsSettings.loadSecrets,
+    ]) {
+      try {
+        await loadSecrets();
+      } catch (e) {
+        debugPrint(
+          '[Storage] secure credential load failed ($e) — keys left '
+          'empty; re-enter to continue.',
+        );
+      }
+    }
+
     if (!_initCompleter.isCompleted) _initCompleter.complete();
     notifyListeners();
   }

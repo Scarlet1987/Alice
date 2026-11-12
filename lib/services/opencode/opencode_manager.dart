@@ -27,6 +27,7 @@ import 'package:front_porch_ai/services/opencode/opencode_paths.dart';
 import 'package:front_porch_ai/services/opencode/opencode_download.dart';
 import 'package:front_porch_ai/services/opencode/opencode_pin.dart';
 import 'package:front_porch_ai/services/opencode/opencode_process.dart';
+import 'package:front_porch_ai/services/opencode/opencode_transfer.dart';
 import 'package:front_porch_ai/services/opencode/opencode_version.dart';
 import 'package:front_porch_ai/services/security/verify_sha256.dart';
 
@@ -46,6 +47,10 @@ typedef OpenCodeHealthGet =
 typedef OpenCodeRemoteLookup =
     Future<({String tag, int? assetBytes})?> Function();
 
+/// Returns the SHA-256 published with the OpenCode release [tag], or null
+/// when the release publishes no hash for this platform's asset.
+typedef OpenCodeChecksumLookup = Future<String?> Function(String tag);
+
 /// Downloads, starts, and stops a private OpenCode the way Porch owns Kobold.
 /// Never uses the Homebrew binary or `~/.config/opencode`.
 class OpenCodeManager extends ChangeNotifier {
@@ -57,6 +62,7 @@ class OpenCodeManager extends ChangeNotifier {
     OpenCodeSpawn? spawn,
     OpenCodeHealthGet? healthGet,
     OpenCodeRemoteLookup? remoteLookup,
+    OpenCodeChecksumLookup? checksumLookup,
     this.writeConfig,
   }) : closet = OpenCodeCloset(rootPath),
        _downloader = downloader ?? openCodeHttpDownload,
@@ -64,7 +70,8 @@ class OpenCodeManager extends ChangeNotifier {
        _pickPort = pickPort ?? openCodePickFreePort,
        _spawn = spawn ?? openCodeSpawnProcess,
        _healthGet = healthGet ?? openCodeGetHealth,
-       _remoteLookup = remoteLookup ?? openCodeFetchRemoteLatest {
+       _remoteLookup = remoteLookup ?? openCodeFetchRemoteLatest,
+       _checksumLookup = checksumLookup ?? openCodeFetchReleaseChecksum {
     if (rootPath.isNotEmpty) unawaited(refreshInstalled());
   }
 
@@ -75,6 +82,7 @@ class OpenCodeManager extends ChangeNotifier {
   final OpenCodeSpawn _spawn;
   final OpenCodeHealthGet _healthGet;
   final OpenCodeRemoteLookup _remoteLookup;
+  final OpenCodeChecksumLookup _checksumLookup;
   final Future<void> Function(OpenCodeCloset closet)? writeConfig;
 
   bool _isDownloading = false;
@@ -198,8 +206,23 @@ class OpenCodeManager extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+      // Pinned to the explicit release tag: the `latest/download` redirect
+      // can move under us, and an unpinned download has no hash to check
+      // against. Without a tag there is nothing to pin to — fail closed.
+      if (tag == null || tag.isEmpty) {
+        throw StateError(
+          'OpenCode release tag unknown — refusing to download an '
+          'unpinned build.',
+        );
+      }
       final bytes = await _downloader(
-        openCodeLatestDownloadUri(),
+        Uri.parse(
+          openCodeDownloadUrl(
+            version: tag,
+            os: openCodeCurrentOs(),
+            arch: openCodeCurrentArch(),
+          ),
+        ),
         onProgress: (received, total) {
           if (total != null && total > 0) {
             _downloadProgress = received / total;
@@ -214,12 +237,16 @@ class OpenCodeManager extends ChangeNotifier {
       }
       await unpack.create(recursive: true);
       // Integrity: the archive is extracted and the binary executed after
-      // this point — refuse if the bytes don't match the published hash.
-      // TODO: pin the expected SHA-256 per OpenCode release (third-party
-      // fork; consider pinning to an explicit tag instead of latest).
-      const expectedSha256 = null;
-      if (expectedSha256 != null &&
-          !VerifySha256.verifyBytes(bytes, expectedSha256)) {
+      // this point — refuse unless the bytes match the SHA-256 published
+      // with this OpenCode release. No published hash means no unpack.
+      final expectedSha256 = await _checksumLookup(tag);
+      if (expectedSha256 == null || expectedSha256.isEmpty) {
+        throw StateError(
+          'No published SHA-256 for OpenCode $tag — refusing to unpack an '
+          'unverified download.',
+        );
+      }
+      if (!VerifySha256.verifyBytes(bytes, expectedSha256)) {
         throw StateError(
           'SHA-256 mismatch for OpenCode download — refusing to unpack. '
           'The download may be corrupt or tampered with.',
@@ -244,23 +271,18 @@ class OpenCodeManager extends ChangeNotifier {
         }
       }
       final size = await File(closet.binaryPath).length();
-      if (tag != null && tag.isNotEmpty) {
-        await OpenCodeBinaryVersion.write(
-          closet.binDir,
-          version: tag,
-          size: size,
-        );
-        _installedVersion = tag;
-      } else {
-        await refreshInstalled();
-      }
+      // [tag] is non-empty here: a null/empty tag throws before downloading.
+      await OpenCodeBinaryVersion.write(
+        closet.binDir,
+        version: tag,
+        size: size,
+      );
+      _installedVersion = tag;
       try {
         await unpack.delete(recursive: true);
       } catch (_) {}
       _downloadProgress = 1;
-      _statusMessage = tag == null || tag.isEmpty
-          ? 'OpenCode ready'
-          : 'OpenCode $tag ready';
+      _statusMessage = 'OpenCode $tag ready';
     } catch (e) {
       _error = '$e';
       _statusMessage = 'OpenCode download failed';

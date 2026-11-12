@@ -13,6 +13,25 @@ const _latestTag = '1.19.99';
 Future<({String tag, int? assetBytes})?> _latestLookup() async =>
     (tag: _latestTag, assetBytes: 44 * 1024 * 1024);
 
+/// Places a binary and version stamp in the closet the way a successful
+/// install would, so lifecycle tests (start / stop / ensure) can run
+/// without downloading. No hash is involved: the guard only runs on an
+/// install attempt, and these tests make none.
+Future<void> _seedInstalledBinary(
+  OpenCodeManager mgr, {
+  String version = _latestTag,
+  String contents = 'SEEDED',
+}) async {
+  await mgr.closet.ensureLayout();
+  await File(mgr.closet.binaryPath).writeAsString(contents);
+  await OpenCodeBinaryVersion.write(
+    mgr.closet.binDir,
+    version: version,
+    size: contents.length,
+  );
+  await mgr.refreshInstalled();
+}
+
 void main() {
   late Directory root;
 
@@ -68,8 +87,13 @@ void main() {
     expect(await writeOpenCodeVoicePluginFile(closet), isFalse);
   });
 
-  test('ensureInstalled writes GitHub latest under the closet', () async {
+  // Finding 3: a release that publishes no SHA-256 must fail closed.
+  // Fake tag 1.19.99 has no GitHub release, so there is no hash to check
+  // against — the download still happens (the bytes must be fetched before
+  // they can be verified), but nothing is unpacked, installed, or stamped.
+  test('ensureInstalled refuses without a published SHA-256', () async {
     final captured = <Uri>[];
+    var unpacks = 0;
     final mgr = OpenCodeManager(
       rootPath: root.path,
       remoteLookup: _latestLookup,
@@ -79,7 +103,7 @@ void main() {
         return utf8.encode('zip-bytes');
       },
       unpack: (bytes, dest) async {
-        expect(bytes, utf8.encode('zip-bytes'));
+        unpacks++;
         final bin = File(
           p.join(dest.path, OpenCodeCloset(root.path).binaryName),
         );
@@ -88,15 +112,28 @@ void main() {
       },
     );
 
-    await mgr.ensureInstalled();
+    await expectLater(
+      mgr.ensureInstalled(),
+      throwsA(
+        isA<StateError>().having(
+          (e) => e.message,
+          'message',
+          contains('No published SHA-256 for OpenCode $_latestTag'),
+        ),
+      ),
+    );
 
-    expect(File(mgr.closet.binaryPath).readAsStringSync(), 'FAKE-OPENCODE');
     expect(captured, hasLength(1));
-    expect(captured.single.toString(), contains('/releases/latest/download/'));
+    expect(
+      captured.single.toString(),
+      contains('/releases/download/v$_latestTag/'),
+    );
+    expect(captured.single.toString(), isNot(contains('latest/download')));
+    expect(unpacks, 0);
+    expect(await mgr.isInstalled, isFalse);
+    expect(mgr.installedVersion, isNull);
+    expect(mgr.error, contains('No published SHA-256'));
     expect(openCodeLooksLikeBrewPath(mgr.closet.binaryPath), isFalse);
-    final stamped = await OpenCodeBinaryVersion.read(mgr.closet.binDir);
-    expect(stamped.version, _latestTag);
-    expect(mgr.isUpdateAvailable, isFalse);
   });
 
   test(
@@ -118,9 +155,14 @@ void main() {
           return bin;
         },
       );
+      // A binary already in the closet means there is nothing to install,
+      // so ensureInstalled must return early without downloading at all.
+      await _seedInstalledBinary(mgr, contents: 'ONCE');
       await mgr.ensureInstalled();
       await mgr.ensureInstalled();
-      expect(downloads, 1);
+      expect(downloads, 0);
+      expect(File(mgr.closet.binaryPath).readAsStringSync(), 'ONCE');
+      expect(mgr.installedVersion, _latestTag);
     },
   );
 
@@ -151,6 +193,8 @@ void main() {
           return OpenCodeProcessHandle.fake(pid: 4242);
         },
       );
+
+      await _seedInstalledBinary(mgr, contents: 'BIN');
 
       await mgr.start();
 
@@ -201,45 +245,66 @@ void main() {
       spawn: (req) async =>
           OpenCodeProcessHandle.fake(pid: 99, onKill: () => killed++),
     );
+    // Start needs a binary in the closet; with no published hash an
+    // install attempt would fail closed, so seed one instead.
+    await _seedInstalledBinary(mgr, contents: 'BIN');
     await mgr.start();
     await mgr.stop();
     expect(killed, 1);
   });
 
-  test('stale stamp does not re-download on ensure; upgrade does', () async {
-    var downloads = 0;
-    final mgr = OpenCodeManager(
-      rootPath: root.path,
-      remoteLookup: _latestLookup,
-      downloader: (url, {onProgress}) async {
-        downloads++;
-        return utf8.encode('zip');
-      },
-      unpack: (bytes, dest) async {
-        final bin = File(
-          p.join(dest.path, OpenCodeCloset(root.path).binaryName),
-        );
-        await bin.writeAsString('PIN');
-        return bin;
-      },
-    );
-    await mgr.ensureInstalled();
-    expect(downloads, 1);
-    await OpenCodeBinaryVersion.write(
-      mgr.closet.binDir,
-      version: '1.0.0',
-      size: 1,
-    );
-    await mgr.refreshInstalled();
-    expect(mgr.installedVersion, '1.0.0');
-    expect(mgr.isUpdateAvailable, isTrue);
-    await mgr.ensureInstalled();
-    expect(downloads, 1);
-    await mgr.upgrade();
-    expect(downloads, 2);
-    expect(mgr.installedVersion, _latestTag);
-    expect(mgr.isUpdateAvailable, isFalse);
-  });
+  test(
+    'stale stamp does not re-download on ensure; upgrade refuses without a published SHA-256',
+    () async {
+      var downloads = 0;
+      var unpacks = 0;
+      final mgr = OpenCodeManager(
+        rootPath: root.path,
+        remoteLookup: _latestLookup,
+        downloader: (url, {onProgress}) async {
+          downloads++;
+          return utf8.encode('zip');
+        },
+        unpack: (bytes, dest) async {
+          unpacks++;
+          final bin = File(
+            p.join(dest.path, OpenCodeCloset(root.path).binaryName),
+          );
+          await bin.writeAsString('PIN');
+          return bin;
+        },
+      );
+      // Seed the closet as if 1.0.0 were installed: ensureInstalled must
+      // leave it alone, and an upgrade attempt must fail closed — fake tag
+      // 1.19.99 publishes no hash, so the bytes are downloaded but never
+      // unpacked and the installed version does not move.
+      await _seedInstalledBinary(mgr, version: '1.0.0', contents: 'PIN');
+      await mgr.refreshInstalled();
+      expect(mgr.installedVersion, '1.0.0');
+      // Seeding never looks up the remote version; check it (no download)
+      // so isUpdateAvailable can compare installed 1.0.0 against 1.19.99.
+      await mgr.checkRemoteVersion();
+      expect(mgr.isUpdateAvailable, isTrue);
+      await mgr.ensureInstalled();
+      expect(downloads, 0);
+      await expectLater(
+        mgr.upgrade(),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('No published SHA-256 for OpenCode $_latestTag'),
+          ),
+        ),
+      );
+      expect(downloads, 1);
+      expect(unpacks, 0);
+      expect(mgr.installedVersion, '1.0.0');
+      expect(mgr.isUpdateAvailable, isTrue);
+      expect(mgr.error, contains('No published SHA-256'));
+      expect(File(mgr.closet.binaryPath).readAsStringSync(), 'PIN');
+    },
+  );
 
   test(
     'checkRemoteVersion records GitHub latest and never downloads',
@@ -261,41 +326,64 @@ void main() {
     },
   );
 
-  test('upgrade stops a running serve then installs GitHub latest', () async {
-    var killed = 0;
-    var downloads = 0;
-    final mgr = OpenCodeManager(
-      rootPath: root.path,
-      remoteLookup: _latestLookup,
-      downloader: (url, {onProgress}) async {
-        downloads++;
-        return utf8.encode('zip');
-      },
-      unpack: (bytes, dest) async {
-        final bin = File(
-          p.join(dest.path, OpenCodeCloset(root.path).binaryName),
-        );
-        await bin.writeAsString('NEW');
-        return bin;
-      },
-      pickPort: () async => 18979,
-      healthGet: (base) async => (healthy: true, version: '1.18.30'),
-      spawn: (req) async =>
-          OpenCodeProcessHandle.fake(pid: 7, onKill: () => killed++),
-    );
-    await mgr.start();
-    expect(mgr.isRunning, isTrue);
-    await OpenCodeBinaryVersion.write(
-      mgr.closet.binDir,
-      version: '1.0.0',
-      size: 1,
-    );
-    await mgr.refreshInstalled();
-    expect(mgr.isUpdateAvailable, isTrue);
-    await mgr.upgrade();
-    expect(killed, greaterThanOrEqualTo(1));
-    expect(downloads, greaterThanOrEqualTo(2));
-    expect(mgr.isRunning, isFalse);
-    expect(mgr.installedVersion, _latestTag);
-  });
+  test(
+    'upgrade stops a running serve then refuses without a published SHA-256',
+    () async {
+      var killed = 0;
+      var downloads = 0;
+      var unpacks = 0;
+      final mgr = OpenCodeManager(
+        rootPath: root.path,
+        remoteLookup: _latestLookup,
+        downloader: (url, {onProgress}) async {
+          downloads++;
+          return utf8.encode('zip');
+        },
+        unpack: (bytes, dest) async {
+          unpacks++;
+          final bin = File(
+            p.join(dest.path, OpenCodeCloset(root.path).binaryName),
+          );
+          await bin.writeAsString('NEW');
+          return bin;
+        },
+        pickPort: () async => 18979,
+        healthGet: (base) async => (healthy: true, version: '1.18.30'),
+        spawn: (req) async =>
+            OpenCodeProcessHandle.fake(pid: 7, onKill: () => killed++),
+      );
+      await _seedInstalledBinary(mgr, contents: 'NEW');
+      await mgr.start();
+      expect(mgr.isRunning, isTrue);
+      await OpenCodeBinaryVersion.write(
+        mgr.closet.binDir,
+        version: '1.0.0',
+        size: 1,
+      );
+      await mgr.refreshInstalled();
+      // Seeding never looks up the remote version; check it (no download)
+      // so isUpdateAvailable can compare installed 1.0.0 against 1.19.99.
+      await mgr.checkRemoteVersion();
+      expect(mgr.isUpdateAvailable, isTrue);
+      // The serve is stopped first, then the install attempt fails closed:
+      // fake tag 1.19.99 publishes no hash, so nothing is unpacked and
+      // the installed version stays at the stale stamp.
+      await expectLater(
+        mgr.upgrade(),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('No published SHA-256 for OpenCode $_latestTag'),
+          ),
+        ),
+      );
+      expect(killed, greaterThanOrEqualTo(1));
+      expect(downloads, 1);
+      expect(unpacks, 0);
+      expect(mgr.isRunning, isFalse);
+      expect(mgr.installedVersion, '1.0.0');
+      expect(mgr.error, contains('No published SHA-256'));
+    },
+  );
 }
