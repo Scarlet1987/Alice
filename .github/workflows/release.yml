@@ -786,10 +786,16 @@ jobs:
           echo "✓ all $(echo $EXPECTED | wc -w) installers present and sized"
 
   # ── Publish .deb to APT repository at apt.frontporchai.app ──
+  # OFF for Alice (2026-11-13, Linux-first): apt.frontporchai.app /
+  # rpm.frontporchai.app and the AUR package belong to upstream
+  # (linux4life1 / Sosukeaizen); Scarlet1987/Alice has no deploy secrets
+  # (APT_DEPLOY_SSH_KEY, AUR_SSH_KEY) and the jobs fail on empty keys.
+  # The GitHub release is the product. Re-enable by deleting the
+  # `if: false` line below once the keys exist.
   publish-apt:
     name: Publish to APT Repository
     needs: [release, publish-release]
-    if: ${{ !contains(github.ref_name, 'beta') && !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'rc') && !contains(github.ref_name, 'dev') }}
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Download Linux Build Artifact
@@ -841,10 +847,11 @@ jobs:
           rm -f ~/.ssh/apt_deploy_key
 
   # ── Publish .rpm to RPM repository at rpm.frontporchai.app ──
+  # OFF for Alice (2026-11-13): see publish-apt above.
   publish-rpm:
     name: Publish to RPM Repository
     needs: [release, publish-release]
-    if: ${{ !contains(github.ref_name, 'beta') && !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'rc') && !contains(github.ref_name, 'dev') }}
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Download Linux Build Artifact
@@ -897,10 +904,11 @@ jobs:
   # Restored 2026-08-16: AUR write freeze lifted (aurweb v6.5.0). Secret
   # AUR_SSH_KEY is still the deploy key. Not restored: beta-release.yml —
   # there is no beta series any more.
+  # OFF for Alice (2026-11-13): see publish-apt above.
   publish-aur:
     name: Update AUR Package
     needs: [release, publish-release]
-    if: ${{ !contains(github.ref_name, 'beta') && !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'rc') && !contains(github.ref_name, 'dev') }}
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Update AUR Package
