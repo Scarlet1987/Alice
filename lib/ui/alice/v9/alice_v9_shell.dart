@@ -63,24 +63,40 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
                 ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _Hero(),
-                _PageNav(state: _state),
-                Expanded(
-                  child: IndexedStack(
-                    index: _state.page.index,
-                    children: [
-                      AliceV9HomePage(state: _state),
-                      AliceV9ModelsPage(state: _state),
-                      AliceV9CreatorPage(state: _state),
-                      AliceV9ProfilePage(state: _state),
-                    ],
-                  ),
-                ),
-                const _MintBar(),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // The overflow Elaina hit on metal (2026-11-13): a 393px
+                // tall window is shorter than the full hero, so a fixed
+                // Column overflowed by 240px and the content below the
+                // hero was unreachable. In a short window the hero
+                // compacts, and it scrolls inside its own space rather
+                // than overflowing the shell.
+                final compact = constraints.maxHeight < 650;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: SingleChildScrollView(
+                        child: _Hero(compact: compact),
+                      ),
+                    ),
+                    _PageNav(state: _state),
+                    Expanded(
+                      child: IndexedStack(
+                        index: _state.page.index,
+                        children: [
+                          AliceV9HomePage(state: _state),
+                          AliceV9ModelsPage(state: _state),
+                          AliceV9CreatorPage(state: _state),
+                          AliceV9ProfilePage(state: _state),
+                        ],
+                      ),
+                    ),
+                    const _MintBar(),
+                  ],
+                );
+              },
             ),
           ),
         );
@@ -93,7 +109,9 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
 /// pitch on the left with its fact pills, and the buy-once card on the
 /// right. No credits in the hero — credits live with FAQ on Home.
 class _Hero extends StatelessWidget {
-  const _Hero();
+  final bool compact;
+
+  const _Hero({this.compact = false});
 
   static const _facts = [
     'Runs 100% on your machine',
@@ -115,12 +133,12 @@ class _Hero extends StatelessWidget {
     final pitch = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Alice',
           style: TextStyle(
             fontFamily: 'Cormorant Garamond',
             fontFamilyFallback: ['Georgia'],
-            fontSize: 72,
+            fontSize: compact ? 48 : 72,
             fontWeight: FontWeight.w700,
             height: 0.92,
             color: AppColors.aliceMint,
@@ -134,26 +152,30 @@ class _Hero extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        const Text(
+        Text(
           '“Follow the white rabbit.”',
           style: TextStyle(
             fontFamily: 'Cormorant Garamond',
             fontFamilyFallback: ['Georgia'],
             fontStyle: FontStyle.italic,
-            fontSize: 28,
+            fontSize: compact ? 20 : 28,
             color: AppColors.aliceSage,
           ),
         ),
-        const SizedBox(height: 18),
-        const Text(
+        SizedBox(height: compact ? 10 : 18),
+        Text(
           'Alice is a local-first AI companion for character chat and '
           'storytelling. The characters, the model, and the conversation '
           'all live on your own computer — Windows, Mac, or Linux — with '
           'no account and no cloud in between.',
-          style: TextStyle(fontSize: 18, color: AppColors.aliceLede),
+          style: TextStyle(
+            fontSize: compact ? 15 : 18,
+            color: AppColors.aliceLede,
+          ),
         ),
-        const SizedBox(height: 24),
-        Wrap(
+        if (!compact) const SizedBox(height: 24),
+        if (!compact)
+          Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
@@ -183,7 +205,7 @@ class _Hero extends StatelessWidget {
       ],
     );
     final card = Container(
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+      padding: EdgeInsets.fromLTRB(22, compact ? 14 : 22, 22, 18),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -201,24 +223,26 @@ class _Hero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'A program you own',
             style: TextStyle(
               fontFamily: 'Cormorant Garamond',
               fontFamilyFallback: ['Georgia'],
-              fontSize: 27,
+              fontSize: compact ? 22 : 27,
               fontWeight: FontWeight.w600,
               color: AppColors.aliceMint,
             ),
           ),
-          const SizedBox(height: 6),
-          const Text(
-            'From Rabbit Hole — software you buy once and keep, the way '
-            'programs used to work.',
-            style: TextStyle(fontSize: 15, color: AppColors.aliceLede),
-          ),
-          const SizedBox(height: 14),
-          for (final point in _ownPoints)
+          if (!compact) const SizedBox(height: 6),
+          if (!compact)
+            const Text(
+              'From Rabbit Hole — software you buy once and keep, the way '
+              'programs used to work.',
+              style: TextStyle(fontSize: 15, color: AppColors.aliceLede),
+            ),
+          if (!compact) const SizedBox(height: 14),
+          if (!compact)
+            for (final point in _ownPoints)
             Padding(
               padding: const EdgeInsets.only(bottom: 9),
               child: Row(
@@ -285,13 +309,17 @@ class _Hero extends StatelessWidget {
       ),
     );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 32, 28, 16),
+      padding: EdgeInsets.fromLTRB(28, compact ? 16 : 32, 28, 16),
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < 900) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [pitch, const SizedBox(height: 24), card],
+              children: [
+                pitch,
+                SizedBox(height: compact ? 12 : 24),
+                card,
+              ],
             );
           }
           return Row(
