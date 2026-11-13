@@ -12,16 +12,43 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:front_porch_ai/database/database.dart';
+import 'package:front_porch_ai/services/character_repository.dart';
+import 'package:front_porch_ai/services/storage_service.dart';
+import 'package:front_porch_ai/services/world_repository.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_shell.dart';
 
+import '../../golden/support/creator_test_support.dart';
+
 Future<void> _pumpShell(WidgetTester tester, Size size) async {
-  SharedPreferences.setMockInitialValues(<String, Object>{});
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setupPathProviderMock();
+  final storage = await makeGoldenStorage();
+  final db = AppDatabase.forTesting(sameIsolate: true);
+  addTearDown(() async => db.close());
+  final characters = CharacterRepository(db, storage);
+  final worlds = WorldRepository(storage, db);
+  worlds.setCharacterRepository(characters);
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(const MaterialApp(home: AliceV9Shell()));
+  await tester.pumpWidget(
+    MaterialApp(
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<StorageService>.value(value: storage),
+          ChangeNotifierProvider<CharacterRepository>.value(
+            value: characters,
+          ),
+          ChangeNotifierProvider<WorldRepository>.value(value: worlds),
+        ],
+        child: const AliceV9Shell(),
+      ),
+    ),
+  );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 100));
 }
