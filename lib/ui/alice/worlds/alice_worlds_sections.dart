@@ -167,42 +167,48 @@ class _TierSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InkWell(
-            onTap: onHeaderTap,
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              child: Row(
-                children: [
-                  Icon(section.icon, size: 24, color: accent),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          section.title,
-                          style: const TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w700,
+          Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: onHeaderTap,
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+                child: Row(
+                  children: [
+                    Icon(section.icon, size: 24, color: accent),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            section.title,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        Text(
-                          section.subtitle,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.hintColor,
+                          Text(
+                            section.subtitle,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.hintColor,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Icon(
-                    open
-                        ? Icons.keyboard_arrow_down_rounded
-                        : Icons.keyboard_arrow_right_rounded,
-                    color: accent,
-                  ),
-                ],
+                    Icon(
+                      open
+                          ? Icons.keyboard_arrow_down_rounded
+                          : Icons.keyboard_arrow_right_rounded,
+                      color: accent,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -322,75 +328,78 @@ class _WorldRow extends StatelessWidget {
           ),
         ),
       ),
-      child: InkWell(
-        onTap: onSelect,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      world.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onSelect,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        world.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
+                    ),
+                    if (unsorted) ...[
+                      const SizedBox(width: 8),
+                      AliceChip(label: 'Unsorted', color: accent),
+                    ],
+                  ],
+                ),
+                if (description.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (unsorted) ...[
-                    const SizedBox(width: 8),
-                    AliceChip(label: 'Unsorted', color: accent),
-                  ],
-                ],
-              ),
-              if (description.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.hintColor,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    if (showAddChild)
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      if (showAddChild)
+                        AliceButton(
+                          label: '+ child',
+                          ghost: true,
+                          small: true,
+                          icon: Icons.add_rounded,
+                          onPressed: onAddChild,
+                        ),
                       AliceButton(
-                        label: '+ child',
+                        label: 'edit',
                         ghost: true,
                         small: true,
-                        icon: Icons.add_rounded,
-                        onPressed: onAddChild,
+                        icon: Icons.edit_rounded,
+                        onPressed: onEdit,
                       ),
-                    AliceButton(
-                      label: 'edit',
-                      ghost: true,
-                      small: true,
-                      icon: Icons.edit_rounded,
-                      onPressed: onEdit,
-                    ),
-                    AliceDangerButton(
-                      label: 'delete',
-                      icon: Icons.delete_rounded,
-                      onPressed: onDelete,
-                    ),
-                  ],
+                      AliceDangerButton(
+                        label: 'delete',
+                        icon: Icons.delete_rounded,
+                        onPressed: onDelete,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

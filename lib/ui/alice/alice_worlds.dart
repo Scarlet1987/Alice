@@ -402,14 +402,17 @@ class _AliceWorldsScreenState extends State<AliceWorldsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: InkWell(
-                    onTap: () => context.read<AppState>().setIndex(2),
-                    child: Text(
-                      'Lore Book lives in creator. The full lore book is '
-                      'in Creator\u2019s World section. Worlds is the '
-                      'place ladder itself.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.hintColor,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      onTap: () => context.read<AppState>().setIndex(2),
+                      child: Text(
+                        'Lore Book lives in creator. The full lore book is '
+                        'in Creator\u2019s World section. Worlds is the '
+                        'place ladder itself.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
                       ),
                     ),
                   ),
