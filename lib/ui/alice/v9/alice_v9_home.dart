@@ -361,11 +361,20 @@ class _JumpRailState extends State<_JumpRail> {
             ),
           ),
           const SizedBox(height: 12),
+          // One straight stack: every target the same height and the full
+          // rail width, one line each — no wrapping, no ragged pills.
+          // `small` so the longest label ("faq definitions") fits on one
+          // line inside the 240px rail.
           for (final target in kV9JumpTargets) ...[
-            V9Button(
-              label: target.toLowerCase(),
-              ghost: true,
-              onPressed: () => widget.onJump(target),
+            SizedBox(
+              height: 44,
+              child: V9Button(
+                label: target.toLowerCase(),
+                ghost: true,
+                small: true,
+                fillWidth: true,
+                onPressed: () => widget.onJump(target),
+              ),
             ),
             const SizedBox(height: 12),
           ],

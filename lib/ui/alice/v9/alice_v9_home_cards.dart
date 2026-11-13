@@ -91,22 +91,19 @@ class CharCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const V9Heading('Choose who you’re talking to'),
-          const SizedBox(height: 8),
-          const V9Muted(
-            'In Alice, every character is a card you can write yourself — '
-            'a personality, a voice, a way of speaking. Tap a portrait to '
-            'bring it to the front.',
-          ),
+          // Short heading, parallel to Stage's "stage": the Demo Space
+          // phrase "Choose who you're talking to" is a full-width heading
+          // and wraps to three lines inside this half-width card, pushing
+          // the Char Cover Flow and button row 72px below Stage's. The
+          // UI is non-organic, so its structure is symmetrical.
+          const V9Heading('characters'),
           const SizedBox(height: 16),
           V9CoverFlow(
             items: charNames,
             selected: charIndex,
             showPortraits: true,
             onSelect: (i) {
-              final card = context
-                  .read<CharacterRepository>()
-                  .characters[i];
+              final card = context.read<CharacterRepository>().characters[i];
               state.selectCharacter(card.dbId);
             },
             emptyText: 'No characters yet — make one in Char creator first.',
@@ -128,4 +125,3 @@ class CharCard extends StatelessWidget {
     );
   }
 }
-

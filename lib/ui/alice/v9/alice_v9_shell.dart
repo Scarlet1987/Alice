@@ -337,8 +337,13 @@ class _Hero extends StatelessWidget {
               ],
             );
           }
+          // Top-aligned, not centred: the pitch and the buy-once card
+          // start on the same line. The hero is asymmetrical in width
+          // (pitch 5, card 3) — that is the deliberate asymmetry — but
+          // its top edge is one straight line, so "Alice" no longer
+          // floats below the card's top.
           return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(flex: 5, child: pitch),
               const SizedBox(width: 34),

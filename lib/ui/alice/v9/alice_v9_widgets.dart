@@ -84,48 +84,51 @@ class V9Button extends StatelessWidget {
   final bool small;
   final bool ghost;
 
+  /// When true the button fills its parent's width instead of sizing to
+  /// its label — the Jump rail's six buttons are one straight stack, all
+  /// the same width and height, instead of six centred pills of different
+  /// widths.
+  final bool fillWidth;
+
   const V9Button({
     super.key,
     required this.label,
     required this.onPressed,
     this.small = false,
     this.ghost = false,
+    this.fillWidth = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ghost
-              ? AppColors.aliceClear
-              : AppColors.aliceGreen,
-          foregroundColor: ghost
-              ? AppColors.aliceMint
-              : AppColors.aliceOnGreen,
-          padding: EdgeInsets.symmetric(
-            horizontal: small ? 16 : 24,
-            vertical: small ? 9 : 13,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(small ? 8 : 10),
-            side: BorderSide(
-              color: ghost
-                  ? AppColors.aliceMint.withValues(alpha: 0.55)
-                  : AppColors.aliceGreen,
-            ),
-          ),
-          elevation: ghost ? 0 : 4,
-          shadowColor: AppColors.aliceGreen.withValues(alpha: 0.35),
-          textStyle: TextStyle(
-            fontSize: small ? 15 : 17,
-            fontWeight: FontWeight.w600,
+    final button = ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ghost ? AppColors.aliceClear : AppColors.aliceGreen,
+        foregroundColor: ghost ? AppColors.aliceMint : AppColors.aliceOnGreen,
+        padding: EdgeInsets.symmetric(
+          horizontal: small ? 16 : 24,
+          vertical: small ? 9 : 13,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(small ? 8 : 10),
+          side: BorderSide(
+            color: ghost
+                ? AppColors.aliceMint.withValues(alpha: 0.55)
+                : AppColors.aliceGreen,
           ),
         ),
-        child: Text(label),
+        elevation: ghost ? 0 : 4,
+        shadowColor: AppColors.aliceGreen.withValues(alpha: 0.35),
+        textStyle: TextStyle(
+          fontSize: small ? 15 : 17,
+          fontWeight: FontWeight.w600,
+        ),
       ),
+      child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
+    if (fillWidth) return button;
+    return Center(child: button);
   }
 }
 
@@ -360,10 +363,7 @@ class V9SlotDropdown extends StatelessWidget {
           items: [
             const DropdownMenuItem<String>(
               value: null,
-              child: Text(
-                '—',
-                style: TextStyle(color: AppColors.aliceSage),
-              ),
+              child: Text('—', style: TextStyle(color: AppColors.aliceSage)),
             ),
             for (final item in items)
               DropdownMenuItem<String>(
