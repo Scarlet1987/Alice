@@ -54,9 +54,7 @@ Future<void> _pumpShell(WidgetTester tester, Size size) async {
 }
 
 void main() {
-  testWidgets('no overflow at the 1691x393 metal window size', (
-    tester,
-  ) async {
+  testWidgets('no overflow at the 1691x393 metal window size', (tester) async {
     await _pumpShell(tester, const Size(1691, 393));
     expect(find.text('Alice'), findsWidgets);
     expect(tester.takeException(), isNull);

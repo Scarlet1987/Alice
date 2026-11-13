@@ -176,32 +176,32 @@ class _Hero extends StatelessWidget {
         if (!compact) const SizedBox(height: 24),
         if (!compact)
           Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final fact in _facts)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppColors.aliceMint.withValues(alpha: 0.4),
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final fact in _facts)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 13,
+                    vertical: 6,
                   ),
-                  borderRadius: BorderRadius.circular(999),
-                  color: AppColors.aliceMint.withValues(alpha: 0.08),
-                ),
-                child: Text(
-                  fact,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.aliceMint,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColors.aliceMint.withValues(alpha: 0.4),
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                    color: AppColors.aliceMint.withValues(alpha: 0.08),
+                  ),
+                  child: Text(
+                    fact,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.aliceMint,
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
     final card = Container(
@@ -215,9 +215,7 @@ class _Hero extends StatelessWidget {
             AppColors.aliceSage.withValues(alpha: 0.05),
           ],
         ),
-        border: Border.all(
-          color: AppColors.aliceMint.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.aliceMint.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -243,30 +241,30 @@ class _Hero extends StatelessWidget {
           if (!compact) const SizedBox(height: 14),
           if (!compact)
             for (final point in _ownPoints)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 9),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '✓ ',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.aliceMint,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      point,
-                      style: const TextStyle(
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '✓ ',
+                      style: TextStyle(
                         fontSize: 15,
-                        color: AppColors.aliceSage,
+                        color: AppColors.aliceMint,
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Text(
+                        point,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: AppColors.aliceSage,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
           Container(
             margin: const EdgeInsets.only(top: 9),
             padding: const EdgeInsets.only(top: 14),
@@ -296,10 +294,7 @@ class _Hero extends StatelessWidget {
                   child: Text(
                     'one-time purchase · pay what you want above the '
                     'minimum on itch.io',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.aliceLede,
-                    ),
+                    style: TextStyle(fontSize: 14, color: AppColors.aliceLede),
                   ),
                 ),
               ],
