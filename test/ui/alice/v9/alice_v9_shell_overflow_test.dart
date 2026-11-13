@@ -25,12 +25,22 @@ import '../../../golden/support/creator_test_support.dart';
 Future<void> _pumpShell(WidgetTester tester, Size size) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   setupPathProviderMock();
-  final storage = await makeGoldenStorage();
-  final db = AppDatabase.forTesting(sameIsolate: true);
+  // Real async work (StorageService init does real directory creates,
+  // the repositories start real DB loads) must run outside the
+  // testWidgets fake-async zone, or the first await never completes
+  // and the test hangs at 0% CPU.
+  late final StorageService storage;
+  late final AppDatabase db;
+  late final CharacterRepository characters;
+  late final WorldRepository worlds;
+  await tester.runAsync(() async {
+    storage = await makeGoldenStorage();
+    db = AppDatabase.forTesting(sameIsolate: true);
+    characters = CharacterRepository(db, storage);
+    worlds = WorldRepository(storage, db);
+    worlds.setCharacterRepository(characters);
+  });
   addTearDown(() async => db.close());
-  final characters = CharacterRepository(db, storage);
-  final worlds = WorldRepository(storage, db);
-  worlds.setCharacterRepository(characters);
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
