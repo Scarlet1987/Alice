@@ -352,7 +352,7 @@ class _JumpRailState extends State<_JumpRail> {
                 textAlign: TextAlign.left,
                 style: TextStyle(
                   fontFamily: 'Cormorant Garamond',
-                  fontFamilyFallback: const ['Georgia'],
+                  fontFamilyFallback: ['Georgia'],
                   fontSize: 25,
                   fontWeight: FontWeight.w700,
                   color: AppColors.aliceMint,
