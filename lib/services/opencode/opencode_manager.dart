@@ -24,13 +24,9 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:front_porch_ai/services/opencode/opencode_paths.dart';
-import 'package:front_porch_ai/services/opencode/opencode_download.dart'
-    hide
-        openCodeHttpDownload,
-        openCodeUnpackZip,
-        openCodePickFreePort,
-        openCodeGetHealth,
-        openCodeFetchRemoteLatest;
+// No opencode_download.dart import: its five helpers are byte-identical
+// copies of the ones in opencode_transfer.dart, and the manager only
+// uses those five, so importing both made every use ambiguous.
 import 'package:front_porch_ai/services/opencode/opencode_pin.dart';
 import 'package:front_porch_ai/services/opencode/opencode_process.dart';
 import 'package:front_porch_ai/services/opencode/opencode_transfer.dart';
