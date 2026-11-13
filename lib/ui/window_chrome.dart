@@ -32,6 +32,6 @@ WindowOptions mainWindowOptions({Size? size, bool? isMacOS}) {
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.normal,
     windowButtonVisibility: true,
-    title: 'Front Porch AI',
+    title: 'Rabbit Hole',
   );
 }

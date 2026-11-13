@@ -71,16 +71,36 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
                 // hero was unreachable. In a short window the hero
                 // compacts, and it scrolls inside its own space rather
                 // than overflowing the shell.
+                //
+                // The scroll is compact-only, on purpose. In a tall
+                // window the hero used to keep its own scroll view too,
+                // so the mouse wheel over the hero scrolled the hero
+                // away (hiding the Alice title) while the page below
+                // stayed put — two scroll regions fighting over one
+                // wheel, and the clipped tops Elaina saw on metal
+                // (2026-11-13). In a tall window the hero is fixed and
+                // the wheel belongs to the page.
                 final compact = constraints.maxHeight < 650;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: SingleChildScrollView(
-                        child: _Hero(compact: compact),
-                      ),
-                    ),
+                    // Tall window: the hero is a plain child that takes
+                    // its natural height, and the page below takes the
+                    // rest. It must NOT sit in a Flexible here — a
+                    // Flexible shares the leftover height 50/50 with the
+                    // page's Expanded, so the hero only got ~300px at
+                    // 1280x720 and its card overflowed by 174px.
+                    // Short window: compact + scrolled in its own space,
+                    // as before.
+                    if (compact)
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: SingleChildScrollView(
+                          child: _Hero(compact: true),
+                        ),
+                      )
+                    else
+                      const _Hero(),
                     _PageNav(state: _state),
                     Expanded(
                       child: IndexedStack(

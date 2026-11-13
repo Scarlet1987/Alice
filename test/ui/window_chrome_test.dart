@@ -17,7 +17,7 @@ void main() {
     expect(options.backgroundColor, isNotNull);
     expect(options.backgroundColor!.a, 1.0);
     expect(options.backgroundColor, AppColors.background);
-    expect(options.title, 'Front Porch AI');
+    expect(options.title, 'Rabbit Hole');
     expect(options.size, const Size(1280, 720));
     expect(options.center, isTrue);
     expect(options.skipTaskbar, isFalse);
@@ -33,7 +33,7 @@ void main() {
       isTrue,
       reason: 'Win/Linux must not paint porch charcoal on the native window',
     );
-    expect(options.title, 'Front Porch AI');
+    expect(options.title, 'Rabbit Hole');
     expect(
       mainWindowOptions(isMacOS: true).backgroundColor,
       isNot(options.backgroundColor),
