@@ -683,13 +683,16 @@ jobs:
       - name: Generate SHA256SUMS
         shell: bash
         run: |
+          # Linux-first G1 (2026-11-13): Front_Porch_AI.pkg is out while macOS
+          # is out of the matrix — no .pkg artifact exists, and sha256sum
+          # fails the whole Publish job on a missing file. Re-add the line
+          # when macOS returns.
           sha256sum \
             Front_Porch_AI-Linux.AppImage \
             Front_Porch_AI-Linux.deb \
             Front_Porch_AI-Linux.rpm \
             Front_Porch_AI_Linux.tar.gz \
-            Front_Porch_AI_Setup.exe \
-            Front_Porch_AI.pkg > SHA256SUMS
+            Front_Porch_AI_Setup.exe > SHA256SUMS
           cat SHA256SUMS
 
       # Mirror the Beta/Nightly "friendly notes" step: pull the bullet list under the
@@ -729,8 +732,9 @@ jobs:
             Front_Porch_AI-Linux.rpm
             Front_Porch_AI_Linux.tar.gz
             Front_Porch_AI_Setup.exe
-            Front_Porch_AI.pkg
             SHA256SUMS
+          # Linux-first G1 (2026-11-13): Front_Porch_AI.pkg removed — see
+          # Generate SHA256SUMS above. Re-add when macOS returns.
           prerelease: ${{ contains(github.ref_name, 'beta') }}
           body: ${{ steps.release_notes.outputs.body }}
         env:
@@ -748,9 +752,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Linux-first G1 (2026-11-13): Front_Porch_AI.pkg removed from
+          # EXPECTED while macOS is out of the matrix. Re-add when it returns.
           EXPECTED="Front_Porch_AI-Linux.AppImage Front_Porch_AI-Linux.deb \
             Front_Porch_AI-Linux.rpm Front_Porch_AI_Linux.tar.gz \
-            Front_Porch_AI_Setup.exe Front_Porch_AI.pkg"
+            Front_Porch_AI_Setup.exe"
           ASSETS=$(gh release view "${GITHUB_REF_NAME}" \
             --repo "${GITHUB_REPOSITORY}" \
             --json assets --jq '.assets[] | "\(.name) \(.size)"')
