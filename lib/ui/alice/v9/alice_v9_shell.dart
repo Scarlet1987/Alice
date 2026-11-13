@@ -118,7 +118,8 @@ class _Hero extends StatelessWidget {
         const Text(
           'Alice',
           style: TextStyle(
-            fontFamily: 'Georgia',
+            fontFamily: 'Cormorant Garamond',
+            fontFamilyFallback: const ['Georgia'],
             fontSize: 72,
             fontWeight: FontWeight.w700,
             height: 0.92,
@@ -136,7 +137,8 @@ class _Hero extends StatelessWidget {
         const Text(
           '“Follow the white rabbit.”',
           style: TextStyle(
-            fontFamily: 'Georgia',
+            fontFamily: 'Cormorant Garamond',
+            fontFamilyFallback: const ['Georgia'],
             fontStyle: FontStyle.italic,
             fontSize: 28,
             color: AppColors.aliceSage,
@@ -202,7 +204,8 @@ class _Hero extends StatelessWidget {
           const Text(
             'A program you own',
             style: TextStyle(
-              fontFamily: 'Georgia',
+              fontFamily: 'Cormorant Garamond',
+              fontFamilyFallback: const ['Georgia'],
               fontSize: 27,
               fontWeight: FontWeight.w600,
               color: AppColors.aliceMint,
@@ -257,7 +260,8 @@ class _Hero extends StatelessWidget {
                 Text(
                   '\$25',
                   style: TextStyle(
-                    fontFamily: 'Georgia',
+                    fontFamily: 'Cormorant Garamond',
+                    fontFamilyFallback: const ['Georgia'],
                     fontSize: 34,
                     fontWeight: FontWeight.w700,
                     color: AppColors.aliceMint,

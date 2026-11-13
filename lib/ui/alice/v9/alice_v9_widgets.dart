@@ -8,12 +8,16 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:front_porch_ai/ui/alice/v9/alice_v9_cover.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
 /// Serif text style used for every v9 heading and card title.
-/// Demo Space pairs Cormorant Garamond with Georgia; Flutter has no
-/// bundled Cormorant, so Georgia is the serif here.
-const _v9Serif = TextStyle(fontFamily: 'Georgia');
+/// Demo Space pairs Cormorant Garamond with Georgia; Cormorant is
+/// bundled (see pubspec), Georgia stays as the fallback.
+const _v9Serif = TextStyle(
+  fontFamily: 'Cormorant Garamond',
+  fontFamilyFallback: ['Georgia'],
+);
 
 /// A v9 card: Demo Space panel — dark surface, thin sage-green line,
 /// 16px corners, soft shadow. Headers always sit inside it.
@@ -156,6 +160,11 @@ class V9CoverFlow extends StatelessWidget {
   final String emptyText;
   final VoidCallback? onCreate;
 
+  /// When true, character cards show their Demo Space portrait
+  /// (demoPortraitAsset in alice_v9_cover.dart); false for Stage
+  /// cards — worlds are not characters and never get a portrait.
+  final bool showPortraits;
+
   const V9CoverFlow({
     super.key,
     required this.items,
@@ -163,6 +172,7 @@ class V9CoverFlow extends StatelessWidget {
     required this.onSelect,
     required this.emptyText,
     this.onCreate,
+    this.showPortraits = false,
   });
 
   @override
@@ -290,51 +300,10 @@ class V9CoverFlow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: Opacity(
                     opacity: index == selected ? 1 : 0.55,
-                    child: Container(
-                      height: index == selected ? 220 : 190,
-                      alignment: Alignment.bottomCenter,
-                      padding: const EdgeInsets.only(bottom: 14),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: index == selected
-                              ? [
-                                  AppColors.aliceForest,
-                                  AppColors.aliceGreenDeep,
-                                  AppColors.aliceInk,
-                                ]
-                              : [
-                                  AppColors.aliceSurface2,
-                                  AppColors.aliceInk,
-                                ],
-                        ),
-                        border: Border.all(
-                          color: AppColors.aliceMint.withValues(
-                            alpha: index == selected ? 0.5 : 0.35,
-                          ),
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.pureBlack.withValues(alpha: 0.5),
-                            offset: const Offset(0, 24),
-                            blurRadius: 44,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        items[index],
-                        textAlign: TextAlign.center,
-                        style: _v9Serif.copyWith(
-                          fontSize: 21,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.aliceSage.withValues(
-                            alpha: index == selected ? 1 : 0.45,
-                          ),
-                        ),
-                      ),
+                    child: V9CoverCard(
+                      name: items[index],
+                      isCentre: index == selected,
+                      showPortraits: showPortraits,
                     ),
                   ),
                 ),

@@ -351,7 +351,8 @@ class _JumpRailState extends State<_JumpRail> {
                 'jump to',
                 textAlign: TextAlign.left,
                 style: TextStyle(
-                  fontFamily: 'Georgia',
+                  fontFamily: 'Cormorant Garamond',
+                  fontFamilyFallback: const ['Georgia'],
                   fontSize: 25,
                   fontWeight: FontWeight.w700,
                   color: AppColors.aliceMint,

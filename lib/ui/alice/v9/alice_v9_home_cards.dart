@@ -102,6 +102,7 @@ class CharCard extends StatelessWidget {
           V9CoverFlow(
             items: charNames,
             selected: charIndex,
+            showPortraits: true,
             onSelect: (i) {
               final card = context
                   .read<CharacterRepository>()
