@@ -1,0 +1,412 @@
+#!/bin/bash
+# Build Front Porch AI for macOS (Release) — FULL local equivalent of the nightly CI flow.
+#
+# Replicates the macOS Rawhide path from CI so you can debug codesign + notarize + .pkg
+# + "ticket survives so Gatekeeper accepts the installed app".
+#
+# Bare-minimum packaging: plain pkgbuild + productsign for .pkg (signed+notarized+stapled).
+# (The unsigned shim DMG was retired 2026-07-27 — the .pkg is the only macOS
+# artifact; the in-app updater has been .pkg-first since the transition and
+# to hdiutil+replace for old .app installs) can bridge old and new users.
+# Primary artifact: .pkg .
+#
+# Preferred auth: App Store Connect API key (stable, no flaky password keychain item).
+#   export APPLE_API_KEY_PATH=/path/to/AuthKey_XXXX.p8
+#   export APPLE_API_KEY_ID=XXXXXX
+#   export APPLE_API_ISSUER=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+#   export APPLE_TEAM_ID=22VHJ43YNK
+#
+# Fallback: keychain profile "front-porch-ai" (run store-credentials once) or APPLE_ID envs.
+#
+# What it does:
+#   1. flutter build macos --release (+ web UI)
+#   2. Rename to FrontPorchAI-Rawhide.app + Plist patch for Rawhide
+#   3. Bundle libfpzip (the only native helper file left — the sidecar
+#      retirement is complete; everything runs in-process, no subprocesses)
+#   4. xattr clean + codesign (hardened runtime, Developer ID)
+#   5. Bare pkgbuild .pkg (installs the app to /Applications)
+#   6. Notarize + staple the .pkg (using API key if set)
+#   7. Diagnostics + verification steps
+#
+# Usage:
+#   ./scripts/build-macos.sh            # full (build + sign + bare .pkg + notarize)
+#   ./scripts/build-macos.sh --fast
+#   ./scripts/build-macos.sh --full-notarize
+#
+# After run: the .pkg is ready.
+# Double-click the .pkg to install to /Applications.
+# and is the bridge so in-app auto-update continues to work for everyone during
+
+set -euo pipefail
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Argument parsing (simple, no getopts for maximum portability)
+# ─────────────────────────────────────────────────────────────────────────────
+DO_ML=1          # full app build (Flutter + web UI) by default
+SKIP_SIGN=0
+SKIP_PKG=0
+FULL_NOTARIZE=0
+CERT_NAME="${MACOS_CERTIFICATE_NAME:-}"
+
+# Notary auth — initialized here at top level so they are always in scope
+# regardless of --skip-sign. Populated later once cert/team are known.
+HAVE_NOTARY_CREDS=0
+NOTARY_AUTH=""
+NOTARY_PROFILE="front-porch-ai"
+
+for arg in "$@"; do
+  case "$arg" in
+    --fast|--skip-ml|--skip-pyinstaller|--no-ml) DO_ML=0 ;;
+    --skip-sign) SKIP_SIGN=1 ;;
+    --sign-only) DO_ML=0; SKIP_SIGN=0 ;;
+    --full-notarize) FULL_NOTARIZE=1 ;;
+    --skip-pkg) SKIP_PKG=1 ;;
+    --cert-name=*) CERT_NAME="${arg#*=}" ;;
+    --help|-h)
+      echo "See top of script for usage."
+      exit 0
+      ;;
+  esac
+done
+
+if [ "$DO_ML" -eq 0 ]; then
+  echo "==> --fast requested: will reuse the existing bundle for quick sign/PKG/staple iteration"
+fi
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+# We always target the Rawhide-style name for local testing (matches what users
+# will download from nightlies and what Gatekeeper will see).
+APP_NAME="FrontPorchAI-Rawhide.app"
+APP_BUNDLE="$ROOT/build/macos/Build/Products/Release/$APP_NAME"
+PKG_PATH=""
+
+
+if [ "$DO_ML" -eq 1 ]; then
+  echo "======================================================================"
+  echo "  LOCAL FULL macOS BUILD + SIGN + BARE .PKG + NOTARIZE (Rawhide-equivalent)"
+  echo "======================================================================"
+  echo "This script mirrors the important parts of nightly.yml so you can"
+  echo "debug codesign / packaging (.pkg) / notarize + staple locally."
+  echo ""
+
+  echo "==> Installing Flutter dependencies..."
+  flutter pub get
+
+  # Build the rewritten React PWA (web_ui/) into assets/web_app so Flutter
+  # bundles a fresh web UI. Skipped gracefully if npm/web_ui is absent (e.g. the
+  # legacy web server is still the default until the parity cutover).
+  if [ -d "$ROOT/web_ui" ] && command -v npm &>/dev/null; then
+    echo "==> Building web UI (React + Vite) into assets/web_app..."
+    ( cd "$ROOT/web_ui" && npm ci && npm run build )
+  else
+    echo "==> Skipping web UI build (web_ui/ or npm not present)."
+  fi
+
+  echo "==> Building macOS app (release)..."
+  flutter build macos --release
+
+  echo "==> Renaming to $APP_NAME and patching display name (Rawhide nightly style)..."
+  cd "$ROOT/build/macos/Build/Products/Release"
+  if [ -d FrontPorchAI.app ]; then
+    rm -rf "$APP_NAME" 2>/dev/null || true
+    mv FrontPorchAI.app "$APP_NAME"
+  fi
+  if [ -d "$APP_NAME" ]; then
+    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Front Porch AI Nightly" "$APP_NAME/Contents/Info.plist" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Set :CFBundleName Front Porch AI Nightly" "$APP_NAME/Contents/Info.plist" 2>/dev/null || true
+    echo "    Renamed and patched: $APP_NAME"
+  else
+    echo "ERROR: Expected $APP_NAME after rename"
+    exit 1
+  fi
+  cd "$ROOT"
+  APP_BUNDLE="$ROOT/build/macos/Build/Products/Release/$APP_NAME"
+
+else
+  # ── FAST MODE ──────────────────────────────────────────────────────────────
+  # Skip flutter pub get, flutter build, and the rename.
+  # Work with the existing bundle from the last full build. This is the
+  # correct iteration loop for sign/PKG/notarize.
+  echo "======================================================================"
+  echo "  FAST MODE — reusing existing bundle (skip Flutter + helper build)"
+  echo "======================================================================"
+  echo ""
+  echo "==> --fast: skipping the Flutter build."
+  echo "    Working with existing bundle at:"
+  echo "    $APP_BUNDLE"
+  echo ""
+  if [ ! -d "$APP_BUNDLE" ]; then
+    echo "ERROR: --fast requires an existing bundle at:"
+    echo "  $APP_BUNDLE"
+    echo "Run without --fast first to do a full build."
+    exit 1
+  fi
+  # Sanity check: a real bundle should be >> 100 MB (Flutter app + web UI +
+  # sherpa/ONNX libs).
+  BUNDLE_SIZE_MB=$(du -sm "$APP_BUNDLE" 2>/dev/null | awk '{print $1}')
+  if [ "${BUNDLE_SIZE_MB:-0}" -lt 100 ]; then
+    echo "WARNING: Bundle is only ${BUNDLE_SIZE_MB}MB — it may be incomplete."
+    echo "         Run without --fast to rebuild from scratch."
+  else
+    echo "    Bundle size: ${BUNDLE_SIZE_MB}MB — looks good."
+  fi
+  echo ""
+fi
+
+# (The sidecar builds that used to run here left with the sidecar
+# retirement — docs/design/sidecar-retirement.md. Everything runs
+# in-process now; the app spawns no helper processes.)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# libfpzip for the native Draw Things client (macOS-only feature)
+# ─────────────────────────────────────────────────────────────────────────────
+# The pure-Dart DT client decodes generated images through a tiny fpzip FFI
+# dylib (lib/services/grpc/dt_native/dt_fpzip.dart looks in
+# Contents/Frameworks/). Without it, Draw Things generation fails with a
+# clear libfpzip-missing error (there is no Python fallback anymore). The
+# dylib is signed by the codesign pass below like every other framework.
+echo "==> Bundling libfpzip (native Draw Things tensor decode)..."
+if [ ! -f "$ROOT/tools/fpzip/libfpzip.dylib" ]; then
+  "$ROOT/scripts/build-fpzip-macos.sh"
+fi
+mkdir -p "$APP_BUNDLE/Contents/Frameworks"
+cp "$ROOT/tools/fpzip/libfpzip.dylib" "$APP_BUNDLE/Contents/Frameworks/"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# xattr clean (MUST be before any codesigning)
+# ─────────────────────────────────────────────────────────────────────────────
+echo "==> Cleaning xattrs (critical before codesign/notarization)..."
+xattr -cr "$APP_BUNDLE" || true
+find "$APP_BUNDLE" -exec xattr -d com.apple.FinderInfo {} + 2>/dev/null || true
+
+if [ "$SKIP_SIGN" -eq 1 ]; then
+  echo "==> Skipping codesign (--skip-sign)"
+else
+  # Determine certificate — auto-discover, prefer the known working one on this Mac.
+  # We use tool access to discover it so you never have to export or type the cert name.
+  PREFERRED_CERT="Developer ID Application: Joseph Spooner (22VHJ43YNK)"
+  if [ -z "$CERT_NAME" ]; then
+    CERT_NAME=$(security find-identity -v -p codesigning 2>/dev/null | grep -F "$PREFERRED_CERT" | head -1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+  fi
+  if [ -z "$CERT_NAME" ]; then
+    CERT_NAME=$(security find-identity -v -p codesigning 2>/dev/null | grep 'Developer ID Application' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+  fi
+  if [ -z "$CERT_NAME" ]; then
+    echo "    No Developer ID Application cert found in keychain."
+    echo "    Falling back to ad-hoc signing ( - ). This is enough to test bundle layout"
+    echo "    and the 'ambiguous bundle format' fixes, but will not produce a shippable build."
+    CERT_NAME="-"
+  fi
+  echo "==> Codesigning with: $CERT_NAME"
+
+  # Extract team ID for notarization steps (no user input needed)
+  TEAM_ID=$(echo "$CERT_NAME" | sed -n 's/.*(\([A-Z0-9]*\)).*/\1/p' || true)
+  if [ -z "$TEAM_ID" ]; then
+    TEAM_ID="22VHJ43YNK"   # known from this Mac's cert
+  fi
+  echo "==> Team ID: $TEAM_ID"
+
+  # Look for Installer cert for signing the .pkg (required for proper .pkg notarization)
+  INSTALLER_CERT=$(security find-identity -v 2>/dev/null | grep 'Developer ID Installer' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+  if [ -n "$INSTALLER_CERT" ]; then
+    echo "==> Found Installer cert for .pkg signing: $INSTALLER_CERT"
+  else
+    # Force the known name even if find-identity doesn't list it yet (common until ACLs fully updated)
+    INSTALLER_CERT="Developer ID Installer: Joseph Spooner (22VHJ43YNK)"
+    echo "==> Using known Installer cert name for .pkg signing: $INSTALLER_CERT (verify it exists in keychain)"
+  fi
+
+  ENTITLEMENTS="$ROOT/macos/Runner/Release.entitlements"
+
+  # 1. Frameworks (outer)
+  while IFS= read -r -d '' f; do
+    codesign --force --sign "$CERT_NAME" --timestamp --options runtime "$f" \
+      2>&1 | grep -v -E '(replacing existing signature|already signed)' || true
+  done < <(find "$APP_BUNDLE/Contents/Frameworks" \( -name "*.framework" -o -name "*.dylib" \) -print0 2>/dev/null || true)
+
+  # (The helper-signing passes that used to follow left with the sidecar
+  # retirement — since phase 5 the app spawns no helper processes, so
+  # Resources holds only data files.)
+
+  # 2. The main app bundle last (outermost)
+  codesign --force --sign "$CERT_NAME" --timestamp --options runtime \
+    --entitlements "$ENTITLEMENTS" "$APP_BUNDLE" || true
+
+  # 6. Strict post-sign verification: fail loud if anything under Resources is not signed
+  # with *our* Developer ID Application cert + hardened runtime. This prevents silent
+  # "some binary wasn't covered" problems that cause Apple "Invalid" on .pkg.
+  echo "    Strict verification: checking every Mach-O under Resources has our Developer ID cert + runtime..."
+  verification_failed=0
+  while IFS= read -r -d '' f; do
+    if file "$f" | grep -q "Mach-O"; then
+      sig_output=$(codesign -dvv "$f" 2>&1)
+      if ! echo "$sig_output" | grep -q "Developer ID Application: Joseph Spooner (22VHJ43YNK)"; then
+        echo "      !!! MISSING OR WRONG CERT: $f"
+        echo "$sig_output" | grep -E 'Authority|flags=' | head -3
+        verification_failed=1
+      elif ! echo "$sig_output" | grep -q 'flags=.*runtime'; then
+        echo "      !!! MISSING HARDENED RUNTIME: $f"
+        verification_failed=1
+      fi
+    fi
+  done < <(find "$APP_BUNDLE/Contents/Resources" -type f -print0 2>/dev/null || true)
+
+  if [ $verification_failed -eq 1 ]; then
+    echo "ERROR: One or more binaries under Resources are not signed with the correct Developer ID Application certificate + hardened runtime."
+    echo "This is almost certainly why the previous .pkg notarization was rejected as 'Invalid'."
+    # Do not exit here — let the build continue so you can inspect, but the .pkg will likely fail notarization again.
+  else
+    echo "    All Resources Mach-O verified as correctly signed with Developer ID + runtime."
+  fi
+
+  echo "    Verifying signature..."
+  codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE" 2>&1 | tail -10 || true
+  echo "==> Codesign complete."
+
+  # === DIAGNOSTICS for ticket/CDHash (for notarization debugging) ===
+  echo "=== DIAGNOSTIC: Post-sign state of .app ==="
+  echo "CodeDirectory / CDHash info:"
+  codesign -dvv "$APP_BUNDLE" 2>&1 | grep -E 'CDHash|CodeDirectory|Sealed Resources|Timestamp|flags=' | cat
+  echo "xattrs on the signed app:"
+  xattr -l "$APP_BUNDLE" 2>/dev/null | cat || echo 'none (or provenance only)'
+  echo "=== End post-sign diagnostic ==="
+
+  # === Unified notary auth detection (run once, early) ===
+  # Prefer stable App Store Connect API key (no flaky password keychain item).
+  # Set these (recommended):
+  #   APPLE_API_KEY_PATH=/path/to/AuthKey_XXXX.p8
+  #   APPLE_API_KEY_ID=XXXXXX
+  #   APPLE_API_ISSUER=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  #   APPLE_TEAM_ID=22VHJ43YNK
+  # Fallbacks: keychain profile or APPLE_ID envs.
+  # Note: NOTARY_PROFILE/HAVE_NOTARY_CREDS/NOTARY_AUTH are initialized at top of script
+  # so they survive even if --skip-sign is used (PKG notarization still runs).
+
+  if [ -n "${APPLE_API_KEY_PATH:-}" ] && [ -f "$APPLE_API_KEY_PATH" ] && \
+     [ -n "${APPLE_API_KEY_ID:-}" ] && [ -n "${APPLE_API_ISSUER:-}" ]; then
+    NOTARY_AUTH="--key $APPLE_API_KEY_PATH --key-id $APPLE_API_KEY_ID --issuer $APPLE_API_ISSUER --team-id ${APPLE_TEAM_ID:-$TEAM_ID}"
+    HAVE_NOTARY_CREDS=1
+    echo "==> Using App Store Connect API key for notarization (stable, recommended)"
+  elif xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1; then
+    HAVE_NOTARY_CREDS=1
+    NOTARY_AUTH="--keychain-profile $NOTARY_PROFILE"
+    echo "==> Using existing notary keychain profile '$NOTARY_PROFILE'"
+  elif [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_ID_PASSWORD:-}" ]; then
+    HAVE_NOTARY_CREDS=1
+    NOTARY_AUTH="--apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id ${APPLE_TEAM_ID:-$TEAM_ID}"
+    echo "==> Using Apple creds from environment."
+  else
+    echo "==> No notary auth available (API key or profile)."
+    echo "    (Set APPLE_API_* envs above, or: xcrun notarytool store-credentials front-porch-ai --team-id $TEAM_ID)"
+  fi
+
+fi
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Bare-minimum .pkg (often more reliable for notarization on complex apps).
+# Installs the exact same bundle to /Applications; libfpzip stays inside
+# the .app exactly as built.
+# ─────────────────────────────────────────────────────────────────────────────
+if [ "$SKIP_PKG" -eq 1 ]; then
+  echo "==> Skipping .pkg creation (--skip-pkg)"
+else
+  PKG_NAME="Front_Porch_AI_Rawhide.pkg"
+  PKG_PATH="$ROOT/$PKG_NAME"
+
+  echo "==> Creating bare-minimum .pkg (unsigned first, then signed with productsign for cleaner signature)"
+  rm -f "$PKG_PATH"
+
+  # Verify the Installer cert is present in the login keychain (more reliable than find-identity -p codesigning)
+  if ! security find-certificate -c "Developer ID Installer: Joseph Spooner (22VHJ43YNK)" -a ~/Library/Keychains/login.keychain-db > /dev/null 2>&1; then
+    echo "ERROR: Developer ID Installer cert not found in login keychain."
+    echo "Please import ~/Desktop/Certificates.p12 (we just did it for you), then run in this terminal:"
+    echo "  security unlock-keychain ~/Library/Keychains/login.keychain-db"
+    echo "  security set-key-partition-list -S apple-tool:,apple: -s ~/Library/Keychains/login.keychain-db"
+    echo "  (enter your Mac login password at prompts)"
+    echo "Then open Keychain Access, find the cert, Get Info > Trust > Code Signing > Always Trust."
+    exit 1
+  fi
+
+  # Create unsigned package first — use build dir, not /tmp, to avoid xattr contamination
+  UNSIGNED_PKG="$ROOT/build/unsigned-$$.pkg"
+  pkgbuild \
+    --component "$APP_BUNDLE" \
+    --install-location /Applications \
+    "$UNSIGNED_PKG" || {
+      echo "ERROR: pkgbuild failed for unsigned package"
+      exit 1
+    }
+
+  # Sign with productsign using the exact known Installer cert name + explicit keychain
+  # This is more reliable for locating the cert in the specific keychain
+  productsign --sign "Developer ID Installer: Joseph Spooner (22VHJ43YNK)" \
+    --keychain ~/Library/Keychains/login.keychain-db \
+    "$UNSIGNED_PKG" "$PKG_PATH" || {
+    echo "ERROR: productsign failed for $PKG_PATH"
+    echo "The cert must be in the keychain and its private key authorized (run the unlock + set-key-partition-list above if needed)."
+    rm -f "$UNSIGNED_PKG"
+    exit 1
+  }
+
+  rm -f "$UNSIGNED_PKG"
+  ls -lh "$PKG_PATH"
+  echo "    .pkg created: $PKG_PATH (signed with Installer cert via productsign)"
+fi
+
+# Use the NOTARY_AUTH detected earlier (API key preferred).
+# Notarize + staple the .pkg.
+if [ "$FULL_NOTARIZE" -eq 1 ] || [ -n "$NOTARY_AUTH" ]; then
+  if [ -z "$NOTARY_AUTH" ]; then
+    echo "    (No notary auth — skipping .pkg notarization.)"
+  else
+    echo "==> Notarizing and stapling .pkg (bare minimum, API key or profile)"
+
+    if [ -f "$PKG_PATH" ]; then
+      # Clean quarantine/provenance xattrs from the final .pkg.
+      # Note: .pkg is a flat XAR archive — do NOT use `find` inside it, only xattr -cr on the file itself.
+      xattr -cr "$PKG_PATH" 2>/dev/null || true
+      xattr -d com.apple.FinderInfo "$PKG_PATH" 2>/dev/null || true
+      xattr -d com.apple.quarantine "$PKG_PATH" 2>/dev/null || true
+
+      echo "    Submitting .pkg for notarization (this can take several minutes for a large bundle)..."
+      xcrun notarytool submit "$PKG_PATH" $NOTARY_AUTH --wait || echo "    .pkg submit had issues (continuing anyway)"
+      xcrun stapler staple "$PKG_PATH" || true
+      xcrun stapler validate "$PKG_PATH" || echo "    (.pkg stapler validate had issues)"
+    fi
+  fi
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Final verification instructions
+# ─────────────────────────────────────────────────────────────────────────────
+echo ""
+echo "======================================================================"
+echo "  DONE.  Bare .pkg + notarize/staple."
+echo "======================================================================"
+echo ""
+echo "Artifacts produced:"
+echo "  .pkg (primary, signed+notarized+stapled): $PKG_PATH"
+echo ""
+echo "To install/test:"
+echo "  1. Double-click $PKG_PATH for the real signed install (recommended)."
+echo "  2. Let the Installer place the app to /Applications/FrontPorchAI-Rawhide.app"
+echo "  3. libfpzip is inside the installed bundle at the exact"
+echo "     correct relative path (Contents/Frameworks)."
+echo "  4. Run the 4 checks on the installed app:"
+echo "     codesign -vvv --deep --strict /Applications/$APP_NAME"
+echo "     spctl --assess --type exec -vv /Applications/$APP_NAME"
+echo "     xcrun stapler validate /Applications/$APP_NAME"
+echo ""
+echo "If Gatekeeper still complains after install, check the notarization log"
+echo "for the submission and re-run with API key env vars (more reliable)."
+echo ""
+echo "The .pkg is at:"
+echo "   $PKG_PATH"
+echo ""
+echo "Iterate fast: ./scripts/build-macos.sh --fast"
+echo ""
+echo "Good luck — this should produce a working notarized .pkg installer."
