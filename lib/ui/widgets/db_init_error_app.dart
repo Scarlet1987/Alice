@@ -48,8 +48,8 @@ class DbInitErrorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = settingsFileCorrupt
-        ? "Front Porch AI couldn't read its settings"
-        : "Front Porch AI couldn't open its database";
+        ? "Rabbit Hole couldn't read its settings"
+        : "Rabbit Hole couldn't open its database";
     final advice = settingsFileCorrupt
         ? 'The settings file (shared_preferences.json in the app\'s data '
               'folder) is damaged — this usually happens after a crash or '
@@ -57,7 +57,7 @@ class DbInitErrorApp extends StatelessWidget {
               'file, then reopen the app. Your characters and chats are '
               'stored separately and are safe; only app settings are lost.'
         : 'This is usually a full disk, missing write permission, or '
-              'another copy of Front Porch AI already running. Free up '
+              'another copy of Rabbit Hole already running. Free up '
               'space, close any other copies, then reopen the app.';
 
     return MaterialApp(

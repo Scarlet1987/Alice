@@ -32,7 +32,7 @@ void main() {
     );
 
     expect(
-      find.text("Front Porch AI couldn't open its database"),
+      find.text("Rabbit Hole couldn't open its database"),
       findsOneWidget,
     );
     expect(find.textContaining('full disk'), findsOneWidget);
@@ -51,7 +51,7 @@ void main() {
     );
 
     expect(
-      find.text("Front Porch AI couldn't read its settings"),
+      find.text("Rabbit Hole couldn't read its settings"),
       findsOneWidget,
     );
     expect(find.textContaining('shared_preferences.json'), findsOneWidget);

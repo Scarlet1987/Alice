@@ -213,7 +213,11 @@ class AppDatabase extends _$AppDatabase {
     // wrong key throws here and startup shows the DB-init error window
     // instead of opening plaintext.
     final dbKey = await loadDatabaseKey();
-    await ensureDatabaseEncrypted(file, dbKey);
+    await ensureDatabaseEncrypted(
+      file,
+      dbKey,
+      expectedSchemaVersion: _schemaVersion,
+    );
     _instance = AppDatabase._internal(
       NativeDatabase.createInBackground(
         file,
@@ -328,8 +332,13 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// The current Drift schema version, also passed to the encryption
+  /// repair so a database whose version was lost by the first encryption
+  /// migration can be healed to exactly this version.
+  static const int _schemaVersion = 55;
+
   @override
-  int get schemaVersion => 55;
+  int get schemaVersion => _schemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

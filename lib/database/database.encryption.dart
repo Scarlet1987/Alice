@@ -165,7 +165,21 @@ void setupEncryptedConnection(Database db, String base64Key) {
 /// write); a plaintext file is migrated in place; an encrypted file is
 /// probed with the key. A failed probe or migration throws
 /// [DatabaseEncryptionException] and leaves the original file untouched.
-Future<void> ensureDatabaseEncrypted(File file, String base64Key) async {
+///
+/// When [expectedSchemaVersion] is given (the app's current Drift schema
+/// version), an encrypted database stuck at user_version 0 that already
+/// holds tables is repaired to that version. That state can only come from
+/// the first encryption migration, which lost user_version (see
+/// [_migratePlaintextToEncrypted]): Drift would otherwise run its
+/// fresh-install path and die on the bare CREATE INDEX for an index the
+/// export already copied. A genuinely fresh database has no tables, so it
+/// is never repaired. Callers that open copies without Drift (backups,
+/// reunification temps) omit the parameter and get no repair.
+Future<void> ensureDatabaseEncrypted(
+  File file,
+  String base64Key, {
+  int? expectedSchemaVersion,
+}) async {
   if (!await file.exists()) return;
   if (await file.length() == 0) return;
   if (isPlaintextDatabase(file)) {
@@ -175,9 +189,35 @@ Future<void> ensureDatabaseEncrypted(File file, String base64Key) async {
   final db = sqlite3.open(file.path);
   try {
     setupEncryptedConnection(db, base64Key);
+    if (expectedSchemaVersion != null) {
+      _repairLostUserVersion(db, expectedSchemaVersion);
+    }
   } finally {
     db.close();
   }
+}
+
+/// Heals a database whose schema version was lost by the first encryption
+/// migration: user_version 0 with real tables. Sets it to
+/// [expectedSchemaVersion] so Drift runs upgrades (or none) instead of its
+/// fresh-install path. Never touches a database with a version already set,
+/// or one with no tables at all.
+void _repairLostUserVersion(Database db, int expectedSchemaVersion) {
+  final version =
+      db.select('PRAGMA user_version;').first['user_version'] as int;
+  if (version != 0) return;
+  final tables = db
+      .select(
+        "SELECT count(*) AS n FROM sqlite_master WHERE type = 'table' "
+        "AND name NOT LIKE 'sqlite_%';",
+      )
+      .first['n'] as int;
+  if (tables == 0) return;
+  debugPrint(
+    '[DB] Repairing lost schema version (0 -> $expectedSchemaVersion) '
+    'on an encrypted database with $tables tables.',
+  );
+  db.execute('PRAGMA user_version = $expectedSchemaVersion;');
 }
 
 /// Converts a plaintext database to SQLCipher in place, without losing user
@@ -194,6 +234,12 @@ Future<void> _migratePlaintextToEncrypted(File file, String base64Key) async {
   } catch (_) {}
 
   try {
+    // sqlcipher_export copies schema and data but NOT PRAGMA user_version,
+    // which is where Drift keeps its schema version. Read it now: without
+    // it the encrypted copy looks brand-new (version 0) to Drift, which
+    // runs its fresh-install path and dies on the bare CREATE INDEX for an
+    // index the export already copied.
+    var sourceUserVersion = 0;
     final plain = sqlite3.open(file.path);
     try {
       if (!_hasCipher(plain)) {
@@ -202,6 +248,8 @@ Future<void> _migratePlaintextToEncrypted(File file, String base64Key) async {
           'empty). Refusing to migrate the database.',
         );
       }
+      sourceUserVersion =
+          plain.select('PRAGMA user_version;').first['user_version'] as int;
       // Checkpoint any WAL so no -wal/-shm sidecar survives the swap and
       // gets replayed against the encrypted file.
       try {
@@ -221,6 +269,15 @@ Future<void> _migratePlaintextToEncrypted(File file, String base64Key) async {
     }
 
     _verifyEncryptedCopy(source: file, copy: tmp, base64Key: base64Key);
+
+    // Write the preserved version onto the verified copy before the swap.
+    final copyDb = sqlite3.open(tmp.path);
+    try {
+      setupEncryptedConnection(copyDb, base64Key);
+      copyDb.execute('PRAGMA user_version = $sourceUserVersion;');
+    } finally {
+      copyDb.close();
+    }
 
     await tmp.rename(file.path);
     await FilePermissions.hardenFile(file);
