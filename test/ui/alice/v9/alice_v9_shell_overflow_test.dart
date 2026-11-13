@@ -21,7 +21,7 @@ import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/world_repository.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_shell.dart';
 
-import '../../golden/support/creator_test_support.dart';
+import '../../../golden/support/creator_test_support.dart';
 
 Future<void> _pumpShell(WidgetTester tester, Size size) async {
   TestWidgetsFlutterBinding.ensureInitialized();
