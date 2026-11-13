@@ -164,8 +164,7 @@ class AppColors {
   static Color borderOf(BuildContext context) =>
       resolve(context, const Color(0xFF1C554B), lightBorder);
 
-  /// Soft border (the preview's --border-soft): card edges and the nav
-  /// rail's right edge — a whisper under [borderOf].
+  /// Soft border: card edges and the nav rail's right edge.
   static const Color borderSoft = Color(0xFF123F37);
   static const Color borderSoftLight = Color(0xFFD9ECE7);
   static Color borderSoftOf(BuildContext context) =>
@@ -360,38 +359,38 @@ class AppColors {
 
   // ---------------------------------------------------------------------------
   // Sweep tokens (2026-10-31, Fix-1 raw colours) — exact values from the
-  // raw colours they replace, so the look does not change. Const tokens
-  // (not *Of resolvers) are used deliberately here: the avatar palette
-  // and forest overlay are fixed hues, not theme-aware chrome.
+  // raw colours they replace, so the look does not change.
   // ---------------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------------
-  // Alice v9 (combined preview v9, 2026-11-05): white and green, not white
-  // and blue. Accent green only — no green wash. All v9 literals live
-  // here; v9 UI code uses only these tokens (raw-colour ratchet).
-  // ---------------------------------------------------------------------------
-
-  /// Alice v9 accent green — buttons, headings, borders.
+  // Alice v9 restyled to the Alice Demo Space (2026-11-09, the entire
+  // design): serif headings, quiet dark green, sage/mint text. All v9
+  // literals live here; v9 UI code uses only these tokens (raw-colour ratchet).
   static const Color aliceGreen = Color(0xFF00914F);
-
-  /// Alice v9 dark green — banner gradient, page background.
   static const Color aliceDark = Color(0xFF14532E);
-
-  /// Alice v9 deepest green — page background gradient end.
   static const Color aliceDeep = Color(0xFF0F3D22);
-
-  /// Alice v9 3D button bottom edge.
   static const Color aliceEdge = Color(0xFF007A42);
-
-  /// Alice v9 pale mint — dropdown fills, selected list rows.
   static const Color alicePale = Color(0xFFD9F0E3);
-
-  /// Alice v9 light mint — page background tint.
   static const Color aliceLight = Color(0xFFEFFAF3);
+  // Demo Space tokens: hero ink/forest, deep green, sage/mint text,
+  // dark surfaces, line, bright accent, chip, lede/trait greens.
+  static const Color aliceInk = Color(0xFF062E1D);
+  static const Color aliceHeroDeep = Color(0xFF041F13);
+  static const Color aliceForest = Color(0xFF0A3D27);
+  static const Color aliceGreenDeep = Color(0xFF0E6B38);
+  static const Color aliceSage = Color(0xFFDCE8DC);
+  static const Color aliceSage2 = Color(0xFFCDDCCD);
+  static const Color aliceSage3 = Color(0xFFC2D6C4);
+  static const Color aliceMint = Color(0xFFBFEEDA);
+  static const Color aliceSurface = Color(0xFF0B3A26);
+  static const Color aliceSurface2 = Color(0xFF0E4630);
+  static const Color aliceInkSoft = Color(0xFFA9C6AE);
+  static const Color aliceLine = Color(0xFF1E5C3E);
+  static const Color aliceLede = Color(0xFFC4DCC6);
+  static const Color aliceOnGreen = Color(0xFFF2FBF5);
+  static const Color aliceClear = Color(0x00000000);
 
   /// Pure black, e.g. the rabbit-icon ring fill in Home credits.
   static const Color pureBlack = Color(0xFF000000);
-
   /// Pure white, e.g. the initial letter on a coloured avatar.
   static const Color pureWhite = Colors.white;
 

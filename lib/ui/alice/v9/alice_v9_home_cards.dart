@@ -48,9 +48,7 @@ class StageCard extends StatelessWidget {
                 'No stages yet — create a world on the Worlds screen first.',
             onCreate: onNew,
           ),
-          const SizedBox(height: 8),
-          const V9Muted('Cover Flow, centered.'),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -93,7 +91,13 @@ class CharCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const V9Heading('current char'),
+          const V9Heading('Choose who you’re talking to'),
+          const SizedBox(height: 8),
+          const V9Muted(
+            'In Alice, every character is a card you can write yourself — '
+            'a personality, a voice, a way of speaking. Tap a portrait to '
+            'bring it to the front.',
+          ),
           const SizedBox(height: 16),
           V9CoverFlow(
             items: charNames,
@@ -107,9 +111,7 @@ class CharCard extends StatelessWidget {
             emptyText: 'No characters yet — make one in Char creator first.',
             onCreate: onNew,
           ),
-          const SizedBox(height: 8),
-          const V9Muted('Cover Flow, centered.'),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

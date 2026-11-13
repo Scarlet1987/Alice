@@ -1,14 +1,14 @@
 // Copyright (C) 2026 Front Porch AI
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
-// Alice v9 Home (combined preview v9): header, nav with dead space,
-// Jump To (6 items, in order), Stage Cover Flow +new/edit/-del, Current
-// Char Cover Flow +new/edit/-del, then Pocket in Space Time holding the
-// Starting Loadout 3x2, lined up under Stage / Current Char (same left
-// and right edges as the two cards above it, same centre line). Stage
-// and Current Char are the same size, their button rows centred. The
-// Jump To heading lifts on hover like a button. Loadout dropdowns are
-// fed by the selected character's owned items — never "Option 1".
+// Alice v9 Home, restyled to the Alice Demo Space (2026-11-09, the
+// entire design): header, nav with dead space, Jump To (6 items, in
+// order), Stage Cover Flow +new/edit/-del, Current Char Cover Flow
+// +new/edit/-del, then Pocket in Space Time holding the Starting
+// Loadout 3x2, lined up under Stage / Current Char, and credits with
+// FAQ at the foot. Stage and Current Char are the same size. Loadout
+// dropdowns are fed by the selected character's owned items — never
+// "Option 1".
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -221,62 +221,96 @@ class AliceV9HomePage extends StatelessWidget {
                 charCard,
                 const SizedBox(height: 16),
                 loadout,
+                const SizedBox(height: 16),
+                const _CreditsSection(),
               ],
             ),
           );
         }
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // IntrinsicHeight, not a bare stretch Row: the scroll view
-              // gives this Column infinite height, and a Row with
-              // CrossAxisAlignment.stretch under it tries to fill that
-              // infinite height — "BoxConstraints forces an infinite
-              // height" on first paint, and the never-laid-out boxes
-              // then fail every hit test. IntrinsicHeight measures the
-              // tallest card first, so stretch has a finite height to
-              // fill and Stage / Current Char stay the same height.
-              IntrinsicHeight(
-                child: Row(
-                  // Stretch, not start: Stage and Current Char are the
-                  // same height (preview v2 fix), button rows centred.
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1120),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      width: 270,
-                      child: _JumpRail(
-                        state: state,
-                        onJump: (t) => _jump(context, t),
+                    // IntrinsicHeight, not a bare stretch Row: the scroll view
+                    // gives this Column infinite height, and a Row with
+                    // CrossAxisAlignment.stretch under it tries to fill that
+                    // infinite height — "BoxConstraints forces an infinite
+                    // height" on first paint, and the never-laid-out boxes
+                    // then fail every hit test. IntrinsicHeight measures the
+                    // tallest card first, so stretch has a finite height to
+                    // fill and Stage / Current Char stay the same height.
+                    IntrinsicHeight(
+                      child: Row(
+                        // Stretch, not start: Stage and Current Char are the
+                        // same height (preview v2 fix), button rows centred.
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            width: 240,
+                            child: _JumpRail(
+                              state: state,
+                              onJump: (t) => _jump(context, t),
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(child: stageCard),
+                          const SizedBox(width: 24),
+                          Expanded(child: charCard),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 24),
-                    Expanded(child: stageCard),
-                    const SizedBox(width: 24),
-                    Expanded(child: charCard),
+                    const SizedBox(height: 24),
+                    // Pocket lines up with Stage / Current Char above it, not
+                    // with the whole page: the same 240px Jump rail + 24px gap
+                    // sits to its left, so it gets exactly the Stage+Char
+                    // width. Its centre is their centre, and when it is
+                    // narrower than them (the 1100px cap inside LoadoutCard)
+                    // it is inset by equal margins on both sides.
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 240),
+                        const SizedBox(width: 24),
+                        Expanded(child: loadout),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    const _CreditsSection(),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              // Pocket lines up with Stage / Current Char above it, not
-              // with the whole page: the same 270px Jump rail + 24px gap
-              // sits to its left, so it gets exactly the Stage+Char
-              // width. Its centre is their centre, and when it is
-              // narrower than them (the 1100px cap inside LoadoutCard)
-              // it is inset by equal margins on both sides.
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(width: 270),
-                  const SizedBox(width: 24),
-                  Expanded(child: loadout),
-                ],
-              ),
-            ],
+            ),
           ),
         );
       },
+    );
+  }
+}
+
+/// Credits live here, with FAQ — not in the hero. No names are listed
+/// yet; none are invented here.
+class _CreditsSection extends StatelessWidget {
+  const _CreditsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return const V9Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          V9Heading('credits'),
+          SizedBox(height: 8),
+          V9Muted(
+            'Hardware credits and software credits are kept here, with '
+            'FAQ — no names are listed yet.',
+          ),
+        ],
+      ),
     );
   }
 }
@@ -313,31 +347,14 @@ class _JumpRailState extends State<_JumpRail> {
                 0,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.aliceGreen,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.aliceEdge,
-                    offset: const Offset(0, 3),
-                  ),
-                  BoxShadow(
-                    color: AppColors.pureBlack.withValues(
-                      alpha: _headingHover ? 0.3 : 0.25,
-                    ),
-                    offset: const Offset(0, 5),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
               child: const Text(
                 'jump to',
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.left,
                 style: TextStyle(
                   fontFamily: 'Georgia',
-                  fontSize: 20,
+                  fontSize: 25,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.pureWhite,
+                  color: AppColors.aliceMint,
                 ),
               ),
             ),
@@ -346,6 +363,7 @@ class _JumpRailState extends State<_JumpRail> {
           for (final target in kV9JumpTargets) ...[
             V9Button(
               label: target.toLowerCase(),
+              ghost: true,
               onPressed: () => widget.onJump(target),
             ),
             const SizedBox(height: 12),

@@ -1,13 +1,12 @@
 // Copyright (C) 2026 Front Porch AI
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
-// Alice v9 shell (combined preview v9): the v9 front end in one screen.
-// Banner — hardware credits left, Rabbit Hole / Alice / Follow the
-// White Rabbit centre, software credits right — then the nav row (Home,
-// Model selection, dead space, Char creator, User profile) and the four
-// pages in an IndexedStack, so page state survives switching. This is
-// the v9 front end; the older Alice shell stays reachable from the rail
-// until its own rebuild (see the Verse V note in the Bible checklist).
+// Alice v9 shell, restyled to the Alice Demo Space (2026-11-09, the
+// entire design): the Demo hero — big serif Alice, "Follow the white
+// rabbit.", pitch left, buy-once card right — then the nav row and the
+// four pages in an IndexedStack, so page state survives switching, and
+// the Demo mint bar at the foot. No placeholder credits anywhere: the
+// hero carries no credits, and credits live with FAQ on Home.
 
 import 'package:flutter/material.dart';
 
@@ -51,41 +50,23 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
       listenable: _state,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: AppColors.aliceDeep,
-          appBar: AppBar(
-            backgroundColor: AppColors.aliceDeep,
-            foregroundColor: AppColors.pureWhite,
-            title: const Text(
-              'Alice — v9',
-              style: TextStyle(fontFamily: 'Georgia'),
-            ),
-          ),
+          backgroundColor: AppColors.aliceInk,
           body: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.aliceDeep,
-                  AppColors.aliceDark,
-                  AppColors.aliceDeep,
+                  AppColors.aliceHeroDeep,
+                  AppColors.aliceInk,
+                  AppColors.aliceForest,
                 ],
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(28, 12, 28, 0),
-                  child: Text(
-                    'Home page',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.alicePale,
-                    ),
-                  ),
-                ),
-                _Banner(),
+                _Hero(),
                 _PageNav(state: _state),
                 Expanded(
                   child: IndexedStack(
@@ -98,6 +79,7 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
                     ],
                   ),
                 ),
+                const _MintBar(),
               ],
             ),
           ),
@@ -107,95 +89,190 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
   }
 }
 
-/// The v9 banner: hardware credits left, Rabbit Hole / Alice / Follow
-/// the White Rabbit centre, software credits right.
-class _Banner extends StatelessWidget {
-  const _Banner();
+/// The Demo Space hero: big serif Alice in mint, italic tagline, the
+/// pitch on the left with its fact pills, and the buy-once card on the
+/// right. No credits in the hero — credits live with FAQ on Home.
+class _Hero extends StatelessWidget {
+  const _Hero();
+
+  static const _facts = [
+    'Runs 100% on your machine',
+    'Character chat & roleplay',
+    'Image generation built in',
+    'Voices with text-to-speech',
+    'Open source · AGPL-3.0',
+  ];
+
+  static const _ownPoints = [
+    'Buy it once — never rent it, never subscribe',
+    'Chats stay on your disk, encrypted at rest',
+    'Happy on everyday hardware — an 8 GB graphics card is plenty',
+    'Source is free on GitHub — the \$25 buys the packaged installer',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(28, 12, 28, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.aliceDark, AppColors.aliceGreen],
-        ),
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(16),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.pureBlack.withValues(alpha: 0.25),
-            offset: const Offset(0, 10),
-            blurRadius: 24,
+    final pitch = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Alice',
+          style: TextStyle(
+            fontFamily: 'Georgia',
+            fontSize: 72,
+            fontWeight: FontWeight.w700,
+            height: 0.92,
+            color: AppColors.aliceMint,
+            shadows: [
+              Shadow(
+                color: AppColors.aliceGreen,
+                offset: Offset(0, 6),
+                blurRadius: 34,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: const Row(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  'hardware credits',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.pureWhite,
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          '“Follow the white rabbit.”',
+          style: TextStyle(
+            fontFamily: 'Georgia',
+            fontStyle: FontStyle.italic,
+            fontSize: 28,
+            color: AppColors.aliceSage,
+          ),
+        ),
+        const SizedBox(height: 18),
+        const Text(
+          'Alice is a local-first AI companion for character chat and '
+          'storytelling. The characters, the model, and the conversation '
+          'all live on your own computer — Windows, Mac, or Linux — with '
+          'no account and no cloud in between.',
+          style: TextStyle(fontSize: 18, color: AppColors.aliceLede),
+        ),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final fact in _facts)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: AppColors.aliceMint.withValues(alpha: 0.4),
+                  ),
+                  borderRadius: BorderRadius.circular(999),
+                  color: AppColors.aliceMint.withValues(alpha: 0.08),
+                ),
+                child: Text(
+                  fact,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.aliceMint,
                   ),
                 ),
-                Text(
-                  'Hardware credits, as in your sketch, left of the banner.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.alicePale, fontSize: 16),
-                ),
-              ],
+              ),
+          ],
+        ),
+      ],
+    );
+    final card = Container(
+      padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.aliceSage.withValues(alpha: 0.14),
+            AppColors.aliceSage.withValues(alpha: 0.05),
+          ],
+        ),
+        border: Border.all(
+          color: AppColors.aliceMint.withValues(alpha: 0.3),
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'A program you own',
+            style: TextStyle(
+              fontFamily: 'Georgia',
+              fontSize: 27,
+              fontWeight: FontWeight.w600,
+              color: AppColors.aliceMint,
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Column(
+          const SizedBox(height: 6),
+          const Text(
+            'From Rabbit Hole — software you buy once and keep, the way '
+            'programs used to work.',
+            style: TextStyle(fontSize: 15, color: AppColors.aliceLede),
+          ),
+          const SizedBox(height: 14),
+          for (final point in _ownPoints)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '✓ ',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.aliceMint,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      point,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppColors.aliceSage,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Container(
+            margin: const EdgeInsets.only(top: 9),
+            padding: const EdgeInsets.only(top: 14),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.aliceMint.withValues(alpha: 0.25),
+                ),
+              ),
+            ),
+            child: const Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  'Rabbit Hole',
-                  style: TextStyle(color: AppColors.alicePale, fontSize: 22),
-                ),
-                Text(
-                  'Alice',
+                  '\$25',
                   style: TextStyle(
                     fontFamily: 'Georgia',
-                    fontSize: 44,
+                    fontSize: 34,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.pureWhite,
+                    color: AppColors.aliceMint,
                   ),
                 ),
-                Text(
-                  'Follow the White Rabbit',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.pureWhite,
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'one-time purchase · pay what you want above the '
+                    'minimum on itch.io',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.aliceLede,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  'software credits',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.pureWhite,
-                  ),
-                ),
-                Text(
-                  'Software credits, as in your sketch, right of the banner.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.alicePale, fontSize: 16),
                 ),
               ],
             ),
@@ -203,12 +280,74 @@ class _Banner extends StatelessWidget {
         ],
       ),
     );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 32, 28, 16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 900) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [pitch, const SizedBox(height: 24), card],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(flex: 5, child: pitch),
+              const SizedBox(width: 34),
+              Expanded(flex: 3, child: card),
+            ],
+          );
+        },
+      ),
+    );
   }
 }
 
-/// Nav row between banner and content: Home, Model selection, dead
-/// space, Char creator, User profile. Home is green with white words
-/// when active, like every other nav button in v9.
+/// The Demo Space reverse bar: sage-to-dark mint band at the foot.
+class _MintBar extends StatelessWidget {
+  const _MintBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.aliceSage2,
+            AppColors.aliceSage3,
+            AppColors.aliceInk,
+          ],
+        ),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              'One-time purchase. No subscription, no rent, no cloud.',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.aliceInk,
+              ),
+            ),
+          ),
+          SizedBox(width: 16),
+          Text(
+            'Windows · macOS · Linux   Yours forever',
+            style: TextStyle(fontSize: 15, color: AppColors.aliceSage),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Nav row between hero and content: Home, Model selection, dead
+/// space, Char creator, User profile. Selected page is the Demo
+/// primary button; the rest are Demo ghost buttons.
 class _PageNav extends StatelessWidget {
   final AliceV9State state;
 
@@ -217,13 +356,8 @@ class _PageNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(28, 16, 28, 0),
+      margin: const EdgeInsets.fromLTRB(28, 8, 28, 0),
       padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.aliceGreen, width: 2),
-        ),
-      ),
       child: Row(
         children: [
           _NavButton(
@@ -268,16 +402,11 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Active page: green with a pale outline (preview v9 nav), not an
-    // inverted white button — every nav button stays green/white.
-    final button = V9Button(label: label, small: true, onPressed: onTap);
-    if (!selected) return button;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.alicePale, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: button,
+    return V9Button(
+      label: label,
+      small: true,
+      ghost: !selected,
+      onPressed: onTap,
     );
   }
 }
