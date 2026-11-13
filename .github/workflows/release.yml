@@ -40,9 +40,16 @@ jobs:
           - os: windows-latest
             platform: windows
             build_path: build/windows/x64/runner/Release
-          - os: macos-latest
-            platform: macos
-            build_path: build/macos/Build/Products/Release
+          # Linux-first G1 (2026-11-13): macOS dropped from the matrix until the
+          # Apple signing secrets are set (MACOS_CERTIFICATE,
+          # MACOS_CERTIFICATE_PWD, MACOS_CERTIFICATE_NAME, APPLE_API_KEY etc).
+          # Without them the macOS leg fails at "Import Apple Developer
+          # Certificate" and blocks Publish for Linux + Windows. Re-add the
+          # entry below when the secrets exist; the macOS steps themselves
+          # are unchanged.
+          # - os: macos-latest
+          #   platform: macos
+          #   build_path: build/macos/Build/Products/Release
           - os: ubuntu-22.04
             platform: linux
             asset_name: Front_Porch_AI_Linux.tar.gz
