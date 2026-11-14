@@ -237,6 +237,18 @@ class _AliceWorldsScreenState extends State<AliceWorldsScreen> {
     final theme = Theme.of(context);
     return Row(
       children: [
+        // The way back (Elaina, 2026-11-14): this screen is pushed as a
+        // route from Home, and it had no back button at all — no AppBar,
+        // no system back on desktop — so the only way out was closing
+        // the app. A ghost button, quiet like navigation should be.
+        AliceButton(
+          label: 'Back',
+          icon: Icons.arrow_back_rounded,
+          ghost: true,
+          small: true,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        const SizedBox(width: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Image.asset(
