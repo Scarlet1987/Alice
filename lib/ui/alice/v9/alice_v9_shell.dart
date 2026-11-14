@@ -3,10 +3,12 @@
 //
 // Alice v9 shell, restyled to the Alice Demo Space (2026-11-09, the
 // entire design): the Demo hero — big serif Alice, "Follow the white
-// rabbit.", pitch left, buy-once card right — then the nav row and the
-// four pages in an IndexedStack, so page state survives switching, and
-// the Demo mint bar at the foot. No placeholder credits anywhere: the
-// hero carries no credits, and credits live with FAQ on Home.
+// rabbit.", pitch left, buy-once card right — then the nav row, the
+// current page, and the Demo mint bar at the foot, all in one scroll
+// area (2026-11-14: one document, hero scrolls off the top). Only the
+// current page is built; page state lives in AliceV9State, so switching
+// loses nothing. No placeholder credits anywhere: the hero carries no
+// credits, and credits live with FAQ on Home.
 
 import 'package:flutter/material.dart';
 
@@ -27,6 +29,10 @@ class AliceV9Shell extends StatefulWidget {
 
 class _AliceV9ShellState extends State<AliceV9Shell> {
   late final AliceV9State _state;
+  // The one scroll area (Elaina, 2026-11-14): the shell owns the only
+  // SingleChildScrollView, and the pages bring none of their own.
+  final ScrollController _scrollController = ScrollController();
+  V9Page _lastPage = V9Page.home;
 
   @override
   void initState() {
@@ -40,8 +46,26 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _state.dispose();
     super.dispose();
+  }
+
+  /// The page on screen. Only the current page is built — the old
+  /// IndexedStack kept all four pages (and their four scroll views) in
+  /// the tree at once. Page state lives in [_state] and the repositories,
+  /// not in the page widgets, so nothing is lost by switching this way.
+  Widget _currentPage() {
+    switch (_state.page) {
+      case V9Page.home:
+        return AliceV9HomePage(state: _state);
+      case V9Page.models:
+        return AliceV9ModelsPage(state: _state);
+      case V9Page.creator:
+        return AliceV9CreatorPage(state: _state);
+      case V9Page.profile:
+        return AliceV9ProfilePage(state: _state);
+    }
   }
 
   @override
@@ -49,6 +73,13 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
     return ListenableBuilder(
       listenable: _state,
       builder: (context, _) {
+        // A page switch starts at the top of the new document.
+        if (_state.page != _lastPage) {
+          _lastPage = _state.page;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) _scrollController.jumpTo(0);
+          });
+        }
         return Scaffold(
           backgroundColor: AppColors.aliceInk,
           body: Container(
@@ -65,56 +96,32 @@ class _AliceV9ShellState extends State<AliceV9Shell> {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // The overflow Elaina hit on metal (2026-11-13): a 393px
-                // tall window is shorter than the full hero, so a fixed
-                // Column overflowed by 240px and the content below the
-                // hero was unreachable. In a short window the hero
-                // compacts, and it scrolls inside its own space rather
-                // than overflowing the shell.
+                // One scroll area (Elaina, 2026-11-14): the face does not
+                // change, the action does. Hero, nav, page and mint bar
+                // are one document that scrolls together, like HTML —
+                // the hero scrolls off the top instead of staying pinned
+                // while the page moves under it. There is exactly one
+                // SingleChildScrollView in the shell, and the pages bring
+                // no scroll view of their own, so no nested region can
+                // fight over the wheel (the "hiccups" on metal).
                 //
-                // The scroll is compact-only, on purpose. In a tall
-                // window the hero used to keep its own scroll view too,
-                // so the mouse wheel over the hero scrolled the hero
-                // away (hiding the Alice title) while the page below
-                // stayed put — two scroll regions fighting over one
-                // wheel, and the clipped tops Elaina saw on metal
-                // (2026-11-13). In a tall window the hero is fixed and
-                // the wheel belongs to the page.
+                // A short window still compacts the hero (smaller title
+                // and tagline, fact pills and buy-once checklist hidden),
+                // but the hero no longer scrolls inside its own space —
+                // the whole document scrolls instead, so the 240px
+                // overflow Elaina hit at 1691x393 cannot come back.
                 final compact = constraints.maxHeight < 650;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Tall window: the hero is a plain child that takes
-                    // its natural height, and the page below takes the
-                    // rest. It must NOT sit in a Flexible here — a
-                    // Flexible shares the leftover height 50/50 with the
-                    // page's Expanded, so the hero only got ~300px at
-                    // 1280x720 and its card overflowed by 174px.
-                    // Short window: compact + scrolled in its own space,
-                    // as before.
-                    if (compact)
-                      Flexible(
-                        fit: FlexFit.loose,
-                        child: SingleChildScrollView(
-                          child: _Hero(compact: true),
-                        ),
-                      )
-                    else
-                      const _Hero(),
-                    _PageNav(state: _state),
-                    Expanded(
-                      child: IndexedStack(
-                        index: _state.page.index,
-                        children: [
-                          AliceV9HomePage(state: _state),
-                          AliceV9ModelsPage(state: _state),
-                          AliceV9CreatorPage(state: _state),
-                          AliceV9ProfilePage(state: _state),
-                        ],
-                      ),
-                    ),
-                    const _MintBar(),
-                  ],
+                return SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _Hero(compact: compact),
+                      _PageNav(state: _state),
+                      _currentPage(),
+                      const _MintBar(),
+                    ],
+                  ),
                 );
               },
             ),

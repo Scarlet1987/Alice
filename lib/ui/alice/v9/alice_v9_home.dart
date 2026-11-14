@@ -209,7 +209,7 @@ class AliceV9HomePage extends StatelessWidget {
           characters: loadoutCharacters,
         );
         if (!wide) {
-          return SingleChildScrollView(
+          return Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -227,62 +227,60 @@ class AliceV9HomePage extends StatelessWidget {
             ),
           );
         }
-        return SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1120),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // IntrinsicHeight, not a bare stretch Row: the scroll view
-                    // gives this Column infinite height, and a Row with
-                    // CrossAxisAlignment.stretch under it tries to fill that
-                    // infinite height — "BoxConstraints forces an infinite
-                    // height" on first paint, and the never-laid-out boxes
-                    // then fail every hit test. IntrinsicHeight measures the
-                    // tallest card first, so stretch has a finite height to
-                    // fill and Stage / Current Char stay the same height.
-                    IntrinsicHeight(
-                      child: Row(
-                        // Stretch, not start: Stage and Current Char are the
-                        // same height (preview v2 fix), button rows centred.
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          SizedBox(
-                            width: 240,
-                            child: _JumpRail(
-                              state: state,
-                              onJump: (t) => _jump(context, t),
-                            ),
-                          ),
-                          const SizedBox(width: 24),
-                          Expanded(child: stageCard),
-                          const SizedBox(width: 24),
-                          Expanded(child: charCard),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Pocket lines up with Stage / Current Char above it, not
-                    // with the whole page: the same 240px Jump rail + 24px gap
-                    // sits to its left, so it gets exactly the Stage+Char
-                    // width. Its centre is their centre, and when it is
-                    // narrower than them (the 1100px cap inside LoadoutCard)
-                    // it is inset by equal margins on both sides.
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // IntrinsicHeight, not a bare stretch Row: the scroll view
+                  // gives this Column infinite height, and a Row with
+                  // CrossAxisAlignment.stretch under it tries to fill that
+                  // infinite height — "BoxConstraints forces an infinite
+                  // height" on first paint, and the never-laid-out boxes
+                  // then fail every hit test. IntrinsicHeight measures the
+                  // tallest card first, so stretch has a finite height to
+                  // fill and Stage / Current Char stay the same height.
+                  IntrinsicHeight(
+                    child: Row(
+                      // Stretch, not start: Stage and Current Char are the
+                      // same height (preview v2 fix), button rows centred.
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SizedBox(width: 240),
+                        SizedBox(
+                          width: 240,
+                          child: _JumpRail(
+                            state: state,
+                            onJump: (t) => _jump(context, t),
+                          ),
+                        ),
                         const SizedBox(width: 24),
-                        Expanded(child: loadout),
+                        Expanded(child: stageCard),
+                        const SizedBox(width: 24),
+                        Expanded(child: charCard),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    const _CreditsSection(),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Pocket lines up with Stage / Current Char above it, not
+                  // with the whole page: the same 240px Jump rail + 24px gap
+                  // sits to its left, so it gets exactly the Stage+Char
+                  // width. Its centre is their centre, and when it is
+                  // narrower than them (the 1100px cap inside LoadoutCard)
+                  // it is inset by equal margins on both sides.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 240),
+                      const SizedBox(width: 24),
+                      Expanded(child: loadout),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const _CreditsSection(),
+                ],
               ),
             ),
           ),

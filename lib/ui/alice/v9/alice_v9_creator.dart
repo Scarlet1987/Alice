@@ -76,7 +76,7 @@ class AliceV9CreatorPage extends StatelessWidget {
     return ListenableBuilder(
       listenable: state,
       builder: (context, _) {
-        return SingleChildScrollView(
+        return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -268,16 +268,27 @@ class _NpcExtras extends StatelessWidget {
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.pureBlack),
-          items: const [
-            'Ally',
-            'Villain',
-            'Merchant',
-            'Mentor',
-            'Rival',
-            'Comic relief',
-            'Love interest',
-            'Wildcard',
-          ].map((r) => DropdownMenuItem(value: r, child: Text(r, style: const TextStyle(color: AppColors.pureBlack)))).toList(),
+          items:
+              const [
+                    'Ally',
+                    'Villain',
+                    'Merchant',
+                    'Mentor',
+                    'Rival',
+                    'Comic relief',
+                    'Love interest',
+                    'Wildcard',
+                  ]
+                  .map(
+                    (r) => DropdownMenuItem(
+                      value: r,
+                      child: Text(
+                        r,
+                        style: const TextStyle(color: AppColors.pureBlack),
+                      ),
+                    ),
+                  )
+                  .toList(),
           onChanged: (v) {
             if (v == null) return;
             state.setNpcRole(v);

@@ -41,9 +41,9 @@ class AliceV9ProfilePage extends StatelessWidget {
   Future<void> _save(BuildContext context) async {
     final error = await state.saveUserProfile();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(error ?? 'User profile saved.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(error ?? 'User profile saved.')));
   }
 
   @override
@@ -53,7 +53,7 @@ class AliceV9ProfilePage extends StatelessWidget {
       builder: (context, _) {
         final words = state.bioWordCount;
         final overLimit = words > 300;
-        return SingleChildScrollView(
+        return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -129,9 +129,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                           const SizedBox(height: 4),
                           TextField(
                             controller: state.userRealName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.pureBlack),
                             decoration: InputDecoration(
                               hintText: 'Your real name',
@@ -152,16 +150,12 @@ class AliceV9ProfilePage extends StatelessWidget {
                             options: kV9GenderOptions,
                             customHint: 'Type your gender identity…',
                             value: state.userGender,
-                            onPick: (pick) =>
-                                state.setUserIdentityPick(
-                                  state.userGender,
-                                  pick,
-                                ),
-                            onCustomChanged: (text) =>
-                                state.setUserIdentityCustom(
-                                  state.userGender,
-                                  text,
-                                ),
+                            onPick: (pick) => state.setUserIdentityPick(
+                              state.userGender,
+                              pick,
+                            ),
+                            onCustomChanged: (text) => state
+                                .setUserIdentityCustom(state.userGender, text),
                             saved: state.profileSaved,
                           ),
                           const SizedBox(height: 12),
@@ -174,9 +168,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                             controller: state.userBirthday,
                             readOnly: true,
                             onTap: () => _pickBirthday(context),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.pureBlack),
                             decoration: InputDecoration(
                               hintText: 'Birthday — tap to pick a date',
@@ -197,11 +189,10 @@ class AliceV9ProfilePage extends StatelessWidget {
                             options: kV9PronounOptions,
                             customHint: 'Type your pronouns, e.g. xe/xem…',
                             value: state.userPronouns,
-                            onPick: (pick) =>
-                                state.setUserIdentityPick(
-                                  state.userPronouns,
-                                  pick,
-                                ),
+                            onPick: (pick) => state.setUserIdentityPick(
+                              state.userPronouns,
+                              pick,
+                            ),
                             onCustomChanged: (text) =>
                                 state.setUserIdentityCustom(
                                   state.userPronouns,
@@ -215,9 +206,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   'Bio — about you',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelLarge,
+                                  style: Theme.of(context).textTheme.labelLarge,
                                 ),
                               ),
                               Text(
@@ -226,9 +215,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
                                       color: overLimit
-                                          ? Theme.of(
-                                              context,
-                                            ).colorScheme.error
+                                          ? Theme.of(context).colorScheme.error
                                           : AppColors.alicePale,
                                     ),
                               ),
@@ -240,9 +227,7 @@ class AliceV9ProfilePage extends StatelessWidget {
                             minLines: 4,
                             maxLines: 8,
                             onChanged: (_) => state.bioChanged(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.pureBlack),
                             decoration: InputDecoration(
                               hintText: 'A short bio about you…',
