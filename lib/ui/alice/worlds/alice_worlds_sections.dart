@@ -167,48 +167,42 @@ class _TierSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: onHeaderTap,
-              borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-                child: Row(
-                  children: [
-                    Icon(section.icon, size: 24, color: accent),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            section.title,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                            ),
+          InkWell(
+            onTap: onHeaderTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              child: Row(
+                children: [
+                  Icon(section.icon, size: 24, color: accent),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          section.title,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w700,
                           ),
-                          Text(
-                            section.subtitle,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.hintColor,
-                            ),
+                        ),
+                        Text(
+                          section.subtitle,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.hintColor,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Icon(
-                      open
-                          ? Icons.keyboard_arrow_down_rounded
-                          : Icons.keyboard_arrow_right_rounded,
-                      color: accent,
-                    ),
-                  ],
-                ),
+                  ),
+                  Icon(
+                    open
+                        ? Icons.keyboard_arrow_down_rounded
+                        : Icons.keyboard_arrow_right_rounded,
+                    color: accent,
+                  ),
+                ],
               ),
             ),
           ),
@@ -328,78 +322,75 @@ class _WorldRow extends StatelessWidget {
           ),
         ),
       ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: onSelect,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        world.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (unsorted) ...[
-                      const SizedBox(width: 8),
-                      AliceChip(label: 'Unsorted', color: accent),
-                    ],
-                  ],
-                ),
-                if (description.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
+      child: InkWell(
+        onTap: onSelect,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
                     child: Text(
-                      description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.hintColor,
+                      world.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (unsorted) ...[
+                    const SizedBox(width: 8),
+                    AliceChip(label: 'Unsorted', color: accent),
+                  ],
+                ],
+              ),
+              if (description.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      if (showAddChild)
-                        AliceButton(
-                          label: '+ child',
-                          ghost: true,
-                          small: true,
-                          icon: Icons.add_rounded,
-                          onPressed: onAddChild,
-                        ),
-                      AliceButton(
-                        label: 'edit',
-                        ghost: true,
-                        small: true,
-                        icon: Icons.edit_rounded,
-                        onPressed: onEdit,
-                      ),
-                      AliceDangerButton(
-                        label: 'delete',
-                        icon: Icons.delete_rounded,
-                        onPressed: onDelete,
-                      ),
-                    ],
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.hintColor,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ],
-            ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (showAddChild)
+                      AliceButton(
+                        label: '+ child',
+                        ghost: true,
+                        small: true,
+                        icon: Icons.add_rounded,
+                        onPressed: onAddChild,
+                      ),
+                    AliceButton(
+                      label: 'edit',
+                      ghost: true,
+                      small: true,
+                      icon: Icons.edit_rounded,
+                      onPressed: onEdit,
+                    ),
+                    AliceDangerButton(
+                      label: 'delete',
+                      icon: Icons.delete_rounded,
+                      onPressed: onDelete,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

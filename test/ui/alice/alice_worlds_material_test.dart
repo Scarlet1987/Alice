@@ -75,5 +75,16 @@ void main() {
     await tester.tap(find.text('Universe').last);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+    // The page must sit under a Material: without one, headings that use
+    // plain const TextStyles inherit Flutter's fallback style — red,
+    // monospace, underlined — instead of the theme. (Found 2026-11-13
+    // from Elaina's screenshots: "Worlds", "Stage" and the rule titles
+    // rendered red serif underlined while tier titles rendered normally,
+    // because only the tier sections sat under the wrapped InkWells.)
+    final worldsAmbient = DefaultTextStyle.of(
+      tester.element(find.text('Worlds')),
+    ).style;
+    expect(worldsAmbient.decoration, TextDecoration.none);
+    expect(worldsAmbient.fontFamily, isNot('monospace'));
   });
 }

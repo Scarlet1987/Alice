@@ -178,49 +178,56 @@ class _AliceWorldsScreenState extends State<AliceWorldsScreen> {
     final selected = _selectedWorldId == null
         ? null
         : worlds.where((w) => w.id == _selectedWorldId).firstOrNull;
+    // The whole page needs one Material ancestor: without it, plain
+    // const TextStyles inherit Flutter's fallback style (red, monospace,
+    // underlined) instead of the theme, and InkWells throw. Transparent
+    // so the frosted card and forest keep their look.
     return AliceForestBackground(
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: 18),
-            AliceTranslucentCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildStageHead(context, repo, worlds, selected),
-                  const SizedBox(height: 18),
-                  _buildJumpTo(context),
-                  const SizedBox(height: 18),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth < 800) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Material(
+        type: MaterialType.transparency,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 18),
+              AliceTranslucentCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildStageHead(context, repo, worlds, selected),
+                    const SizedBox(height: 18),
+                    _buildJumpTo(context),
+                    const SizedBox(height: 18),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth < 800) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildRules(context),
+                              const SizedBox(height: 18),
+                              _buildBoard(context, repo, worlds),
+                            ],
+                          );
+                        }
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildRules(context),
-                            const SizedBox(height: 18),
-                            _buildBoard(context, repo, worlds),
+                            SizedBox(width: 300, child: _buildRules(context)),
+                            const SizedBox(width: 18),
+                            Expanded(child: _buildBoard(context, repo, worlds)),
                           ],
                         );
-                      }
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(width: 300, child: _buildRules(context)),
-                          const SizedBox(width: 18),
-                          Expanded(child: _buildBoard(context, repo, worlds)),
-                        ],
-                      );
-                    },
-                  ),
-                ],
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -402,17 +409,14 @@ class _AliceWorldsScreenState extends State<AliceWorldsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: InkWell(
-                      onTap: () => context.read<AppState>().setIndex(2),
-                      child: Text(
-                        'Lore Book lives in creator. The full lore book is '
-                        'in Creator\u2019s World section. Worlds is the '
-                        'place ladder itself.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor,
-                        ),
+                  child: InkWell(
+                    onTap: () => context.read<AppState>().setIndex(2),
+                    child: Text(
+                      'Lore Book lives in creator. The full lore book is '
+                      'in Creator\u2019s World section. Worlds is the '
+                      'place ladder itself.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
                       ),
                     ),
                   ),
