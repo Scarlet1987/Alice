@@ -110,6 +110,7 @@ class AliceV9CreatorPage extends StatelessWidget {
                           onSave: () => _saveMc(context),
                           saveLabel: 'Save main character',
                           creatorSaved: state.creatorSaved,
+                          alignSaveBottom: constraints.maxWidth >= 700,
                         );
                         final npc = _IdentityCard(
                           title: 'name and gender (NPC)',
@@ -134,19 +135,26 @@ class AliceV9CreatorPage extends StatelessWidget {
                           saveLabel: 'Save NPC',
                           creatorSaved: state.creatorSaved,
                           extra: _NpcExtras(state: state),
+                          alignSaveBottom: constraints.maxWidth >= 700,
                         );
                         if (constraints.maxWidth < 700) {
                           return Column(
                             children: [mc, const SizedBox(height: 16), npc],
                           );
                         }
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: mc),
-                            const SizedBox(width: 16),
-                            Expanded(child: npc),
-                          ],
+                        // One skeleton, like Stage / Current Char on Home:
+                        // the row measures the tallest card first, so MC
+                        // and NPC share one height instead of ending
+                        // ragged (continuity, 2026-11-14).
+                        return IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(child: mc),
+                              const SizedBox(width: 16),
+                              Expanded(child: npc),
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -177,6 +185,10 @@ class _IdentityCard extends StatelessWidget {
   final String saveLabel;
   final bool creatorSaved;
   final Widget? extra;
+  // Wide row only: push the save to the card's foot so both saves sit
+  // on one line. False in the narrow stack — a Spacer in an
+  // unbounded-height Column throws.
+  final bool alignSaveBottom;
 
   const _IdentityCard({
     required this.title,
@@ -192,6 +204,7 @@ class _IdentityCard extends StatelessWidget {
     required this.saveLabel,
     required this.creatorSaved,
     this.extra,
+    this.alignSaveBottom = false,
   });
 
   @override
@@ -241,6 +254,7 @@ class _IdentityCard extends StatelessWidget {
             saved: creatorSaved,
           ),
           if (extra != null) ...[const SizedBox(height: 12), extra!],
+          if (alignSaveBottom) const Spacer(),
           const SizedBox(height: 16),
           V9Button(label: saveLabel, onPressed: onSave),
         ],

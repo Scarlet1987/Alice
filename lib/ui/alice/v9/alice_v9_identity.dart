@@ -169,8 +169,11 @@ class _V9IdentityRowState extends State<V9IdentityRow> {
   }
 }
 
-/// One option button: solid green, white words; the picked one inverts
-/// to white with green words and a green outline (preview .sel style).
+/// One option button: unpicked is a ghost (clear, green outline, green
+/// words); the picked one is solid green with white words — the same
+/// picked language as the Home nav and every other selected control
+/// (continuity, 2026-11-14). The old inversion (picked = white with
+/// green words) read backwards against the rest of the face.
 class _OptionButton extends StatelessWidget {
   final String label;
   final bool selected;
@@ -190,13 +193,8 @@ class _OptionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.pureWhite
-              : AppColors.aliceGreen,
-          border: Border.all(
-            color: AppColors.aliceGreen,
-            width: selected ? 3 : 1,
-          ),
+          color: selected ? AppColors.aliceGreen : Colors.transparent,
+          border: Border.all(color: AppColors.aliceGreen, width: 1),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -211,10 +209,9 @@ class _OptionButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: selected
-                ? AppColors.aliceGreen
-                : AppColors.pureWhite,
-            fontFamily: 'Georgia',
+            color: selected ? AppColors.pureWhite : AppColors.aliceGreen,
+            fontFamily: 'Cormorant Garamond',
+            fontFamilyFallback: const ['Georgia'],
           ),
         ),
       ),
