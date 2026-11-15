@@ -6,6 +6,10 @@
 export 'alice_v9_creator.dart';
 export 'alice_v9_creator_measurements.dart';
 export 'alice_v9_creator_personality.dart';
+export 'alice_v9_faq.dart';
+export 'alice_v9_faq_content.dart';
+export 'alice_v9_faq_file.dart';
+export 'alice_v9_faq_widgets.dart';
 export 'alice_v9_home.dart';
 export 'alice_v9_home_cards.dart';
 export 'alice_v9_home_loadout.dart';

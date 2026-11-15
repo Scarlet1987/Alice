@@ -60,6 +60,11 @@ class AppDirectories {
   /// The only bridge to library is the user's explicit "Separate to my library" action.
   Directory get groupsDir => Directory(path.join(rootPath ?? '', 'groups'));
 
+  /// The running feedback file (`alice-feedback-file.md`) lives here —
+  /// user-visible, under the library root, never in the database.
+  Directory get feedbackDir =>
+      Directory(path.join(rootPath ?? '', 'feedback'));
+
   Directory get customBackgroundDir =>
       Directory(path.join(rootPath ?? '', 'custom_backgrounds'));
 

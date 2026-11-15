@@ -19,6 +19,7 @@ import 'package:front_porch_ai/services/storage_service.dart';
 import 'package:front_porch_ai/services/world_repository.dart';
 import 'package:front_porch_ai/ui/alice/alice_worlds.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_state.dart';
+import 'package:front_porch_ai/ui/alice/v9/alice_v9_faq.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_home_cards.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_home_loadout.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_widgets.dart';
@@ -67,10 +68,17 @@ class AliceV9HomePage extends StatelessWidget {
         state.note(
           'World lore — lore lives on the Worlds screen, not on Home.',
         );
+      case 'FAQ definitions':
+        // The FAQ feature (Elaina, 2026-11-14): the policy questions,
+        // the draft guide, and the suggestion box feeding the running
+        // feedback file. Pushed as a route, like the Worlds screen.
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AliceFaqScreen()),
+        );
       default:
-        // FAQ definitions, Benchmark, Start server: not placed yet in
-        // the sketch, and the preview says so rather than inventing a
-        // destination for them.
+        // Benchmark, Start server: not placed yet in the sketch, and
+        // the preview says so rather than inventing a destination
+        // for them.
         state.note(
           '$target — not placed yet in this sketch. Tell me where it goes.',
         );

@@ -85,6 +85,9 @@ class StorageService extends ChangeNotifier {
   Directory get toolsDir => directories.toolsDir;
   Directory get skillsDir => directories.skillsDir;
 
+  /// The user-visible folder holding the running feedback file.
+  Directory get feedbackDir => directories.feedbackDir;
+
   Directory get charactersDir => directories.charactersDir;
 
   /// Directory for all group-private data (decoupled from singular library characters).
