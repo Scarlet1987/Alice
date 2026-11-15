@@ -208,20 +208,15 @@ void main() {
     tester,
   ) async {
     final service = await _pumpFaq(tester);
-    expect(
-      find.text('Everything Alice ships with works — every feature in the '
-          'box does what it says.'),
-      findsNothing,
-    );
+    const doneItem =
+        '•  Everything Alice ships with works — every feature in the '
+        'box does what it says.';
+    expect(find.text(doneItem), findsNothing);
     await tester.ensureVisible(find.text('Out of beta — the v2.0 jump'));
     await tester.tap(find.text('Out of beta — the v2.0 jump'));
     await tester.pumpAndSettle();
     expect(find.text('The out-of-beta test'), findsOneWidget);
-    expect(
-      find.text('Everything Alice ships with works — every feature in the '
-          'box does what it says.'),
-      findsOneWidget,
-    );
+    expect(find.text(doneItem), findsOneWidget);
     expect(service.savedMarkdown, contains('OUT OF BETA'));
     expect(tester.takeException(), isNull);
   });
