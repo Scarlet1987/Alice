@@ -1,0 +1,303 @@
+/* Copyright (C) 2026 Front Porch AI — SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+   Alice FAQ: the v9 face (dark green, Alice green, sage/mint) scoped to
+   this page only — the rest of the web UI keeps the warm-porch theme.
+   Mirrors the Dart FAQ screen (lib/ui/alice/v9/alice_v9_faq.dart):
+   cards, the beta pill, the draft tag, solid picked buttons with ghost
+   unpicked ones, and the form/file split side by side on wide screens.
+*/
+
+.faq-page {
+  --faq-deep: #041f13;
+  --faq-ink: #062e1d;
+  --faq-forest: #0a3d27;
+  --faq-green: #00914f;
+  --faq-mint: #bfeeda;
+  --faq-sage: #dce8dc;
+  --faq-lede: #cddccd;
+  --faq-soft: rgba(220, 232, 220, 0.62);
+  --faq-line: rgba(191, 238, 218, 0.25);
+  max-width: 1120px;
+  background: linear-gradient(var(--faq-deep), var(--faq-ink), var(--faq-forest));
+  color: var(--faq-sage);
+  border-radius: 16px;
+}
+
+.faq-back {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--faq-mint);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.faq-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--faq-mint);
+  margin: 0 0 8px;
+}
+
+.faq-title em {
+  font-style: italic;
+}
+
+.faq-lede {
+  font-size: 1rem;
+  color: var(--faq-lede);
+  margin: 0 0 12px;
+}
+
+.faq-beta-pill {
+  display: inline-block;
+  padding: 6px 13px;
+  border: 1px solid rgba(191, 238, 218, 0.4);
+  border-radius: 999px;
+  background: rgba(191, 238, 218, 0.08);
+  color: var(--faq-mint);
+  font-size: 0.9rem;
+}
+
+.faq-card {
+  background: var(--faq-forest);
+  border: 1px solid var(--faq-line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 18px;
+}
+
+.faq-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.faq-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--faq-mint);
+  margin: 0 0 8px;
+}
+
+.faq-card-head .faq-heading {
+  margin: 0;
+  flex: 1;
+}
+
+.faq-draft-tag {
+  padding: 4px 10px;
+  border: 1px solid rgba(191, 238, 218, 0.4);
+  border-radius: 999px;
+  color: var(--faq-mint);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.faq-muted {
+  color: var(--faq-soft);
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+
+.faq-group-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--faq-mint);
+  margin: 16px 0 2px;
+}
+
+.faq-group-sub {
+  color: var(--faq-soft);
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+.faq-qa {
+  border-bottom: 1px solid rgba(191, 238, 218, 0.25);
+}
+
+.faq-qa-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  color: var(--faq-sage);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-qa-toggle {
+  color: var(--faq-mint);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.faq-qa-a {
+  color: var(--faq-lede);
+  font-size: 0.95rem;
+  margin: 0 0 10px;
+}
+
+.faq-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 899px) {
+  .faq-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faq-field {
+  display: block;
+  margin-top: 14px;
+}
+
+.faq-field-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--faq-sage);
+  margin: 0 0 2px;
+}
+
+.faq-field-question {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--faq-lede);
+}
+
+.faq-field-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--faq-soft);
+  margin-bottom: 4px;
+}
+
+.faq-page input,
+.faq-page textarea,
+.faq-page select {
+  background: rgba(6, 46, 29, 0.55);
+  border: 1px solid var(--faq-line);
+  color: var(--faq-sage);
+}
+
+.faq-page input::placeholder,
+.faq-page textarea::placeholder {
+  color: rgba(220, 232, 220, 0.55);
+}
+
+.faq-page input:focus,
+.faq-page textarea:focus,
+.faq-page select:focus {
+  outline: none;
+  border-color: var(--faq-green);
+}
+
+.faq-kind-row {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 4px;
+}
+
+.faq-btn {
+  background: var(--faq-green);
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq-btn-small {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+.faq-btn-ghost {
+  background: transparent;
+  border-color: var(--faq-green);
+  color: var(--faq-green);
+}
+
+.faq-btn-block {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.faq-note {
+  color: var(--faq-mint);
+  font-size: 0.95rem;
+  margin: 12px 0 0;
+}
+
+.faq-file-meta {
+  color: var(--faq-soft);
+  font-size: 0.9rem;
+  margin: 8px 0 16px;
+}
+
+.faq-done-list {
+  margin: 16px 0 10px;
+}
+
+.faq-done-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--faq-mint);
+  margin: 0 0 8px;
+}
+
+.faq-done-item {
+  color: var(--faq-sage);
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+}
+
+.faq-entry-group {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--faq-mint);
+  margin: 12px 0 8px;
+}
+
+.faq-entry {
+  margin-bottom: 14px;
+}
+
+.faq-entry-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--faq-sage);
+  margin: 0 0 4px;
+}
+
+.faq-entry-line {
+  color: var(--faq-sage);
+  font-size: 0.95rem;
+  margin: 0 0 2px;
+}
+
+.faq-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}

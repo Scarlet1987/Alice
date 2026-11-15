@@ -70,6 +70,7 @@ const ROUTES: ((i: { character: string; story: string }) => string)[] = [
   (i) => `/stories/${i.story}/lore`,
   (i) => `/stories/${i.story}/log`,
   (i) => `/edit/${i.character}`,
+  () => '/faq',
 ];
 
 /**

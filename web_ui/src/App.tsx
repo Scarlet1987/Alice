@@ -16,6 +16,7 @@ import { CharacterEditPage } from './pages/CharacterEditPage';
 import { CreateCharacterPage } from './pages/CreateCharacterPage';
 import { CreateAiCharacterPage } from './pages/CreateAiCharacterPage';
 import { CreateGroupChatPage } from './pages/CreateGroupChatPage';
+import { FaqPage } from './pages/FaqPage';
 import { WorldsPage } from './pages/WorldsPage';
 import { WorldFromWikiPage } from './pages/WorldFromWikiPage';
 import { StoriesPage } from './pages/StoriesPage';
@@ -87,6 +88,7 @@ export function App() {
         <Route path="/models" element={<ModelsPage />} />
         <Route path="/edit/:id" element={<CharacterEditPage />} />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/faq" element={<FaqPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

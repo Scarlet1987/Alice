@@ -16,6 +16,7 @@ const NAV = [
   { to: '/remote', label: 'Remote', icon: '🌐', end: false },
   { to: '/settings', label: 'Settings', icon: '🎛️', end: false },
   { to: '/account', label: 'Account', icon: '⚙️', end: false },
+  { to: '/faq', label: 'FAQ', icon: '❓', end: false },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
