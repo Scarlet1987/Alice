@@ -68,11 +68,17 @@ Future<StorageService> _pumpShell(WidgetTester tester, Size size) async {
 }
 
 
-/// Settles with real async enabled, so the screen's file I/O (load on
-/// open, save on submit) actually completes — plain pumpAndSettle
-/// leaves real-async work pending in the fake-async zone.
-Future<void> _settle(WidgetTester tester) =>
-    tester.runAsync(tester.pumpAndSettle);
+/// Settles after a tap, letting the screen's real file I/O finish: the
+/// load on open (and the save after a submit) only completes once real
+/// time passes — neither plain pumpAndSettle nor runAsync(pumpAndSettle)
+/// flushes it (probe: still 'Loading the file…' after both, loaded
+/// after a real delay + pump).
+Future<void> _settle(WidgetTester tester) async {
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 500)),
+  );
+  await tester.pumpAndSettle();
+}
 
 Future<void> _openFaq(WidgetTester tester) async {
   // The Jump rail sits below the fold at 1280x720 (the hero is tall),
