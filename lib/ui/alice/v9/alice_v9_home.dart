@@ -72,7 +72,7 @@ class AliceV9HomePage extends StatelessWidget {
         // The FAQ feature (Elaina, 2026-11-14): the policy questions,
         // the draft guide, and the suggestion box feeding the running
         // feedback file. Pushed as a route, like the Worlds screen.
-        await Navigator.of(context).push(
+        Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const AliceFaqScreen()),
         );
       default:

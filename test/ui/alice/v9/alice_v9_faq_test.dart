@@ -114,6 +114,7 @@ void main() {
       find.text('Added — it\'s in the file below, under its category.'),
       findsOneWidget,
     );
+    expect(find.text('Chat & replies — 1 entry'), findsOneWidget);
     expect(
       find.text('1. [Request] Replies stop mid-sentence on long chats'),
       findsOneWidget,

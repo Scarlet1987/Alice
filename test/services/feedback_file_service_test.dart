@@ -61,13 +61,15 @@ void main() {
       ]);
       final text = file.renderMarkdown();
       // Chat comes before Voice in file order, even though the Voice
-      // entry arrived first.
+      // entry arrived first. The markdown groups by plain category
+      // headings; the "— N entries" count is the screen's, not the
+      // file's.
+      expect(text, contains('## Chat & replies'));
+      expect(text, contains('## Voice'));
       expect(
         text.indexOf('## Chat & replies'),
         lessThan(text.indexOf('## Voice')),
       );
-      expect(text, contains('Chat & replies — 2 entries'));
-      expect(text, contains('Voice — 1 entry'));
       expect(text, contains('### 1. [Request] Replies stop mid-sentence'));
       expect(text, contains('### 2. [Request] A second chat request'));
       expect(text, contains('### 3. [Request] A slower speaking speed'));
@@ -107,8 +109,13 @@ void main() {
       expect(parsed.fileOpened, DateTime(2026, 11, 15));
       expect(parsed.entries.length, 3);
       expect(parsed.entries[0].kind, FeedbackKind.complaint);
-      expect(parsed.entries[1].who, '');
-      expect(parsed.entries[1].category, 'Voice');
+      // Parsed entries come back in file (grouped) order, not
+      // insertion order: the Voice entry is last in the file.
+      final voice = parsed.entries.firstWhere(
+        (entry) => entry.category == 'Voice',
+      );
+      expect(voice.who, '');
+      expect(voice.what, 'A slower speaking speed');
     });
 
     test('parse is lenient with a hand-edited file', () {
@@ -160,7 +167,10 @@ Entries: 1
 
       final loaded = await service.load();
       expect(loaded.entries.length, 1);
-      expect(loaded.entries.first.what, 'Replies stop mid-sentence');
+      expect(
+        loaded.entries.first.what,
+        'Replies stop mid-sentence on long chats',
+      );
       expect(loaded.entries.first.who, 'Sam R.');
 
       await service.clear();
