@@ -71,11 +71,12 @@ Future<StorageService> _pumpShell(WidgetTester tester, Size size) async {
 /// Settles after a tap, letting the screen's real file I/O finish: the
 /// load on open (and the save after a submit) only completes once real
 /// time passes — neither plain pumpAndSettle nor runAsync(pumpAndSettle)
-/// flushes it (probe: still 'Loading the file…' after both, loaded
-/// after a real delay + pump).
+/// flushes it, and 500ms of real time was not enough under suite load
+/// (probe: still 'Loading the file…' after both settles, loaded after
+/// a real 1s delay + pump).
 Future<void> _settle(WidgetTester tester) async {
   await tester.runAsync(
-    () => Future<void>.delayed(const Duration(milliseconds: 500)),
+    () => Future<void>.delayed(const Duration(seconds: 1)),
   );
   await tester.pumpAndSettle();
 }
