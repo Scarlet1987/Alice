@@ -67,13 +67,20 @@ Future<StorageService> _pumpShell(WidgetTester tester, Size size) async {
   return storage;
 }
 
+
+/// Settles with real async enabled, so the screen's file I/O (load on
+/// open, save on submit) actually completes — plain pumpAndSettle
+/// leaves real-async work pending in the fake-async zone.
+Future<void> _settle(WidgetTester tester) =>
+    tester.runAsync(tester.pumpAndSettle);
+
 Future<void> _openFaq(WidgetTester tester) async {
   // The Jump rail sits below the fold at 1280x720 (the hero is tall),
   // so scroll it into view before tapping — a tap on an off-screen
   // offset throws instead of scrolling.
   await tester.ensureVisible(find.text('faq definitions'));
   await tester.tap(find.text('faq definitions'));
-  await tester.pumpAndSettle();
+  await _settle(tester);
   expect(find.text('Questions, complaints & requests'), findsOneWidget);
 }
 
@@ -93,7 +100,7 @@ void main() {
     expect(find.text('The suggestion box'), findsOneWidget);
     expect(find.text('The running file'), findsOneWidget);
     await tester.tap(find.text('Back'));
-    await tester.pumpAndSettle();
+    await _settle(tester);
     expect(find.text('Questions, complaints & requests'), findsNothing);
     expect(find.text('Alice'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -113,7 +120,7 @@ void main() {
     );
     await tester.ensureVisible(find.text('Add it to the file'));
     await tester.tap(find.text('Add it to the file'));
-    await tester.pumpAndSettle();
+    await _settle(tester);
     expect(
       find.text('Added — it\'s in the file below, under its category.'),
       findsOneWidget,
@@ -141,7 +148,7 @@ void main() {
     await _openFaq(tester);
     await tester.ensureVisible(find.text('Add it to the file'));
     await tester.tap(find.text('Add it to the file'));
-    await tester.pumpAndSettle();
+    await _settle(tester);
     expect(
       find.text(
         'The file needs the What — everything else can be filled in as '
@@ -166,7 +173,7 @@ void main() {
     );
     await tester.ensureVisible(find.text('Out of beta — the v2.0 jump'));
     await tester.tap(find.text('Out of beta — the v2.0 jump'));
-    await tester.pumpAndSettle();
+    await _settle(tester);
     expect(find.text('The out-of-beta test'), findsOneWidget);
     expect(
       find.text('Everything Alice ships with works — every feature in the '
@@ -191,7 +198,7 @@ void main() {
     addTearDown(() => PickerPrefs.testSaveFileOverride = null);
     await tester.ensureVisible(find.text('Download the file'));
     await tester.tap(find.text('Download the file'));
-    await tester.pumpAndSettle();
+    await _settle(tester);
     expect(captured, isNotNull);
     expect(
       utf8.decode(captured!),
