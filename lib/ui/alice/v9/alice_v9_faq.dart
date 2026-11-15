@@ -27,7 +27,16 @@ import 'package:front_porch_ai/ui/widgets/warm_dialog.dart';
 import 'package:front_porch_ai/utils/picker_prefs.dart';
 
 class AliceFaqScreen extends StatefulWidget {
-  const AliceFaqScreen({super.key});
+  const AliceFaqScreen({super.key, this.initialFile, this.service});
+
+  /// A preloaded file, for tests: when given, the screen uses it
+  /// directly instead of loading the file from disk. In production
+  /// this is always null and the screen loads the file itself.
+  final FeedbackFile? initialFile;
+
+  /// The file service, for tests: when given, the screen uses it
+  /// instead of building one from StorageService.
+  final FeedbackFileService? service;
 
   @override
   State<AliceFaqScreen> createState() => _AliceFaqScreenState();
@@ -53,10 +62,17 @@ class _AliceFaqScreenState extends State<AliceFaqScreen> {
   @override
   void initState() {
     super.initState();
-    _service = FeedbackFileService(
-      context.read<StorageService>().feedbackDir,
-    );
-    _load();
+    _service = widget.service ??
+        FeedbackFileService(
+          context.read<StorageService>().feedbackDir,
+        );
+    final initial = widget.initialFile;
+    if (initial != null) {
+      _file = initial;
+      _mark = initial.jumpMark;
+    } else {
+      _load();
+    }
   }
 
   @override
