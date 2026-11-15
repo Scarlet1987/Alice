@@ -2,6 +2,26 @@
 
 These notes feed the in-app "Update Available" dialog for stable releases on `main`.
 
+## v1.0.1
+
+A fix release for v1.0.0. Here is what I have — try it, and let me know what we can change.
+
+**Your existing chats and worlds open again.** If you had Alice installed before, the database could fail to open on first launch. That is fixed — your existing data migrates and opens.
+
+**Worlds page reads right.** Headings no longer show as red error text.
+
+**Worlds has a way back.** The new-world screen now has a Back button, so you can leave it without building or saving anything.
+
+**The whole shell scrolls as one page.** Hero, navigation, page, and the bar at the bottom now move together as a single document.
+
+**Home is symmetrical.** Character cards share one layout, the Jump rail is one straight stack, and the hero and the buy-once card line up at the top.
+
+**Creator reads clean.** Picked options are solid green with white words, and the main-character and non-player cards are the same height, with both Save buttons on one line.
+
+Under the hood: dependencies updated, four unused ones removed, and dead test files cleared out.
+
+Alice is free while it's in beta. Feedback welcome — tell me what to change.
+
 ## v1.5.0 — Revenge of the Kobold
 
 The engine room got rebuilt while you were chatting. Kobold insists you update.
