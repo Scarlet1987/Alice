@@ -68,6 +68,10 @@ Future<StorageService> _pumpShell(WidgetTester tester, Size size) async {
 }
 
 Future<void> _openFaq(WidgetTester tester) async {
+  // The Jump rail sits below the fold at 1280x720 (the hero is tall),
+  // so scroll it into view before tapping — a tap on an off-screen
+  // offset throws instead of scrolling.
+  await tester.ensureVisible(find.text('faq definitions'));
   await tester.tap(find.text('faq definitions'));
   await tester.pumpAndSettle();
   expect(find.text('Questions, complaints & requests'), findsOneWidget);
