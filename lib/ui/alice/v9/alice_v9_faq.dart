@@ -147,7 +147,7 @@ class _AliceFaqScreenState extends State<AliceFaqScreen> {
     }
     setState(() {
       _formError = null;
-      _formNote = 'Added — it\'s in the file below, under its category.';
+      _formNote = 'Added — it\'s in the file, under its category.';
     });
     await _save();
   }

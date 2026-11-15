@@ -168,7 +168,7 @@ void main() {
     final service = await _pumpFaq(tester);
     await _submitWhat(tester, 'Replies stop mid-sentence on long chats');
     expect(
-      find.text('Added — it\'s in the file below, under its category.'),
+      find.text('Added — it\'s in the file, under its category.'),
       findsOneWidget,
     );
     expect(find.text('Chat & replies — 1 entry'), findsOneWidget);
