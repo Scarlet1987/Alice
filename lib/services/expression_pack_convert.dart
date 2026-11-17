@@ -91,10 +91,14 @@ PackConversion convertPackBaseNow(Uint8List raw) {
 }
 
 PackConversion _webp(Uint8List raw) {
+  // The picture size is read from the RIFF chunks first, before any
+  // decoder allocates: a lossy VP8 chunk carries its size in 16 bits a
+  // side (only 14 are the size in the format — the top two are a scale,
+  // and the decoder reads all 16), and a file can carry a small chunk
+  // followed by a huge one. Any chunk over budget is refused as too
+  // large here, with the size as written.
+  _budgetWebpChunks(raw);
   final decoder = img.WebPDecoder();
-  // The header is read by the decoder itself (the last picture chunk wins,
-  // and a lossy picture's size is 16 bits a side), so this is the size it
-  // allocates for.
   final info = decoder.startDecode(raw);
   if (info == null) return const PackConversion.refused(_notPicture);
   if (info.hasAnimation || info.format == img.WebPFormat.animated) {
@@ -107,6 +111,46 @@ PackConversion _webp(Uint8List raw) {
   _budget(info.width, info.height);
   return _finish(decoder.decodeFrame(0));
 }
+
+/// Every size a WebP decoder might allocate for, read from the RIFF chunks:
+/// the VP8X canvas, each lossy VP8 frame's raw 16-bit size, and each
+/// lossless VP8L picture's size. A truncated chunk stops the walk and
+/// leaves the file to the decoder, which refuses it as not a picture.
+void _budgetWebpChunks(Uint8List raw) {
+  var pos = 12;
+  while (pos + 8 <= raw.length) {
+    final type = String.fromCharCodes(raw, pos, pos + 4);
+    final size = _u32(raw, pos + 4);
+    final data = pos + 8;
+    if (data + size > raw.length) break;
+    if (type == 'VP8X' && size >= 10) {
+      _budget(_u24(raw, data + 4) + 1, _u24(raw, data + 7) + 1);
+    } else if (type == 'VP8 ' && size >= 10) {
+      // A real lossy frame starts with its start code; anything else is
+      // not a frame header, and the decoder will say so.
+      if (raw[data + 3] == 0x9D &&
+          raw[data + 4] == 0x01 &&
+          raw[data + 5] == 0x2A) {
+        _budget(_u16(raw, data + 6), _u16(raw, data + 8));
+      }
+    } else if (type == 'VP8L' && size >= 5 && raw[data] == 0x2F) {
+      final packed = _u32(raw, data + 1);
+      _budget((packed & 0x3FFF) + 1, ((packed >> 14) & 0x3FFF) + 1);
+    }
+    pos = data + size + (size.isOdd ? 1 : 0);
+  }
+}
+
+int _u16(Uint8List raw, int at) => raw[at] | (raw[at + 1] << 8);
+
+int _u24(Uint8List raw, int at) =>
+    raw[at] | (raw[at + 1] << 8) | (raw[at + 2] << 16);
+
+int _u32(Uint8List raw, int at) =>
+    raw[at] |
+    (raw[at + 1] << 8) |
+    (raw[at + 2] << 16) |
+    (raw[at + 3] << 24);
 
 void _budget(int width, int height) {
   if (width <= 0 || height <= 0) {

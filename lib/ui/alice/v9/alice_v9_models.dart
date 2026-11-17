@@ -8,12 +8,13 @@
 // a real model file; the asset check only reports what it found — it
 // never pretends an asset played.
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_state.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_models_panes.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_widgets.dart';
+import 'package:front_porch_ai/ui/widgets/guarded_picker.dart';
+import 'package:front_porch_ai/utils/picker_prefs.dart';
 
 class AliceV9ModelsPage extends StatelessWidget {
   final AliceV9State state;
@@ -21,12 +22,15 @@ class AliceV9ModelsPage extends StatelessWidget {
   const AliceV9ModelsPage({super.key, required this.state});
 
   Future<void> _browseModel(BuildContext context, String kind) async {
-    // file_picker 13: static methods on FilePicker, no `.platform`.
-    // pickFiles returns List<PlatformFile> directly (see
-    // lib/utils/picker_prefs.dart) — not a FilePickerResult with .files.
-    final files = await FilePicker.pickFiles(dialogTitle: 'Pick a $kind model');
-    if (files.isEmpty) return;
-    state.pickModelAsset(files.first.name, kind);
+    // GuardedPicker, not a raw FilePicker call: a failed window is
+    // explained instead of throwing past the button (issue #255).
+    final result = await GuardedPicker.pickFiles(
+      context,
+      category: PickerPrefs.catImport,
+      dialogTitle: 'Pick a $kind model',
+    );
+    if (result == null || result.files.isEmpty) return;
+    state.pickModelAsset(result.files.first.name, kind);
   }
 
   void _runAssetCheck() {
