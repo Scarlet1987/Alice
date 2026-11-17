@@ -151,13 +151,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # macOS dropped 2026-11-17 (maintainer call): Apple code signing /
+        # notarization is too painful to keep fighting. The macOS build +
+        # signing steps below stay in the file, dormant (all gated on
+        # matrix.platform == 'macos'), so macOS comes back by re-adding
+        # one matrix line and the .pkg entries in the artifact lists.
         include:
           - os: windows-latest
             platform: windows
             build_path: build/windows/x64/runner/Release
-          - os: macos-latest
-            platform: macos
-            build_path: build/macos/Build/Products/Release
           - os: ubuntu-22.04
             platform: linux
             asset_name: Front_Porch_AI_Nightly-Linux.tar.gz
@@ -678,7 +680,6 @@ jobs:
           name: nightly-${{ matrix.platform }}
           path: |
             Front_Porch_AI_Nightly_Setup.exe
-            Front_Porch_AI_Nightly.pkg
             Front_Porch_AI_Nightly-Linux.AppImage
             Front_Porch_AI_Nightly-Linux.tar.gz
           if-no-files-found: ignore
@@ -748,7 +749,6 @@ jobs:
           generate_release_notes: false
           files: |
             Front_Porch_AI_Nightly_Setup.exe
-            Front_Porch_AI_Nightly.pkg
             Front_Porch_AI_Nightly-Linux.AppImage
             Front_Porch_AI_Nightly-Linux.tar.gz
           body: |
