@@ -230,7 +230,6 @@ void main() {
       contextSize: rig.storage.backendSettings.contextSize,
       useVulkan: false,
       useCublas: false,
-      useMetal: false,
       useRocm: false,
       hardware: rig.kobold.hardwareInfo!(),
       free: rig.kobold.freeBeforeLaunch,

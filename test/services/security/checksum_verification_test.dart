@@ -115,7 +115,7 @@ void main() {
     test('accepts a bare hex digest and the hex-plus-name form', () {
       expect(parseSha256File('${'e' * 64}\n'), 'e' * 64);
       expect(
-        parseSha256File("${'f' * 64}  Tailscale-1.0-macos.pkg\n"),
+        parseSha256File("${'f' * 64}  Tailscale-1.0-linux.deb\n"),
         'f' * 64,
       );
     });
@@ -222,7 +222,7 @@ void main() {
       final hex = 'a' * 64;
       server = await _startServer((req) async {
         if (req.uri.path == '/pkg.sha256') {
-          _respond(req, 200, utf8.encode('$hex  Tailscale-1.0-macos.pkg\n'));
+          _respond(req, 200, utf8.encode('$hex  Tailscale-1.0-linux.deb\n'));
         } else {
           _respond(req, 404, utf8.encode('nope'));
         }
@@ -249,7 +249,7 @@ void main() {
           req.response.statusCode = 302;
           req.response.headers.set(
             'location',
-            'https://example.invalid/stable/Tailscale-1.2.3-macos.pkg',
+            'https://example.invalid/stable/Tailscale-1.2.3-linux.deb',
           );
           await req.response.close();
         } else if (req.uri.path == '/plain') {
@@ -264,7 +264,7 @@ void main() {
           client: client,
           url: _url(server, '/latest'),
         ),
-        Uri.parse('https://example.invalid/stable/Tailscale-1.2.3-macos.pkg'),
+        Uri.parse('https://example.invalid/stable/Tailscale-1.2.3-linux.deb'),
       );
       expect(
         await resolveRedirectTarget(

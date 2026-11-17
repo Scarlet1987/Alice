@@ -54,7 +54,6 @@ class _Running extends KoboldService {
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) async {
     startedModels.add(modelPath);

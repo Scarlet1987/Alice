@@ -169,9 +169,9 @@ void main() {
     });
 
     test('which folders those are, on each OS', () {
-      // macOS is not a supported host: no sensitive home folders there.
+      // Linux has no such folders: those are dot folders there.
       expect(
-        civitaiSensitiveHomeFolders(home: '/Users/a', os: 'macos', env: {}),
+        civitaiSensitiveHomeFolders(home: '/home/a', os: 'linux', env: {}),
         isEmpty,
       );
       expect(

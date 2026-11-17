@@ -73,7 +73,6 @@ class BackendSettings
 
   bool? _useCublas;
   bool? _useVulkan;
-  bool? _useMetal;
   bool? _useRocm;
   bool _flashAttentionEnabled = true;
   bool _mlockEnabled = false; // was on everywhere; pins the model in RAM
@@ -156,7 +155,6 @@ class BackendSettings
 
   bool? get useCublas => _useCublas;
   bool? get useVulkan => _useVulkan;
-  bool? get useMetal => _useMetal;
   bool? get useRocm => _useRocm;
   bool get flashAttentionEnabled => _flashAttentionEnabled;
   bool get mlockEnabled => _mlockEnabled;
@@ -221,7 +219,6 @@ class BackendSettings
 
     _useCublas = prefs?.getBool(k('use_cublas'));
     _useVulkan = prefs?.getBool(k('use_vulkan'));
-    _useMetal = prefs?.getBool(k('use_metal'));
     _useRocm = prefs?.getBool(k('use_rocm'));
     _flashAttentionEnabled =
         prefs?.getBool(k('flash_attention_enabled')) ?? _flashAttentionEnabled;
@@ -481,16 +478,6 @@ class BackendSettings
       await prefs?.setBool(k('use_vulkan'), value);
     } else {
       await prefs?.remove(k('use_vulkan'));
-    }
-    notify();
-  }
-
-  Future<void> setUseMetal(bool? value) async {
-    _useMetal = value;
-    if (value != null) {
-      await prefs?.setBool(k('use_metal'), value);
-    } else {
-      await prefs?.remove(k('use_metal'));
     }
     notify();
   }

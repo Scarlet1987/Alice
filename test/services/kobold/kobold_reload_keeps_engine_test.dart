@@ -79,7 +79,6 @@ class _Kobold extends KoboldService {
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) async {
     starts++;
@@ -93,7 +92,6 @@ class _Kobold extends KoboldService {
       contextSize: contextSize,
       useVulkan: useVulkan,
       useCublas: useCublas,
-      useMetal: useMetal,
       useRocm: useRocm,
     );
   }

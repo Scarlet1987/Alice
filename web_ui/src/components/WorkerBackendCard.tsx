@@ -6,8 +6,6 @@ import { api } from '../api/client';
 import { isLmStudioUrl, urlHasStoredApiKey } from '../remoteApiKeys';
 import { ModelPicker } from './ModelPicker';
 import { type LocalModelFile } from './models/types';
-import { INTEL_MAC_LOCAL_UNSUPPORTED } from '../backendOptions';
-import { useLocalUnsupported } from '../hooks/useLocalUnsupported';
 import {
   kWorkerDualLocalMessage,
   workerBackendIsOff,
@@ -125,11 +123,6 @@ export function WorkerBackendCard({
       .catch(() => setLocalModels([]));
   }, [id]);
 
-  // An Intel Mac host cannot run KoboldCpp: greyed out, as the desktop's
-  // Realism evals host bar does, with its sentence. Asked while the host
-  // picker shows.
-  const localUnsupported = useLocalUnsupported(different);
-
   const onHostChange = (nextId: string) => {
     const opt = HOSTS.find((o) => o.id === nextId);
     if (!opt) return;
@@ -197,21 +190,12 @@ export function WorkerBackendCard({
             >
               {off && <option value="">Choose a host…</option>}
               {visible.map((o) => (
-                <option
-                  key={o.id}
-                  value={o.id}
-                  disabled={o.id === 'kobold' && localUnsupported}
-                >
+                <option key={o.id} value={o.id}>
                   {o.label}
                 </option>
               ))}
             </select>
           </label>
-          {localUnsupported && (
-            <p className="muted small" data-testid="side-jobs-local-unsupported">
-              {INTEL_MAC_LOCAL_UNSUPPORTED}
-            </p>
-          )}
           {!off && sameHost && (
             <p className="muted small" data-testid="side-jobs-same-host-status">
               Realism evals use the chat host above. Pick a model only.

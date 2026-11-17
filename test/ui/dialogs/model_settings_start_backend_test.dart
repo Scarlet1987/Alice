@@ -42,9 +42,6 @@ class _Engine extends ChangeNotifier implements BackendManager {
   bool get isDownloading => false;
 
   @override
-  bool get isIntelMac => false;
-
-  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -164,7 +161,6 @@ void main() {
       userCublas: b.useCublas,
       userVulkan: b.useVulkan,
       userRocm: b.useRocm,
-      userMetal: b.useMetal,
     );
     expect(automatic(), isTrue, reason: 'nothing chosen yet');
 

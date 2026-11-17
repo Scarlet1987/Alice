@@ -222,7 +222,7 @@ class _AliceSetupWizardState extends State<AliceSetupWizard> {
 
   Future<void> _confirmLocalEngine() async {
     final bm = _backendManager();
-    if (bm.backendPath == null && !bm.isIntelMac) {
+    if (bm.backendPath == null) {
       _startDownload();
     } else {
       _go(_WizardStep.imageGen);

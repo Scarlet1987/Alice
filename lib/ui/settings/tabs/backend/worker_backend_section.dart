@@ -71,14 +71,6 @@ class _WorkerBackendSectionState extends State<WorkerBackendSection> {
   Widget build(BuildContext context) {
     final storage = context.watch<StorageService>();
     final llm = context.watch<LLMProvider>();
-    // Dialog goldens / interaction pumps omit BackendManager. Same floor
-    // as ModelManager below — Intel Mac is the only read.
-    var intelMac = false;
-    try {
-      intelMac = Provider.of<BackendManager>(context).isIntelMac;
-    } on ProviderNotFoundException {
-      intelMac = false;
-    }
     final theme = Theme.of(context);
     final muted = AppColors.textTertiary(context);
     final off = workerBackendIsOff(storage.workerBackendType);
@@ -190,7 +182,7 @@ class _WorkerBackendSectionState extends State<WorkerBackendSection> {
                 RemoteProviderBar(
                   selected: kind,
                   noneSelected: off,
-                  koboldEnabled: !intelMac,
+                  koboldEnabled: true,
                   onSelected: (next) async {
                     await applyWorkerProvider(
                       kind: next,

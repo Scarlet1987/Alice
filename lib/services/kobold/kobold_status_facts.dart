@@ -58,7 +58,6 @@ class KoboldStatusFacts {
       cublas: b.useCublas,
       vulkan: b.useVulkan,
       rocm: b.useRocm,
-      metal: b.useMetal,
       gpuId: b.gpuId,
       unified: unified,
     );

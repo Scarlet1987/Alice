@@ -344,7 +344,6 @@ extension LLMProviderWorker on LLMProvider {
         contextSize: _storageService.backendSettings.contextSize,
         useVulkan: _storageService.backendSettings.useVulkan ?? false,
         useCublas: _storageService.backendSettings.useCublas ?? false,
-        useMetal: _storageService.backendSettings.useMetal ?? false,
         useRocm: _storageService.backendSettings.useRocm ?? false,
       );
     } catch (e) {

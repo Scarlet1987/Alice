@@ -242,13 +242,6 @@ void main() {
       expect(prefs.getBool('use_vulkan'), true);
     });
 
-    test('setUseMetal persists to SharedPreferences', () async {
-      final svc = await createStorageService();
-      await svc.backendSettings.setUseMetal(true);
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getBool('use_metal'), true);
-    });
-
     test('setUseRocm persists to SharedPreferences', () async {
       final svc = await createStorageService();
       await svc.backendSettings.setUseRocm(true);

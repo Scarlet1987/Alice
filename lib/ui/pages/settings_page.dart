@@ -96,7 +96,6 @@ class _SettingsPageState extends State<SettingsPage> {
   final _remoteApiKeyController = TextEditingController();
   bool _useVulkan = false;
   bool _useCublas = false;
-  bool _useMetal = false;
   bool _useRocm = false;
   String? _selectedModelPath;
   final TextEditingController _systemPromptController = TextEditingController();
@@ -160,7 +159,6 @@ class _SettingsPageState extends State<SettingsPage> {
     // Default to false if null, logic below handles the "first run" auto-enable
     _useCublas = storage.backendSettings.useCublas == true;
     _useVulkan = storage.backendSettings.useVulkan == true;
-    _useMetal = storage.backendSettings.useMetal == true;
     _useRocm = storage.backendSettings.useRocm == true;
     // Mirror the persisted launch values into the controllers HERE, not only
     // inside _applyHardwareDefaults: that runs only once HardwareService has

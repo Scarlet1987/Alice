@@ -97,24 +97,22 @@ void main() {
     final noCard = find.textContaining('no graphics card it can use');
     await until(card);
 
-    // The chips write all four switches: off, for "CPU only".
+    // The chips write all three switches: off, for "CPU only".
     final b = storage.backendSettings;
     await tester.runAsync(() async {
       await b.setUseCublas(false);
       await b.setUseVulkan(false);
       await b.setUseRocm(false);
-      await b.setUseMetal(false);
     });
     await tester.pump();
     await until(noCard);
     expect(card, findsNothing);
 
-    // "Reset to Automatic" clears all four.
+    // "Reset to Automatic" clears all three.
     await tester.runAsync(() async {
       await b.setUseCublas(null);
       await b.setUseVulkan(null);
       await b.setUseRocm(null);
-      await b.setUseMetal(null);
     });
     await tester.pump();
     await until(card);

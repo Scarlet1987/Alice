@@ -59,7 +59,7 @@ void main() {
     );
     // ROCm is the acceleration flag that was missing; the other three pin the
     // rule rather than the single instance.
-    for (final flag in ['_useRocm', '_useCublas', '_useVulkan', '_useMetal']) {
+    for (final flag in ['_useRocm', '_useCublas', '_useVulkan']) {
       expect(
         body.contains('$flag = storage.'),
         isTrue,

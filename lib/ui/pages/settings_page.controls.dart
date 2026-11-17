@@ -84,19 +84,15 @@ extension _SettingsLaunchControls on _SettingsPageState {
           storage.backendSettings.setUseRocm(true);
           storage.backendSettings.setUseVulkan(false);
           storage.backendSettings.setUseCublas(false);
-          storage.backendSettings.setUseMetal(false);
           _useRocm = true;
           _useVulkan = false;
           _useCublas = false;
-          _useMetal = false;
         } else {
           storage.backendSettings.setUseVulkan(true);
           storage.backendSettings.setUseCublas(false);
-          storage.backendSettings.setUseMetal(false);
           storage.backendSettings.setUseRocm(false);
           _useVulkan = true;
           _useCublas = false;
-          _useMetal = false;
           _useRocm = false;
         }
         changed = true;
@@ -104,9 +100,6 @@ extension _SettingsLaunchControls on _SettingsPageState {
         _useVulkan = storage.backendSettings.useVulkan ?? false;
         if (storage.backendSettings.useCublas != null) {
           _useCublas = storage.backendSettings.useCublas!;
-        }
-        if (storage.backendSettings.useMetal != null) {
-          _useMetal = storage.backendSettings.useMetal!;
         }
         if (storage.backendSettings.useRocm != null) {
           _useRocm = storage.backendSettings.useRocm!;

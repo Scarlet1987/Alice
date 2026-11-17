@@ -48,7 +48,6 @@ Future<List<String>> buildKoboldLaunchArgs({
   required int contextSize,
   required bool useVulkan,
   required bool useCublas,
-  required bool useMetal,
   required bool useRocm,
   HardwareInfo? hardware,
   Future<HardwareInfo?> Function()? awaitHardware,
@@ -67,7 +66,6 @@ Future<List<String>> buildKoboldLaunchArgs({
     contextSize: contextSize,
     useVulkan: useVulkan,
     useCublas: useCublas,
-    useMetal: useMetal,
     useRocm: useRocm,
     hardware: hardware,
     awaitHardware: awaitHardware,
@@ -104,7 +102,6 @@ Future<KoboldStagedRole> stageKoboldRole({
   required int contextSize,
   required bool useVulkan,
   required bool useCublas,
-  required bool useMetal,
   required bool useRocm,
   HardwareInfo? hardware,
   Future<HardwareInfo?> Function()? awaitHardware,
@@ -122,7 +119,6 @@ Future<KoboldStagedRole> stageKoboldRole({
     contextSize: contextSize,
     useVulkan: useVulkan,
     useCublas: useCublas,
-    useMetal: useMetal,
     useRocm: useRocm,
     hardware: hardware,
     awaitHardware: awaitHardware,
@@ -180,7 +176,6 @@ Future<Map<String, dynamic>> koboldLaunchMap({
   required int contextSize,
   required bool useVulkan,
   required bool useCublas,
-  required bool useMetal,
   required bool useRocm,
   HardwareInfo? hardware,
   Future<HardwareInfo?> Function()? awaitHardware,
@@ -231,7 +226,6 @@ Future<Map<String, dynamic>> koboldLaunchMap({
   final (:gpu, :machine) = await _backendFor(
     useVulkan: useVulkan,
     useCublas: useCublas,
-    useMetal: useMetal,
     useRocm: useRocm,
     storage: storage,
     hardware: hardware,
@@ -376,7 +370,6 @@ Future<KoboldLaunchConfig> _tunedForMachine(
 Future<({KoboldBackendChoice gpu, HardwareInfo? machine})> _backendFor({
   required bool useVulkan,
   required bool useCublas,
-  required bool useMetal,
   required bool useRocm,
   required StorageService storage,
   required HardwareInfo? hardware,
@@ -386,7 +379,6 @@ Future<({KoboldBackendChoice gpu, HardwareInfo? machine})> _backendFor({
   final cublas = useCublas ? true : b.useCublas;
   final vulkan = useVulkan ? true : b.useVulkan;
   final rocm = useRocm ? true : b.useRocm;
-  final metal = useMetal ? true : b.useMetal;
   // Only the automatic choice needs to know the card. On a first run
   // detection may still be going; without the wait this launch would be CPU
   // only.
@@ -394,7 +386,6 @@ Future<({KoboldBackendChoice gpu, HardwareInfo? machine})> _backendFor({
     userCublas: cublas,
     userVulkan: vulkan,
     userRocm: rocm,
-    userMetal: metal,
   );
   final machine = hardware ?? (automatic ? await awaitHardware?.call() : null);
   final gpu = koboldBackendFor(
@@ -402,7 +393,6 @@ Future<({KoboldBackendChoice gpu, HardwareInfo? machine})> _backendFor({
     cublas: cublas,
     vulkan: vulkan,
     rocm: rocm,
-    metal: metal,
     gpuId: b.gpuId,
   );
   return (gpu: gpu, machine: machine);

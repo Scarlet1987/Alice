@@ -91,7 +91,6 @@ extension LLMProviderSpeedTest on LLMProvider {
       cublas: b.useCublas,
       vulkan: b.useVulkan,
       rocm: b.useRocm,
-      metal: b.useMetal,
       gpuId: b.gpuId,
     );
     final now = readKcpps(jsonEncode(await _speedTestMap(null)));

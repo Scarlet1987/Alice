@@ -33,13 +33,6 @@ import 'package:front_porch_ai/utils/utils.dart';
 part 'backend_manager.download.dart';
 part 'backend_manager.gate.dart';
 
-/// Said wherever the app would offer KoboldCpp on an Intel Mac, which cannot
-/// run it: the desktop's Backend tab and the phone's Models page (its own
-/// copy in web_ui/src/backendOptions.ts says the same).
-const String kIntelMacLocalUnsupported =
-    'Local inference is not supported on Intel Macs. Only Remote API mode is '
-    'available.';
-
 class BackendManager extends ChangeNotifier {
   final StorageService _storageService;
   bool _isDownloading = false;
@@ -60,11 +53,6 @@ class BackendManager extends ChangeNotifier {
   bool _isCheckingVersion = false;
   String? _versionError;
 
-  /// The processor as `uname -m` names it (`arm64` on Apple Silicon), null
-  /// until it has answered: unknown is never taken for an Intel Mac.
-  String? _arch;
-  final Completer<void> _archRead = Completer<void>();
-
   /// Done once the first look for the engine file and its record is over;
   /// the start-up gate reads [backendPath] only after this.
   final Completer<void> _engineChecked = Completer<void>();
@@ -81,7 +69,7 @@ class BackendManager extends ChangeNotifier {
   // older NVIDIA cards but has NO ROCm; an AMD box on a non-AVX2 CPU therefore
   // runs CPU-side, since the ROCm binary is a standard AVX2 build that would
   // simply crash there). Defaults to true so detection failure never downgrades
-  // a capable machine. (Irrelevant on Apple Silicon; the mac build is arm64.)
+  // a capable machine.
   final bool _hasAvx2 = cpuHasAvx2();
 
   bool get useRocm => _useRocm;
@@ -120,19 +108,6 @@ class BackendManager extends ChangeNotifier {
     return 'v$_localVersion, ${_formatFileSize(_localSize!)}';
   }
 
-  /// KoboldCpp cannot run here: the app says [kIntelMacLocalUnsupported].
-  /// False until the processor is known; listeners hear when it is.
-  bool get isIntelMac => _onMac && _intelCpu;
-
-  bool get _intelCpu => _arch != null && _arch != 'arm64';
-
-  /// Done once the processor is known, or could not be read. What depends
-  /// on it (which engine to download, whether it can run) waits for this.
-  Future<void> get architectureKnown => _archRead.future;
-
-  final bool _onMac;
-  final Future<String?> Function() _readArch;
-
   /// HardwareService, when provided (production wiring in main.providers.dart).
   /// Used for CUDA/ROCm status instead of spawning duplicate nvidia-smi /
   /// rocminfo probes — HardwareService already does that detection once.
@@ -140,17 +115,12 @@ class BackendManager extends ChangeNotifier {
   /// download logic picks the universal nocuda binary).
   final HardwareService? _hardwareService;
 
-  /// [onMac] and [readArch] stand in for the machine in tests.
   /// [hardwareService] supplies CUDA/ROCm status in production (wired in
   /// main.providers.dart) so BackendManager doesn't spawn duplicate probes.
   BackendManager(
     this._storageService, {
-    @visibleForTesting bool? onMac,
-    @visibleForTesting Future<String?> Function()? readArch,
     HardwareService? hardwareService,
-  }) : _onMac = onMac ?? Platform.isMacOS,
-       _readArch = readArch ?? _uname,
-       _hardwareService = hardwareService {
+  }) : _hardwareService = hardwareService {
     // Don't _init() here: _storageService.backendSettings reads null until
     // StorageService finishes loading, so the first init saw useRocm=null
     // (logged false) and the storage-ready notify re-ran it (logged true) —
@@ -202,17 +172,6 @@ class BackendManager extends ChangeNotifier {
         'AG_DEBUG: CPU lacks AVX2 — using KoboldCpp oldpc build '
         '(${_getExecutableName()})',
       );
-    }
-    if (_onMac && !_archRead.isCompleted) {
-      final arch = await _readArch();
-      if (!_archRead.isCompleted) {
-        _arch = arch;
-        _archRead.complete();
-        // The desktop's KoboldCpp section and the phone's status follow it.
-        if (_intelCpu) notifyListeners();
-      }
-    } else if (!_archRead.isCompleted) {
-      _archRead.complete();
     }
     // GPU acceleration status comes from HardwareService (which probes once
     // during its own detection) — no duplicate nvidia-smi spawn here.
@@ -359,12 +318,11 @@ class BackendManager extends ChangeNotifier {
   /// engine (first-launch choice, engine-status chip, model-download trigger,
   /// and every "backend not found" launch path funnel through here). A no-op
   /// whenever downloading would be wrong: engine already installed, download
-  /// already running, a remote/own backend selected, or an Intel Mac.
+  /// already running, or a remote/own backend selected.
   /// Progress rides the existing [isDownloading]/[downloadProgress]/
   /// [statusMessage] notifier fields — callers just fire and forget.
   Future<void> ensureEngineInstalled() async {
-    await architectureKnown;
-    if (_isDownloading || _backendPath != null || isIntelMac) return;
+    if (_isDownloading || _backendPath != null) return;
     await _storageService.initialized;
     final backendType = _storageService.backendSettings.backendType;
     if (backendType == 'openRouter' || backendType == 'omlx') return;
@@ -405,15 +363,4 @@ class BackendManager extends ChangeNotifier {
       );
     }
   }
-}
-
-/// The processor, as `uname -m` names it; null when it cannot be read.
-Future<String?> _uname() async {
-  try {
-    final result = await Process.run('uname', ['-m']);
-    if (result.exitCode == 0) return result.stdout.toString().trim();
-  } on Object catch (e) {
-    debugPrint('[Backend] the processor could not be read: $e');
-  }
-  return null;
 }

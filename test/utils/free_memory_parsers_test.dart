@@ -24,24 +24,6 @@ void main() {
     expect(meminfoAvailableMb('MemTotal: 1 kB\n'), isNull);
   });
 
-  test('vm_stat (macOS): free, inactive, speculative and purgeable pages', () {
-    // As this Mac printed it (16 KB pages).
-    const text =
-        'Mach Virtual Memory Statistics: (page size of 16384 bytes)\n'
-        'Pages free:                                  5635977.\n'
-        'Pages active:                                1014036.\n'
-        'Pages inactive:                              1213251.\n'
-        'Pages speculative:                            106531.\n'
-        'Pages throttled:                                   0.\n'
-        'Pages wired down:                             312038.\n'
-        'Pages purgeable:                               33364.\n';
-    expect(
-      vmStatAvailableMb(text),
-      (5635977 + 1213251 + 106531 + 33364) * 16384 ~/ (1024 * 1024),
-    );
-    expect(vmStatAvailableMb('no header'), isNull);
-  });
-
   test('an AMD card on Linux: total less used', () {
     expect(
       amdFreeMb(totalBytes: '17163091968\n', usedBytes: '37748736\n'),

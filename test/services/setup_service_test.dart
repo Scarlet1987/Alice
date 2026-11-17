@@ -43,12 +43,6 @@ class FakeBackendManager extends ChangeNotifier implements BackendManager {
   int downloadCalls = 0;
 
   @override
-  bool get isIntelMac => false;
-
-  @override
-  Future<void> get architectureKnown => Future.value();
-
-  @override
   String? get backendPath => installedPath;
 
   @override

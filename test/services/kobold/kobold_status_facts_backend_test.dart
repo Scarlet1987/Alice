@@ -55,12 +55,10 @@ Future<void> _chip(
   bool cublas = false,
   bool vulkan = false,
   bool rocm = false,
-  bool metal = false,
 }) async {
   await b.setUseCublas(cublas);
   await b.setUseVulkan(vulkan);
   await b.setUseRocm(rocm);
-  await b.setUseMetal(metal);
 }
 
 /// What the card shows for each context size and the largest that works, as
@@ -139,7 +137,7 @@ void main() {
         facts(storage, nvidia, qwen).lines.first,
         contains('fits on your graphics card'),
       );
-      // The chips write all four switches off for "CPU only".
+      // The chips write all three switches off for "CPU only".
       await _chip(storage.backendSettings);
       final cpu = facts(storage, nvidia, qwen);
       expect(cpu.lines.first, contains('no graphics card it can use'));
@@ -260,7 +258,6 @@ void main() {
             contextSize: b.contextSize,
             useVulkan: b.useVulkan ?? false,
             useCublas: b.useCublas ?? false,
-            useMetal: b.useMetal ?? false,
             useRocm: b.useRocm ?? false,
             hardware: hw,
           );

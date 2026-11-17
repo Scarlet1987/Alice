@@ -77,7 +77,6 @@ typedef RecordedStart = ({
   int layers,
   bool cublas,
   bool vulkan,
-  bool metal,
   bool rocm,
 });
 
@@ -101,7 +100,6 @@ class RecordingKobold extends KoboldService {
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) async {
     starts.add((
@@ -111,7 +109,6 @@ class RecordingKobold extends KoboldService {
       layers: gpuLayers,
       cublas: useCublas,
       vulkan: useVulkan,
-      metal: useMetal,
       rocm: useRocm,
     ));
     return const KoboldLaunchResult.started();
@@ -145,8 +142,6 @@ class ReadyBackendManager extends ChangeNotifier implements BackendManager {
 
   @override
   String? get backendPath => exe;
-  @override
-  bool get isIntelMac => false;
   @override
   String? get error => null;
   @override

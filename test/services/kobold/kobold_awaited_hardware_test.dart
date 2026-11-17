@@ -72,7 +72,6 @@ void main() {
       contextSize: 16384,
       useVulkan: false,
       useCublas: false,
-      useMetal: false,
       useRocm: false,
       hardware: hardware,
       awaitHardware: awaitHardware,

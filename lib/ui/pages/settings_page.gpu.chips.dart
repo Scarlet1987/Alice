@@ -21,7 +21,7 @@ part of 'settings_page.dart';
 /// Context slider, acceleration expander, and GPU backend chips.
 extension _SettingsGpuChips on _SettingsPageState {
   /// Acceleration "just works": a status line showing what automatic mode
-  /// resolved to, with the manual backend chips (Vulkan/ROCm/CUDA/Metal —
+  /// resolved to, with the manual backend chips (Vulkan/ROCm/CUDA —
   /// confusing to most users) tucked into a collapsed Advanced expander.
   Widget _buildAccelerationSection(
     BuildContext context,
@@ -34,13 +34,11 @@ extension _SettingsGpuChips on _SettingsPageState {
       userCublas: bs.useCublas,
       userVulkan: bs.useVulkan,
       userRocm: bs.useRocm,
-      userMetal: bs.useMetal,
     );
     final backend = GpuBackendResolver.resolve(
       userCublas: bs.useCublas,
       userVulkan: bs.useVulkan,
       userRocm: bs.useRocm,
-      userMetal: bs.useMetal,
       hasCuda: hw?.hasCuda ?? false,
       vendor: hw?.vendor ?? 'Unknown',
     );
@@ -74,12 +72,10 @@ extension _SettingsGpuChips on _SettingsPageState {
                   storage.backendSettings.setUseVulkan(null);
                   storage.backendSettings.setUseRocm(null);
                   storage.backendSettings.setUseCublas(null);
-                  storage.backendSettings.setUseMetal(null);
                   rebuildState(() {
                     _useVulkan = false;
                     _useRocm = false;
                     _useCublas = false;
-                    _useMetal = false;
                   });
                 },
                 child: const Text('Reset to Automatic'),
@@ -194,19 +190,17 @@ extension _SettingsGpuChips on _SettingsPageState {
     BuildContext context,
     HardwareService hardwareService,
   ) {
-    // Saves all four switches, not only the one touched: all four off is "CPU
+    // Saves all three switches, not only the one touched: all three off is "CPU
     // only", while any left unset lets the launch pick a GPU on its own.
     void selectBackend({
       bool vulkan = false,
       bool rocm = false,
       bool cublas = false,
-      bool metal = false,
     }) {
       final ss = Provider.of<StorageService>(context, listen: false);
       ss.backendSettings.setUseVulkan(vulkan);
       ss.backendSettings.setUseRocm(rocm);
       ss.backendSettings.setUseCublas(cublas);
-      ss.backendSettings.setUseMetal(metal);
     }
 
     return Wrap(
@@ -222,7 +216,6 @@ extension _SettingsGpuChips on _SettingsPageState {
               if (val) {
                 _useCublas = false;
                 _useRocm = false;
-                _useMetal = false;
               }
             });
             selectBackend(vulkan: val);
@@ -242,7 +235,6 @@ extension _SettingsGpuChips on _SettingsPageState {
                       if (val) {
                         _useVulkan = false;
                         _useCublas = false;
-                        _useMetal = false;
                       }
                     });
                     selectBackend(rocm: val);
@@ -267,7 +259,6 @@ extension _SettingsGpuChips on _SettingsPageState {
                       if (val) {
                         _useVulkan = false;
                         _useRocm = false;
-                        _useMetal = false;
                       }
                     });
                     selectBackend(cublas: val);

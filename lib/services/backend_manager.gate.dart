@@ -106,7 +106,7 @@ extension BackendManagerGate on BackendManager {
   }) async {
     await _storageService.initialized;
     await engineChecked;
-    final installed = _backendPath != null && !isIntelMac;
+    final installed = _backendPath != null;
     if (!installed) return KoboldUpdateGate.nothing;
     final version = await installedVersion();
     if (KoboldBinaryVersion.tooOldProblem(version) != null) {

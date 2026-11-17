@@ -44,7 +44,6 @@ class _Engine extends KoboldService {
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) {
     calls.add('start');
@@ -58,7 +57,6 @@ class _Engine extends KoboldService {
       contextSize: contextSize,
       useVulkan: useVulkan,
       useCublas: useCublas,
-      useMetal: useMetal,
       useRocm: useRocm,
     );
   }

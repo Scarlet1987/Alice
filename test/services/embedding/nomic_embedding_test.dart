@@ -39,8 +39,9 @@ import 'package:front_porch_ai/services/embedding/native_embedding_engine.dart';
 void main() {
   final files = NativeEmbeddingEngine.resolveModelFiles(null);
   // Outside a built app bundle the ORT dylib needs an explicit path
-  // (FP_ORT_LIB, e.g. the onnxruntime_v2 pub-cache package's macos/ copy) —
-  // without it the engine can't load and the test would error, not skip.
+  // (FP_ORT_LIB, e.g. the onnxruntime_v2 pub-cache package's platform
+  // copy) — without it the engine can't load and the test would error,
+  // not skip.
   final ortLib = Platform.environment['FP_ORT_LIB'] ?? '';
   final runnable = files != null && ortLib.isNotEmpty;
 

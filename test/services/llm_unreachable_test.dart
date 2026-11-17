@@ -7,8 +7,9 @@
 // race), and LlmUnavailableException's user-facing toString. The matcher must
 // recognize the same failure across platforms: Windows words
 // connection-refused as "The remote computer refused the network connection"
-// (errno 1225), macOS as "Connection refused" (errno 61), Linux as errno 111.
-// Story pages and the web client surface these errors verbatim.
+// (errno 1225), other platforms as "Connection refused" (errno 61,
+// errno 111 on Linux). Story pages and the web client surface these
+// errors verbatim.
 
 import 'dart:async';
 
@@ -25,7 +26,7 @@ void main() {
       expect(looksLikeBackendUnreachable(Exception(msg)), isTrue);
     });
 
-    test('matches macOS connection-refused wording (errno 61)', () {
+    test('matches connection-refused wording (errno 61)', () {
       const msg =
           'SocketException: Connection refused (OS Error: Connection '
           'refused, errno = 61), address = 127.0.0.1, port = 5001';

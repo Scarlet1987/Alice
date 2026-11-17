@@ -194,9 +194,9 @@ void main() {
   ) async {
     // Everything above proves the CHANNEL answers. This proves the answer
     // reaches a widget: platformSpellCheck() has to hand a service to
-    // EditableText, which has to call it and store the spans. That gate read
-    // `Platform.isMacOS || Platform.isWindows`, so the whole pipeline stayed
-    // dark on Linux even with a working plugin behind it.
+    // EditableText, which has to call it and store the spans. That gate only
+    // enabled it on some platforms, so the whole pipeline stayed dark on
+    // Linux even with a working plugin behind it.
     expect(
       AppTextField.platformSpellCheck(),
       isNotNull,

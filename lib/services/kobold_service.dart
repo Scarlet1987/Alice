@@ -469,7 +469,6 @@ class KoboldService extends ChangeNotifier
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) => _startKobold(
     executablePath,
@@ -481,7 +480,6 @@ class KoboldService extends ChangeNotifier
     contextSize: contextSize,
     useVulkan: useVulkan,
     useCublas: useCublas,
-    useMetal: useMetal,
     useRocm: useRocm,
   );
 

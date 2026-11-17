@@ -37,7 +37,7 @@ class ComfyMachineLayout {
   });
 }
 
-enum ComfyHostOs { mac, windows, linux }
+enum ComfyHostOs { windows, linux }
 
 /// A running Comfy or Automatic1111 process.
 class ComfyProcessSnapshot {
@@ -275,34 +275,6 @@ ComfyMachineLayout comfyMachineLayout({
   ];
   final packages = <String>[];
   switch (os) {
-    case ComfyHostOs.mac:
-      desktop.add(
-        ctx.join(
-          home,
-          'Library',
-          'Application Support',
-          'Comfy Desktop',
-          'instance-model-paths',
-        ),
-      );
-      extras.add(
-        ctx.join(
-          home,
-          'Library',
-          'Application Support',
-          'ComfyUI',
-          'extra_models_config.yaml',
-        ),
-      );
-      packages.add(
-        ctx.join(
-          home,
-          'Library',
-          'Application Support',
-          'StabilityMatrix',
-          'Packages',
-        ),
-      );
     case ComfyHostOs.windows:
       desktop.add(ctx.join(roaming, 'Comfy Desktop', 'instance-model-paths'));
       extras.add(ctx.join(roaming, 'ComfyUI', 'extra_models_config.yaml'));

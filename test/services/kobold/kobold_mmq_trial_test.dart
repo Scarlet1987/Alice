@@ -168,7 +168,6 @@ void main() {
       contextSize: 8192,
       useVulkan: vulkan,
       useCublas: cublas,
-      useMetal: false,
       useRocm: false,
       hardware: nvidia,
     );

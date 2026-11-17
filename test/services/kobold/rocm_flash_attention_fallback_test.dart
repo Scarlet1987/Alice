@@ -81,7 +81,6 @@ void main() {
         contextSize: 8192,
         useVulkan: false,
         useCublas: false,
-        useMetal: false,
         useRocm: true,
       );
 

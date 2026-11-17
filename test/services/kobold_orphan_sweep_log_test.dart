@@ -20,8 +20,8 @@ void main() {
 
   setUp(() async {
     final temp = await Directory.systemTemp.createTemp('fpai sweep log');
-    // Resolved, so the path is the one a process really shows (the macOS
-    // temp folder sits behind a /var -> /private/var link).
+    // Resolved, so the path is the one a process really shows (a temp
+    // folder can sit behind a symlink).
     root = Directory(temp.resolveSymbolicLinksSync());
   });
 

@@ -42,7 +42,6 @@ class EngineStatusChip extends StatelessWidget {
         if (backendType == 'openRouter' || backendType == 'omlx') {
           return const SizedBox.shrink();
         }
-        if (backend.isIntelMac) return const SizedBox.shrink();
         if (!storage.backendSettings.backendChoiceDone) {
           return const SizedBox.shrink();
         }

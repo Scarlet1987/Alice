@@ -22,13 +22,6 @@ import 'package:front_porch_ai/ui/pages/pages.dart';
 import '../../golden/support/fakes.dart';
 import '../../helpers/settings_page_harness.dart';
 
-class _IntelMac extends ReadyBackendManager {
-  _IntelMac(super.exe);
-
-  @override
-  bool get isIntelMac => true;
-}
-
 void main() {
   const pointer =
       'The Local model card, on the Backend tab, shows how your model and '
@@ -98,11 +91,4 @@ void main() {
     expect(oldFigures, findsNothing);
   });
 
-  testWidgets('on an Intel Mac, which has no Local model card, nothing points '
-      'to one', (tester) async {
-    await mount(tester, backend: _IntelMac('koboldcpp'));
-
-    expect(find.text('6 GB of graphics memory.'), findsOneWidget);
-    expect(find.text(pointer), findsNothing);
-  });
 }

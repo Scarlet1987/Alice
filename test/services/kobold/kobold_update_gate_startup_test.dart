@@ -17,8 +17,7 @@ import '../kobold_service_test.dart'
     show createStorageService, setupPathProviderMock;
 
 class _Manager extends BackendManager {
-  _Manager(super.storage)
-    : super(onMac: Platform.isMacOS, readArch: () async => 'arm64');
+  _Manager(super.storage);
   @override
   Future<void> checkForUpdates() async {}
 }
@@ -52,6 +51,5 @@ void main() {
 
 String _executableName() {
   if (Platform.isWindows) return 'koboldcpp.exe';
-  if (Platform.isMacOS) return 'koboldcpp-mac-arm64';
   return 'koboldcpp-linux-x64-nocuda';
 }

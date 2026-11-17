@@ -48,21 +48,8 @@ Future<void> verifyStagedKoboldEngine({
 /// — backend_binary_staging_test calls it.
 extension BackendManagerDownload on BackendManager {
   Future<void> _downloadBackendImpl() async {
-    // Which engine to fetch, and whether one can run here, need the
-    // processor. Waited for first: nothing awaits between the check below
-    // and the download being marked as running.
-    await architectureKnown;
     if (_isDownloading) return;
     if (_storageService.rootPath == null) return;
-
-    // Intel Macs cannot run KoboldCpp (no Metal GPU acceleration)
-    if (isIntelMac) {
-      _error =
-          'Local inference is not supported on Intel Macs. Please use Remote API mode.';
-      _statusMessage = 'Unsupported';
-      notify();
-      return;
-    }
 
     _isDownloading = true;
     _error = null;

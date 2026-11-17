@@ -131,20 +131,6 @@ extension _AliceSetupWizardSteps on _AliceSetupWizardState {
   // ── 3. Download prompt ───────────────────────────────────────────
 
   Widget _downloadPromptStep() {
-    final bm = _backendManager();
-    if (bm.isIntelMac) {
-      return _WizardFrame(
-        title: 'The AI engine',
-        primaryLabel: 'Continue',
-        onPrimary: () => _go(_WizardStep.textEngine),
-        onSkip: _skipAll,
-        child: _body(
-          'This Mac can’t run the built-in engine, so there’s nothing to '
-          'download. You can connect your own AI service later in '
-          'Settings → Backend.',
-        ),
-      );
-    }
     final gpu = _profile == null ? 'your hardware' : _describeGpu(_profile!);
     return _WizardFrame(
       title: 'Would you like to download the AI engine?',
@@ -209,20 +195,6 @@ extension _AliceSetupWizardSteps on _AliceSetupWizardState {
   // ── 5a. Text engine ──────────────────────────────────────────────
 
   Widget _textEngineStep() {
-    final bm = _backendManager();
-    if (bm.isIntelMac) {
-      return _WizardFrame(
-        title: 'Chat engine',
-        primaryLabel: 'Got it',
-        onPrimary: () => _go(_WizardStep.imageGen),
-        onSkip: _skipAll,
-        child: _body(
-          'This powers chat responses. This Mac can’t run the built-in '
-          'engine, so connect your own AI service later in '
-          'Settings → Backend.',
-        ),
-      );
-    }
     final tier = _profile?.capabilityTier;
     final note = tier == 'low'
         ? 'Your computer can run it — Alice will automatically use lighter settings to keep it smooth.'

@@ -78,16 +78,14 @@ extension _SettingsHardware on _SettingsPageState {
   }
 
   /// The card's name and memory. With KoboldCpp, where the model will run
-  /// here, it says where the memory estimate is: on the Local model card,
-  /// which an Intel Mac does not have.
+  /// here, it says where the memory estimate is: on the Local model card.
   Widget _buildHardwareCard(
     BuildContext context,
     HardwareInfo hw,
     LLMProvider llmProvider,
   ) {
     final local =
-        llmProvider.isLocal &&
-        !Provider.of<BackendManager>(context, listen: false).isIntelMac;
+        llmProvider.isLocal;
     final faint = AppColors.textTertiary(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

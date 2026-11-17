@@ -118,15 +118,6 @@ void main() {
         'http://127.0.0.1:${server.port}/koboldcpp',
       );
       addTearDown(manager.dispose);
-      // The Mac's processor is read in the background after start; until
-      // then it counts as an Intel Mac, where no engine is downloaded.
-      for (var i = 0; i < 100 && manager.isIntelMac; i++) {
-        await Future<void>.delayed(const Duration(milliseconds: 20));
-      }
-      if (manager.isIntelMac) {
-        markTestSkipped('KoboldCpp is not downloaded on Intel Macs');
-        return;
-      }
 
       await manager.downloadBackend();
 

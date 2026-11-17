@@ -6,11 +6,11 @@ import 'package:front_porch_ai/services/opencode/opencode.dart';
 
 void main() {
   test('latest download URL is GitHub latest, not brew', () {
-    final url = openCodeLatestDownloadUri(os: 'darwin', arch: 'arm64');
+    final url = openCodeLatestDownloadUri(os: 'windows', arch: 'x64');
     expect(
       url.toString(),
       'https://github.com/anomalyco/opencode/releases/latest/download/'
-      'opencode-darwin-arm64.zip',
+      'opencode-windows-x64.zip',
     );
     expect(url.toString(), isNot(contains('homebrew')));
     expect(
@@ -23,15 +23,7 @@ void main() {
     );
   });
 
-  test('GitHub asset names match Mac zip, Linux tar.gz, Windows zip', () {
-    expect(
-      openCodeReleaseAssetName(os: 'darwin', arch: 'arm64'),
-      'opencode-darwin-arm64.zip',
-    );
-    expect(
-      openCodeReleaseAssetName(os: 'darwin', arch: 'x64'),
-      'opencode-darwin-x64.zip',
-    );
+  test('GitHub asset names match Linux tar.gz, Windows zip', () {
     expect(
       openCodeReleaseAssetName(os: 'linux', arch: 'x64'),
       'opencode-linux-x64.tar.gz',
@@ -53,12 +45,12 @@ void main() {
   test('versioned download URL still names a tag asset', () {
     final url = openCodeDownloadUrl(
       version: '1.19.99',
-      os: 'darwin',
-      arch: 'arm64',
+      os: 'windows',
+      arch: 'x64',
     );
     expect(url, contains('/anomalyco/opencode/releases/download/'));
     expect(url, contains('v1.19.99/'));
-    expect(url, endsWith('opencode-darwin-arm64.zip'));
+    expect(url, endsWith('opencode-windows-x64.zip'));
   });
 
   test('brew and user-config paths are rejected as the product copy', () {

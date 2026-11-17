@@ -133,7 +133,6 @@ void main() {
       contextSize: 16384,
       useVulkan: false,
       useCublas: true,
-      useMetal: false,
       useRocm: false,
       hardware: hardware,
       free: free,

@@ -114,7 +114,6 @@ void main() {
     int contextSize = 8192,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
     HardwareInfo? hardware,
     Future<HardwareInfo?> Function()? awaitHardware,
@@ -130,7 +129,6 @@ void main() {
     contextSize: contextSize,
     useVulkan: useVulkan,
     useCublas: useCublas,
-    useMetal: useMetal,
     useRocm: useRocm,
     hardware: hardware,
     awaitHardware: awaitHardware,
@@ -453,13 +451,12 @@ void main() {
     final blind = staged(await build());
     expect(blind.containsKey('usecublas'), isFalse);
     expect(blind.containsKey('usevulkan'), isFalse);
-  }, skip: Platform.isMacOS ? 'Metal needs no backend setting' : false);
+  });
 
   test('an explicit "CPU only" choice is respected', () async {
     final b = storage.backendSettings;
     await b.setUseCublas(false);
     await b.setUseVulkan(false);
-    await b.setUseMetal(false);
     await b.setUseRocm(false);
     final config = staged(await build(hardware: _nvidia));
     expect(config.containsKey('usecublas'), isFalse);
@@ -494,7 +491,7 @@ void main() {
       );
       expect(asked, 1);
       expect(config['usecuda'], ['normal', '0']);
-    }, skip: Platform.isMacOS ? 'Metal needs no backend setting' : false);
+    });
 
     test('detection that finds nothing leaves the launch on the CPU', () async {
       final config = staged(await build(awaitHardware: () async => null));

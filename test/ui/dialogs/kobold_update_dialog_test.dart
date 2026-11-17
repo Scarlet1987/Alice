@@ -21,8 +21,7 @@ import '../../services/kobold_service_test.dart'
 
 /// The engine download from [url]; the GitHub lookup is seeded instead.
 class _Manager extends BackendManager {
-  _Manager(super.storage, this.url)
-    : super(onMac: Platform.isMacOS, readArch: () async => 'arm64');
+  _Manager(super.storage, this.url);
   final String url;
   @override
   String get engineDownloadUrl => url;
@@ -259,6 +258,5 @@ void main() {
 
 String _executableName() {
   if (Platform.isWindows) return 'koboldcpp.exe';
-  if (Platform.isMacOS) return 'koboldcpp-mac-arm64';
   return 'koboldcpp-linux-x64-nocuda';
 }

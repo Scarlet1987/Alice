@@ -58,7 +58,6 @@ void main() {
       contextSize: 16384,
       useVulkan: false,
       useCublas: true,
-      useMetal: false,
       useRocm: false,
       hardware: HardwareInfo(
         gpuName: 'NVIDIA GeForce RTX 4080',

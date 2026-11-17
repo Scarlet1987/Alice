@@ -80,17 +80,16 @@ void main() {
     });
 
     test('Apple hardware is one pool of memory whatever the switches say', () {
-      for (final switches in <(bool?, bool?, bool?, bool?)>[
-        (null, null, null, null),
-        (false, false, false, false),
-        (false, false, false, true),
+      for (final switches in <(bool?, bool?, bool?)>[
+        (null, null, null),
+        (false, false, false),
+        (false, false, true),
       ]) {
         final c = koboldBackendFor(
           hardware: _apple,
           cublas: switches.$1,
           vulkan: switches.$2,
           rocm: switches.$3,
-          metal: switches.$4,
         );
         expect(c.backend, KoboldGpuBackend.none, reason: '$switches');
         expect(c.memory, KoboldMemoryBackend.metal, reason: '$switches');
@@ -99,7 +98,7 @@ void main() {
     });
 
     test('a backend chosen in Settings is the one that runs, on any card', () {
-      // The chips write all four switches: the chosen one on, the rest off.
+      // The chips write all three switches: the chosen one on, the rest off.
       expect(
         _says(
           koboldBackendFor(
@@ -107,7 +106,6 @@ void main() {
             cublas: false,
             vulkan: false,
             rocm: true,
-            metal: false,
             gpuId: 2,
           ),
         ),
@@ -126,7 +124,6 @@ void main() {
             cublas: false,
             vulkan: true,
             rocm: false,
-            metal: false,
           ),
         ),
         _expect(KoboldGpuBackend.vulkan, KoboldMemoryBackend.vulkan),
@@ -139,7 +136,6 @@ void main() {
             cublas: true,
             vulkan: false,
             rocm: false,
-            metal: false,
           ),
         ),
         _expect(KoboldGpuBackend.cuda, KoboldMemoryBackend.cuda, gpuId: 0),
@@ -152,7 +148,6 @@ void main() {
         cublas: false,
         vulkan: false,
         rocm: false,
-        metal: false,
       );
       expect(c.backend, KoboldGpuBackend.none);
       expect(c.onCard, isFalse);
@@ -168,10 +163,8 @@ void main() {
           userCublas: false,
           userVulkan: null,
           userRocm: null,
-          userMetal: null,
           hasCuda: true,
           vendor: 'Nvidia',
-          onMac: false,
         ),
         GpuBackend.cuda,
         reason: 'the Settings status line says the same',
@@ -279,7 +272,6 @@ void main() {
         cublas: false,
         vulkan: false,
         rocm: false,
-        metal: false,
       ).machineFor(_nvidia, (graphics: 7000, system: 20000));
       expect(cpu.totalGraphicsMb, 0);
       expect(cpu.freeGraphicsMb, 0);
@@ -294,7 +286,6 @@ void main() {
         cublas: false,
         vulkan: false,
         rocm: false,
-        metal: false,
       );
       expect(card.fixedBatch(automatic: true, chosen: 4096), isNull);
       expect(card.fixedBatch(automatic: false, chosen: 4096), 4096);

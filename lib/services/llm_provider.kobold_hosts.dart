@@ -328,7 +328,6 @@ extension LLMProviderKoboldHosts on LLMProvider {
       contextSize: b.contextSize,
       useVulkan: b.useVulkan ?? false,
       useCublas: b.useCublas ?? false,
-      useMetal: b.useMetal ?? false,
       useRocm: b.useRocm ?? false,
       hardware: _koboldService.hardwareInfo?.call(),
       free: _koboldService.freeBeforeLaunch,

@@ -26,8 +26,7 @@ part of 'settings_facade.dart';
 extension SettingsFacadeUpdate on SettingsFacade {
   /// Why [body] must not be stored, in plain words, or null. Asked before
   /// anything is written, so a refused save changes nothing.
-  String? refusal(Map<String, dynamic> body) =>
-      _presetRefusal(body) ?? _intelMacRefusal(body);
+  String? refusal(Map<String, dynamic> body) => _presetRefusal(body);
 
   /// While KoboldCpp runs a preset, the preset's context is the context and
   /// every place that sets it is locked ([koboldPresetOwnsContext], in the
@@ -46,23 +45,6 @@ extension SettingsFacadeUpdate on SettingsFacade {
           kcppsPath: b.activeKcppsPath,
         )
         ? kPresetOwnsContext
-        : null;
-  }
-
-  /// An Intel Mac cannot run KoboldCpp. The desktop greys it out in its chat
-  /// backend and Realism evals host pickers, and says
-  /// [kIntelMacLocalUnsupported]; a save that would switch either one to it
-  /// (an older phone still offers it) is refused in that sentence. A page
-  /// whose backend already is KoboldCpp sends it back with the rest of the
-  /// form, which is not a switch.
-  String? _intelMacRefusal(Map<String, dynamic> body) {
-    bool kobold(Object? type) =>
-        SettingsFacade._parse(type?.toString() ?? '') == BackendType.kobold;
-    final switches =
-        (kobold(body['backend']) && _llm.activeBackend != BackendType.kobold) ||
-        (kobold(body['workerBackend']) && !kobold(_storage.workerBackendType));
-    return switches && _llm.backendManager.isIntelMac
-        ? kIntelMacLocalUnsupported
         : null;
   }
 

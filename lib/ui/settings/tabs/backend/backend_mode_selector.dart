@@ -43,7 +43,6 @@ class BackendModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backendManager = Provider.of<BackendManager>(context);
     final llmProvider = Provider.of<LLMProvider>(context);
     final storage = Provider.of<StorageService>(context);
     final theme = Theme.of(context);
@@ -63,39 +62,6 @@ class BackendModeSelector extends StatelessWidget {
       children: [
         const SectionHeader('Chat speech'),
         const SizedBox(height: 8),
-        // Intel Mac warning banner.
-        if (backendManager.isIntelMac) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: AppColors.taskAccentOf(context).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.taskAccentOf(context).withValues(alpha: 0.4),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  size: 20,
-                  color: AppColors.taskAccentOf(context),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    kIntelMacLocalUnsupported,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.taskAccentOf(context),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -107,7 +73,7 @@ class BackendModeSelector extends StatelessWidget {
             children: [
               RemoteProviderBar(
                 selected: kind,
-                koboldEnabled: !backendManager.isIntelMac,
+                koboldEnabled: true,
                 onSelected: (next) async {
                   await applyRemoteProvider(
                     kind: next,

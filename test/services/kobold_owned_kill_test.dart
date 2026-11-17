@@ -17,17 +17,20 @@ void main() {
   test('an executable\'s pattern is its full path, escaped for pkill and '
       'anchored so it must be the whole first word', () {
     final patterns = koboldOwnedPatterns(
-      '/Users/me/Documents/FrontPorchAI/koboldcpp_bin/koboldcpp-mac-arm64',
+      '/home/me/Documents/FrontPorchAI/koboldcpp_bin/koboldcpp-linux-x64-nocuda',
       isFolder: false,
     );
-    expect(patterns.single, contains('koboldcpp_bin/koboldcpp-mac-arm64'));
+    expect(
+      patterns.single,
+      contains('koboldcpp_bin/koboldcpp-linux-x64-nocuda'),
+    );
     // Never the bare name.
     expect(patterns.single, isNot('koboldcpp'));
     // A dot is a wildcard to pkill unless escaped.
     expect(koboldOwnedPatterns('/a/b.c', isFolder: false), [r'^/a/b\.c( |$)']);
     final exe = RegExp(patterns.single);
     const path =
-        '/Users/me/Documents/FrontPorchAI/koboldcpp_bin/koboldcpp-mac-arm64';
+        '/home/me/Documents/FrontPorchAI/koboldcpp_bin/koboldcpp-linux-x64-nocuda';
     expect(exe.hasMatch('$path --port 5001'), isTrue);
     expect(exe.hasMatch(path), isTrue);
     expect(exe.hasMatch('$path-old --port 5001'), isFalse);
@@ -105,7 +108,7 @@ void main() {
 
     setUp(() async {
       // Resolved, so every spelling below is the one a process really shows
-      // (the macOS temp folder sits behind a /var -> /private/var link).
+      // (a temp folder can sit behind a symlink).
       final temp = await Directory.systemTemp.createTemp('fpai kill (test)');
       root = Directory(temp.resolveSymbolicLinksSync());
       owned = Directory(p.join(root.path, 'koboldcpp_bin'));

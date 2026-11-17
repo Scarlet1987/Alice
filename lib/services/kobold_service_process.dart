@@ -58,7 +58,6 @@ extension KoboldServiceProcess on KoboldService {
       contextSize: b.contextSize,
       useVulkan: b.useVulkan ?? false,
       useCublas: b.useCublas ?? false,
-      useMetal: b.useMetal ?? false,
       useRocm: b.useRocm ?? false,
     );
     if (!started.started) return started;
@@ -79,7 +78,6 @@ extension KoboldServiceProcess on KoboldService {
     int contextSize = 4096,
     bool useVulkan = false,
     bool useCublas = false,
-    bool useMetal = false,
     bool useRocm = false,
   }) async {
     if (_isStarting) return const KoboldLaunchResult.refused(_alreadyStarting);
@@ -137,7 +135,6 @@ extension KoboldServiceProcess on KoboldService {
           contextSize: contextSize,
           useVulkan: useVulkan,
           useCublas: useCublas,
-          useMetal: useMetal,
           useRocm: useRocm,
           hardware: hardwareInfo?.call(),
           // Only asked for on a first run with no backend chosen. It can

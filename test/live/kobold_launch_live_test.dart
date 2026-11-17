@@ -78,7 +78,6 @@ void main() {
       port: port,
       gpuLayers: b.gpuLayers,
       contextSize: b.contextSize,
-      useMetal: Platform.isMacOS,
     );
     await waitForLiveModel(port);
   }

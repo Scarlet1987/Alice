@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Start Backend launches from what is saved. It used to write the page's own
-// copy of the context, the GPU layers and the four acceleration switches
+// copy of the context, the GPU layers and the three acceleration switches
 // into storage first, and that copy is older than the card, the phone and
 // "Reset to Automatic":
 //  - a context chosen on the Local model card was put back to the old one;
-//  - "Reset to Automatic" followed by Start wrote four "off" switches, which
+//  - "Reset to Automatic" followed by Start wrote three "off" switches, which
 //    is "CPU only", not automatic;
 //  - a GPU layer count typed on the Advanced tab was never saved.
 //
@@ -39,7 +39,6 @@ Future<Map<String, dynamic>> stagedConfigFor(
       contextSize: s.context,
       useVulkan: s.vulkan,
       useCublas: s.cublas,
-      useMetal: s.metal,
       useRocm: s.rocm,
       hardware: hardware,
     ),
@@ -52,16 +51,14 @@ GpuBackend resolvedOn(SettingsPageRig rig, HardwareInfo hw) {
     userCublas: b.useCublas,
     userVulkan: b.useVulkan,
     userRocm: b.useRocm,
-    userMetal: b.useMetal,
     hasCuda: hw.hasCuda,
     vendor: hw.vendor,
-    onMac: false,
   );
 }
 
 List<bool?> switchesOf(SettingsPageRig rig) {
   final b = rig.store.backendSettings;
-  return [b.useCublas, b.useVulkan, b.useMetal, b.useRocm];
+  return [b.useCublas, b.useVulkan, b.useRocm];
 }
 
 void main() {
@@ -97,7 +94,7 @@ void main() {
     await openTab(tester, 'Advanced');
     await tapVisible(tester, find.text('Reset to Automatic'));
     await settle(tester);
-    expect(switchesOf(rig), [null, null, null, null]);
+    expect(switchesOf(rig), [null, null, null]);
 
     await openTab(tester, 'Backend');
     await tapVisible(tester, find.text('Start Backend'));
@@ -107,15 +104,14 @@ void main() {
       null,
       null,
       null,
-      null,
-    ], reason: 'Start wrote four "off" switches, which is CPU only');
+    ], reason: 'Start wrote three "off" switches, which is CPU only');
     expect(resolvedOn(rig, nvidiaGtx1060), GpuBackend.cuda);
     final config = await stagedConfigFor(tester, rig, nvidiaGtx1060);
     expect(config.containsKey('usecuda'), isTrue, reason: 'no GPU was staged');
   });
 
   group('turning an acceleration switch off', () {
-    // One machine that offers all four switches, so each can be turned on
+    // One machine that offers all three switches, so each can be turned on
     // and off.
     final everything = HardwareInfo(
       gpuName: 'NVIDIA GeForce RTX 4090',
@@ -127,9 +123,9 @@ void main() {
       hasMetal: true,
     );
     const chips = {
-      'Use Vulkan': [false, true, false, false],
-      'Use ROCm (AMD)': [false, false, false, true],
-      'Use CuBLAS (Nvidia)': [true, false, false, false],
+      'Use Vulkan': [false, true, false],
+      'Use ROCm (AMD)': [false, false, true],
+      'Use CuBLAS (Nvidia)': [true, false, false],
     };
 
     for (final MapEntry(key: label, value: only) in chips.entries) {
@@ -165,8 +161,8 @@ void main() {
         await settle(tester);
         expect(
           switchesOf(rig),
-          [false, false, false, false],
-          reason: '"$label" off means no acceleration: all four are saved off',
+          [false, false, false],
+          reason: '"$label" off means no acceleration: all three are saved off',
         );
 
         await openTab(tester, 'Backend');

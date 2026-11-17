@@ -19,7 +19,7 @@
 import 'dart:io';
 
 /// Which GPU acceleration path KoboldCpp should use.
-enum GpuBackend { cuda, rocm, vulkan, metal, cpu }
+enum GpuBackend { cuda, rocm, vulkan, cpu }
 
 /// THE single source of truth for GPU backend selection — binary choice,
 /// launch flags, .kcpps export, and the settings UI all resolve through
@@ -39,34 +39,25 @@ enum GpuBackend { cuda, rocm, vulkan, metal, cpu }
 ///   override automatically.
 class GpuBackendResolver {
   /// Resolves the active backend from user prefs (null = not set = auto)
-  /// and detected hardware facts. [onMac] says whether the machine is Apple
-  /// hardware when the caller knows better than the platform this runs on
-  /// (null: this platform).
+  /// and detected hardware facts.
   static GpuBackend resolve({
     required bool? userCublas,
     required bool? userVulkan,
     required bool? userRocm,
-    required bool? userMetal,
     required bool hasCuda,
     required String vendor,
-    bool? onMac,
   }) {
     // Explicit choices win, most specific first.
     if (userRocm == true) return GpuBackend.rocm;
     if (userCublas == true) return GpuBackend.cuda;
     if (userVulkan == true) return GpuBackend.vulkan;
-    if (userMetal == true) return GpuBackend.metal;
     // All-false is an explicit "CPU only" choice; all-null is automatic.
-    if (userRocm == false &&
-        userCublas == false &&
-        userVulkan == false &&
-        userMetal == false) {
+    if (userRocm == false && userCublas == false && userVulkan == false) {
       return GpuBackend.cpu;
     }
     return _auto(
       hasCuda: hasCuda,
       vendor: vendor,
-      onMac: onMac ?? false,
     );
   }
 
@@ -75,19 +66,13 @@ class GpuBackendResolver {
     required bool? userCublas,
     required bool? userVulkan,
     required bool? userRocm,
-    required bool? userMetal,
   }) =>
-      userCublas == null &&
-      userVulkan == null &&
-      userRocm == null &&
-      userMetal == null;
+      userCublas == null && userVulkan == null && userRocm == null;
 
   static GpuBackend _auto({
     required bool hasCuda,
     required String vendor,
-    required bool onMac,
   }) {
-    if (onMac) return GpuBackend.metal;
     if (hasCuda) return GpuBackend.cuda;
     if (vendor == 'AMD' || vendor == 'Intel') return GpuBackend.vulkan;
     return GpuBackend.cpu;
@@ -101,8 +86,6 @@ class GpuBackendResolver {
         return 'CUDA (NVIDIA GPU detected)';
       case GpuBackend.vulkan:
         return 'Vulkan ($vendor GPU detected)';
-      case GpuBackend.metal:
-        return 'Metal (Apple Silicon)';
       case GpuBackend.rocm:
         return 'ROCm (expert override)';
       case GpuBackend.cpu:

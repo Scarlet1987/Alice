@@ -332,7 +332,7 @@ void main() {
       () => 'the group to come back after reload',
     );
     // Drive up to two post-reload turns and require the state markers in an
-    // outbound prompt. Two, because the first CI runs (linux + macos) showed a
+    // outbound prompt. Two, because the first CI runs (linux) showed a
     // single-prompt observation is racy on slow runners: the round-robin
     // pointer, the settle timing and the body-capture order can all shift
     // WHICH prompt first carries the injection. The property under test —

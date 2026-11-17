@@ -87,12 +87,7 @@ desktop:
     );
   });
 
-  test('macOS and Linux read Comfy Desktop data dirs', () {
-    final mac = comfyMachineLayout(os: ComfyHostOs.mac, home: '/Users/me');
-    expect(
-      mac.desktopConfigDirs.single,
-      '/Users/me/Library/Application Support/Comfy Desktop/instance-model-paths',
-    );
+  test('Linux reads Comfy Desktop data dirs', () {
     final linux = comfyMachineLayout(os: ComfyHostOs.linux, home: '/home/me');
     expect(
       linux.desktopConfigDirs,
@@ -283,7 +278,7 @@ Future<Directory> _models(Directory root, String name) async {
 
 ComfyMachineLayout _layout(String home, {List<String>? installs}) {
   return ComfyMachineLayout(
-    os: ComfyHostOs.mac,
+    os: ComfyHostOs.linux,
     home: home,
     desktopConfigDirs: const [],
     extraModelConfigFiles: const [],

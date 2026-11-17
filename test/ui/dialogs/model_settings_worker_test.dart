@@ -31,9 +31,6 @@ class _Store extends FakeStorageService {
 
 class _Mgr extends ChangeNotifier implements BackendManager {
   @override
-  bool get isIntelMac => false;
-
-  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

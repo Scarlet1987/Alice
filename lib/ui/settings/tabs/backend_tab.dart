@@ -74,7 +74,6 @@ class BackendTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backendManager = Provider.of<BackendManager>(context);
     final llmProvider = Provider.of<LLMProvider>(context);
 
     return SingleChildScrollView(
@@ -96,7 +95,7 @@ class BackendTab extends StatelessWidget {
                   )
                 : null,
           ),
-          if (llmProvider.hasManagedProcess && !backendManager.isIntelMac)
+          if (llmProvider.hasManagedProcess)
             ManagedBackendSection(
               selectedModelPath: selectedModelPath,
               localPresets: localPresets,

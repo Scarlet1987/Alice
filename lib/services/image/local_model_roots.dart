@@ -22,11 +22,7 @@ const _kWebuiNames = [
 
 /// Layout of the computer this process is running on.
 ComfyMachineLayout currentComfyMachineLayout() {
-  final os = Platform.isWindows
-      ? ComfyHostOs.windows
-      : Platform.isLinux
-      ? ComfyHostOs.linux
-      : ComfyHostOs.mac;
+  final os = Platform.isWindows ? ComfyHostOs.windows : ComfyHostOs.linux;
   final env = Platform.environment;
   return comfyMachineLayout(
     os: os,

@@ -16,8 +16,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Front Porch AI. If not, see <https://www.gnu.org/licenses/>.
 
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:front_porch_ai/services/gpu_backend_resolver.dart';
 
@@ -26,14 +24,12 @@ void main() {
     bool? cublas,
     bool? vulkan,
     bool? rocm,
-    bool? metal,
     bool hasCuda = false,
     String vendor = 'Unknown',
   }) => GpuBackendResolver.resolve(
     userCublas: cublas,
     userVulkan: vulkan,
     userRocm: rocm,
-    userMetal: metal,
     hasCuda: hasCuda,
     vendor: vendor,
   );
@@ -54,7 +50,6 @@ void main() {
         expect(resolve(vendor: 'Unknown'), GpuBackend.cpu);
       });
     },
-    skip: Platform.isMacOS ? 'auto resolves to Metal on macOS' : false,
   );
 
   group('user overrides win', () {
@@ -70,7 +65,6 @@ void main() {
           cublas: false,
           vulkan: false,
           rocm: false,
-          metal: false,
           hasCuda: true,
           vendor: 'Nvidia',
         ),
@@ -83,7 +77,6 @@ void main() {
           userCublas: null,
           userVulkan: null,
           userRocm: null,
-          userMetal: null,
         ),
         isTrue,
       );
@@ -92,7 +85,6 @@ void main() {
           userCublas: null,
           userVulkan: false,
           userRocm: null,
-          userMetal: null,
         ),
         isFalse,
       );

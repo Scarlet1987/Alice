@@ -109,9 +109,9 @@ class KoboldBackendChoice {
 ///
 /// A preset names its own backend: [preset] and [presetGpuId], which the
 /// switches do not override. Otherwise the switches in Settings decide
-/// ([cublas], [vulkan], [rocm] and [metal], null for never chosen, and
+/// ([cublas], [vulkan] and [rocm], null for never chosen, and
 /// [gpuId] the card CUDA names), and with none chosen the detected card
-/// does ([GpuBackendResolver]; "CPU only" is all four set to false).
+/// does ([GpuBackendResolver]; "CPU only" is all three set to false).
 ///
 /// [rocm] counts with a preset too: it says the engine is the ROCm build.
 ///
@@ -122,7 +122,6 @@ KoboldBackendChoice koboldBackendFor({
   bool? cublas,
   bool? vulkan,
   bool? rocm,
-  bool? metal,
   int gpuId = 0,
   bool? unified,
   KoboldGpuBackend? preset,
@@ -141,10 +140,8 @@ KoboldBackendChoice koboldBackendFor({
     userCublas: cublas,
     userVulkan: vulkan,
     userRocm: rocm,
-    userMetal: metal,
     hasCuda: hardware?.hasCuda ?? false,
     vendor: hardware?.vendor ?? 'Unknown',
-    onMac: apple,
   );
   return switch (resolved) {
     // An explicit card id: card 0 can be the integrated chip on a laptop.
@@ -163,8 +160,8 @@ KoboldBackendChoice koboldBackendFor({
       backend: KoboldGpuBackend.vulkan,
       unified: apple,
     ),
-    // Metal is automatic on Apple hardware; CPU needs no setting either.
-    GpuBackend.metal || GpuBackend.cpu => KoboldBackendChoice(
+    // CPU needs no setting.
+    GpuBackend.cpu => KoboldBackendChoice(
       backend: KoboldGpuBackend.none,
       unified: apple,
     ),

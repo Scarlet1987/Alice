@@ -26,30 +26,6 @@ int? meminfoAvailableMb(String text) {
   return kb == null ? null : int.parse(kb.group(1)!) ~/ 1024;
 }
 
-/// `vm_stat` output: free, inactive, speculative and purgeable pages are what
-/// a newly started program can have.
-int? vmStatAvailableMb(String text) {
-  final page = int.tryParse(
-    RegExp(r'page size of (\d+) bytes').firstMatch(text)?.group(1) ?? '',
-  );
-  if (page == null) return null;
-  int pages(String name) =>
-      int.tryParse(
-        RegExp(
-              '^Pages $name:\\s+(\\d+)',
-              multiLine: true,
-            ).firstMatch(text)?.group(1) ??
-            '',
-      ) ??
-      0;
-  final available =
-      pages('free') +
-      pages('inactive') +
-      pages('speculative') +
-      pages('purgeable');
-  return available * page ~/ (1024 * 1024);
-}
-
 /// An AMD card on Linux: the driver's `mem_info_vram_total` and
 /// `mem_info_vram_used`, in bytes.
 int? amdFreeMb({required String totalBytes, required String usedBytes}) {

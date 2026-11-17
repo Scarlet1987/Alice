@@ -94,7 +94,6 @@ void main() {
       port: port,
       gpuLayers: storage.backendSettings.gpuLayers,
       contextSize: storage.backendSettings.contextSize,
-      useMetal: Platform.isMacOS,
     );
     await waitForLiveModel(port);
   }
