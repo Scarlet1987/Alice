@@ -10,7 +10,7 @@
 // against one fixture per dialect — the same functions, no picker.
 //
 // Run it with:
-//   flutter test integration_test/lorebook_chat_test.dart -d macos
+//   flutter test integration_test/lorebook_chat_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

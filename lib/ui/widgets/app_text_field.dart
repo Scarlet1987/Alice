@@ -67,9 +67,8 @@ String? _spanWord(String text, TextRange range) {
 ///
 /// | Platform | Spell check service            |
 /// |----------|-------------------------------|
-/// | macOS    | `NSSpellChecker`              |
 /// | Windows  | Windows Spell Checking API    |
-/// | Linux    | hunspell, compiled into the app             |
+/// | Linux    | hunspell, compiled into the app |
 /// | iOS/Android | OS keyboard handles it (no override needed) |
 ///
 /// This widget only injects [SpellCheckConfiguration] on the three desktop
@@ -152,11 +151,11 @@ class AppTextField extends StatelessWidget {
     // Spell check configuration.
     //
     // Behaviours:
-    //  - `null` (default) → platform default (enabled on Windows/macOS via
+    //  - `null` (default) → platform default (enabled on Windows via
     //    [platformSpellCheck], disabled elsewhere).
     //  - `SpellCheckConfiguration.disabled()` → explicitly disabled.
     //
-    // ⚠️ Do NOT pass `null` to disable spell check on Windows/macOS — it
+    // ⚠️ Do NOT pass `null` to disable spell check on Windows — it
     // will be silently upgraded to the platform default (enabled). Use
     // `SpellCheckConfiguration.disabled()` for explicit opt-out.
     this.spellCheckConfiguration,
@@ -235,15 +234,12 @@ class AppTextField extends StatelessWidget {
   /// Exposed as a static so other widgets that cannot use [AppTextField]
   /// (e.g. [TextFormField] with a `validator`) can reuse the same logic.
   ///
-  /// ## macOS / Windows / Linux
+  /// ## Windows / Linux
   ///
-  /// No explicit [SpellCheckService] is provided. On macOS, Flutter's material
-  /// [TextField.build] routes the config through
-  /// [CupertinoTextField.inferIOSSpellCheckConfiguration], which adds the
-  /// misspelled text style and hands off to the native [FlutterTextInputPlugin]
-  /// (NSSpellChecker). [DefaultSpellCheckService] must NOT be used here —
-  /// its own documentation states it is "currently only supported by Android
-  /// and iOS" and it returns empty results on macOS desktop.
+  /// No explicit [SpellCheckService] is provided. [DefaultSpellCheckService]
+  /// must NOT be used here — its own documentation states it is "currently
+  /// only supported by Android and iOS" and it returns empty results on
+  /// desktop.
   ///
   /// A debug-mode warning about `nativeSpellCheckServiceDefined` may appear
   /// on the first build before the text input plugin activates; this is a
@@ -252,7 +248,6 @@ class AppTextField extends StatelessWidget {
   ///
   /// | Platform | Behaviour                                        |
   /// |----------|--------------------------------------------------|
-  /// | macOS    | Native NSSpellChecker via FlutterTextInputPlugin |
   /// | Windows  | Native Windows Spell Checking API                |
   /// | Linux    | Vendored hunspell + a bundled en_US dictionary   |
   /// | Others   | `null` — spell check disabled                   |
@@ -272,7 +267,7 @@ class AppTextField extends StatelessWidget {
     bool showMisspellings = true,
   }) {
     if (!DesktopSpellCheckService.isEnabled) return null;
-    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isLinux) {
       return SpellCheckConfiguration(
         spellCheckService: DesktopSpellCheckService(),
         misspelledTextStyle: showMisspellings
@@ -382,7 +377,7 @@ class AppTextField extends StatelessWidget {
   ///   3. `null` — no spell check (unsupported platforms)
   ///
   /// **Note:** `null` from the caller does NOT disable spell check — it
-  /// delegates to the platform default (enabled on Windows/macOS).
+  /// delegates to the platform default (enabled on Windows).
   /// Use `SpellCheckConfiguration.disabled()` to explicitly opt out.
   SpellCheckConfiguration? get _resolvedSpellCheck {
     // Explicit caller override always wins — allows both opt-in and opt-out.

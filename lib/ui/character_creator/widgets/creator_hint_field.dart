@@ -14,7 +14,7 @@ import 'package:front_porch_ai/ui/theme/app_colors.dart';
 ///
 /// Stateful only to own the save debounce: on Windows and Linux every
 /// preference write rewrites the whole preferences file on the UI thread,
-/// so a save per keystroke stalled typing (#371; invisible on macOS).
+/// so a save per keystroke stalled typing (#371).
 /// `notify()` stays immediate — it is just a listener callback, and the
 /// Generate button's enabled state rides on it.
 class CreatorHintField extends StatefulWidget {

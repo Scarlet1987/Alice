@@ -19,12 +19,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as p;
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:front_porch_ai/services/security/release_checksums.dart';
-import 'package:front_porch_ai/services/security/verify_sha256.dart';
 
 /// How an install attempt resolved — drives what the tutorial tells the user
 /// to do next.
@@ -64,9 +59,6 @@ class TailscaleInstallResult {
 
 /// "Install Tailscale for me", using each OS's official, blessed mechanism so
 /// we never hand-roll downloads or silently elevate:
-///   • macOS   — the versioned standalone .pkg (the only variant with
-///               `tailscale serve`), verified against its published
-///               `<pkg>.sha256` before the Installer opens it.
 ///   • Windows — winget (downloads + UAC-elevates), else the download page.
 ///   • Linux   — the official package via the native package manager
 ///               (apt/dnf/yum/pacman/zypper under pkexec), else the official
@@ -75,8 +67,6 @@ class TailscaleInstallResult {
 /// The two unavoidable human gates (admin approval, browser sign-in) are OS
 /// security boundaries we deliberately keep, not automate around.
 class TailscaleInstaller {
-  static const String macPkgUrl =
-      'https://pkgs.tailscale.com/stable/Tailscale-latest-macos.pkg';
   static const String wingetId = 'Tailscale.Tailscale';
   static const String linuxCommand =
       'curl -fsSL https://tailscale.com/install.sh | sh';
@@ -84,13 +74,11 @@ class TailscaleInstaller {
       'https://tailscale.com/download/windows';
   static const String linuxDownloadUrl = 'https://tailscale.com/download/linux';
 
-  /// True on the three desktop platforms we can drive an install on.
-  static bool get isSupported =>
-      Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+  /// True on the desktop platforms we can drive an install on.
+  static bool get isSupported => Platform.isWindows || Platform.isLinux;
 
   Future<TailscaleInstallResult> install() async {
     try {
-      if (Platform.isMacOS) return await _installMac();
       if (Platform.isWindows) return await _installWindows();
       if (Platform.isLinux) return await _installLinux();
     } catch (e) {
@@ -98,77 +86,6 @@ class TailscaleInstaller {
       return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
     }
     return const TailscaleInstallResult(TailscaleInstallOutcome.unsupported);
-  }
-
-  /// Resolves the versioned macOS pkg URL behind the `Tailscale-latest-`
-  /// alias (the alias itself publishes no `.sha256`). Returns null when the
-  /// alias does not redirect to a versioned `Tailscale-N.N.N-macos.pkg`.
-  /// [latestUrl] overrides the alias URL; it is a test seam only.
-  @visibleForTesting
-  static Future<Uri?> resolveVersionedMacPkg(
-    http.Client client, {
-    Uri? latestUrl,
-  }) async {
-    final target = await resolveRedirectTarget(
-      client: client,
-      url: latestUrl ?? Uri.parse(macPkgUrl),
-    );
-    if (target == null) return null;
-    if (!RegExp(
-      r'Tailscale-[0-9]+\.[0-9]+\.[0-9]+-macos\.pkg$',
-    ).hasMatch(target.path)) {
-      return null;
-    }
-    return target;
-  }
-
-  Future<TailscaleInstallResult> _installMac() async {
-    // The standalone .pkg (the only variant with `tailscale serve`) is
-    // opened in the Installer so Gatekeeper verifies the signature — but
-    // first the download itself is verified against the hash Tailscale
-    // publishes at `<versioned-pkg-url>.sha256`. The `latest` alias has no
-    // .sha256, so resolve it to the versioned pkg, fetch that pkg's hash,
-    // download the versioned pkg, and verify before opening. Any failure
-    // blocks the install: the unverified file is deleted, never opened.
-    final client = http.Client();
-    try {
-      final pkgUrl = await resolveVersionedMacPkg(client);
-      if (pkgUrl == null) {
-        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
-      }
-      final expected = await fetchSha256FromUrl(
-        client: client,
-        url: Uri.parse('${pkgUrl.toString()}.sha256'),
-      );
-      if (expected == null) {
-        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
-      }
-      final res = await client
-          .get(pkgUrl)
-          .timeout(const Duration(seconds: 120));
-      if (res.statusCode != 200 || res.bodyBytes.isEmpty) {
-        return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
-      }
-      final tmpDir = await Directory.systemTemp.createTemp('fpai_tailscale_');
-      final file = File(p.join(tmpDir.path, p.basename(pkgUrl.path)));
-      await file.writeAsBytes(res.bodyBytes);
-      await VerifySha256.verifyFileOrDelete(
-        file,
-        expected,
-        assetLabel: 'tailscale macOS pkg',
-      );
-      final open = await Process.run('open', [file.path]);
-      return open.exitCode == 0
-          ? const TailscaleInstallResult(
-              TailscaleInstallOutcome.launchedInstaller,
-            )
-          : const TailscaleInstallResult(TailscaleInstallOutcome.failed);
-    } catch (e) {
-      debugPrint('[TailscaleInstaller] mac install error: $e');
-      return const TailscaleInstallResult(TailscaleInstallOutcome.failed);
-    } finally {
-      client.close();
-    }
   }
 
   Future<TailscaleInstallResult> _installWindows() async {

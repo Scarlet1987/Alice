@@ -34,7 +34,6 @@ import 'package:image/image.dart' as img;
 
 import 'package:front_porch_ai/services/grpc/dt_native/draw_things_native_client.dart';
 import 'package:front_porch_ai/services/grpc/dt_native/dt_config_fb.dart';
-import 'package:front_porch_ai/services/grpc/dt_native/dt_fpzip.dart';
 import 'package:front_porch_ai/services/grpc/dt_native/dt_proto.dart';
 import 'package:front_porch_ai/services/grpc/dt_native/dt_tensor.dart';
 
@@ -331,52 +330,6 @@ void main() {
       final p3 = decoded.getPixel(1, 1);
       expect([p3.r, p3.g, p3.b], [px(vals[9]), px(vals[10]), px(vals[11])]);
     });
-  });
-
-  group('dt_fpzip (requires libfpzip; set FP_FPZIP_LIB)', () {
-    final available = DtFpzip.instance.isAvailable;
-
-    test('decompress matches python fpzip', () {
-      final stream = hex(
-        '66707929870ef0ff0002fd000001fe000001fe000000ff0007da25ca666a287dc7'
-        '9ffa3b201001bacdb769f846f55180dbebf400',
-      );
-      final expected = [
-        -1.0, -0.8333333134651184, -0.6666666269302368, -0.5,
-        -0.3333333134651184, -0.1666666865348816, 0.0, 0.16666662693023682,
-        0.3333333730697632, 0.5, 0.6666666269302368, 0.8333333730697632,
-      ];
-      final r = DtFpzip.instance.decompress(stream);
-      expect((r.nf, r.nz, r.ny, r.nx), (1, 2, 2, 3));
-      for (var i = 0; i < expected.length; i++) {
-        expect(r.data[i], closeTo(expected[i], 1e-6));
-      }
-    }, skip: available ? false : 'libfpzip not present in this environment');
-
-    test('decodeGeneratedImage decodes an fpzip NNC payload end to end', () {
-      final payload = hex(
-        '0100000001000000020000000040000000000000010000000200000002000000'
-        '0300000000000000000000000000000000000000000000000000000000000000'
-        '0000000066707929870ef0ff0002fd000001fe000001fe000000ff0007da25ca'
-        '666a287dc79ffa3b201001bacdb769f846f55180dbebf400',
-      );
-      final png = decodeGeneratedImage(payload);
-      final decoded = img.decodePng(png)!;
-      expect(decoded.width, 2);
-      expect(decoded.height, 2);
-      // Expected pixels from the python golden float values (fpzip is
-      // lossless at precision=0, so decode returns numpy's exact f32s).
-      const vals = [
-        -1.0, -0.8333333134651184, -0.6666666269302368, -0.5,
-        -0.3333333134651184, -0.1666666865348816, 0.0, 0.16666662693023682,
-        0.3333333730697632, 0.5, 0.6666666269302368, 0.8333333730697632,
-      ];
-      int px(double v) => ((v + 1.0) * 127.5).clamp(0.0, 255.0).round();
-      final p0 = decoded.getPixel(0, 0);
-      expect([p0.r, p0.g, p0.b], [px(vals[0]), px(vals[1]), px(vals[2])]);
-      final p3 = decoded.getPixel(1, 1);
-      expect([p3.r, p3.g, p3.b], [px(vals[9]), px(vals[10]), px(vals[11])]);
-    }, skip: available ? false : 'libfpzip not present in this environment');
   });
 
   group('sanity', () {

@@ -69,7 +69,6 @@ class TtsService extends ChangeNotifier {
   double _generationProgress = 0.0;
   double _modelDownloadProgress = 0.0;
   bool _isDownloadingModel = false;
-  Process? _afplayProcess; // macOS audio playback process
 
   // Audio cache — keeps the last generated WAV for instant replay
   File? _cachedWav;
@@ -260,9 +259,6 @@ class TtsService extends ChangeNotifier {
     _generationProgress = 0.0;
     _currentMessageId = null;
     _nowSpeaking = null;
-
-    _afplayProcess?.kill();
-    _afplayProcess = null;
 
     await _audioPlayer.stop();
     if (_disposed) return;

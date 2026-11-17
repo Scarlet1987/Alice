@@ -219,14 +219,12 @@ class _InlineChatImageState extends State<InlineChatImage> {
     }
   }
 
-  /// Reveal the image in the platform file manager (Windows/macOS select the
+  /// Reveal the image in the platform file manager (Windows selects the
   /// file; Linux file managers have no portable "select", so open the folder).
   Future<void> _revealInFolder() async {
     try {
       if (Platform.isWindows) {
         await Process.run('explorer', ['/select,', widget.path]);
-      } else if (Platform.isMacOS) {
-        await Process.run('open', ['-R', widget.path]);
       } else {
         await Process.run('xdg-open', [p.dirname(widget.path)]);
       }

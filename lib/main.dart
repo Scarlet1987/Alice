@@ -47,7 +47,6 @@ import 'package:front_porch_ai/ui/window_size_env.dart';
 import 'package:front_porch_ai/ui/alice/v9/alice_v9_shell.dart';
 import 'package:front_porch_ai/ui/alice/alice_setup_wizard.dart';
 import 'package:front_porch_ai/app_version.dart';
-import 'package:front_porch_ai/utils/native_exit.dart';
 import 'package:front_porch_ai/utils/utils.dart' show StartupTrace;
 import 'package:front_porch_ai/database/database.dart';
 // ignore: unused_import — used in the commented-out auto-cleanup block below
@@ -178,18 +177,10 @@ class _MyAppState extends State<MyApp> with WindowListener {
   double? _normalX;
   double? _normalY;
 
-  /// macOS-only hook for Cmd+Q / Dock-quit — see [_onAppExitRequested].
-  AppLifecycleListener? _appExitListener;
-
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
-    if (Platform.isMacOS) {
-      _appExitListener = AppLifecycleListener(
-        onExitRequested: _onAppExitRequested,
-      );
-    }
     // Run migration after first frame, then reunification if needed
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _mark('FIRST FRAME (user sees the app)');
@@ -248,7 +239,6 @@ class _MyAppState extends State<MyApp> with WindowListener {
 
   @override
   void dispose() {
-    _appExitListener?.dispose();
     windowManager.removeListener(this);
     super.dispose();
   }
@@ -298,24 +288,8 @@ class _MyAppState extends State<MyApp> with WindowListener {
     _saveStateAndShutdown();
   }
 
-  /// Cmd+Q / Dock "Quit" (macOS): AppKit asks the framework for a cancelable
-  /// app exit BEFORE terminating. Without this hook the default answer lets
-  /// [NSApp terminate:] proceed straight into libc exit() and the native-
-  /// finalizer abort — so quitting via Cmd+Q kept producing crash reports
-  /// even with the red-button path fixed. Run the same cleanup instead; it
-  /// ends in exitWithoutNativeFinalizers, so the response is never sent.
-  Future<AppExitResponse> _onAppExitRequested() async {
-    if (_shutdownStarted) {
-      // A close is already in flight and will _exit when done — refuse this
-      // termination so the engine can't race our cleanup with its teardown.
-      return AppExitResponse.cancel;
-    }
-    await _saveStateAndShutdown();
-    return AppExitResponse.exit; // unreachable on macOS
-  }
-
   /// True once a shutdown path has started — makes close requests
-  /// idempotent (red button + Cmd+Q can both fire in one quit).
+  /// idempotent.
   bool _shutdownStarted = false;
 
   @override

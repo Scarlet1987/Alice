@@ -21,7 +21,7 @@ This guide walks you from a fresh install to your first conversation. No technic
 
 ## What Is Front Porch AI?
 
-Front Porch AI is a desktop app for Windows, macOS, and Linux that lets you chat, roleplay, and tell stories with AI characters — with everything running on *your* machine.
+Front Porch AI is a desktop app for Windows and Linux that lets you chat, roleplay, and tell stories with AI characters — with everything running on *your* machine.
 
 Out of the box, the app runs AI models locally, so your conversations never leave your computer. If you'd rather use a big cloud model instead, you can connect services like OpenRouter — but that's always your choice, never the default.
 
@@ -47,7 +47,7 @@ Front Porch AI runs on a wide range of hardware. A gaming PC is great; a modest 
 
 | | Minimum | Recommended |
 |---|---|---|
-| **Operating system** | Windows 10, macOS 13.3 Ventura, or a recent Linux distro | The latest stable release of your OS |
+| **Operating system** | Windows 10 or a recent Linux distro | The latest stable release of your OS |
 | **Memory (RAM)** | 8 GB | 16 GB or more |
 | **Graphics card** | Optional — the app can run on your CPU alone | A GPU with 8 GB+ of VRAM (its own memory), or an Apple Silicon Mac |
 | **Disk space** | 10 GB free | 50 GB+ if you want room for several AI models and voices |
@@ -68,7 +68,7 @@ Front Porch AI runs on a wide range of hardware. A gaming PC is great; a modest 
 The short version:
 
 1. Go to the [Releases page](https://github.com/linux4life1/front-porch-AI/releases).
-2. Download the latest **stable** build — `.exe` installer for Windows, `.pkg` installer for macOS (signed & Apple-notarized, so Gatekeeper opens it without a fuss), `.AppImage` / `.deb` / `.rpm` for Linux.
+2. Download the latest **stable** build — `.exe` installer for Windows, `.AppImage` / `.deb` / `.rpm` for Linux.
 3. Install and launch it.
 
 On Linux you can also install through your package manager (recommended — updates arrive automatically). Full instructions for every platform, including package-manager setup, are in the **[Installation Guide](install.md)**.

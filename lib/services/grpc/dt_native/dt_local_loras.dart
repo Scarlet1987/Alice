@@ -23,27 +23,15 @@ import 'package:path/path.dart' as p;
 
 /// Draw Things only fills Echo("models") when Model Browser is on. The app
 /// still keeps the weights in its Models folder, and generation names a LoRA
-/// by that file name. This reads the folder the macOS app uses, or
-/// `DRAWTHINGS_MODELS_DIR` when a CLI server was pointed somewhere else.
+/// by that file name. This reads `DRAWTHINGS_MODELS_DIR` when a CLI server
+/// was pointed somewhere else; there is no default folder any more (the
+/// macOS app's Models folder went with macOS support).
 Directory? drawThingsDefaultModelsDirectory() {
   final override = Platform.environment['DRAWTHINGS_MODELS_DIR'];
   if (override != null && override.trim().isNotEmpty) {
     return Directory(override.trim());
   }
-  if (!Platform.isMacOS) return null;
-  final home = Platform.environment['HOME'];
-  if (home == null || home.isEmpty) return null;
-  return Directory(
-    p.join(
-      home,
-      'Library',
-      'Containers',
-      'com.liuliu.draw-things',
-      'Data',
-      'Documents',
-      'Models',
-    ),
-  );
+  return null;
 }
 
 /// Echo may return `lora/name.ckpt`. Generate wants the file name.

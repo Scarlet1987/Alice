@@ -7,7 +7,7 @@ new, or jump straight to whatever you're stuck on.
 
 | Document | What's in it |
 |---|---|
-| [Installation Guide](install.md) | Hardware requirements, install methods for Windows/macOS/Linux, and building from source |
+| [Installation Guide](install.md) | Hardware requirements, install methods for Windows/Linux, and building from source |
 | [Getting Started](getting-started.md) | First launch, picking a backend and model, and your first conversation |
 | [User Guide](user-guide.md) | The full feature reference — chats, groups, personas, lorebooks, worlds, TTS, image generation and the web/mobile UI |
 

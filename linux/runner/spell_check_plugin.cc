@@ -16,8 +16,7 @@
 
 // Exposes a spell checker to Flutter via the `front_porch_ai/spell_check`
 // method channel — the same channel, the same arguments and the same reply
-// shape as macOS (NSSpellChecker, see macos/Runner/SpellCheckPlugin.swift) and
-// Windows (ISpellChecker, see windows/runner/spell_check_plugin.cpp).
+// shape as Windows (ISpellChecker, see windows/runner/spell_check_plugin.cpp).
 //
 //   Channel method: `spellCheck`
 //   Arguments:      [String languageTag, String text]
@@ -34,8 +33,8 @@
 // keeps other languages — and any words they have added themselves — working.
 //
 // Indices are **UTF-16 code units**, because that is what Dart's TextRange
-// counts. The macOS and Windows implementations get this for free (NSString
-// and std::wstring are both UTF-16); here the text arrives as UTF-8, so the
+// counts. The Windows implementation gets this for free (std::wstring is
+// UTF-16); here the text arrives as UTF-8, so the
 // scanner tracks a UTF-16 offset alongside the byte pointer. Getting this
 // wrong would put the red underline on the wrong word in any message
 // containing an emoji — which, in this app, is most of them.
@@ -50,7 +49,7 @@ constexpr size_t kMaxSpans = 512;
 
 // The context menu in app_text_field.dart shows at most 5 replacements, so
 // marshalling more across the channel is pure waste. Observably identical to
-// macOS/Windows, which return everything and get truncated Dart-side.
+// Windows, which returns everything and gets truncated Dart-side.
 constexpr size_t kMaxSuggestions = 5;
 
 // Words shorter than this are never worth flagging ("a", "I", stray initials)
@@ -351,7 +350,7 @@ void ScanChunk(Dictionary* dict, const char* start, const char* end, int u16,
 
 // Splits the text into whitespace-delimited chunks so URLs and email
 // addresses can be skipped wholesale. Without this, "github.com" reads as the
-// two misspellings "github" and "com"; macOS and Windows both suppress them.
+// two misspellings "github" and "com"; Windows suppresses them too.
 FlValue* CheckText(Dictionary* dict, const char* text) {
   FlValue* spans = fl_value_new_list();
   const char* p = text;

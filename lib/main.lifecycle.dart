@@ -19,8 +19,8 @@
 part of 'main.dart';
 
 /// Shutdown + post-first-frame chores, extracted verbatim from
-/// `_MyAppState` (god-file elimination, Tranche C). `onWindowClose` /
-/// `_onAppExitRequested` (shell) call `_saveStateAndShutdown()` unqualified;
+/// `_MyAppState` (god-file elimination, Tranche C). `onWindowClose`
+/// (shell) calls `_saveStateAndShutdown()` unqualified;
 /// `build`'s post-frame block calls `_checkForUpdates(context)` /
 /// `_autoStartWebServer(context)` unqualified — unqualified class→extension
 /// resolution is the same pattern proven at 0 warnings by
@@ -58,7 +58,7 @@ extension _MainLifecycle on _MyAppState {
         // maximized, never unmaximizes or resizes, and closes while still
         // maximized, stale defaults are saved here (1280x720 / 0) rather
         // than their actual normal geometry. This works across
-        // Windows/macOS/Linux because each OS internally preserves the
+        // Windows/Linux because each OS internally preserves the
         // pre-maximize "restore down" rect and applies it when the window
         // is unmaximized after next launch — the stale prefs are simply
         // overwritten. If a platform ever drops this behavior, the fix is
@@ -147,22 +147,7 @@ extension _MainLifecycle on _MyAppState {
     //   "FlutterEngineRemoveView returned kInvalidArguments"
     //   "Segmentation fault (core dumped)" or a native crash popup on Windows 11.
     // Workaround: exit(0) after cleanup to bypass the buggy view teardown.
-    if (Platform.isLinux || Platform.isWindows) {
-      exit(0);
-    } else {
-      // macOS: end the process WITHOUT running C++ static destructors.
-      // destroy() → [NSApp terminate:] → libc exit() → __cxa_finalize runs
-      // the bundled native libraries' global destructors — and onnxruntime's
-      // (in-process expression/embedding engines; its worker pool holds ~16
-      // parked threads at quit) aborts there via std::terminate. Every
-      // red-button close produced an "Abort trap: 6" crash report in
-      // ~/Library/Logs/DiagnosticReports even though the quit was clean.
-      // Dart's exit(0) would hit the same finalize pass, so end the process
-      // with no finalizers instead. Safe: everything above was awaited
-      // (prefs written, chat saves flushed, KoboldCpp stopped, web server
-      // stopped), and SQLite's committed WAL data is crash-safe by design.
-      exitWithoutNativeFinalizers(0);
-    }
+    exit(0);
   }
 
   Future<void> _checkForUpdates(BuildContext context) async {

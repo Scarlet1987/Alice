@@ -177,7 +177,6 @@ class _ModelSettingsDialogState extends State<ModelSettingsDialog> {
 
             RemoteProviderBar(
               selected: providerKind,
-              showOmlx: Platform.isMacOS,
               onSelected: (kind) async {
                 await applyRemoteProvider(
                   kind: kind,

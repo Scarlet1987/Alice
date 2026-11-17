@@ -32,7 +32,6 @@ import 'package:front_porch_ai/utils/utils.dart';
 export 'package:front_porch_ai/models/hardware_info.dart';
 
 part 'hardware_service.nvidia.dart';
-part 'hardware_service.apple.dart';
 part 'hardware_service.linux.dart';
 part 'hardware_service.windows.dart';
 part 'hardware_service.free.dart';
@@ -96,9 +95,9 @@ class HardwareService extends ChangeNotifier {
   /// "Cuda11 + AVX1" — it keeps CUDA for older NVIDIA cards but has no ROCm and
   /// no Vulkan, so an AMD/Intel GPU (or no GPU) gets zero acceleration and
   /// inference falls entirely onto the CPU. Returns false until detection has
-  /// run (so the warning never flashes prematurely) and on macOS (arm64/Metal,
-  /// where AVX2 is irrelevant). Drives the "expect slow performance" warning in
-  /// setup + model settings (desktop) and the web Models page.
+  /// run (so the warning never flashes prematurely). Drives the "expect slow
+  /// performance" warning in setup + model settings (desktop) and the web
+  /// Models page.
   bool get cpuOnlyLowPerf {
     if (!Platform.isWindows && !Platform.isLinux) return false;
     final info = _hardwareInfo;
@@ -218,8 +217,6 @@ class HardwareService extends ChangeNotifier {
         await _detectWindows();
       } else if (Platform.isLinux) {
         await _detectLinux();
-      } else if (Platform.isMacOS) {
-        await _detectMac();
       }
     } catch (e) {
       print('Hardware detection failed: $e');
@@ -274,7 +271,7 @@ class HardwareService extends ChangeNotifier {
         vendor: auditVendor,
         hasCuda: audit.hasCuda,
         hasRocm: audit.hasRocm,
-        hasMetal: Platform.isMacOS,
+        hasMetal: false,
       );
       return;
     }
@@ -385,14 +382,13 @@ class HardwareService extends ChangeNotifier {
     _hasCuda = false;
     _hasRocm = false;
 
-    // CUDA Check (nvidia-smi) — skip on macOS where it doesn't exist, and
-    // skip entirely when the vendor probe already told us this isn't NVIDIA
-    // hardware (AMD/Intel boxes were spawning nvidia-smi just to watch it
-    // fail, on every launch).
+    // CUDA Check (nvidia-smi) — skip entirely when the vendor probe already
+    // told us this isn't NVIDIA hardware (AMD/Intel boxes were spawning
+    // nvidia-smi just to watch it fail, on every launch).
     // Use _runNvidiaSmi() so we still detect CUDA when the driver installed
     // nvidia-smi only under NVSMI/ (not in PATH).
     final isNvidia = vendor == null || vendor == 'Nvidia';
-    if (!Platform.isMacOS && isNvidia) {
+    if (isNvidia) {
       final res = await _runNvidiaSmi([]);
       if (res != null) _hasCuda = true;
     }

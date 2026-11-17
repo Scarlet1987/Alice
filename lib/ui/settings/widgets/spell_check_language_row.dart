@@ -28,9 +28,9 @@ const String _kAddDictionary = '__add_dictionary__';
 /// it.
 ///
 /// The menu lists what the platform can actually check — hunspell dictionaries
-/// found on disk (Linux), `NSSpellChecker.availableLanguages` (macOS),
-/// `ISpellCheckerFactory` supported languages (Windows) — so it can never
-/// offer a language that would silently do nothing.
+/// found on disk (Linux), `ISpellCheckerFactory` supported languages
+/// (Windows) — so it can never offer a language that would silently do
+/// nothing.
 class SpellCheckLanguageRow extends StatefulWidget {
   const SpellCheckLanguageRow({super.key});
 
@@ -53,10 +53,10 @@ class _SpellCheckLanguageRowState extends State<SpellCheckLanguageRow> {
   /// searches — so the language appears in this menu, and wins over both the
   /// system's copy and the ones we bundle.
   ///
-  /// Linux only, and not an omission elsewhere: NSSpellChecker and
-  /// ISpellChecker are closed and consume only their own installed
-  /// dictionaries, so there is nowhere on macOS or Windows to put such a file.
-  /// Those users add a language through the OS instead.
+  /// Linux only, and not an omission elsewhere: ISpellChecker is closed and
+  /// consumes only its own installed dictionaries, so there is nowhere on
+  /// Windows to put such a file. Those users add a language through the OS
+  /// instead.
   Future<void> _addDictionaryFile() async {
     final picked = await GuardedPicker.pickFiles(
       context,
@@ -174,7 +174,7 @@ class _SpellCheckLanguageRowState extends State<SpellCheckLanguageRow> {
                     child: Text(spellCheckLanguageLabel(tag)),
                   ),
                 // Linux only — see _addDictionaryFile for why this cannot
-                // exist on macOS or Windows.
+                // exist on Windows.
                 if (Platform.isLinux)
                   const DropdownMenuItem(
                     value: _kAddDictionary,

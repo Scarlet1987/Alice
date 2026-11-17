@@ -52,7 +52,6 @@ When something goes wrong, this page is the fastest route back to chatting. Find
 ### Platform Notes
 - [Linux: flickering or visual glitches](#linux-flickering-or-visual-glitches)
 - [Linux: AMD GPU not being used](#linux-amd-gpu-not-being-used)
-- [macOS: "damaged" warning, and Intel Macs](#macos-damaged-warning-and-intel-macs)
 - [Windows: antivirus false positive](#windows-antivirus-false-positive)
 
 ### Still Stuck?
@@ -65,7 +64,7 @@ When something goes wrong, this page is the fastest route back to chatting. Find
 ### Three things to try first
 
 1. **Quit and relaunch — properly.** Close the app with its own close button (not force-quit), wait a few seconds, and start it again. A clean close does real work: it writes the last turn's Realism and Needs state to the database and shuts the AI engine down instead of orphaning it. Force-quitting mid-generation is how you lose the last exchange's state and end up with a leftover engine blocking the next launch.
-2. **Update.** Many "known issues" are already fixed. Settings → **General** → **Check for Updates Now**. That button only appears where the app can update itself — Windows (installer builds), macOS, and the Linux **AppImage**. If you installed from `apt`, `dnf`, or the AUR, update the normal way (`sudo apt upgrade`, `sudo dnf upgrade`, `yay -Syu`). One exception to know about: the AUR package is a **full release behind** right now — `front-porch-ai-bin` is on 1.1.2 while apt and dnf serve 1.2.0, because the automatic push is being rejected at the AUR's end and I can't promise a fix date. So check your installed version rather than assuming `yay -Syu` moved you, and use the AppImage or `.tar.gz` from the [Releases page](https://github.com/linux4life1/front-porch-AI/releases) if you need current. See the [install guide](install.md) for more.
+2. **Update.** Many "known issues" are already fixed. Settings → **General** → **Check for Updates Now**. That button only appears where the app can update itself — Windows (installer builds) and the Linux **AppImage**. If you installed from `apt`, `dnf`, or the AUR, update the normal way (`sudo apt upgrade`, `sudo dnf upgrade`, `yay -Syu`). One exception to know about: the AUR package is a **full release behind** right now — `front-porch-ai-bin` is on 1.1.2 while apt and dnf serve 1.2.0, because the automatic push is being rejected at the AUR's end and I can't promise a fix date. So check your installed version rather than assuming `yay -Syu` moved you, and use the AppImage or `.tar.gz` from the [Releases page](https://github.com/linux4life1/front-porch-AI/releases) if you need current. See the [install guide](install.md) for more.
 3. **Launch from a terminal** so you can see error messages (RAG, engine, crashes):
    - **Windows:** open **cmd** (not by double-clicking the app), then:
      ```bat
@@ -81,7 +80,6 @@ When something goes wrong, this page is the fastest route back to chatting. Find
      That opens a dedicated console window.
 
      **Note:** builds before the Windows console fix could attach to cmd but still print nothing (stdout never rebound). Update to a build that includes that fix, or use a dev `flutter run -d windows` session if you’re on an older installer.
-   - **macOS:** in Terminal: `/Applications/front_porch_ai.app/Contents/MacOS/FrontPorchAI` (stable package name) or `/Applications/FrontPorchAI-Rawhide.app/Contents/MacOS/FrontPorchAI` for nightlies.
    - **Linux:** run `front-porch-ai` if you installed a package, or the `front_porch_ai` binary / the AppImage directly.
 
    Whatever it prints when things go wrong is gold — include it if you ask for help.
@@ -97,9 +95,8 @@ When something goes wrong, this page is the fastest route back to chatting. Find
 - **Another copy is already running.** Two copies of Front Porch AI can't share one database. If a previous run is still alive (or still shutting down), the new one can't open the file. Check your task manager for a stray `front_porch_ai` and close it.
 - **Leftover AI engine from a previous run.** If the app was force-quit, KoboldCpp can be left running and hold onto its port. Clean up:
   - Windows: Task Manager → end any `koboldcpp` process (`koboldcpp.exe`, or `koboldcpp-oldpc.exe` on older CPUs).
-  - macOS/Linux: `pkill -f koboldcpp`
+  - Linux: `pkill -f koboldcpp`
 - **Linux — missing system libraries.** Run it from a terminal; if it complains about a missing `.so` file, install the library it names (commonly GTK 3, libsecret, or GStreamer). The **AppImage** bundles everything and is the easy way out.
-- **macOS — blocked by Gatekeeper.** See the [macOS note](#macos-damaged-warning-and-intel-macs).
 - **Broken download/install.** Re-download the release and reinstall. Your data is safe — it lives in your Documents folder, not the install folder.
 
 **If you get a window that says "Front Porch AI couldn't open its database"** — that's the app telling you exactly what's wrong. It's almost always one of three things: the disk is full, the app doesn't have permission to write to its data folder, or another copy is already running. Free up space, close the other copy, then reopen.
@@ -144,10 +141,9 @@ Front Porch AI manages a local AI engine (a program called **KoboldCpp**) for yo
 - **Engine not downloaded / half-downloaded:** Settings → **Backend** → **Koboldcpp Backend**. If it says *Status: Missing*, press **Download**. If it's there but old, the same button offers **Check for Updates** / **Update to v…**.
 - **Something is already using its port** (5001). Usually a leftover engine from a crashed session:
   - Windows: `taskkill /F /IM koboldcpp.exe` — if that reports the process wasn't found, run `taskkill /F /IM koboldcpp-oldpc.exe` as well. On a CPU without AVX2 the app uses the `oldpc` build, so it's that name holding the port.
-  - macOS/Linux: `pkill -f koboldcpp`
+  - Linux: `pkill -f koboldcpp`
 - **The model file can't actually be opened.** Cloud-synced folders are a classic trap: a OneDrive, iCloud Drive, or Dropbox "online-only" file looks present in your file browser but its contents aren't on the device, so the engine exits with a bare error code. The app now checks this before launching and explains it. The fix: right-click the models folder → **Always keep on this device**, or move your models somewhere outside the synced folder.
 - **GPU driver trouble:** see [GPU not detected](#gpu-not-detected).
-- **Intel Mac:** local models aren't supported on Intel Macs — use the **OpenAI-Compatible API** backend instead.
 
 ### Generation is extremely slow
 
@@ -248,7 +244,6 @@ A few things can trip it:
 ### Microphone / speech-to-text not working
 
 1. **OS permission first:**
-   - macOS: System Settings → Privacy & Security → Microphone → allow Front Porch AI.
    - Windows: Settings → Privacy → Microphone.
    - Linux: make sure PipeWire/PulseAudio is running and the mic works in other apps.
 2. **Right device selected?** Settings → **Voice & Media** → **Voice Input (STT)** → pick your actual microphone (or leave it on *System Default*).
@@ -275,7 +270,6 @@ The desktop app serves the web/mobile UI itself, on port **8085** by default. Tu
 When the browser just spins:
 
 - **Check it's actually running.** That same panel shows **Status: Running** or **Stopped**, and — once it's up — the exact address to type, like `http://192.168.1.20:8085`.
-- **macOS 15 and newer asks permission.** The first time the server serves over your network, macOS shows a **Local Network** prompt. If you dismissed it, the phone will never connect: System Settings → Privacy & Security → **Local Network** → switch Front Porch AI on.
 - **Firewalls.** On Windows, allow Front Porch AI through Windows Defender Firewall on **private** networks. On Linux, open the port in `ufw`/`firewalld` if you run one.
 - **Same network?** Phone on mobile data, or on a "guest" Wi-Fi network that isolates devices, won't see your computer. For access from outside the house, use the Tailscale option in the guided setup rather than opening your router.
 - **The server turned itself off.** If a previous start failed, the app disables the web server so it can't wedge your next launch. Flip the switch back on.
@@ -321,7 +315,7 @@ Importing a `.fpworld` file needs **Front Porch AI 1.2 or newer**. On 1.1.2 and 
 Everything — characters, chats, memories, backups, models — lives in one folder:
 
 - **Windows:** `Documents\FrontPorchAI\`
-- **macOS / Linux:** `~/Documents/FrontPorchAI/`
+- **Linux:** `~/Documents/FrontPorchAI/`
 - Nightlies use **`FrontPorchAI-Beta`** instead (leftover name).
 
 **Not sure? The app will tell you.** Settings → **Advanced** → **Storage Configuration** shows the exact **Data Directory** path. The pencil icon next to it relocates your database, characters, chats, worlds, models and the AI engine to a new home (an external drive, a bigger disk) and reopens everything from there — no restart, no manual copying.
@@ -391,16 +385,6 @@ sudo usermod -aG render,video $USER
 Log out and back in, then relaunch the app.
 
 **ROCm is deliberately never chosen automatically** — "ROCm is installed" and "ROCm works with this card" are different questions, and guessing wrong means the engine crashes at launch instead of just being slower. It's an expert opt-in under Settings → Advanced → Hardware & GPU → **Advanced: manual backend override**. If the app detects an AMD card on Linux without ROCm while auto-configuring, it pops up distro-specific installation instructions so you can decide for yourself.
-
-### macOS: "damaged" warning, and Intel Macs
-
-- **"App is damaged and can't be opened":** you shouldn't see this on current releases — Front Porch AI is code-signed and **notarized by Apple**, so Gatekeeper opens it cleanly. If it appears you're probably on an old build: grab the current `.pkg` installer from the [Releases page](https://github.com/linux4life1/front-porch-AI/releases). (The `.pkg` is now the only macOS download; the old unsigned `.dmg` is retired.) As a last resort you can clear the quarantine flag:
-  ```bash
-  xattr -cr "/Applications/FrontPorchAI.app"
-  ```
-  (Adjust the app name/path to match yours.)
-- **Intel Macs:** local AI models aren't supported (Apple Silicon's Metal acceleration is required). The app greys out the **Local (KoboldCPP)** option and shows a banner saying so — but it does *not* switch you over by itself, so nothing works until you make the change: Settings → **Backend** → **OpenAI-Compatible API**, then fill in your API details. Everything else in the app runs normally.
-- **Apple Silicon tips:** Metal acceleration is automatic. Memory is shared between CPU and GPU, so close heavy apps when running larger models, and prefer Q4/Q5 versions.
 
 ### Windows: antivirus false positive
 

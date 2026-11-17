@@ -344,7 +344,7 @@ class WebServerHost extends ChangeNotifier {
           'try again.';
     }
     if (e is SocketException) {
-      // EADDRINUSE: macOS 48, Linux 98, Windows 10048. The "shared flag"
+      // EADDRINUSE: Linux 98, Windows 10048. The "shared flag"
       // message is Dart's in-process flavor of the same collision (two binds
       // from one process — e.g. overlapping start() calls).
       // EACCES: 13 (Unix), 10013 (Windows reserved port ranges).

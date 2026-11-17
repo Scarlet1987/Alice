@@ -145,13 +145,12 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isMac = Theme.of(context).platform == TargetPlatform.macOS;
-    final saveChord = isMac ? '⌘↵' : 'Ctrl+Enter';
+    final saveChord = 'Ctrl+Enter';
 
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): _cancel,
-        SingleActivator(LogicalKeyboardKey.enter, meta: isMac, control: !isMac):
+        const SingleActivator(LogicalKeyboardKey.enter, control: true):
             _save,
       },
       child: Focus(

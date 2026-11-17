@@ -201,7 +201,7 @@ class SherpaWhisperEngine {
   /// Decodes a RIFF/WAVE file into mono float samples in [-1, 1].
   ///
   /// Exists because sherpa's readWave only accepts the classic 16-byte fmt
-  /// chunk, but the macOS recorder writes WAVE_FORMAT_EXTENSIBLE (40-byte
+  /// chunk, but some recorders write WAVE_FORMAT_EXTENSIBLE (40-byte
   /// fmt) — which made EVERY desktop dictation fail native and ride the
   /// Python sidecar. Walks chunks (fmt sizes 16/18/40, other chunks
   /// skipped), accepts PCM16 and float32 (extensible SubFormat resolved),

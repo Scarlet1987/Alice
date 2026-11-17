@@ -11,8 +11,8 @@ typedef CivitaiKeyRead = Future<String?> Function(String key);
 typedef CivitaiKeyWrite = Future<void> Function(String key, String value);
 typedef CivitaiKeyDelete = Future<void> Function(String key);
 
-/// Shown when the OS key store will not give the saved key back, as happens
-/// with ad-hoc signed macOS builds. Search without a key still works.
+/// Shown when the OS key store will not give the saved key back.
+/// Search without a key still works.
 const String kCivitaiKeyUnreadable =
     "Couldn't read your saved CivitAI key. Searching without a key still "
     'works; downloads and adult results need it.';
@@ -42,9 +42,7 @@ class CivitaiCredentialStore {
   });
 
   factory CivitaiCredentialStore.secure([
-    FlutterSecureStorage storage = const FlutterSecureStorage(
-      mOptions: MacOsOptions(usesDataProtectionKeychain: false),
-    ),
+    FlutterSecureStorage storage = const FlutterSecureStorage(),
   ]) {
     return CivitaiCredentialStore(
       readKey: (key) => storage.read(key: key),

@@ -127,7 +127,6 @@ class NativeImageBackend extends ChangeNotifier {
   ///   The C++ side exposes: native_load_model(const char* path, int* error).
   ///   Vulkan backend is selected automatically on AMD; CUDA on NVIDIA.
   /// TODO(platform): Windows — same FFI, DirectML fallback if no Vulkan/CUDA.
-  /// TODO(platform): macOS — same FFI, Metal backend.
   Future<void> loadModel(String path) async {
     if (_loadedModelPath == path && _status == NativeEngineStatus.ready) {
       return; // Already loaded.

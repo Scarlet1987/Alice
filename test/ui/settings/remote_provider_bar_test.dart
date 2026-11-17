@@ -7,7 +7,7 @@ import 'package:front_porch_ai/services/storage/settings/remote_provider.dart';
 import 'package:front_porch_ai/ui/settings/widgets/remote_provider_bar.dart';
 
 void main() {
-  testWidgets('one row of hosts; oMLX omitted unless showOmlx', (tester) async {
+  testWidgets('one row of hosts; oMLX always omitted', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -27,19 +27,6 @@ void main() {
     expect(find.text('oMLX'), findsNothing);
     expect(find.text('Local'), findsNothing);
     expect(find.text('Remote API'), findsNothing);
-
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: RemoteProviderBar(
-            selected: RemoteProviderKind.omlx,
-            showOmlx: true,
-            onSelected: _noop,
-          ),
-        ),
-      ),
-    );
-    expect(find.text('oMLX'), findsOneWidget);
   });
 }
 

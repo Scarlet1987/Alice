@@ -13,7 +13,7 @@
 //     Folder moves both, and FolderService has them afterwards.
 //
 // Run it with:
-//   flutter test integration_test/library_organize_test.dart -d macos
+//   flutter test integration_test/library_organize_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

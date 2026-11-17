@@ -54,7 +54,7 @@ extension HardwareServiceNvidia on HardwareService {
   /// it, and the user is left with "Unknown GPU" even though their RTX 5060 Ti
   /// is perfectly functional. This helper recovers from that scenario.
   Future<ProcessResult?> _runNvidiaSmi(List<String> args) async {
-    // 1) Try the bare command — works on Linux, macOS, and most Windows
+    // 1) Try the bare command — works on Linux and most Windows
     //    installs (System32\nvidia-smi.exe is in PATH by default).
     try {
       final result = await Process.run('nvidia-smi', args);

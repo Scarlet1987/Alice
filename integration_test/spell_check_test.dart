@@ -74,7 +74,7 @@ void main() {
       reason:
           'The native spell checker returned null for "$text". On Linux this '
           'means no dictionary resolved at all — including the one we bundle, '
-          'so the app bundle is incomplete. On macOS/Windows it means the '
+          'so the app bundle is incomplete. On Windows it means the '
           'platform channel is not registered.',
     );
     return spans!;

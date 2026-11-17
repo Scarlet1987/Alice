@@ -89,11 +89,10 @@ class WebAuthMiddleware {
       'iPhone',
       'iPad',
       'Windows',
-      'Mac',
       'Linux',
     ]) {
       if (ua.contains(o)) {
-        os = o == 'Mac' ? 'macOS' : (o == 'iPhone' || o == 'iPad' ? 'iOS' : o);
+        os = o == 'iPhone' || o == 'iPad' ? 'iOS' : o;
         break;
       }
     }

@@ -133,7 +133,7 @@ jobs:
               // The ONE script that is regression evidence. ci-local.sh exists
               // to run the Linux-gated golden suite with the SAME command CI
               // uses, so a push can be gated on the same result — 18 goldens are
-              // @TestOn('linux') and a green macOS run never executes them,
+              // @TestOn('linux') and a green run on any other OS never executes them,
               // which is how a red-CI commit reached Rawhide once already. Its
               // value is entirely in matching ci.yml; the moment the two drift,
               // the pre-push gate silently stops being a gate. That drift is not

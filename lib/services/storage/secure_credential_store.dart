@@ -47,9 +47,7 @@ class SecureCredentialStore {
   });
 
   factory SecureCredentialStore.secure([
-    FlutterSecureStorage storage = const FlutterSecureStorage(
-      mOptions: MacOsOptions(usesDataProtectionKeychain: false),
-    ),
+    FlutterSecureStorage storage = const FlutterSecureStorage(),
   ]) {
     return SecureCredentialStore(
       readKey: (key) => storage.read(key: key),

@@ -128,7 +128,7 @@ KoboldBackendChoice koboldBackendFor({
   KoboldGpuBackend? preset,
   int? presetGpuId,
 }) {
-  final apple = unified ?? hardware?.hasMetal ?? Platform.isMacOS;
+  final apple = unified ?? hardware?.hasMetal ?? false;
   if (preset != null) {
     return KoboldBackendChoice(
       backend: preset,

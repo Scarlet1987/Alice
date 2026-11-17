@@ -38,7 +38,7 @@ extension SettingsFacadeRead on SettingsFacade {
       'remoteModelName': b.remoteModelName,
       'hasApiKey': b.remoteApiKey.isNotEmpty,
       'remoteApiUrlsWithKeys': b.remoteApiUrlsWithKeys,
-      'omlxAvailable': Platform.isMacOS,
+      'omlxAvailable': false,
       'remoteConfigured': _llm.openRouterService.isConfigured,
       'remoteReachability': _llm.openRouterService.reachability.name,
       'contextSize': b.contextSize,

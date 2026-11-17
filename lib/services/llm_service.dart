@@ -365,7 +365,7 @@ abstract class LLMService extends ChangeNotifier {
 /// nothing listening on the port, host down, or the HTTP client torn down
 /// mid-request. The OS words the same failure differently per platform:
 /// Windows says "The remote computer refused the network connection"
-/// (errno 1225), macOS "Connection refused" (errno 61), Linux errno 111 —
+/// (errno 1225), Linux errno 111 —
 /// so match the broad shapes rather than one platform's phrasing.
 bool looksLikeBackendUnreachable(Object error) {
   final s = error.toString();

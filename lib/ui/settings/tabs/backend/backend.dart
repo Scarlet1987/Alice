@@ -11,7 +11,6 @@ export 'kobold_speed_test_button.dart';
 export 'kobold_speed_test_dialog.dart';
 export 'kobold_status_card.dart';
 export 'managed_backend_section.dart';
-export 'omlx_section.dart';
 export 'opencode_managed_section.dart';
 export 'remote_api_section.dart';
 export 'super_grok_card.dart';

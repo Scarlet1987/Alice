@@ -11,7 +11,7 @@
 // class both lived on this seam.
 //
 // Run it with:
-//   flutter test integration_test/web_server_test.dart -d macos
+//   flutter test integration_test/web_server_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 // The server binds an EPHEMERAL port (0) on loopback only: LAN exposure

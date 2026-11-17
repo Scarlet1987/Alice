@@ -112,48 +112,30 @@ extension TtsServiceSupport on TtsService {
   }
 
   /// Play a WAV file.
-  /// On macOS, uses the built-in `afplay` command for reliability
-  /// (audioplayers has platform channel bugs on macOS).
-  /// On other platforms, uses the audioplayers plugin.
+  /// Play a WAV file using the audioplayers plugin.
   Future<void> _playWavFile(File wavFile) async {
-    if (Platform.isMacOS) {
-      // Use macOS built-in afplay for reliable playback
-      try {
-        _afplayProcess = await Process.start('afplay', [wavFile.path]);
-        final exitCode = await _afplayProcess!.exitCode;
-        _afplayProcess = null;
-        if (exitCode != 0) {
-          print('afplay exited with code $exitCode');
-        }
-      } catch (e) {
-        _afplayProcess = null;
-        print('afplay failed: $e');
-      }
-    } else {
-      final completer = Completer<void>();
-      void finish() {
-        if (!completer.isCompleted) completer.complete();
-      }
+    final completer = Completer<void>();
+    void finish() {
+      if (!completer.isCompleted) completer.complete();
+    }
 
-      final sub = _audioPlayer.onPlayerComplete.listen((_) => finish());
-      // Manual stop() emits PlayerState.stopped, NOT onPlayerComplete — so
-      // without this second listener, hanging up (or pressing Stop) mid-
-      // sentence leaves this await hanging forever on Windows/Linux: the
-      // caller's loop never returns, its temp WAVs are never cleaned up, and
-      // the orphaned subscription fires into the NEXT session. macOS never
-      // sees it because that platform plays through afplay above. Same guard
-      // as the read-along player in story_reader_page.readalong.dart.
-      final stopSub = _audioPlayer.onPlayerStateChanged.listen((state) {
-        if (state == PlayerState.stopped) finish();
-      });
+    final sub = _audioPlayer.onPlayerComplete.listen((_) => finish());
+    // Manual stop() emits PlayerState.stopped, NOT onPlayerComplete — so
+    // without this second listener, hanging up (or pressing Stop) mid-
+    // sentence leaves this await hanging forever: the caller's loop never
+    // returns, its temp WAVs are never cleaned up, and the orphaned
+    // subscription fires into the NEXT session. Same guard as the read-along
+    // player in story_reader_page.readalong.dart.
+    final stopSub = _audioPlayer.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.stopped) finish();
+    });
 
-      try {
-        await _audioPlayer.play(DeviceFileSource(wavFile.path));
-        await completer.future;
-      } finally {
-        await sub.cancel();
-        await stopSub.cancel();
-      }
+    try {
+      await _audioPlayer.play(DeviceFileSource(wavFile.path));
+      await completer.future;
+    } finally {
+      await sub.cancel();
+      await stopSub.cancel();
     }
   }
 

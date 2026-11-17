@@ -283,14 +283,9 @@ class BackendManager extends ChangeNotifier {
       final v = await KoboldBinaryVersion.read(_storageService.binDir.path);
       _localVersion = v.version;
       _localSize = v.size;
-      // On Linux/Mac, ensure executable permission
+      // On Linux, ensure executable permission
       if (!Platform.isWindows) {
         await Process.run('chmod', ['+x', _backendPath!]);
-      }
-      // On macOS, clear quarantine attribute that sandbox sets on downloaded binaries
-      if (Platform.isMacOS) {
-        await Process.run('xattr', ['-cr', _backendPath!]);
-        print('AG_DEBUG: Cleared quarantine on $_backendPath');
       }
     } else {
       _backendPath = null;

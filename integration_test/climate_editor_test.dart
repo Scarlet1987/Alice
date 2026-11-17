@@ -15,7 +15,7 @@
 // prefers JSON — a stale id here would silently win on some paths).
 //
 // Run it with:
-//   flutter test integration_test/climate_editor_test.dart -d macos
+//   flutter test integration_test/climate_editor_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

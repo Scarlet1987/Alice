@@ -143,7 +143,7 @@ Uint8List readFileNoFollow(
   final out = BytesBuilder(copy: false);
   try {
     afterOpen?.call(path);
-    if (onMode != null) onMode(_descriptorMode(libc, fd, path));
+    if (onMode != null) onMode(_descriptorMode(fd));
     while (true) {
       final n = read(fd, buffer, chunk);
       if (n < 0) throw FileSystemException('could not read the file', path);
@@ -160,30 +160,10 @@ Uint8List readFileNoFollow(
   }
 }
 
-/// Permission bits of the open file [fd]. macOS `/dev/fd/N` reports the
-/// descriptor's own access (a read-only open of a 0640 file shows 0440), so
-/// macOS asks `fstat`; Linux `/dev/fd/N` is the file itself.
-int _descriptorMode(DynamicLibrary libc, int fd, String path) {
-  final abi = Abi.current();
-  if (abi != Abi.macosArm64 && abi != Abi.macosX64) {
-    return File('/dev/fd/$fd').statSync().mode & 0xFFF;
-  }
-  // Intel's plain `fstat` is the old 32-bit-inode layout; `$INODE64` is
-  // the one whose st_mode follows the 4-byte st_dev, as on Apple silicon.
-  final fstat = libc
-      .lookupFunction<
-        Int32 Function(Int32, Pointer<Uint8>),
-        int Function(int, Pointer<Uint8>)
-      >(abi == Abi.macosX64 ? r'fstat$INODE64' : 'fstat');
-  final stat = calloc<Uint8>(256); // struct stat is 144 bytes
-  try {
-    if (fstat(fd, stat) != 0) {
-      throw FileSystemException('could not read the file mode', path);
-    }
-    return (stat + 4).cast<Uint16>().value & 0xFFF;
-  } finally {
-    calloc.free(stat);
-  }
+/// Permission bits of the open file [fd], via `/dev/fd/N` (the file itself
+/// on Linux).
+int _descriptorMode(int fd) {
+  return File('/dev/fd/$fd').statSync().mode & 0xFFF;
 }
 
 /// O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC for this platform, or
@@ -200,15 +180,6 @@ int? _flags() {
 /// and any other is refused.
 ({int creat, int excl, int nofollow, int cloexec, int nonblock})? _osFlags() {
   final abi = Abi.current();
-  if (abi == Abi.macosArm64 || abi == Abi.macosX64) {
-    return (
-      creat: 0x200,
-      excl: 0x800,
-      nofollow: 0x100,
-      cloexec: 0x1000000,
-      nonblock: 0x4,
-    );
-  }
   if (abi == Abi.linuxX64 || abi == Abi.linuxIA32) {
     return (
       creat: 0x40,

@@ -2,7 +2,7 @@
 #
 # The `golden` tag marks Flutter widget pixel goldens (matchesGoldenFile). These
 # are render-sensitive and are authored against the Linux CI image. The widget
-# golden files also carry `@TestOn('linux')`, so they auto-skip on macOS/Windows
+# golden files also carry `@TestOn('linux')`, so they auto-skip on Windows
 # (where anti-aliasing differs) and run on Linux / CI. Text and JSON snapshot
 # goldens are untagged and always run on every platform.
 #

@@ -7,7 +7,7 @@
 // drives ChatService.continueGeneration through a full app boot so a future
 // finalize regression cannot hide behind "units still green".
 //
-//   flutter test integration_test/continue_path_test.dart -d macos
+//   flutter test integration_test/continue_path_test.dart -d linux
 
 import 'dart:io';
 

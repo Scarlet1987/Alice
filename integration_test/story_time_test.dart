@@ -15,7 +15,7 @@
 // seed-stable across reload) — this suite is the clock's counterpart.
 //
 // Run it with:
-//   flutter test integration_test/story_time_test.dart -d macos
+//   flutter test integration_test/story_time_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

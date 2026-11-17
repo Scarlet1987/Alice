@@ -123,7 +123,6 @@ ThemeData buildPorchThemeData({required bool isDark, required bool oledBlack}) {
         TargetPlatform.android: _PorchPageTransitionBuilder(),
         TargetPlatform.iOS: _PorchPageTransitionBuilder(),
         TargetPlatform.linux: _PorchPageTransitionBuilder(),
-        TargetPlatform.macOS: _PorchPageTransitionBuilder(),
         TargetPlatform.windows: _PorchPageTransitionBuilder(),
       },
     ),

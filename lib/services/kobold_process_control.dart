@@ -198,8 +198,7 @@ const String _engineNamePrefix = 'koboldcpp';
 /// matched; an executable must be the whole first word.
 ///
 /// Two spellings are given when the FOLDER is reached through a symbolic
-/// link: as written, and resolved (on macOS a temp or home path runs under
-/// its `/private/...` name). The executable itself is never resolved: a
+/// link: as written, and resolved. The executable itself is never resolved: a
 /// linked one could point at a shared program, and every copy of that
 /// would be stopped.
 ///

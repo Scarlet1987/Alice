@@ -17,7 +17,7 @@
 //     must NOT run image cleanup).
 //
 // Run it with:
-//   flutter test integration_test/backup_restore_test.dart -d macos
+//   flutter test integration_test/backup_restore_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

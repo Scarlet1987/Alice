@@ -120,9 +120,9 @@ class SpellCheckPluginImpl {
       // The Windows spell-check API is BCP-47 and wants a HYPHEN ("en-US").
       // The app's stored setting is a dictionary tag with an underscore
       // ("en_US"), because that is what hunspell files are named on Linux and
-      // what NSSpellChecker uses on macOS. Normalise here, exactly as the
-      // Swift plugin normalises the other way — each platform converts to its
-      // own convention so the Dart side can keep one canonical form.
+      // what NSSpellChecker used on macOS. Normalise here — each platform
+      // converts to its own convention so the Dart side can keep one
+      // canonical form.
       // Without this, IsSupported() rejects every tag and spell check is
       // silently dead on Windows.
       std::replace(language_tag.begin(), language_tag.end(), '_', '-');

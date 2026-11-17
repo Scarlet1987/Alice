@@ -95,8 +95,8 @@ class PickerDialogTimeout implements Exception {
 /// Android SAF persistable URI grants are never enabled (we never pass
 /// AndroidOptions).
 ///
-/// Every open/save/directory dialog previously started at the OS default (root
-/// of the drive on macOS), which made repetitive imports from the same folder
+/// Every open/save/directory dialog previously started at the OS default
+/// (root of the drive), which made repetitive imports from the same folder
 /// slow. This records the parent directory of whatever the user picks and feeds
 /// it back as `initialDirectory` next time — bucketed by [category] so image
 /// imports, general file imports, exports and folder pickers each resume where
@@ -354,7 +354,7 @@ class PickerPrefs {
       name.replaceAll(_unsafeNameChars, '_');
 
   /// Save [bytes] through the native dialog. file_picker writes those
-  /// bytes itself (Windows/Linux/macOS `writeAsBytes` after the dialog).
+  /// bytes itself (Windows/Linux `writeAsBytes` after the dialog).
   /// [bytes] is required and must be non-empty — a dummy `Uint8List(0)`
   /// truncates/wipes the chosen file. The suggested [fileName] is made
   /// safe for Windows first.

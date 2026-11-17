@@ -130,7 +130,6 @@ void main() {
       'Use Vulkan': [false, true, false, false],
       'Use ROCm (AMD)': [false, false, false, true],
       'Use CuBLAS (Nvidia)': [true, false, false, false],
-      'Use Metal (MacOS)': [false, false, true, false],
     };
 
     for (final MapEntry(key: label, value: only) in chips.entries) {

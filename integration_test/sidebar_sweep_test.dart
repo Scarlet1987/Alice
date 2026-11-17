@@ -13,7 +13,7 @@
 //   * Story Tools: the Chaos master switch actually turns chaos on.
 //
 // Run it with:
-//   flutter test integration_test/sidebar_sweep_test.dart -d macos
+//   flutter test integration_test/sidebar_sweep_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

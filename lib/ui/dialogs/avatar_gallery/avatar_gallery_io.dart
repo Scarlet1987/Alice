@@ -30,7 +30,7 @@ import 'package:front_porch_ai/utils/utils.dart';
 /// failed file window can explain itself ([GuardedPicker]).
 
 /// Pick a single image and return its bytes, or null if cancelled. Handles the
-/// macOS desktop quirk where `.bytes` is null and only `.path` is populated.
+/// case where `.bytes` is null and only `.path` is populated.
 Future<Uint8List?> pickImageBytes(BuildContext context) async {
   final result = await GuardedPicker.pickFiles(
     context,

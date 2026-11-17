@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // A key store that will not give the saved key back (a known problem with
-// ad-hoc signed macOS builds) must say so, and must not stop a search that
+// ad-hoc signed builds) must say so, and must not stop a search that
 // never needed the key.
 
 import 'dart:convert';

@@ -77,7 +77,7 @@ void _ignoreSigpipe() {
   if (Platform.isWindows) return;
   try {
     // int signal(int signum, sighandler_t handler); SIG_IGN == (void*)1,
-    // SIGPIPE == 13 on both macOS (Darwin) and Linux.
+    // SIGPIPE == 13 on Linux.
     final signal = DynamicLibrary.process()
         .lookupFunction<
           Pointer<Void> Function(Int32, Pointer<Void>),
@@ -90,29 +90,26 @@ void _ignoreSigpipe() {
 }
 
 void _installSignalHandlers() {
-  // Intercept SIGINT (Ctrl+C) and SIGTERM on Linux/macOS to prevent
+  // Intercept SIGINT (Ctrl+C) and SIGTERM on Linux to prevent
   // the Flutter engine from doing an unclean teardown that triggers:
   //   "FlutterEngineRemoveView returned kInvalidArguments"
   //   "Segmentation fault (core dumped)"
-  // On macOS the exit must also skip C++ finalizers (see
-  // exitWithoutNativeFinalizers) or the abort-in-destructor crash fires here
-  // too and the signal-quit gets logged as "Abort trap: 6".
   if (!Platform.isWindows) {
     ProcessSignal.sigint.watch().listen((_) {
       debugPrint('Caught SIGINT — exiting immediately.');
-      Platform.isMacOS ? exitWithoutNativeFinalizers(0) : exit(0);
+      exit(0);
     });
     ProcessSignal.sigterm.watch().listen((_) {
       debugPrint('Caught SIGTERM — exiting immediately.');
-      Platform.isMacOS ? exitWithoutNativeFinalizers(0) : exit(0);
+      exit(0);
     });
   }
   // Ignore SIGPIPE at the C level. A write to a socket/pipe whose peer has
   // already closed (a dropped web-server connection, the mDNSResponder/Tailscale
   // sockets used when serving over the LAN or a tailnet, a subprocess stdio pipe)
   // raises SIGPIPE, whose default disposition SILENTLY terminates the whole
-  // process with no crash report — the "app just vanishes from the dock when I
-  // toggle the web server on" bug in the signed/notarized build. The standalone
+  // process with no crash report — the "app just vanishes when I
+  // toggle the web server on" bug. The standalone
   // Dart VM sets SIG_IGN for us (so `flutter run` never showed it), but the
   // Flutter embedder leaves the default in place. dart:io deliberately REFUSES
   // to watch SIGPIPE, so we set the disposition directly via libc.
@@ -211,7 +208,7 @@ Future<({AppDatabase db, bool needsMigration})?> _openDatabaseGuarded() async {
 /// engine's resize handshake can complete instead of timing out with no
 /// frame to wait for (flutter/flutter#192537: a timed-out handshake left
 /// the window white until a real resize). On Windows [runApp] has already
-/// been called; macOS and Linux still call this before it.
+/// been called; Linux still calls this before it.
 Future<void> _showMainWindow() async {
   final forcedSize = WindowSizeEnv.sizeFromEnvironment();
   final windowOptions = mainWindowOptions(size: forcedSize);

@@ -27,7 +27,7 @@ enum GpuBackend { cuda, rocm, vulkan, metal, cpu }
 ///
 /// Policy:
 /// - Explicit user overrides always win (Settings → Advanced acceleration).
-/// - Otherwise AUTOMATIC: Metal on macOS, CUDA when the NVIDIA driver
+/// - Otherwise AUTOMATIC: CUDA when the NVIDIA driver
 ///   answers, **Vulkan for everything else with a GPU** (AMD and Intel),
 ///   CPU when no GPU is usable.
 /// - **ROCm is never auto-selected.** `rocminfo` succeeding only proves the
@@ -66,7 +66,7 @@ class GpuBackendResolver {
     return _auto(
       hasCuda: hasCuda,
       vendor: vendor,
-      onMac: onMac ?? Platform.isMacOS,
+      onMac: onMac ?? false,
     );
   }
 

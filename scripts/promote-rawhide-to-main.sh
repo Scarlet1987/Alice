@@ -106,7 +106,7 @@ for p in "${GUARD_PATHS[@]}"; do
 done
 
 # 4) The tree differs from Rawhide ONLY in the guarded paths (nothing leaked).
-#    (while-read, not mapfile — macOS ships bash 3.2.)
+#    (while-read, not mapfile.)
 drift_count=0
 while IFS= read -r f; do
   [ -z "$f" ] && continue

@@ -6,8 +6,7 @@ updated, and would make the checksum below meaningless.
 
 ## Why it is here
 
-Spell check on macOS and Windows uses the OS's own checker (`NSSpellChecker`,
-`ISpellChecker`). Linux has no such guarantee. The first Linux implementation
+Spell check on Windows uses the OS's own checker (`ISpellChecker`). Linux has no such guarantee. The first Linux implementation
 loaded Enchant at runtime with `dlopen`, which worked but left the feature
 standing on three moving parts none of which this project controls: Enchant
 itself (a 51 KB broker shim), the hunspell engine it loads behind that, and

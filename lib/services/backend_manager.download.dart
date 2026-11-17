@@ -312,9 +312,6 @@ extension BackendManagerDownload on BackendManager {
       if (_hasCuda) return 'koboldcpp-linux-x64';
       return 'koboldcpp-linux-x64-nocuda';
     }
-    if (Platform.isMacOS) {
-      return _intelCpu ? 'koboldcpp-mac-x64' : 'koboldcpp-mac-arm64';
-    }
     return 'koboldcpp';
   }
 
@@ -331,11 +328,6 @@ extension BackendManagerDownload on BackendManager {
       if (_useRocm) return 'https://koboldai.org/cpplinuxrocm';
       if (_hasCuda) return '$base/koboldcpp-linux-x64';
       return '$base/koboldcpp-linux-x64-nocuda';
-    }
-    if (Platform.isMacOS) {
-      return _intelCpu
-          ? 'https://github.com/LostRuins/koboldcpp/releases/latest/download/koboldcpp-mac-x64'
-          : 'https://github.com/LostRuins/koboldcpp/releases/latest/download/koboldcpp-mac-arm64';
     }
     throw Exception('Unsupported platform');
   }

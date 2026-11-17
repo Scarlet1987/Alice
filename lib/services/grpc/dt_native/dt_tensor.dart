@@ -20,8 +20,6 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-import 'dt_fpzip.dart';
-
 /// Draw Things NNC tensor codec — a 1:1 port of `image_to_nnc_tensor` /
 /// `nnc_tensor_to_image` in tools/dt-grpc-python/client.py.
 ///
@@ -151,9 +149,8 @@ bool isEncodedImage(Uint8List data) =>
 
 /// Decode a generated-image payload from the server into PNG bytes.
 /// PNG/JPEG payloads pass through; NNC tensors are decoded — raw float16/32
-/// directly, fpzip-compressed payloads via the fpzip FFI binding (throws
-/// [DtFpzipUnavailableException] when the native library is missing, which
-/// the caller turns into a sidecar fallback).
+/// directly. fpzip-compressed payloads are not supported in this build: the
+/// fpzip decoder shipped only on macOS, and macOS support was removed.
 Uint8List decodeGeneratedImage(Uint8List data) {
   if (isEncodedImage(data)) return data;
   if (data.length <= _headerLen) {
@@ -191,13 +188,13 @@ Uint8List decodeGeneratedImage(Uint8List data) {
       );
     }
   } else {
-    // Compressed payload — an embedded fpzip stream carrying its own dims
-    // ((nf=1, nz=H, ny=W, nx=C) → C-order (H, W, C) float32).
-    final result = DtFpzip.instance.decompress(payload);
-    h = result.nz;
-    w = result.ny;
-    c = result.nx;
-    floats = result.data;
+    // Compressed payload — an embedded fpzip stream. There is no decoder
+    // in this build: fpzip shipped only on macOS, and macOS support was
+    // removed, so Draw Things generations (which always arrive compressed)
+    // cannot be unpacked. The caller surfaces this as a backend error.
+    throw const FormatException(
+      'fpzip-compressed NNC payloads are not supported in this build',
+    );
   }
 
   if (c < 3 || h <= 0 || w <= 0) {

@@ -10,7 +10,7 @@
 // normal mode uses — proven by the memory card landing in the panel.
 //
 // Run it with:
-//   flutter test integration_test/journal_review_test.dart -d macos
+//   flutter test integration_test/journal_review_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

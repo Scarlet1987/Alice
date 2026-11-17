@@ -190,7 +190,6 @@ class _WorkerBackendSectionState extends State<WorkerBackendSection> {
                 RemoteProviderBar(
                   selected: kind,
                   noneSelected: off,
-                  showOmlx: Platform.isMacOS,
                   koboldEnabled: !intelMac,
                   onSelected: (next) async {
                     await applyWorkerProvider(

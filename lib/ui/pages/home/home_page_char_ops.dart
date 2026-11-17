@@ -271,8 +271,8 @@ extension _HomePageCharOps on _HomePageState {
   /// both the V2 PNG bulk import and the BYAF (Backyard AI) bulk import.
   ///
   /// The returned Future completes when [runImport] finishes (file IO done),
-  /// not when the dialog is merely shown. Desktop drop holds macOS bookmarks
-  /// and HomeDropZone._busy on that Future.
+  /// not when the dialog is merely shown. Desktop drop holds
+  /// HomeDropZone._busy on that Future.
   Future<void> _runBulkProgressImport(
     BuildContext context, {
     required String title,

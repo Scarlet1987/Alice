@@ -395,7 +395,7 @@ class _MintBar extends StatelessWidget {
           ),
           SizedBox(width: 16),
           Text(
-            'Windows · macOS · Linux   Yours forever',
+            'Windows · Linux   Yours forever',
             style: TextStyle(fontSize: 15, color: AppColors.aliceSage),
           ),
         ],

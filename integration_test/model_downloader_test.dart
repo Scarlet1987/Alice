@@ -12,7 +12,7 @@
 // P1/P2).
 //
 // Run it with:
-//   flutter test integration_test/model_downloader_test.dart -d macos
+//   flutter test integration_test/model_downloader_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

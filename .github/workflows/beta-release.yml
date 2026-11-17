@@ -29,9 +29,6 @@ jobs:
           - os: windows-latest
             platform: windows
             build_path: build/windows/x64/runner/Release
-          - os: macos-latest
-            platform: macos
-            build_path: build/macos/Build/Products/Release
           - os: ubuntu-22.04
             platform: linux
             asset_name: Front_Porch_AI_Linux.tar.gz
@@ -146,44 +143,6 @@ jobs:
           fi
           echo "SQLite is reachable from the bundle."
 
-      - name: Bundle libfpzip for the native Draw Things client (macOS)
-        if: matrix.platform == 'macos'
-        shell: bash
-        run: |
-          # The pure-Dart Draw Things client decodes generated images through
-          # a tiny fpzip FFI dylib (dt_fpzip.dart looks in Contents/Frameworks/).
-          # Without it, Draw Things generation fails with a clear
-          # libfpzip-missing error (no fallback exists — the sidecars are
-          # gone). Built fresh (LLNL fpzip 1.3.0, universal arm64+x86_64)
-          # and signed by the codesign pass below like every other
-          # Frameworks dylib. Draw Things is macOS-only software, so no
-          # Windows/Linux counterpart exists.
-          ./scripts/build-fpzip-macos.sh
-          APP_PATH=$(find build/macos/Build/Products/Release -maxdepth 1 -name "*.app" | head -1)
-          if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found for libfpzip bundling" >&2
-            exit 1
-          fi
-          mkdir -p "$APP_PATH/Contents/Frameworks"
-          cp tools/fpzip/libfpzip.dylib "$APP_PATH/Contents/Frameworks/"
-          echo "Bundled libfpzip into $APP_PATH/Contents/Frameworks/"
-
-      - name: Re-sign macOS App (ad-hoc with entitlements)
-        if: matrix.platform == 'macos'
-        run: |
-          APP_NAME=$(ls -d ${{ matrix.build_path }}/*.app | head -1)
-          ENTITLEMENTS="${{ github.workspace }}/macos/Runner/Release.entitlements"
-          echo "Re-signing $APP_NAME after libfpzip bundling..."
-          echo "Using entitlements: $ENTITLEMENTS"
-          # Sign inner frameworks/dylibs first (inside-out signing; covers the
-          # freshly bundled libfpzip.dylib)
-          find "$APP_NAME/Contents/Frameworks" -name "*.framework" -o -name "*.dylib" | while read f; do
-            codesign --force --sign - "$f" 2>/dev/null || true
-          done
-          # Sign the main app with entitlements (preserves file picker, network, etc.)
-          codesign --force --sign - --entitlements "$ENTITLEMENTS" "$APP_NAME"
-          echo "✓ Ad-hoc signature applied with entitlements"
-
       - name: Download VC++ Redistributable
         if: matrix.platform == 'windows'
         run: |
@@ -202,44 +161,6 @@ jobs:
           & $ISCC /DPRE_RELEASE=1 /DMyAppVersion="$VERSION" /DMyAppBuildDir="${{ github.workspace }}\${{ matrix.build_path }}" /DMyAppLicenseFile="${{ github.workspace }}\LICENSE" /DMyAppIconFile="${{ github.workspace }}\windows\runner\resources\app_icon.ico" "installers\windows\setup.iss"
           Copy-Item "installers\windows\Front_Porch_AI_Beta_Setup.exe" -Destination "."
         shell: pwsh
-
-
-
-      - name: Clean xattrs from app bundle (required before packaging)
-        if: matrix.platform == 'macos'
-        run: |
-          APP_PATH="build/macos/Build/Products/Release/FrontPorchAI.app"
-          xattr -cr "$APP_PATH" || true
-          find "$APP_PATH" -exec xattr -d com.apple.FinderInfo {} + 2>/dev/null || true
-
-      # Primary artifact for beta channel is now .pkg (to match the updater consts
-      # and the overall .pkg direction). Beta flow currently does ad-hoc app re-sign
-      # (no full Developer ID + notary secrets in this workflow), so we do a bare
-      # pkgbuild here. The important thing for the auto-updater is the
-      # fixed canonical .pkg name (the shim DMG was retired 2026-07-27).
-      - name: Build macOS PKG (primary for beta channel)
-        if: matrix.platform == 'macos'
-        run: |
-          cd build/macos/Build/Products/Release
-          APP_NAME=$(ls -d *.app | head -1)
-          PKG_NAME="Front_Porch_AI_MacOS.pkg"
-          UNSIGNED_PKG="unsigned_${PKG_NAME}"
-          echo "Building (bare) .pkg for beta channel: $PKG_NAME from $APP_NAME"
-          pkgbuild \
-            --component "$APP_NAME" \
-            --install-location /Applications \
-            "$UNSIGNED_PKG" || { echo "ERROR: pkgbuild failed"; exit 1; }
-          # No productsign here (beta flow lacks the full installer cert import/notary path
-          # that nightly/release have). The .pkg is still the canonical name the updater
-          # will look for; real signed+stapled .pkgs come from the other channels.
-          mv "$UNSIGNED_PKG" "$PKG_NAME"
-          echo "✓ PKG created: $PKG_NAME (beta channel)"
-          # Promote the *canonical* PKG name (what _platformAsset + fallback will
-          # request for the beta/pre-release channel) to workspace root so that
-          # upload-artifact + gh-release publish it under the exact name the
-          # in-app updater expects. Use ${GITHUB_WORKSPACE} (absolute) to avoid
-          # brittle relative ../../ counts (addresses review issues 1 and 9).
-          mv "$PKG_NAME" "${GITHUB_WORKSPACE}/Front_Porch_AI_MacOS.pkg" 2>/dev/null || true
 
       - name: Get Version
         id: get_version
@@ -302,7 +223,6 @@ jobs:
           name: build-${{ matrix.platform }}
           path: |
             Front_Porch_AI_Beta_Setup.exe
-            Front_Porch_AI_MacOS.pkg
             Front_Porch_AI-Linux.AppImage
           if-no-files-found: ignore
 
@@ -346,7 +266,6 @@ jobs:
         with:
           files: |
             Front_Porch_AI_Beta_Setup.exe
-            Front_Porch_AI_MacOS.pkg
             Front_Porch_AI-Linux.AppImage
           prerelease: true
           name: "${{ github.ref_name }} (Pre-Release)"

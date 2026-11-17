@@ -19,7 +19,6 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -139,9 +138,9 @@ class _ChatPageState extends State<ChatPage> {
   /// the id is no longer in the active cast (e.g. after switching chats).
   String? _focusedParticipantId;
 
-  /// Platform-appropriate label for the regenerate shortcut (#86), surfaced in
+  /// Label for the regenerate shortcut (#86), surfaced in
   /// the Generate-reply button tooltip so keyboard users can discover it.
-  String get _regenShortcutLabel => Platform.isMacOS ? '⌘R' : 'Ctrl+R';
+  String get _regenShortcutLabel => 'Ctrl+R';
 
   @override
   void initState() {
@@ -160,15 +159,13 @@ class _ChatPageState extends State<ChatPage> {
           _sendCurrentMessage(chatService);
           return KeyEventResult.handled;
         }
-        // ⌘R (macOS) / Ctrl+R — (re)generate the last AI reply. If the previous
+        // Ctrl+R — (re)generate the last AI reply. If the previous
         // reply was deleted, regenerateLastMessage() generates a fresh one from
         // the trailing user prompt instead (it handles both). Mirrors the
         // Generate-reply toolbar button / bubble regen for keyboard users.
         if (event is KeyDownEvent &&
             event.logicalKey == LogicalKeyboardKey.keyR &&
-            (Platform.isMacOS
-                ? HardwareKeyboard.instance.isMetaPressed
-                : HardwareKeyboard.instance.isControlPressed)) {
+            HardwareKeyboard.instance.isControlPressed) {
           final chatService = Provider.of<ChatService>(context, listen: false);
           if (!chatService.isGenerating && !chatService.isGuestBusy) {
             final last = chatService.messages.isEmpty

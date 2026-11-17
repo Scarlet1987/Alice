@@ -22,8 +22,7 @@
 // which wrote all 71 wizard preferences one after another. On Windows and
 // Linux each preference write re-encodes the whole preferences map and
 // rewrites the whole file synchronously, so one key cost 71 file rewrites on
-// the UI thread before the character could be drawn. macOS keeps preferences
-// in NSUserDefaults, which is why it never showed there.
+// the UI thread before the character could be drawn.
 //
 // This test types into EVERY text box of each creation mode and counts the
 // writes that reach the real legacy preferences store (its platform channel

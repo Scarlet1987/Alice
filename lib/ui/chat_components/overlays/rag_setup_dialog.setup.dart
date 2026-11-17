@@ -213,8 +213,6 @@ extension _RagSetupProgress on RagSetupDialogState {
                   Text(
                     Platform.isWindows
                         ? '  %LOCALAPPDATA%/front-porch-ai/embeddings/'
-                        : Platform.isMacOS
-                        ? '  ~/Library/Caches/front-porch-ai/embeddings/'
                         : '  ~/.cache/front-porch-ai/embeddings/',
                     style: TextStyle(
                       color: AppColors.textTertiary(context),

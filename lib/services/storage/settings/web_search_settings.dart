@@ -57,9 +57,7 @@ String wikiHostLabel(String url) {
 /// No key → Wikipedia.
 class WebSearchSettings with SettingsBase {
   WebSearchSettings({
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage(
-      mOptions: MacOsOptions(usesDataProtectionKeychain: false),
-    ),
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     SecureCredentialStore? secureStore,
   }) : _store =
            secureStore ??
@@ -145,7 +143,7 @@ class WebSearchSettings with SettingsBase {
       ..addAll(_decodeWikiMap(prefs?.getString(k('wiki_url_by_character'))));
     await _migrateDefaultIntoSaved();
     final key = k(_apiKeyName);
-    // Null prefs = in-memory sandbox. Never read the live macOS keychain.
+    // Null prefs = in-memory sandbox. Never read the live OS keychain.
     if (prefs == null) {
       _searchApiKey = '';
       return;

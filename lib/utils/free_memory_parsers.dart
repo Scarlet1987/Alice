@@ -26,7 +26,7 @@ int? meminfoAvailableMb(String text) {
   return kb == null ? null : int.parse(kb.group(1)!) ~/ 1024;
 }
 
-/// macOS `vm_stat`: free, inactive, speculative and purgeable pages are what
+/// `vm_stat` output: free, inactive, speculative and purgeable pages are what
 /// a newly started program can have.
 int? vmStatAvailableMb(String text) {
   final page = int.tryParse(

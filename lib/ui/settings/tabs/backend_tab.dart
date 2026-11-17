@@ -96,11 +96,6 @@ class BackendTab extends StatelessWidget {
                   )
                 : null,
           ),
-          if (llmProvider.activeBackend == BackendType.omlx)
-            OmlxSection(
-              availableModels: availableModels,
-              onModelsFetched: onModelsFetched,
-            ),
           if (llmProvider.hasManagedProcess && !backendManager.isIntelMac)
             ManagedBackendSection(
               selectedModelPath: selectedModelPath,

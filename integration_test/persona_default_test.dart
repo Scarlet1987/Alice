@@ -19,7 +19,7 @@
 //      unmoved by the reopen.
 //
 // Run it with:
-//   flutter test integration_test/persona_default_test.dart -d macos
+//   flutter test integration_test/persona_default_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

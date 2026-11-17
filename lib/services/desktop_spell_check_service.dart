@@ -21,12 +21,12 @@ import 'dart:ui' show Locale, TextRange;
 import 'package:flutter/services.dart'
     show MethodChannel, SpellCheckService, SuggestionSpan;
 
-/// A [SpellCheckService] backed by a native spell checker: macOS
-/// `NSSpellChecker`, Windows `ISpellChecker`, and on Linux a hunspell engine
-/// compiled into the app itself (`third_party/hunspell`).
+/// A [SpellCheckService] backed by a native spell checker: Windows
+/// `ISpellChecker`, and on Linux a hunspell engine compiled into the app
+/// itself (`third_party/hunspell`).
 ///
-/// Communicates with `SpellCheckPlugin` (Swift / C++ / C++-GObject) over the
-/// `front_porch_ai/spell_check` method channel. All three runners implement
+/// Communicates with `SpellCheckPlugin` (C++ / C++-GObject) over the
+/// `front_porch_ai/spell_check` method channel. Both runners implement
 /// the identical contract:
 ///
 ///   send    `spellCheck` with `[languageTag, text]`

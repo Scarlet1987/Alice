@@ -8,7 +8,7 @@
 // tap-to-jump seeks the cited message in the chat list.
 //
 // Run it with:
-//   flutter test integration_test/growth_rings_test.dart -d macos
+//   flutter test integration_test/growth_rings_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

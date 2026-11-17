@@ -5,8 +5,7 @@ part of 'hardware_service.dart';
 
 extension HardwareServiceFreeMemory on HardwareService {
   /// Free graphics and system memory now. Graphics is read on NVIDIA cards
-  /// (nvidia-smi), AMD cards on Linux (the driver's counters) and Apple
-  /// Silicon (the share the graphics may use, as far as memory is free).
+  /// (nvidia-smi) and AMD cards on Linux (the driver's counters).
   ///
   /// A reading taken while this app's KoboldCpp holds memory says less than
   /// the model will have, so callers that need "free before the model
@@ -31,10 +30,6 @@ extension HardwareServiceFreeMemory on HardwareService {
     if (Platform.isLinux) {
       return meminfoAvailableMb(await File('/proc/meminfo').readAsString());
     }
-    if (Platform.isMacOS) {
-      final r = await Process.run('vm_stat', const []);
-      return r.exitCode == 0 ? vmStatAvailableMb('${r.stdout}') : null;
-    }
     if (Platform.isWindows) {
       final r = await Process.run('powershell', const [
         '-NoProfile',
@@ -49,14 +44,6 @@ extension HardwareServiceFreeMemory on HardwareService {
   Future<int?> _freeGraphicsMb(int? gpuId, int? freeSystem) async {
     final info = hardwareInfo;
     if (info == null) return null;
-    if (Platform.isMacOS) {
-      // One pool: the graphics may use its share of it, as far as it is
-      // free.
-      if (info.vramMb <= 0) return null;
-      return freeSystem == null
-          ? info.vramMb
-          : (freeSystem < info.vramMb ? freeSystem : info.vramMb);
-    }
     if (info.hasCuda || info.vendor == 'Nvidia') {
       final r = await _runNvidiaSmi(const [
         '--query-gpu=memory.free',

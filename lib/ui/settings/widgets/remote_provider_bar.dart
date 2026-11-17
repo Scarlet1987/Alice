@@ -22,13 +22,12 @@ import 'package:front_porch_ai/services/storage/settings/remote_provider.dart';
 import 'package:front_porch_ai/ui/theme/app_colors.dart';
 
 /// One-row host switcher (KoboldCpp / OpenRouter / Nano-GPT / xAI /
-/// LM Studio / oMLX / Custom). oMLX is omitted unless [showOmlx] is true (macOS).
+/// LM Studio / Custom).
 class RemoteProviderBar extends StatelessWidget {
   const RemoteProviderBar({
     super.key,
     required this.selected,
     required this.onSelected,
-    this.showOmlx = false,
     this.koboldEnabled = true,
     this.remoteHostsOnly = false,
     this.noneSelected = false,
@@ -36,7 +35,6 @@ class RemoteProviderBar extends StatelessWidget {
 
   final RemoteProviderKind selected;
   final ValueChanged<RemoteProviderKind> onSelected;
-  final bool showOmlx;
   final bool koboldEnabled;
 
   /// OpenRouter / Nano-GPT / xAI / LM Studio only — wizard Setup, not Model Settings.
@@ -67,7 +65,7 @@ class RemoteProviderBar extends StatelessWidget {
     final source = remoteHostsOnly ? _remoteHosts : _all;
     final items = [
       for (final e in source)
-        if (e.$1 != RemoteProviderKind.omlx || showOmlx) e,
+        if (e.$1 != RemoteProviderKind.omlx) e,
     ];
     _Pill pill((RemoteProviderKind, String) e, {bool wrapped = false}) => _Pill(
       label: e.$2,

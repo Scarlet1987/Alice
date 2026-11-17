@@ -16,7 +16,7 @@
 //
 // Boot/sandbox contract is identical to app_smoke_test.dart; see its header.
 //
-//   flutter test integration_test/regen_feelings_cadence_test.dart -d macos
+//   flutter test integration_test/regen_feelings_cadence_test.dart -d linux
 
 import 'dart:convert';
 import 'dart:io';

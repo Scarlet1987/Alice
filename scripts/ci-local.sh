@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Run the CI-parity Linux test jobs locally BEFORE pushing, inside the
-# linux/amd64 `fpai-golden` Docker image (runs via Rosetta on Apple Silicon).
+# linux/amd64 `fpai-golden` Docker image.
 #
-# Why this exists: the widget golden tests are Linux-gated — a green macOS
-# `flutter test` does NOT execute them, which is exactly how a red-CI commit
-# once reached Rawhide. This script mirrors the GitHub `golden` and `test`
-# jobs byte-for-byte (same Flutter version as ci.yml, same flags) so pushes
-# can be gated on the same evidence CI uses.
+# Why this exists: the widget golden tests are Linux-gated — a green
+# `flutter test` on any other OS does NOT execute them, which is exactly how
+# a red-CI commit once reached Rawhide. This script mirrors the GitHub
+# `golden` and `test` jobs byte-for-byte (same Flutter version as ci.yml,
+# same flags) so pushes can be gated on the same evidence CI uses.
 #
 # The image is built from scripts/ci-golden.Dockerfile — when ci.yml bumps
 # its flutter-version, rebuild with the matching FLUTTER_VERSION build-arg
@@ -28,9 +28,9 @@
 # the merge base of HEAD. It also exits 3 when GitHub does not answer within
 # 20 seconds. FPAI_ALLOW_STALE_BASE=1 skips the check, for offline use.
 #
-# The macOS working tree is rsynced into a named Docker volume (incremental,
+# The working tree is rsynced into a named Docker volume (incremental,
 # a few seconds) instead of being mounted read-write, so the container's
-# Linux .dart_tool/build artifacts can never pollute the Mac checkout.
+# Linux .dart_tool/build artifacts can never pollute the checkout.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -52,8 +52,8 @@ if [ "${FPAI_ALLOW_STALE_BASE:-0}" = "1" ]; then
 else
   echo "── checking this branch is on the current Rawhide…"
   # The fetch gets 20 seconds. A network that drops packets would leave it
-  # waiting for minutes, and macOS has no `timeout`, so the script watches it
-  # and stops it (and its transport helper) at the deadline.
+  # waiting for minutes, so the script watches it and stops it (and its
+  # transport helper) at the deadline.
   git fetch --quiet origin Rawhide &
   fetch_pid=$!
   deadline=$((SECONDS + 20))

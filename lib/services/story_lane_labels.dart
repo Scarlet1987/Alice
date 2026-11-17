@@ -64,7 +64,7 @@ Map<String, dynamic> storyLaneOptionsFor(
           },
     'hosts': [
       for (final kind in RemoteProviderKind.values)
-        if (kind != RemoteProviderKind.omlx || Platform.isMacOS)
+        if (kind != RemoteProviderKind.omlx)
           {
             'kind': kind.name,
             'label': remoteProviderKindLabel(kind),

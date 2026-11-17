@@ -75,30 +75,7 @@ extension _SettingsLaunchControls on _SettingsPageState {
         }
       }
     }
-    // MacOS Logic: Default to Metal if not set
-    else if (Platform.isMacOS) {
-      if (storage.backendSettings.useMetal == null) {
-        storage.backendSettings.setUseMetal(true);
-        storage.backendSettings.setUseVulkan(false);
-        storage.backendSettings.setUseCublas(false);
-        _useMetal = true;
-        _useVulkan = false;
-        _useCublas = false;
-        changed = true;
-      } else {
-        _useMetal = storage.backendSettings.useMetal!;
-        if (storage.backendSettings.useVulkan != null) {
-          _useVulkan = storage.backendSettings.useVulkan!;
-        }
-        if (storage.backendSettings.useCublas != null) {
-          _useCublas = storage.backendSettings.useCublas!;
-        }
-        if (storage.backendSettings.useRocm != null) {
-          _useRocm = storage.backendSettings.useRocm!;
-        }
-      }
-    }
-    // Non-NVIDIA/Non-Mac Logic: Default to ROCm if available, else Vulkan
+    // Non-NVIDIA Logic: Default to ROCm if available, else Vulkan
     else {
       if (storage.backendSettings.useVulkan == null &&
           storage.backendSettings.useRocm == null) {
@@ -142,8 +119,6 @@ extension _SettingsLaunchControls on _SettingsPageState {
       final String msg;
       if (hw.vendor == 'Nvidia') {
         msg = 'NVIDIA GPU detected: CuBLAS enabled.';
-      } else if (Platform.isMacOS) {
-        msg = 'Apple Silicon detected: Metal enabled.';
       } else if (hw.vendor == 'AMD' && Platform.isLinux && hw.hasRocm) {
         msg = 'AMD GPU detected: ROCm enabled for native GPU acceleration.';
       } else if (hw.vendor == 'AMD' &&

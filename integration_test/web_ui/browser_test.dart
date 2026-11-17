@@ -12,7 +12,7 @@
 // no browsers installed) does not pick it up; CI runs it in the web-e2e job.
 //
 // Run it with (once: `cd web_ui && npm ci && npx playwright install chromium webkit`):
-//   flutter test integration_test/web_ui/browser_test.dart -d macos
+//   flutter test integration_test/web_ui/browser_test.dart -d linux
 
 import 'dart:async';
 import 'dart:convert';

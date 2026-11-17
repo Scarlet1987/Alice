@@ -199,8 +199,8 @@ void main() {
           'sqlite3 2.x bundles NOTHING and requires sqlite3_flutter_libs '
           '0.5.x to build the library.\n\n'
           '2.x + 0.6.x produces a build with NO SQLITE AT ALL. It compiles, '
-          'it passes tests, and it works on macOS and Windows because they '
-          'fall back to system SQLite — then it bricks every Linux install '
+          'it passes tests, and it works on Windows because it falls '
+          'back to system SQLite — then it bricks every Linux install '
           'with "libsqlite3.so is missing". That shipped as v1.1.0.\n',
     );
   });

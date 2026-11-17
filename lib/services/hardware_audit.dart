@@ -200,9 +200,8 @@ class HardwareAudit {
     final systemRamMb = await _probeSystemRam();
     final cpuCores = Platform.numberOfProcessors;
     // CUDA is viable exactly when nvidia-smi ran successfully — _probeVram
-    // already determined that above, so no second spawn. Never true on macOS.
+    // already determined that above, so no second spawn.
     final hasCuda =
-        !Platform.isMacOS &&
         (vendor == 'Nvidia' || vendor == 'Unknown') &&
         vramRes.nvidiaSmiOk;
     final rocm = await _probeRocm(vendor);
@@ -269,7 +268,6 @@ class HardwareAudit {
       if (gpuLine == null) return 'None';
       return _vendorFromName(gpuLine);
     }
-    if (Platform.isMacOS) return 'Apple';
     if (Platform.isWindows) {
       try {
         final res = await Process.run('powershell', [
@@ -402,15 +400,6 @@ class HardwareAudit {
             }
           }
         }
-      } else if (Platform.isMacOS) {
-        final res = await Process.run('sysctl', [
-          '-n',
-          'hw.memsize',
-        ]).timeout(const Duration(seconds: 5));
-        if (res.exitCode == 0) {
-          final bytes = int.tryParse(res.stdout.toString().trim());
-          if (bytes != null) return (bytes / (1024 * 1024)).round();
-        }
       } else if (Platform.isWindows) {
         final res = await Process.run('powershell', [
           '-command',
@@ -451,7 +440,6 @@ class HardwareAudit {
     required bool hasCuda,
     required bool hasRocm,
   }) {
-    if (Platform.isMacOS) return const ['metal', 'cpu'];
     switch (vendor) {
       case 'Nvidia':
         return hasCuda ? const ['cuda', 'vulkan', 'cpu'] : const ['cpu'];

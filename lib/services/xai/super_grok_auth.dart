@@ -61,8 +61,7 @@ class SuperGrokAuth extends ChangeNotifier {
        _legacyPrefs = legacyPrefs,
        _sessionHolder = sessionHolder;
 
-  /// Session lives beside the other API keys in SharedPreferences — the
-  /// macOS keychain comes back empty on ad-hoc Rawhide launches.
+  /// Session lives beside the other API keys in SharedPreferences.
   factory SuperGrokAuth.inPrefs(
     SharedPreferences? Function() prefs,
     String key,

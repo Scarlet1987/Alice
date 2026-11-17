@@ -1,9 +1,6 @@
 // Copyright (C) 2026 Front Porch AI
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'dart:ffi' show Abi;
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,8 +27,6 @@ class SetupBackendPicker extends StatelessWidget {
     final activeBackend = llmProvider.activeBackend;
     final isKobold = activeBackend == BackendType.kobold;
     final isRemote = activeBackend == BackendType.openRouter;
-    final isAppleSiliconMac =
-        Platform.isMacOS && Abi.current() == Abi.macosArm64;
     final remoteKind = resolveRemoteProviderKind(
       backendType: storage.backendSettings.backendType,
       url: storage.backendSettings.remoteApiUrl,
@@ -74,22 +69,6 @@ class SetupBackendPicker extends StatelessWidget {
                 },
               ),
             ),
-            if (isAppleSiliconMac) ...[
-              const SizedBox(width: 8),
-              Expanded(
-                child: BackendChip(
-                  label: 'oMLX',
-                  icon: Icons.apple,
-                  isSelected: activeBackend == BackendType.omlx,
-                  onTap: () async {
-                    if (activeBackend != BackendType.omlx) {
-                      await llmProvider.setActiveBackend(BackendType.omlx);
-                      await state.loadAvailableModels(llmProvider);
-                    }
-                  },
-                ),
-              ),
-            ],
           ],
         ),
         if (isRemote) ...[

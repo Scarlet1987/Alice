@@ -46,7 +46,7 @@ interface Settings {
   remoteModelName: string;
   hasApiKey: boolean;
   remoteApiUrlsWithKeys?: string[];
-  /** Host is macOS — oMLX is Apple Silicon only. Absent = hide (old hosts). */
+  /** oMLX is Apple Silicon only and is no longer offered. Absent = hide (old hosts). */
   omlxAvailable?: boolean;
   remoteConfigured?: boolean;
   remoteReachability?: 'unknown' | 'checking' | 'reachable' | 'unreachable';

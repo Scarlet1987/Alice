@@ -40,7 +40,7 @@ class KcppsEditorController extends ChangeNotifier {
        _threads = threads ?? suggestKoboldThreads,
        _readFree = readFree,
        _readModel = readModel ?? _readGguf,
-       unifiedMemory = unified ?? Platform.isMacOS;
+       unifiedMemory = unified ?? false;
 
   final StorageService storage;
   final HardwareService hardware;

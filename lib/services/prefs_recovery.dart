@@ -37,9 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// [healIfCorrupt] probes the store before anything else reads it; on the
 /// corruption signature it moves the broken file aside (kept as
 /// `shared_preferences.json.corrupt` for diagnosis) and retries once, so the
-/// app boots with default settings instead of not booting at all. macOS uses
-/// NSUserDefaults rather than this JSON file, so there is nothing to heal
-/// there and the probe simply passes the error through to the startup guard.
+/// app boots with default settings instead of not booting at all.
 class PrefsRecovery {
   PrefsRecovery._();
 

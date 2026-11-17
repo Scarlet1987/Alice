@@ -107,7 +107,6 @@ class BackendModeSelector extends StatelessWidget {
             children: [
               RemoteProviderBar(
                 selected: kind,
-                showOmlx: Platform.isMacOS,
                 koboldEnabled: !backendManager.isIntelMac,
                 onSelected: (next) async {
                   await applyRemoteProvider(

@@ -1,6 +1,6 @@
 # Installation Guide
 
-Front Porch AI runs on Windows, macOS, and Linux. This page covers installing the app, keeping it updated, and building from source if you're a developer.
+Front Porch AI runs on Windows and Linux. This page covers installing the app, keeping it updated, and building from source if you're a developer.
 
 If you're wondering whether your computer can handle it, see [What You Need to Run It](getting-started.md#what-you-need-to-run-it) in the Getting Started guide — the short answer is that most machines from the last several years are fine, and a graphics card is helpful but optional.
 
@@ -9,7 +9,6 @@ If you're wondering whether your computer can handle it, see [What You Need to R
 ## Table of Contents
 
 - [Windows](#windows)
-- [macOS](#macos)
 - [Linux — Package Managers (Recommended)](#linux--package-managers-recommended)
 - [Linux — AppImage and Manual Packages](#linux--appimage-and-manual-packages)
 - [Nightly Builds](#nightly-builds)
@@ -30,18 +29,6 @@ A few things the installer quietly handles for you:
 - **No admin password needed.** It installs into your own user folder, so Windows has no reason to ask for one.
 - **The Visual C++ runtime** is installed automatically if your PC doesn't already have it — that's the usual culprit behind "missing VCRUNTIME140.dll" errors.
 - **Channels don't collide.** Stable and nightly each install to their own folder and appear separately in Add/Remove Programs, so you can keep the stable app and try a nightly at the same time.
-
-## macOS
-
-Needs **macOS 13.3 Ventura** or newer (the bundled ONNX runtime is built for 13.3). Monterey and older will not run it.
-
-1. Download `Front_Porch_AI.pkg` from the [Releases page](https://github.com/linux4life1/front-porch-AI/releases). It's the only macOS download — there's no `.dmg` any more.
-2. Double-click it and follow the installer. It places **Front Porch AI** in your **Applications** folder for you.
-3. Launch it from Applications.
-
-> **Tip:** Stable releases are code-signed and **notarized by Apple**, so macOS opens the app without Gatekeeper warnings, "damaged app" scares, or right-click workarounds — on the first launch and every launch after. Very few apps in this space bother with notarization; I do it for every stable release, and for nightly builds too.
-
-The app is built natively for Apple Silicon (M1 and newer), where it runs local AI models beautifully. It also runs on Intel Macs, but those can't run models locally — on an Intel Mac the app skips the AI-engine download entirely and shows a banner in **Settings → Backend** saying local inference isn't supported and only Remote API mode is available. It doesn't switch you over for you: choosing Remote API there is a one-time step you do yourself.
 
 ## Linux — Package Managers (Recommended)
 
@@ -105,15 +92,13 @@ Whichever you choose, you need a normal GTK 3 desktop environment underneath —
 
 Everything in the current stable release really is in stable. **Nightly** is the only early-access channel — a fresh build of Rawhide most mornings whenever there's new work to ship; quiet days are skipped. They're tagged `nightly-…` and flagged "Pre-release" on the [Releases page](https://github.com/linux4life1/front-porch-AI/releases). There is no beta series.
 
-**What you can download.** Nightlies come as a Windows installer, a macOS `.pkg`, a Linux AppImage, and a Linux `.tar.gz`. There is no nightly `.deb` or `.rpm`, and nightlies never go into the apt/dnf repositories — those carry stable only. On Arch, `front-porch-ai-beta-bin` in the AUR follows the nightlies (the package name is leftover).
+**What you can download.** Nightlies come as a Windows installer, a Linux AppImage, and a Linux `.tar.gz`. There is no nightly `.deb` or `.rpm`, and nightlies never go into the apt/dnf repositories — those carry stable only. On Arch, `front-porch-ai-beta-bin` in the AUR follows the nightlies (the package name is leftover).
 
 **Your stable install stays safe.** Nightlies keep everything — characters, chats, settings, models — in a separate `FrontPorchAI-Beta` folder (the name is leftover from when there was a beta channel) with their own settings, so they never touch your stable data. You can run stable and a nightly side by side. The first time a nightly starts it offers to copy your stable database across, so you can try new features with your existing characters; your stable copy is left untouched either way, and you can decline.
 
 **Backups & Restore is limited on nightlies.** The **Backups & Restore** page opens but its contents are replaced by a notice, so there is no way to browse or roll back a snapshot there. The automatic snapshots themselves keep running: a nightly still saves a copy of its database every half hour, into its own `FrontPorchAI-Beta` folder, on the same schedule stable uses. If you need to restore one while you're on a nightly, the files are sitting in a `backups` folder next to that build's database.
 
 A backup is a copy of the **database file** only — your chats, your characters' records, and the rest of the database rows. Settings aren't in it (they're stored separately from the database), and neither are image files, so a backup won't bring back a character card image you deleted.
-
-**macOS.** Nightly `.pkg` files are signed and notarized just like stable ones.
 
 Expect occasional rough edges — that's the deal with early builds. Bug reports on [Discord](https://discord.gg/e4tET6rpdv) are always welcome.
 
@@ -123,7 +108,7 @@ Expect occasional rough edges — that's the deal with early builds. Bug reports
 
 There's no manual setup, and nothing gets downloaded without you asking for it.
 
-1. **First launch asks one question:** should the app run the built-in AI engine (KoboldCpp) for you, or do you have your own backend already — OpenRouter, Nano-GPT, oMLX, LM Studio, or any OpenAI-compatible API? Choose the built-in engine (or "Not sure yet") and it starts fetching quietly in the background while you carry on setting things up. Choose your own backend and nothing is downloaded at all. You can change your mind any time in **Settings → Backend**.
+1. **First launch asks one question:** should the app run the built-in AI engine (KoboldCpp) for you, or do you have your own backend already — OpenRouter, Nano-GPT, LM Studio, or any OpenAI-compatible API? Choose the built-in engine (or "Not sure yet") and it starts fetching quietly in the background while you carry on setting things up. Choose your own backend and nothing is downloaded at all. You can change your mind any time in **Settings → Backend**.
 2. **It looks at your hardware** — graphics card, video memory, system memory — and picks sensible defaults.
 3. **It drops you on the home screen**, ready to add characters and models.
 
@@ -138,13 +123,12 @@ From there, open **Manage Models** in the sidebar to download your first AI mode
 | How you installed | How updates arrive |
 | --- | --- |
 | Windows installer | The app notices new versions and can install them for you |
-| macOS `.pkg` | The app notices new versions and can install them for you |
 | Linux AppImage | The app notices new versions and can install them for you |
 | apt / dnf repository | With your normal system updates (`apt upgrade`, `dnf upgrade`) |
 | Arch AUR | `yay -Syu` |
 | `.deb`, `.rpm`, or `.tar.gz` you downloaded by hand | Download the newer file yourself |
 
-The in-app updater only appears for the first three. Everywhere else the app deliberately stays quiet and leaves updating to your package manager, so it can't fight with it.
+The in-app updater only appears for the first two. Everywhere else the app deliberately stays quiet and leaves updating to your package manager, so it can't fight with it.
 
 **Chatting from your phone.** There's nothing to install on the phone — the desktop app can serve a full web interface to any browser on your network. See [Web & Phone Access](user-guide.md#web--phone-access) in the User Guide.
 
@@ -166,7 +150,7 @@ Everything below is for people who want to hack on the app. Regular users can st
 
 **Prerequisites**
 
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) **3.47.0** — the exact version CI builds and tests with. The project needs Dart 3.10.8 or newer. macOS **13.3 Ventura** is the floor.
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) **3.47.0** — the exact version CI builds and tests with. The project needs Dart 3.10.8 or newer.
 - Git
 
 That's the whole list — voice, speech-to-text, character expressions and memory embeddings all run **in-process** via libraries that ship with the app's packages. No Rust and no Python toolchain to set up. (The language model itself is the exception, and always has been: KoboldCpp is a separate local server that the app downloads, then starts and stops for you from the UI.)
@@ -204,10 +188,6 @@ The generated database code and the built web/phone interface are both committed
 ```bash
 flutter build windows   # or: flutter build linux
 ```
-
-On macOS, a plain `flutter build macos` is what you want for local testing.
-
-`./scripts/build-macos.sh` exists too, but read the label before you run it: it is the local equivalent of the **nightly** pipeline, not the stable release one. It builds, code-signs, packages and notarizes — and along the way it renames the bundle to `FrontPorchAI-Rawhide.app`, sets its display name to "Front Porch AI Nightly", and produces `Front_Porch_AI_Rawhide.pkg`. What it does **not** do is change the app's version, so the build still reports itself as a stable release and opens your normal `FrontPorchAI` data folder and database — not the `FrontPorchAI-Beta` one. If you want it sandboxed the way a real nightly is, edit the `appVersion` constant in `lib/app_version.dart` to a pre-release string yourself; that patch is exactly what the nightly workflow applies before it builds. The `.pkg` step also checks for my personal Developer ID Installer certificate by name and stops with an error if it isn't in the keychain, so if you're not me, run it with `--skip-pkg` (and `--skip-sign` as well if you have no signing identity at all).
 
 That's it — the built bundle is self-contained.
 

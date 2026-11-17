@@ -21,10 +21,9 @@ String civitaiHomeFolder({Map<String, String>? env, String? os}) {
 }
 
 /// Folders of the home folder that hold what a login runs or a program keeps
-/// for the system, though they are not named with a dot: `~/Library` on macOS
-/// (LaunchAgents are in it) and, on Windows, the roaming and local app data
-/// folders (the Startup folder is in the first). Empty on Linux, where those
-/// are dot folders.
+/// for the system, though they are not named with a dot: on Windows, the
+/// roaming and local app data folders (the Startup folder is in the first).
+/// Empty on Linux, where those are dot folders.
 ///
 /// With a [home] given, the Windows folders are the ones under it: the
 /// environment's own app data folders count only when they are inside it, so a
@@ -37,10 +36,6 @@ List<String> civitaiSensitiveHomeFolders({
 }) {
   env ??= Platform.environment;
   os ??= Platform.operatingSystem;
-  if (os == 'macos') {
-    final h = home ?? civitaiHomeFolder(env: env, os: os);
-    return [if (h.isNotEmpty) p.join(h, 'Library')];
-  }
   if (os != 'windows') return const [];
   final w = p.windows;
   final h = home ?? civitaiHomeFolder(env: env, os: os);

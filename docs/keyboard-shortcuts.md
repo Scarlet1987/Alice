@@ -2,7 +2,7 @@
 
 Front Porch AI keeps keyboard handling deliberately small. There are only a handful of real shortcuts — everything else follows your operating system's normal behavior.
 
-Throughout this page: on macOS use **⌘ Command**; on Windows and Linux use **Ctrl**.
+Throughout this page: use **Ctrl**.
 
 ---
 
@@ -23,7 +23,7 @@ A stray Enter won't fire off an empty message. Sending only happens when the box
 
 | Shortcut | Action |
 |---|---|
-| `Ctrl / ⌘ + R` | Rewrite the last AI reply |
+| `Ctrl + R` | Rewrite the last AI reply |
 
 This works while the message box has focus, and it's ignored while a reply is still streaming in. If you already deleted the last reply, it writes a fresh one from your last message instead. It behaves the same way in group chats.
 
@@ -40,7 +40,7 @@ Click the pencil (**Edit message**) on any bubble and the editor has its own two
 | Shortcut | Action |
 |---|---|
 | `Esc` | Cancel — if you changed something, it asks before discarding |
-| `Ctrl / ⌘ + Enter` | Save |
+| `Ctrl + Enter` | Save |
 
 These behave the same in the desktop app and the browser UI.
 
@@ -63,21 +63,17 @@ Every text field in the app (chat box, character editor, story editor…) suppor
 
 | Shortcut | Action |
 |---|---|
-| `Ctrl / ⌘ + C` | Copy |
-| `Ctrl / ⌘ + V` | Paste |
-| `Ctrl / ⌘ + X` | Cut |
-| `Ctrl / ⌘ + Z` | Undo |
-| `Ctrl / ⌘ + Shift + Z` | Redo |
-| `Ctrl / ⌘ + A` | Select all |
+| `Ctrl + C` | Copy |
+| `Ctrl + V` | Paste |
+| `Ctrl + X` | Cut |
+| `Ctrl + Z` | Undo |
+| `Ctrl + Shift + Z` | Redo |
+| `Ctrl + A` | Select all |
 | Arrow keys, Home, End, PgUp, PgDn | Move around and select text |
 
-Chat bubbles are the same: drag across the spoken line (and an expanded Thought) and use **Copy** or `Ctrl / ⌘ + C`. The name and buttons on the bubble are not part of that selection.
-
-macOS **Edit → Find** (`⌘F`) is not in the menu. It used to be a leftover from the app template and did nothing on the chat canvas. The browser UI may still open the browser’s own Find — that is the browser, not Front Porch.
+Chat bubbles are the same: drag across the spoken line (and an expanded Thought) and use **Copy** or `Ctrl + C`. The name and buttons on the bubble are not part of that selection.
 
 `Esc` closes most dialogs and `Tab` moves focus between controls — standard behavior on every platform. In the small single-line prompts (renaming a folder, searching for a model, typing a tag), **Enter** confirms instead of adding a line.
-
-On macOS the usual menu-bar items are there too: `⌘Q` to quit, `⌘H` to hide, `⌘M` to minimize, `⌃⌘F` for full screen. One thing to know: **"Preferences…" (`⌘,`) in the app menu does nothing** — it's a leftover from the standard macOS app template that I never wired up. Settings lives in the left sidebar.
 
 ---
 

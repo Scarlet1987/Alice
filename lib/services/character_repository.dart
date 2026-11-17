@@ -287,7 +287,7 @@ class CharacterRepository extends ChangeNotifier {
       // (`_resolveImagePath`) while `Directory.list()` returns the platform
       // separator — on Windows that is '\', so no referenced path ever matched
       // its own file and every live portrait was classified as an orphan.
-      // Case is folded because Windows/macOS filesystems match names that way;
+      // Case is folded because Windows filesystems match names that way;
       // a near-miss must err toward KEEPING the file.
       final referencedNames = <String>{};
       for (final c in _characters) {
@@ -407,7 +407,7 @@ class CharacterRepository extends ChangeNotifier {
   /// Memo for [coverImageFileFor]: chat message bubbles resolve the cover
   /// on EVERY rebuild (dozens of bubbles × every streaming token batch),
   /// and the uncached path does a synchronous existsSync per call — near
-  /// free on macOS/APFS, but 10-100x slower on Windows where Defender
+  /// free on Linux, but 10-100x slower on Windows where Defender
   /// intercepts file stats. Field-reported as "the app got sluggish" in
   /// the 20260716 nightly. The key embeds the star id and portrait path,
   /// so changing either self-invalidates; mutations also clear the whole

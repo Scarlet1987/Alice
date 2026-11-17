@@ -135,7 +135,6 @@ recomputed in the web layer).
 
 These require a real browser/device and are the only remaining W8 items:
 
-- [ ] **Safari (macOS)** — chat streaming, wizards, Realism/Needs panel.
 - [ ] **Safari (iPadOS)** — tablet master/detail layout; touch.
 - [ ] **Firefox (Windows)** — full pass.
 - [ ] **iOS Safari + Android Chrome** — phone layout (single-pane, drawers), the Realism/Needs sheet.

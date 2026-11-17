@@ -17,7 +17,7 @@
 // support/chat_driver.dart; a CI red here means a real regression.
 //
 // Run it with:
-//   flutter test integration_test/app_smoke_test.dart -d macos   (or windows)
+//   flutter test integration_test/app_smoke_test.dart -d linux   (or windows)
 //
 // DELIBERATELY NOT COVERED (offline constraints, documented honestly):
 //  - RAG/embeddings: the nomic ONNX model is a consent-gated download; there

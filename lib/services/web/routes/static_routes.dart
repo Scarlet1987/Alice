@@ -26,7 +26,7 @@ import 'package:shelf/shelf.dart' as shelf;
 /// routes resolve to index.html. Hashed build assets are cached aggressively;
 /// index.html and the service worker are never cached.
 ///
-/// The asset base is resolved once across dev / macOS bundle / Linux+Windows
+/// The asset base is resolved once across dev / Linux+Windows
 /// layouts (the same locations the legacy WebAssetServer used). This is the
 /// clean-namespace replacement that will fully supersede it at Phase 6 cutover.
 class StaticRoutes {
@@ -147,27 +147,7 @@ class StaticRoutes {
       dir = parent;
     }
 
-    // 2. macOS release bundle (App.framework / Contents/Resources).
-    if (Platform.isMacOS) {
-      final contents = exeDir.parent;
-      for (final fa in [
-        p.join(
-          contents.path,
-          'Frameworks',
-          'App.framework',
-          'Versions',
-          'A',
-          'Resources',
-          'flutter_assets',
-        ),
-        p.join(contents.path, 'Resources', 'flutter_assets'),
-      ]) {
-        final candidate = p.join(fa, 'assets', 'web_app');
-        if (Directory(candidate).existsSync()) return candidate;
-      }
-    }
-
-    // 3. Linux / Windows desktop release: data/flutter_assets next to exe.
+    // 2. Linux / Windows desktop release: data/flutter_assets next to exe.
     final dataAssets = p.join(
       exeDir.path,
       'data',

@@ -106,7 +106,6 @@ The only internet bits, and only if you turn them on:
 ### What computer do I need?
 
 - **Windows** 10 or 11
-- **Mac** — macOS 12 Monterey or newer. Apple Silicon (M1+) can run local models. **Intel Macs cannot.** On Intel, open Settings → Backend and pick **OpenAI-Compatible API** yourself. The app will not do that for you.
 - **Linux** — APT, RPM, AUR, AppImage, `.deb` / `.rpm`
 
 8 GB RAM minimum, 16 GB nicer. A GPU helps. No GPU is fine with a small model or a remote API.

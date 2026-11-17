@@ -180,10 +180,7 @@ docs/Newsletter-Since-March-28-2026.md
 !.claude/skills/flutter-add-integration-test/
 !.claude/skills/path-complete-chat/
 
-# Locally-built fpzip dylib for the native Draw Things client (scripts/build-fpzip-macos.sh)
-tools/fpzip/
-
-# Local build installers at the repo root (scripts/build-macos.sh output) —
+# Local build installers at the repo root —
 # a git add -A once swept a 1.2GB pkg+dmg pair into a commit and the push
 # died at GitHub's file-size wall. Never again.
 /*.pkg

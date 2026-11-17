@@ -279,7 +279,6 @@ class TailscaleProvider {
     const candidates = [
       '/usr/bin/tailscale',
       '/usr/local/bin/tailscale',
-      '/Applications/Tailscale.app/Contents/MacOS/Tailscale',
       r'C:\Program Files\Tailscale\tailscale.exe',
     ];
     for (final c in candidates) {

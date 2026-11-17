@@ -24,7 +24,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:front_porch_ai/app_version.dart';
 import 'package:front_porch_ai/services/security/release_checksums.dart';
-import 'package:front_porch_ai/utils/native_exit.dart';
 
 part 'update_service_download.dart';
 part 'update_service_install.dart';
@@ -35,10 +34,7 @@ part 'update_service_install.dart';
 
 /// Cross-platform self-update service.
 /// Checks GitHub Releases for new versions and downloads/runs the update.
-/// Supports Windows (Inno Setup), Linux (.deb), and macOS (.pkg —
-/// signed+notarized+stapled, the only macOS asset since the unsigned shim
-/// DMG was retired 2026-07-27; binaries old enough to predate the .pkg
-/// updater must manually download once).
+/// Supports Windows (Inno Setup) and Linux (.deb).
 class UpdateService extends ChangeNotifier {
   static const String _repoOwner = 'Scarlet1987';
   static const String _repoName = 'Alice';
@@ -54,10 +50,6 @@ class UpdateService extends ChangeNotifier {
     r'^front-porch-ai_.+_amd64\.deb$',
     caseSensitive: false,
   );
-  // Primary (new canonical) asset names for macOS .pkg releases (signed+notarized).
-  static const String _macosAssetPkg = 'Front_Porch_AI.pkg';
-  static const String _macosAssetBetaPkg = 'Front_Porch_AI_MacOS.pkg';
-  static const String _macosAssetNightlyPkg = 'Front_Porch_AI_Nightly.pkg';
   static const String _prefsKeyAutoCheck = 'update_auto_check';
 
   String _currentVersion = '';
@@ -134,12 +126,6 @@ class UpdateService extends ChangeNotifier {
     if (Platform.isLinux) {
       return Platform.environment.containsKey('APPIMAGE');
     }
-    if (Platform.isMacOS) {
-      // Supported when running as an .app bundle (not flutter run debug).
-      // Check that the executable is inside a .app/Contents/MacOS/ structure.
-      final exe = Platform.resolvedExecutable;
-      return exe.contains('.app/Contents/MacOS/');
-    }
     return false;
   }
 
@@ -169,13 +155,6 @@ class UpdateService extends ChangeNotifier {
     }
     if (Platform.isLinux) {
       return '';
-    }
-    if (Platform.isMacOS) {
-      // .pkg is the only macOS asset (the legacy shim DMG and its fallback
-      // probe were retired 2026-07-27).
-      if (isNightlyBuild) return _macosAssetNightlyPkg;
-      if (isPreRelease) return _macosAssetBetaPkg;
-      return _macosAssetPkg;
     }
     return '';
   }
@@ -273,9 +252,9 @@ class UpdateService extends ChangeNotifier {
       _selectedAssetName = resolvedAssetName ?? _platformAsset;
       _sha256SumsUrl = findChecksumAssetUrl(assets, _selectedAssetName) ?? '';
       _releaseNotes = targetRelease['body'] as String? ?? '';
-      // The friendly "What's New" (including the macOS .pkg+shim transition note)
-      // comes from docs/<Branch>.md (e.g. docs/Rawhide.md) via the CI release_notes
-      // step; it is rendered in the in-app Update Available dialog.
+      // The friendly "What's New" comes from docs/<Branch>.md (e.g.
+      // docs/Rawhide.md) via the CI release_notes step; it is rendered in
+      // the in-app Update Available dialog.
       _updateAvailable = _isNewerVersion(normalizedVersion, _currentVersion);
 
       return _updateAvailable;
@@ -313,7 +292,7 @@ class UpdateService extends ChangeNotifier {
     return null;
   }
 
-  /// Run the update immediately and exit (or relaunch on Linux/macOS).
+  /// Run the update immediately and exit (or relaunch on Linux).
   Future<void> installNow() => _installNowImpl();
 
   /// Run the pending update on app close.

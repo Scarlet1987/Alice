@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:front_porch_ai/services/services.dart';
 
 import 'dt_native/draw_things_native_client.dart';
-import 'dt_native/dt_fpzip.dart';
 import 'dt_native/dt_local_loras.dart';
 
 /// Draw Things gRPC service — the pure-Dart native client
@@ -227,22 +226,6 @@ class DrawThingsGrpcService {
       'DrawThingsGrpcService: generate (model=$model, '
       'loras=${loras.isEmpty ? "none" : loras.map((l) => l['file']).join(',')})',
     );
-
-    // Pre-flight fpzip: generated images arrive as fpzip-compressed NNC
-    // tensors, so without libfpzip the generation would only fail AFTER a
-    // full (possibly minutes-long) render. Releases bundle libfpzip in
-    // Contents/Frameworks/ — missing means broken packaging (or a dev
-    // checkout that hasn't run scripts/build-fpzip-macos.sh).
-    if (!DtFpzip.instance.isAvailable) {
-      EngineHealth.instance.reportFailure(
-        EngineHealth.drawThings,
-        'libfpzip not found — cannot decode generated images',
-      );
-      throw Exception(
-        'libfpzip is missing from this build — Draw Things images cannot '
-        'be decoded (dev checkouts: run scripts/build-fpzip-macos.sh).',
-      );
-    }
 
     final native = DrawThingsNativeClient(host: host, port: port);
     try {

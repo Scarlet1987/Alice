@@ -19,7 +19,7 @@
 // coverage map, P3).
 //
 // Run it with:
-//   flutter test integration_test/message_actions_test.dart -d macos
+//   flutter test integration_test/message_actions_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

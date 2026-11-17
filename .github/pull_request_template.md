@@ -28,10 +28,10 @@ releases only. -->
 ## How was this tested?
 
 <!-- Required. "It compiles" is not testing. Say what you actually ran and saw.
-Front Porch AI ships on Windows, macOS and Linux — tell us which you used, and
+Front Porch AI ships on Windows and Linux — tell us which you used, and
 flag anything you could not verify. -->
 
-Tested on: <!-- Windows / macOS / Linux — and which ones you couldn't check -->
+Tested on: <!-- Windows / Linux — and which ones you couldn't check -->
 
 - [ ] `flutter analyze` is clean
 - [ ] `flutter test` passes

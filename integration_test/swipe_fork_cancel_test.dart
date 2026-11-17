@@ -17,7 +17,7 @@
 //     fork index, and leaves the old session untouched.
 //
 // Run it with:
-//   flutter test integration_test/swipe_fork_cancel_test.dart -d macos
+//   flutter test integration_test/swipe_fork_cancel_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

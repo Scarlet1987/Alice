@@ -15,7 +15,7 @@ will rot, point at the live source instead of pinning it here.
 
 ## Product
 
-Front Porch AI is a Flutter desktop app (Windows / Linux / macOS) for
+Front Porch AI is a Flutter desktop app (Windows / Linux) for
 character chat with local LLMs (KoboldCpp) and optional remote APIs. It
 includes a Realism Engine (emotion / trust / relationship / needs), RAG
 memory via in-process ONNX embeddings, TTS/STT, Porch Stories, **The Stoop**
@@ -54,22 +54,19 @@ flutter test --concurrency=4 --exclude-tags golden
 flutter test test/path/to/file.dart
 flutter test --plain-name "test name"
 
-# Linux-gated pixel goldens (macOS `flutter test` never runs them)
+# Linux-gated pixel goldens (only run on Linux)
 ./scripts/ci-local.sh                 # goldens in the fpai-golden image
 ./scripts/ci-local.sh test | all | update-goldens
 
 # E2E — ONE file per invocation. A directory launch starts a second app
 # while the first still holds the device.
 flutter test integration_test/app_smoke_test.dart -d linux
-# macOS: unset MallocStackLogging MallocStackLoggingNoCompact
-# MallocStackLoggingLite before E2E (even `=0` prints to stderr and
-# corrupts Flutter's isolate JSON).
 
 cd web_ui && npm ci
 cd web_ui && npm run lint && npm test   # CI `web-tests` (tsc + react-hooks eslint + vitest)
 # Web UI in real browsers against the booted app — CI `web-e2e`
 # (once: cd web_ui && npm ci && npx playwright install chromium webkit)
-flutter test integration_test/web_ui/browser_test.dart -d macos
+flutter test integration_test/web_ui/browser_test.dart -d linux
 # FPAI_E2E_HOLD=1 on that command keeps the sandboxed app serving; then
 # `cd web_ui && npm run e2e` with the env in web_ui/e2e/.auth/server.json
 cd web_ui && npm run build              # writes ../assets/web_app — required
@@ -78,7 +75,6 @@ cd web_ui && npm run build              # writes ../assets/web_app — required
 
 flutter build linux
 flutter build windows
-./scripts/build-macos.sh
 ```
 
 CI Flutter is **3.47.0**. Dart SDK constraint is `^3.10.8`.

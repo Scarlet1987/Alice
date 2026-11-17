@@ -278,31 +278,6 @@ extension _SettingsGpuChips on _SettingsPageState {
                 : const Icon(Icons.block, size: 16),
           ),
         ),
-        Tooltip(
-          message: hardwareService.hardwareInfo?.hasMetal == true
-              ? 'Use Metal (Apple Silicon/Mac)'
-              : 'Requires MacOS with Metal support',
-          child: FilterChip(
-            label: const Text('Use Metal (MacOS)'),
-            selected: _useMetal,
-            onSelected: hardwareService.hardwareInfo?.hasMetal == true
-                ? (val) {
-                    rebuildState(() {
-                      _useMetal = val;
-                      if (val) {
-                        _useVulkan = false;
-                        _useCublas = false;
-                        _useRocm = false;
-                      }
-                    });
-                    selectBackend(metal: val);
-                  }
-                : null, // Disabled if not MacOS/Metal
-            avatar: hardwareService.hardwareInfo?.hasMetal == true
-                ? null
-                : const Icon(Icons.block, size: 16),
-          ),
-        ),
       ],
     );
   }

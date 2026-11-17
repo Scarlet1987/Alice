@@ -23,8 +23,7 @@
 // `prefs.set*` calls. On Windows and Linux the shared_preferences store
 // re-encodes the whole preference map and does a SYNCHRONOUS whole-file write
 // per setter, so typing a sentence was thousands of blocking file writes on
-// the UI thread. (Invisible on macOS, which routes to NSUserDefaults — the
-// same platform-asymmetric cost class as the `coverImageFileFor` regression.)
+// the UI thread.
 //
 // The field now debounces the save and flushes any pending one on dispose, so
 // nothing typed is ever lost. `notify()` deliberately stays immediate: the

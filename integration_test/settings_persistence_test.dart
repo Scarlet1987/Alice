@@ -18,7 +18,7 @@
 // hardware-detect trips this suite, whatever its mechanism.
 //
 // Run it with:
-//   flutter test integration_test/settings_persistence_test.dart -d macos
+//   flutter test integration_test/settings_persistence_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart (sandboxed paths,
 // mock prefs, fake OpenAI-compatible backend as a PseudoRemote). See that

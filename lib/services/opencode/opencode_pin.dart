@@ -40,14 +40,12 @@ const kOpenCodeGitHubLatestDownloadBase =
     'releases/latest/download';
 
 String openCodeCurrentOs() {
-  if (Platform.isMacOS) return 'darwin';
   if (Platform.isWindows) return 'windows';
   return 'linux';
 }
 
 String openCodeCurrentArch() {
   switch (Abi.current()) {
-    case Abi.macosArm64:
     case Abi.linuxArm64:
     case Abi.windowsArm64:
       return 'arm64';
@@ -56,7 +54,7 @@ String openCodeCurrentArch() {
   }
 }
 
-/// GitHub layout: Mac/Windows zip, Linux tar.gz. Not musl/baseline.
+/// GitHub layout: Windows zip, Linux tar.gz. Not musl/baseline.
 String openCodeReleaseAssetName({required String os, required String arch}) {
   if (os == 'linux') return 'opencode-linux-$arch.tar.gz';
   return 'opencode-$os-$arch.zip';

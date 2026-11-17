@@ -116,8 +116,6 @@ class NativeEmbeddingEngine {
         Platform.environment['USERPROFILE'] ??
         '';
     return [
-      if (Platform.isMacOS && home.isNotEmpty)
-        p.join(home, 'Library', 'Caches', 'front-porch-ai', 'embeddings'),
       if (Platform.isLinux)
         p.join(
           Platform.environment['XDG_CACHE_HOME'] ??

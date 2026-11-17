@@ -10,7 +10,7 @@
 // can build and wire the world in the first place.
 //
 // Run it with:
-//   flutter test integration_test/worlds_management_test.dart -d macos
+//   flutter test integration_test/worlds_management_test.dart -d linux
 //
 // Isolation contract: identical to app_smoke_test.dart — see its header.
 

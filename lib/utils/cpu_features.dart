@@ -52,6 +52,6 @@ bool cpuHasAvx2() {
   } catch (_) {
     // Fall through to the safe default below.
   }
-  // macOS (arm64-only KoboldCpp release) and any detection failure.
+  // Detection failure: assume AVX2 is present (safe default).
   return true;
 }

@@ -20,7 +20,7 @@ part of 'update_service.dart';
 
 /// Platform install / replace / relaunch after a completed download.
 extension UpdateServiceInstall on UpdateService {
-  /// Run the update immediately and exit (or relaunch on Linux/macOS).
+  /// Run the update immediately and exit (or relaunch on Linux).
   Future<void> _installNowImpl() async {
     if (_pendingInstallerPath == null) return;
     try {
@@ -32,15 +32,10 @@ extension UpdateServiceInstall on UpdateService {
       if (Platform.isLinux) {
         await _replaceAppImage(_pendingInstallerPath!);
         await _relaunchAppImage();
-      } else if (Platform.isMacOS) {
-        await _replaceMacApp(_pendingInstallerPath!);
-        await _relaunchMacApp();
       } else {
         await _launchWindowsInstaller(_pendingInstallerPath!);
       }
-      // macOS must skip C++ finalizers or the install-and-relaunch gets
-      // logged as an "Abort trap: 6" crash (see exitWithoutNativeFinalizers).
-      Platform.isMacOS ? exitWithoutNativeFinalizers(0) : exit(0);
+      exit(0);
     } catch (e) {
       debugPrint('Install now failed: $e');
       rethrow;
@@ -59,8 +54,6 @@ extension UpdateServiceInstall on UpdateService {
       }
       if (Platform.isLinux) {
         await _replaceAppImage(_pendingInstallerPath!);
-      } else if (Platform.isMacOS) {
-        await _replaceMacApp(_pendingInstallerPath!);
       } else {
         await _launchWindowsInstaller(_pendingInstallerPath!);
       }
@@ -144,98 +137,5 @@ extension UpdateServiceInstall on UpdateService {
     if (currentAppImage == null || currentAppImage.isEmpty) return;
     debugPrint('Relaunching AppImage: $currentAppImage');
     await Process.start(currentAppImage, [], mode: ProcessStartMode.detached);
-  }
-
-  /// Get the current .app bundle path from the resolved executable.
-  /// e.g. /Applications/FrontPorchAI.app/Contents/MacOS/front_porch_ai
-  ///   → /Applications/FrontPorchAI.app
-  String get _currentMacAppPath {
-    final exe = Platform.resolvedExecutable;
-    // Walk up from MacOS/binary → Contents → .app
-    return File(exe).parent.parent.parent.path;
-  }
-
-  /// Install the macOS update (.pkg — the only macOS asset since the legacy
-  /// DMG shim path was deleted 2026-07-27 along with the shim builds).
-  /// Spawns a detached shell script that:
-  ///   1. Waits for this process to exit (by PID)
-  ///   2. `open`s the .pkg so the user gets the standard Installer.app flow
-  ///      (one auth prompt, official Apple path, signed+notarized+stapled
-  ///      package installs the new .app to /Applications).
-  ///
-  /// Cleanup (rm of downloaded installer + script) is best-effort after launch
-  /// of the consumer (Installer.app or the new app). This can race on slow disks
-  /// or with detached exit(0) in the parent (errors only visible in system logs
-  /// after the app has exited). For .pkg we deliberately omit payload rm so the
-  /// Installer can manage its temp. Documented limitation per review feedback.
-  Future<void> _replaceMacApp(String installerPath) async {
-    final currentApp = _currentMacAppPath;
-    final appParent = File(currentApp).parent.path;
-    final appName = currentApp.split('/').last;
-    final destPath = '$appParent/$appName';
-    final currentPid = pid; // Current process PID (dart:io top-level getter)
-
-    debugPrint(
-      'macOS update: will handle PKG $installerPath after PID $currentPid exits (replacing $currentApp)',
-    );
-
-    // Compute the output script filename first (it is independent).
-    // Robust wait + cleanup + error to stderr (bash sidecar spirit).
-    // Unique temp dir per install — a predictable path in the shared temp dir
-    // allows symlink planting between write and execute (§3g).
-    final scriptDir = await Directory.systemTemp.createTemp('fpai_update_');
-    final scriptPath = '${scriptDir.path}/fp_update.sh';
-
-    // Defense-in-depth escaping for paths embedded into the generated shell
-    // script (issue #12). Pid is numeric and safe. We use single-quote + ' -> '\''
-    // escaping for the path values so that even if (theoretically) a path
-    // contained a single quote, the generated bash remains correct. Current
-    // values (asset names from GH, dest from resolvedExecutable walk) are
-    // controlled and safe, but this satisfies the nit without changing quoting
-    // style in the templates.
-    String _shellEscape(String p) => p.replaceAll("'", r"'\''");
-    final escInstaller = _shellEscape(installerPath);
-    final escScript = _shellEscape(scriptPath);
-
-    final script =
-        '''#!/bin/bash
-# Wait for the current app process to exit (max 30s)
-for i in {1..60}; do
-  if ! kill -0 $currentPid 2>/dev/null; then
-    break
-  fi
-  sleep 0.5
-done
-
-# Primary .pkg path (signed+notarized+stapled): just hand it to the system
-# Installer. User authenticates in the standard UI; the installer places
-# the new bundle (preserving sidecars etc.) and handles launch.
-open '$escInstaller'
-
-# Clean up the downloaded package and this script (best effort; see race note).
-# For .pkg we omit rm of the payload itself (let Installer.app / system manage
-# the temp file to avoid TOCTOU/race with the launched Installer process).
-rm -f '$escScript' || true
-
-# No explicit relaunch here — Installer.app or the user will start the new app.
-# (The old bundle at $destPath may be replaced in-place by the package.)
-''';
-
-    await File(scriptPath).writeAsString(script);
-    await Process.run('chmod', ['+x', scriptPath]);
-
-    // Launch the script detached — it will outlive this process
-    await Process.start('/bin/bash', [
-      scriptPath,
-    ], mode: ProcessStartMode.detached);
-    debugPrint('macOS update script launched: $scriptPath');
-  }
-
-  /// Relaunch the macOS app after replacing it.
-  /// (Handled by the Installer.app flow the update script launches; kept for
-  /// API symmetry and installOnClose fallback.)
-  Future<void> _relaunchMacApp() async {
-    // The Installer.app flow (opened by the update shell script) handles
-    // placement; the user relaunches from there. Nothing to do here.
   }
 }
